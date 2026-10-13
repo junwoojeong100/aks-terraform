@@ -110,9 +110,12 @@ resource "kubernetes_deployment_v1" "app" {
             }
           }
 
+          # kubernetes provider 는 컨테이너 security_context 에서 생략한 값을 false 로 보냅니다.
+          # run_as_non_root 를 명시하지 않으면 파드 수준의 true 를 덮어써 PSS restricted 에 막힙니다.
           security_context {
             allow_privilege_escalation = false
             read_only_root_filesystem  = true
+            run_as_non_root            = true
 
             capabilities {
               drop = ["ALL"]

@@ -80,11 +80,15 @@ run_quiet() {
 tf_init() { run_quiet terraform -chdir="terraform/$1" init -backend-config=../backend.hcl -input=false -no-color; }
 tf_state() { terraform -chdir="terraform/$1" state list 2>/dev/null; }
 
-# 05-aks state 에 클러스터가 없으면(= 이미 지움) 0
+# 05-aks state 에 클러스터가 없으면(= 이미 지움) 0.
+# `tf_state | grep -q` 는 pipefail 에서 grep 이 먼저 끝나면 terraform 이 SIGPIPE 를 받아 결과가 뒤집히므로(클러스터가 있는데도 "없음"),
+# 출력을 먼저 변수에 담습니다. state 를 읽지 못하면 "아직 있음"(1)으로 봅니다: 읽기 실패를 "이미 지움"으로 오해하지 않기 위해서입니다.
 cluster_gone() {
+  local list
   [ "$dry" -eq 1 ] && return 1
   tf_init 05-aks >/dev/null 2>&1 || return 1
-  ! tf_state 05-aks | grep -q '^azurerm_kubernetes_cluster\.this$'
+  list="$(tf_state 05-aks)" || return 1
+  ! grep -q '^azurerm_kubernetes_cluster\.this$' <<<"$list"
 }
 
 # 클러스터가 이미 없으면 kubernetes provider 가 접속할 수 없으므로, 안에 있던 리소스는 state 에서만 제거합니다.
@@ -109,10 +113,14 @@ unlock_resource_locks() {
   fi
   local unlock=(terraform -chdir=terraform/08-governance destroy -auto-approve -input=false -lock-timeout=300s -no-color
     -target=azurerm_management_lock.network -target=azurerm_management_lock.platform)
+  local locks
   if [ "$dry" -eq 1 ]; then
     info "(잠금이 있을 때만 실행됩니다)"
     run "${unlock[@]}"
-  elif tf_state 08-governance | grep -q '^azurerm_management_lock\.'; then
+  elif ! locks="$(tf_state 08-governance)"; then
+    fail "08-governance 의 state 를 읽지 못해 잠금 여부를 확인할 수 없습니다 (backend.hcl · 로그인을 확인하세요)"
+    return 1
+  elif grep -q '^azurerm_management_lock\.' <<<"$locks"; then
     run "${unlock[@]}" || return 1
   else
     skip "해제할 잠금이 없습니다"
@@ -120,7 +128,7 @@ unlock_resource_locks() {
 }
 
 destroy_stack() {
-  local s="$1"
+  local s="$1" list
   section "destroy $s"
   if [ ! -d "terraform/$s" ]; then
     skip "스택 디렉터리가 없습니다"
@@ -130,9 +138,16 @@ destroy_stack() {
     fail "$s: init 실패 (terraform/backend.hcl 과 ARM_SUBSCRIPTION_ID 를 확인하세요)"
     return 1
   }
-  if [ "$dry" -eq 0 ] && [ -z "$(tf_state "$s")" ]; then
-    skip "$s: state 가 비어 있습니다 (이미 삭제됨)"
-    return 0
+  if [ "$dry" -eq 0 ]; then
+    # state 를 읽지 못한 것을 "비어 있음"으로 오해하면 남아 있는 스택을 건너뛰게 되므로, 읽기 실패는 오류로 처리합니다.
+    list="$(tf_state "$s")" || {
+      fail "$s: state 를 읽지 못했습니다 (terraform/backend.hcl · 로그인 · 네트워크를 확인하세요)"
+      return 1
+    }
+    if [ -z "$list" ]; then
+      skip "$s: state 가 비어 있습니다 (이미 삭제됨)"
+      return 0
+    fi
   fi
   case "$s" in 06-workload | 07-ingress) drop_k8s_state_if_cluster_gone "$s" ;; esac
   if run terraform -chdir="terraform/$s" destroy -auto-approve -input=false -lock-timeout=300s -no-color; then

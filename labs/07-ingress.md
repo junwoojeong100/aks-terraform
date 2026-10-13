@@ -41,6 +41,7 @@
 | NetworkPolicy: **앱 파드는 같은 네임스페이스(`web`)의 파드에서 오는 8080 만 허용** | Cilium 이 강제하는 네임스페이스 단위 격리. Envoy 프록시가 같은 네임스페이스에 만들어지므로 통과합니다. ⚠️ `pod_selector {}` 는 `web` 안의 *모든* 파드를 허용합니다. 더 좁히려면 `kubectl -n web get pods --show-labels` 로 Envoy 파드의 실제 라벨을 확인한 뒤 그 라벨로 제한하세요. (NetworkPolicy 는 앱 파드에만 적용해야 Envoy 의 외부 수신이 막히지 않습니다.) |
 | 네임스페이스 PSS: `baseline` 강제 + `restricted` 경고 | Envoy 프록시 파드가 같은 네임스페이스에 만들어지므로 enforce 는 baseline. |
 | `internal_gateway` 변수 | 공용/내부 노출을 코드 한 줄로 전환. 운영에서는 내부 LB + Application Gateway(WAF) 조합이 일반적입니다. |
+| 공용 Gateway 의 인바운드는 **03-network 노드 NSG** 에서 허용 | Standard LB 는 인바운드가 기본적으로 닫혀 있고, AKS 는 서브넷에 연결한 NSG 에 규칙을 추가하지 않습니다. 03-network 의 `AllowGatewayHttpHttps`(80/443, 출발지 `gateway_allowed_source_prefixes`)가 그 역할을 하며, 내부 Gateway 는 VNet 안 트래픽을 기본 규칙(`AllowVnetInBound`)이 허용합니다. |
 
 ## 코드
 
@@ -263,8 +264,10 @@ resource "kubernetes_deployment_v1" "app" {
             }
           }
 
+          # kubernetes provider 는 컨테이너 security_context 에서 생략한 값을 false 로 보내므로 run_as_non_root 를 명시합니다.
           security_context {
             allow_privilege_escalation = false
+            run_as_non_root            = true
 
             capabilities {
               drop = ["ALL"]
@@ -599,8 +602,8 @@ curl -i "http://$IP/"
 kubectl -n web get pods -l app=aspnetapp -o wide
 kubectl -n web get pods -l app=aspnetapp -o jsonpath='{range .items[*]}{.spec.nodeName}{"\n"}{end}' | sort | uniq -c
 
-# 액세스 로그 (Envoy 기본 활성)
-kubectl -n web logs deploy/web-gateway-approuting-istio --tail=5
+# 액세스 로그 (Envoy 기본 활성, JSON 한 줄). Envoy 파드가 2개라 `deploy/...` 로는 한 파드의 로그만(시작 로그일 수도) 보이므로 라벨로 모두 봅니다
+kubectl -n web logs -l gateway.networking.k8s.io/gateway-name=web-gateway --tail=3 --prefix
 ```
 
 ### 4단계. 동작 실험
@@ -622,7 +625,7 @@ kubectl -n web get gateway web-gateway -o jsonpath='{.status.addresses[0].value}
 
 ### TLS (HTTPS) 로 확장하기
 
-`Gateway` 에 `443/HTTPS` 리스너를 추가하고 `tls.certificateRefs` 로 쿠버네티스 Secret 을 가리킵니다. 인증서는 **Key Vault 에 두고 Secrets Store CSI 의 `secretObjects`** 로 Secret 에 동기화하는 것이 Microsoft 베이스라인 방식입니다(Lab 06 의 SecretProviderClass 패턴과 동일, `Key Vault Certificate User` 역할 필요). 자세한 절차는 [App Routing Gateway API: DNS 와 TLS](https://learn.microsoft.com/azure/aks/app-routing-gateway-api-dns-tls) 를 참고하세요.
+`Gateway` 에 `443/HTTPS` 리스너를 추가하고 `tls.certificateRefs` 로 쿠버네티스 Secret 을 가리킵니다. 노드 NSG(03-network)는 80 과 443 을 이미 허용하므로 NSG 를 고칠 필요가 없습니다. 인증서는 **Key Vault 에 두고 Secrets Store CSI 의 `secretObjects`** 로 Secret 에 동기화하는 것이 Microsoft 베이스라인 방식입니다(Lab 06 의 SecretProviderClass 패턴과 동일, `Key Vault Certificate User` 역할 필요). 자세한 절차는 [App Routing Gateway API: DNS 와 TLS](https://learn.microsoft.com/azure/aks/app-routing-gateway-api-dns-tls) 를 참고하세요.
 
 ### 자동 검증 스크립트
 
@@ -704,7 +707,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then verify_stack; summary; fi
 | `Gateway` 의 `ADDRESS` 가 비어 있음 | LB 프로비저닝 대기(1–3분). `kubectl -n web describe gateway web-gateway` 의 Conditions 와 `kubectl -n web get events` 확인. 공인 IP 쿼터 부족일 수 있습니다. |
 | plan 오류 `no matches for kind "Gateway"` / GatewayClass 없음 | Lab 05 의 `azapi_update_resource.gateway_api` 가 적용되지 않음 (`enable_gateway_api=false` 였는지 확인). `kubectl get gatewayclass`. |
 | `ImagePullBackOff` | `az acr import` 누락(이미지 경로 `demo/aspnetapp:v1`). `kubectl describe pod` 확인. |
-| `curl` 이 타임아웃 | 노드 서브넷 NSG(AKS 가 규칙을 추가하는 데 시간 필요), 내부 Gateway(`internal_gateway=true`)인데 VNet 밖에서 접근, 또는 NetworkPolicy. |
+| `curl` 이 타임아웃 | 03-network 노드 서브넷 NSG 의 `AllowGatewayHttpHttps` 규칙(AKS 는 서브넷에 연결한 NSG 를 수정하지 않으므로 Terraform 이 만든 규칙이 필요)과 `gateway_allowed_source_prefixes` 에 내 IP 가 포함되는지 확인, 내부 Gateway(`internal_gateway=true`)인데 VNet 밖에서 접근, 또는 NetworkPolicy. |
 | HTTPRoute 가 `Accepted: False` | `parentRefs` 이름 불일치 또는 `allowedRoutes`(Same namespace) 위반. |
 
 다음 → [Lab 08. 거버넌스와 보안: Azure Policy · Defender · 예산](08-governance.md)

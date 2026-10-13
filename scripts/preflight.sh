@@ -125,7 +125,9 @@ else
 fi
 
 section "7. 권한 (이 실습은 역할 할당을 많이 만듭니다)"
-me="$(jv "$acct" .user.name)"
+# 게스트/개인(MSA) 계정은 로그인 이름(user.name)으로 조회가 안 되므로 객체 ID 를 우선 씁니다 (서비스 주체는 appId 로 대체).
+me="$(az ad signed-in-user show --query id -o tsv 2>/dev/null)"
+[ -n "$me" ] || me="$(jv "$acct" .user.name)"
 roles="$(az role assignment list --assignee "$me" --all --include-inherited --query '[].roleDefinitionName' -o tsv 2>/dev/null)"
 if printf '%s\n' "$roles" | grep -qx 'Owner'; then
   pass "Owner 역할 보유"

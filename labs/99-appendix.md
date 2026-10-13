@@ -6,21 +6,98 @@
 
 ## A. 이 가이드를 검증한 방법과 한계
 
+### A-1. 정적 검증 (Azure 불필요)
+
 | 검증 | 내용 | 결과 |
 |---|---|---|
 | `terraform fmt -check` | 모든 스택/모듈 | 통과 |
 | `terraform validate` | azurerm 5.9.0 · azapi 2.13.0 · kubernetes 3.3.0 · random 3.9.1 · time 0.14.2 실제 스키마 기준 | 통과 |
-| `terraform test` (mock provider) | 모든 스택의 plan 로직 + 변수 검증(`naming` 모듈 포함 총 <!-- count:test-runs -->28<!-- /count -->개 run) | 통과 |
+| `terraform test` (mock provider) | 모든 스택의 plan 로직 + 변수 검증(`naming` 모듈 포함 총 <!-- count:test-runs -->34<!-- /count -->개 run) | 통과 |
 | AzAPI 본문 검증 | `Microsoft.ContainerService/managedClusters@2026-05-01` 의 속성명을 OpenAPI 스펙과 azapi 내장 스키마로 확인 | 통과 |
 | 내장 정책 정의 ID | `az policy definition show` 로 8개 ID 확인 | 확인 |
 | VM 크기/영역 | `Standard_D4ds_v5` 가 koreacentral 영역 1·2·3 에서 사용 가능한지 확인 | 확인 |
 | 셸 스크립트 정적 검사 | `scripts/` 전체를 `bash -n` 과 ShellCheck 로 검사, macOS 기본 bash 3.2 로도 실행 | 통과 |
-| `scripts/preflight.sh` | 실제 구독에서 **읽기 전용**으로 실행해 도구 · RP · 쿼터 · VM 크기 · 역할 판정 결과를 확인 | 확인 |
-| `scripts/verify.sh` | `az` 가 돌려주는 JSON 의 속성 경로를 같은 종류의 실제 리소스(Storage · VNet · NAT Gateway · ACR · Key Vault · Log Analytics · UAMI · AKS)로 확인. kubectl 단계는 모의 응답으로 로직 확인 | 부분 확인 |
-| `scripts/cleanup.sh` | `--dry-run` 과 모의 terraform 으로 삭제 순서 · 재실행 · 실패 시 중단 · 확인 입력/구독 불일치 같은 안전장치를 확인. **실제 삭제는 실행하지 않음** | 확인 |
 
-> [!WARNING]
-> **실제 Azure 구독에 `apply` 한 결과는 아닙니다.** 리전별 용량(VM/NAT StandardV2), 쿼터, 조직 정책(Management group 의 Azure Policy), preview 기능 상태 등은 환경마다 다를 수 있습니다. 처음에는 `terraform plan` 을 꼼꼼히 읽고, 문제가 있으면 아래 *B. 트러블슈팅 모음* 과 각 Lab 의 *자주 만나는 문제* 를 확인하세요. 같은 이유로 `scripts/verify.sh` 와 `scripts/cleanup.sh` 도 이 가이드의 스택을 실제로 배포한 환경에서는 실행해 보지 못했으므로, 처음에는 `cleanup.sh --dry-run` 으로 계획을 먼저 확인하세요.
+### A-2. 실제 Azure 구독에서 처음부터 끝까지 실행한 결과 (2026-10-13)
+
+정적 검증만으로는 알 수 없는 것을 확인하려고, 문서의 명령을 **Lab 01 부터 Lab 11 까지 순서대로 실제 구독에서 실행**하고 각 Lab 의 `scripts/verify.sh` 로 결과를 확인했습니다. 마지막에 Lab 11 로 모두 삭제했습니다.
+
+| 항목 | 내용 |
+|---|---|
+| 구독 | 개인 Visual Studio Enterprise 구독(Owner), 게스트(개인) 계정으로 로그인, 리전 koreacentral |
+| 도구 | Terraform 1.16.5 · azurerm 5.9.0 · azapi 2.13.0 · kubernetes 3.3.0 · Azure CLI 2.86.0 · kubectl 1.37.1 · kubelogin 0.2.8 (macOS, arm64) |
+| 클러스터 | Standard 1.36.4, Automatic 1.35.8 (`stable` 채널은 N-1) |
+| 쿼터 | 구독 기본값이 패밀리 20 · 전체 32 vCPU 여서 [Lab 01](01-prerequisites.md) §4 의 방법으로 48 · 64 로 늘린 뒤, 기본 구성(D4ds_v5)으로 실행 |
+
+| Lab | 실행한 것 | 결과 |
+|---|---|---|
+| [01](01-prerequisites.md) | 도구 설치(`brew`), RP 등록, 쿼터 · VM 크기 확인, `preflight.sh` | 통과(16/16). 게스트 계정에서 역할 판정이 실패하던 점 수정 |
+| [02](02-bootstrap.md) | naming 테스트, apply(4개, 1분 32초), `backend.hcl`, state 원격 이전, 블롭 조회 · 키 인증 끔 확인, 동시 plan 잠금과 `-lock-timeout`, `verify.sh` | 통과(9/9) |
+| [03](03-network.md) | apply(26개, 2분), 서브넷 · NAT · NSG 확인, `verify.sh`, NSG 실측(아래), `gateway_allowed_source_prefixes` 경로 4가지 | 통과(19/19) |
+| [04](04-platform.md) | apply(18개, 4분), ACR · Key Vault · Private Endpoint · DNS 확인, `az acr import`, Grafana 의 Prometheus 데이터 소스, PromQL `count(up)`, `verify.sh` | 통과(17/17) |
+| [05](05-aks.md) | apply, kubeconfig, 노드 · 애드온 · Gateway API 확인, KQL, Spot 풀 추가 · 제거, private 전환 plan, `az aks command invoke`, `verify.sh` | 통과(33/33). 첫 apply 실패(409 경쟁)를 고침. Spot 스케일 업은 용량 부족으로 미확인 |
+| [06](06-workload-identity.md) | apply, 시크릿 마운트 = Key Vault 값, 토큰 클레임, 2분 자동 갱신, 사설 DNS(10.10.3.x), `verify.sh` | 통과(9/9). 첫 apply 실패(PSS)를 고침 |
+| [07](07-ingress.md) | apply(22초), 공용 Gateway `curl` 200, HPA 3→10, NetworkPolicy 차단, 내부 Gateway(10.10.2.x) 전환 · 복귀, `verify.sh` | 통과(8/8, 내부 모드 7/7 + 건너뜀 1) |
+| [08](08-governance.md) | apply(9개), Gatekeeper 제약 동기화, 준수 상태, Deny 효과, 예산, 잠금(`ScopeLocked`), `verify.sh` | 통과(9, 경고 1). Defender 구독 플랜은 실행하지 않음 |
+| [09](09-operations.md) | 업그레이드 사전 점검, 오토스케일러 상태, vm_size 변경 plan, `az aks stop`(3분) / `start`(5분) | 일부. 업그레이드 자체는 실행하지 못함 |
+| [10](10-aks-automatic.md) | apply(약 9분), NAP · Deployment Safeguards, BYO VNet 으로 다시 만들기(약 11분)와 삭제, `verify.sh` | 통과(10/10) |
+| [11](11-cleanup.md) | `cleanup.sh --dry-run`, 실제 삭제, 정리 확인 | 아래 *A-5* |
+
+**NSG 규칙 실측 (Lab 03).** 규칙을 지우거나 Deny 규칙을 더해 확인한 결과입니다. 처음에는 "Pod CIDR 은 기본 Deny 에 막힌다"고 적었다가 실측과 달라 고쳤습니다.
+
+| 실험 | 결과 |
+|---|---|
+| 노드 NSG 에서 `AllowPodsToPods` 를 지움(기본 규칙만 남김) | 노드 간 Pod 통신과 DNS 는 **정상** → 기본 규칙으로 통과 |
+| 위 상태에서 Pod → Pod Deny(4000)를 추가 | 타임아웃, DNS 실패. `AllowPodsToPods`(110)를 되돌리면 정상 |
+| `AllowGatewayHttpHttps` 를 지움 | 공용 Gateway 접속 불가(타임아웃). 되돌리면 200 → **필수** |
+| API 서버 서브넷 → 노드 Deny 를 추가하고 `AllowApiServerToCluster` 를 지움 | `kubectl exec` 가 `connection reset`. 규칙을 되돌리면 정상 |
+| API 서버 서브넷 → Pod Deny 를 추가하고 규칙을 지움 | Gatekeeper 웹훅 호출은 정상 → Pod 대상은 방어적인 항목 |
+| AKS 가 LB 규칙을 쓰는 곳 | 노드 리소스 그룹의 자체 NSG(NIC 에 연결)에만 `k8s-azure-lb_allow_…` 가 생기고, 서브넷에 연결한 NSG 는 그대로 |
+| `gateway_allowed_source_prefixes` | 기본(`Internet`) · 여러 CIDR(복수 속성) · 한 개(단수 속성) · `[]`(규칙 삭제) 모두 apply 후 plan 이 깨끗 |
+
+### A-3. 실행하다 발견해서 고친 불일치
+
+| # | 위치 | 증상 | 수정 |
+|---|---|---|---|
+| 1 | `05-aks/monitoring.tf` | 첫 apply 가 `409 AnotherOperationInProgress` 로 실패. AzAPI 가 클러스터를 PUT 하는 동안 User 노드 풀 생성과 겹침 | `azapi_update_resource.control_plane_metrics` 가 노드 풀 뒤에 실행되도록 `depends_on` 추가 |
+| 2 | `06-workload/kubernetes.tf`, `07-ingress/app.tf` | `kv-demo` 가 `violates PodSecurity "restricted": runAsNonRoot != true` 로 거부되어 10분 롤아웃 대기 후 실패. kubernetes provider 는 컨테이너 `security_context` 의 생략값을 `false` 로 보내 파드 수준의 `true` 를 덮어씀(07 의 앱 컨테이너도 같은 구성이었음) | 컨테이너 `security_context` 에 `run_as_non_root = true` 명시 |
+| 3 | `scripts/cleanup.sh` | `tf_state \| grep -q` 가 pipefail 에서 SIGPIPE 로 결과가 뒤집혀, 클러스터가 있는데도 "이미 없음"으로 판단하고 06 의 쿠버네티스 리소스를 state 에서 지움. state 읽기 실패를 "비어 있음"으로 오해해 스택을 건너뛸 수도 있었음 | 출력을 먼저 변수에 담고, 읽기 실패는 오류로 처리 |
+| 4 | `scripts/preflight.sh` | 게스트(개인) 계정은 로그인 이름으로 역할을 조회할 수 없어 "역할을 조회하지 못했습니다" 경고 | 로그인한 사용자의 객체 ID 로 조회 |
+| 5 | Lab 01 §4 | 구독 기본 쿼터(예: 패밀리 20 · 전체 32)가 최소 24 vCPU 보다 작을 수 있음 | 필요량 표와 `az quota create` 예시 추가 |
+| 6 | Lab 03, `03-network` 주석 | "Pod CIDR 은 VirtualNetwork 태그에 속하지 않아 기본 Deny 에 막힌다"는 설명이 실측과 다름 | 공용 Gateway 규칙만 필수, Pod · API 서버 규칙은 Deny 를 더할 때 필요한 방어용으로 정정 |
+| 7 | Lab 06 1단계 | `terraform -chdir=../04-platform` 이 저장소 루트에서 실패 | `terraform -chdir=terraform/04-platform` |
+| 8 | Lab 06 3단계 | JWT 를 푸는 `base64 -d` 가 패딩이 없어 macOS 에서 잘림 | python 으로 패딩을 맞춰 디코드 |
+| 9 | Lab 08 3단계 | 시험 파드를 `web` 에 만들면 Pod Security(baseline)가 Gatekeeper 보다 먼저 거부해 문서의 메시지가 나오지 않음 | `default` 네임스페이스에서 시험 |
+| 10 | Lab 07 3단계 | `kubectl logs deploy/…` 는 Envoy 파드 2개 중 하나만 보여 시작 로그가 나올 수 있음 | 라벨 셀렉터 + `--prefix` |
+| 11 | Lab 09 §3 | vm_size 변경 plan 이 `replace` 가 아니라 `updated in-place` 로 표시됨(임시 풀 교체는 apply 중 수행) | 설명 정정 |
+| 12 | Lab 10 2단계 | Automatic 이 1.35 로 만들어져 Gateway API CRD 가 없고 `kubectl get gatewayclass` 가 실패 | 1.36+ 에서만 해당한다는 안내 추가 |
+| 13 | Lab 05 · 08 | plan 리소스 수 표기가 실제와 다름 | Lab 05 는 16 → 15(리소스 그룹 포함), Lab 08 은 정책 할당 8개 + `time_static` 1개 = 9개로 정정 |
+
+### A-4. 확인하지 못했거나 환경에 따라 다른 것
+
+- **Spot 스케일 업(Lab 05 (a))**: 풀 추가 · 제거는 확인했지만, 파드를 올리자 `SkuNotAvailable`(Capacity Restrictions: `Standard_D4ds_v5`)로 노드가 늘지 않았습니다. Spot 용량은 리전 · 시간에 따라 다릅니다.
+- **업그레이드(Lab 09 §1)**: 업그레이드할 GA 버전이 없어서(1.36.4 가 최신 GA, 1.37.0 은 preview, 노드 이미지도 최신) 실행하지 못했습니다. 롤링 교체(surge · PDB)는 미확인입니다.
+- **Defender 구독 플랜(Lab 08 4단계)**: 이 구독에는 이미 켜져 있어 실행하지 않았습니다(Terraform 으로 관리하면 `destroy` 때 Free 로 되돌아가 구독의 기존 설정이 바뀔 수 있습니다). 클러스터 단위 `enable_defender` 만 사용했습니다.
+- **Defender 자동 프로비저닝 정책이 있는 구독**: 클러스터를 만든 직후 한동안 `Updating` 이라 `verify.sh` 의 프로비저닝 상태가 일시적으로 실패하고, 05-aks plan 에 `microsoft_defender` 제거 diff 가 계속 보입니다. `-var enable_defender=true` 로 맞추면 사라집니다([Lab 08](08-governance.md) 2단계).
+- **조직 정책이 Storage 공용 접근을 끄는 구독**: 관리 그룹의 Azure Policy(Modify)가 Storage 계정의 공용 네트워크 접근을 `Disabled` 로 바꾸는 구독에서는 Lab 02 의 원격 state 접근이 `403 AuthorizationFailure` 로 실패했습니다(Terraform 이 `Enabled` 로 만들어도 정책이 바꿈). 이 가이드는 공용 엔드포인트 + Entra 인증을 전제로 하므로, 정책 예외를 받거나 다른 구독을 써야 합니다.
+- **`terraform plan -detailed-exitcode`**: provider 가 `available_kubernetes_versions` 출력 값만 바꿔도 `2` 를 돌려줍니다(실제 인프라 변경 없음). CI 의 "변경 없음" 판정에는 이 값을 무시하세요.
+- **실행하지 않은 것**: Windows(PowerShell) 명령, 다른 리전, 팀 환경(Entra 그룹 `admin_principal_ids`), `enable_private_cluster=true` 로 실제 배포(plan 만), TLS(443) 리스너, Application Gateway for Containers, Grafana 웹 UI 로그인, `az login` 의 대화형 로그인, [Lab 09](09-operations.md) §6 의 GitHub Actions 워크플로 예시.
+- **Azure CLI 간헐 오류**: `az aks get-credentials` 가 `Error loading command module 'serviceconnector': deadlock` 으로 한 번 실패하고 다시 실행하면 성공했습니다(CLI 쪽 문제).
+
+### A-5. 정리 결과 (Lab 11)
+
+| 항목 | 결과 |
+|---|---|
+| `cleanup.sh --dry-run` | 문서와 같은 순서 · 명령으로 계획이 출력됨 |
+| 스택 삭제 | `cleanup.sh --yes` 로 03–10 스택을 삭제했습니다. 오래 걸리는 것은 AKS 클러스터(약 6분), AKS Automatic(약 10분), **Managed Grafana(약 10분)** 이며, 나머지는 몇 초–몇 분입니다 |
+| 부트스트랩 삭제 | 문서대로 backend 블록을 주석 처리하고 `terraform init -migrate-state -force-copy` 로 state 를 로컬로 되돌린 뒤 `cleanup.sh --yes --include-bootstrap` 으로 삭제했습니다(이미 지운 스택은 "state 가 비어 있습니다"로 건너뜀) |
+| 정리 확인 | 태그 `lab=aks-terraform-guide` 리소스 그룹 없음, AKS 노드 리소스 그룹 없음, 리소스 잠금 · 예산 · 정책 할당 없음. 구독의 리소스 그룹과 리소스 수가 실행 전과 같음 |
+| 남은 것 | soft-delete 상태의 Key Vault 1개. purge protection 이 켜져 있어 7일 뒤 자동으로 삭제되며 비용은 없습니다 |
+| Terraform 밖의 부산물 | 실행 중 Azure 가 자동으로 만든 `NetworkWatcherRG` 와 Defender 의 기본 Log Analytics 작업 영역(`DefaultResourceGroup-…`)은 Terraform 이 모르는 리소스라 직접 지웠습니다(작업 영역은 soft-delete 상태에서 복구한 뒤 `--force` 로 완전 삭제) |
+| 실행 중 찾은 문제 | `cleanup.sh` 의 `cluster_gone` 오판(A-3 의 3번). 고친 뒤 SIGPIPE 조건 단위 테스트와 실제 정리로 확인 |
+| 회귀 확인 | 고친 05-aks 를 새로 한 번에 `apply`(15개, 18분 11초)해 409 없이 성공하는 것을 확인한 뒤 다시 삭제 |
+
+구독 단위로는 `Microsoft.Quota` Resource Provider 등록과 vCPU 쿼터 증설(Lab 01 §4)이 남아 있습니다. 둘 다 비용이 없습니다.
 
 ## B. 트러블슈팅 모음
 
@@ -37,6 +114,9 @@
 | `kubectl: Unable to connect ... i/o timeout` | 내 공인 IP 변경 → `TF_VAR_allowed_ip_ranges` 갱신 후 05-aks `apply` (API 서버 authorized IP). |
 | `kubelogin` 오류 / `Unauthorized` | `az login` 재실행, `kubelogin convert-kubeconfig -l azurecli`, Azure RBAC 역할 전파 대기. |
 | `terraform plan` 이 매번 `node_count` 변경을 요구 | 오토스케일러와 충돌. 코드에 `node_count` 를 쓰지 말고 `min_count`/`max_count` 만 사용 ([Lab 09](09-operations.md)). |
+| `409 ... AnotherOperationInProgress` (`azapi_update_resource`) | 같은 클러스터에 대한 다른 작업(노드 풀 생성 등)과 겹친 것입니다. 이 가이드 코드는 `depends_on` 으로 순서를 고정했고, 겹쳤다면 작업이 끝난 뒤 `terraform apply` 를 다시 실행하세요. |
+| `kubernetes_deployment_v1` 이 10분 뒤 `Waiting for rollout to finish` 로 실패 | 파드가 만들어지지 않는 경우입니다. `kubectl -n <네임스페이스> get events` 의 `FailedCreate` 사유를 확인하세요(예: `violates PodSecurity "restricted"` → 컨테이너 `security_context` 의 `run_as_non_root`). |
+| `terraform init -migrate-state` 가 `403 AuthorizationFailure` | 방금 만든 역할 할당이 전파되는 중이면 1–5분 뒤 재시도합니다. 계속되면 `az storage account show -n <계정> --query publicNetworkAccess` 를 확인하세요. `Disabled` 라면 조직 정책이 공용 접근을 꺼 둔 것이라 정책 예외나 다른 구독이 필요합니다. |
 
 ## C. 프로덕션으로 가기 전 체크리스트
 
@@ -513,6 +593,14 @@ kj() { kubectl --request-timeout=20s "$@" -o json 2>/dev/null || true; }
 
 # tf_out 스택 출력이름 : terraform output -raw (값이 없거나 apply 전이면 빈 문자열)
 tf_out() { terraform -chdir="${TF_DIR}/$1" output -raw "$2" 2>/dev/null || true; }
+
+# nodes_nsg_rules 네트워크리소스그룹 : 03-network 의 노드 서브넷 NSG(…-aks-nodes) 규칙을 JSON 으로 가져옵니다 (NSG 가 없으면 빈 문자열)
+nodes_nsg_rules() {
+  local nsg
+  nsg="$(az network nsg list -g "$1" --query "[?ends_with(name, '-aks-nodes')].name | [0]" -o tsv 2>/dev/null)"
+  [ -n "$nsg" ] || return 0
+  azj network nsg rule list -g "$1" --nsg-name "$nsg"
+}
 
 # tf_applied 스택 : 출력이 하나라도 있으면(= init 과 apply 를 마쳤으면) 0
 tf_applied() {

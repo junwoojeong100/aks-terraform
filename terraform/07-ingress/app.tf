@@ -81,8 +81,10 @@ resource "kubernetes_deployment_v1" "app" {
             }
           }
 
+          # kubernetes provider 는 컨테이너 security_context 에서 생략한 값을 false 로 보내므로 run_as_non_root 를 명시합니다.
           security_context {
             allow_privilege_escalation = false
+            run_as_non_root            = true
 
             capabilities {
               drop = ["ALL"]

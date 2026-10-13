@@ -257,7 +257,7 @@ variable "maintenance_utc_offset" {
 }
 
 variable "pod_cidr" {
-  description = "Azure CNI Overlay Pod CIDR. VNet / 온프레미스 대역과 겹치면 안 됩니다."
+  description = "Azure CNI Overlay Pod CIDR. VNet / 온프레미스 대역과 겹치면 안 됩니다. 03-network 의 pod_cidr(노드 NSG 의 허용 규칙)와 같은 값을 쓰세요."
   type        = string
   default     = "10.244.0.0/16"
 }
@@ -711,7 +711,12 @@ resource "azapi_update_resource" "control_plane_metrics" {
     }
   }
 
-  depends_on = [azurerm_monitor_data_collection_rule_association.prometheus]
+  # 같은 클러스터에 대한 PUT 이 노드 풀 생성/변경과 겹치면 409 AnotherOperationInProgress 로 실패하므로 노드 풀 뒤에 실행합니다.
+  depends_on = [
+    azurerm_monitor_data_collection_rule_association.prometheus,
+    azurerm_kubernetes_cluster_node_pool.user,
+    azurerm_kubernetes_cluster_node_pool.spot,
+  ]
 }
 
 # --- Container Insights (로그) -----------------------------------------------------
@@ -1336,7 +1341,7 @@ plan 출력에서 확인할 점:
 
 - `check.kubernetes_version_is_supported` 경고가 없는지 (지원 버전 목록이 출력됩니다)
 - `azurerm_kubernetes_cluster.this` → `network_profile`, `api_server_access_profile`, `identity` 값이 Lab 03/04 결과와 연결되는지
-- 리소스 수: 약 16개 — 클러스터, User 노드 풀, DCE·DCR·DCRA(Prometheus / Container Insights), Prometheus 규칙 그룹 2개, 진단 설정, AzAPI 업데이트 2개, 역할 할당 2개
+- 리소스 수: 15개 — 리소스 그룹, 클러스터, User 노드 풀, DCE 1 · DCR 2 · DCRA 2(Prometheus / Container Insights), Prometheus 규칙 그룹 2개, 진단 설정, AzAPI 업데이트 2개, 역할 할당 2개
 
 ```bash
 terraform apply tfplan        # 클러스터 생성 10~20분 + azapi 업데이트 5~10분
@@ -1438,7 +1443,7 @@ scripts/verify.sh 05-aks
 source "$(dirname "${BASH_SOURCE[0]}")/../lib/common.sh"
 
 verify_stack() {
-  local rg name aks nodes ready want zones gc pods p bad sku channel
+  local rg name aks nodes ready want zones gc pods p bad sku channel netrg podcidr nsgrules
   rg="$(tf_out 05-aks resource_group_name)"
   name="$(tf_out 05-aks cluster_name)"
 
@@ -1474,6 +1479,18 @@ verify_stack() {
   expect_eq "CNI / 모드" "$(jv "$aks" '[.networkProfile.networkPlugin, .networkProfile.networkPluginMode] | join("/")')" "azure/overlay"
   expect_eq "데이터 플레인 / 네트워크 정책" "$(jv "$aks" '[.networkProfile.networkDataplane, .networkProfile.networkPolicy] | join("/")')" "cilium/cilium"
   expect_eq "아웃바운드 방식 (직접 만든 NAT Gateway)" "$(jv "$aks" .networkProfile.outboundType)" "userAssignedNATGateway"
+  # 03-network 의 노드 NSG 는 Pod CIDR 간 인바운드를 허용합니다 (오버레이 Pod 트래픽에도 서브넷 NSG 가 적용됨).
+  # 두 스택의 pod_cidr 가 다르면, 나중에 NSG 에 Deny 규칙을 더하는 순간 노드 간 Pod 통신(DNS 포함)이 막힙니다.
+  netrg="$(tf_out 03-network resource_group_name)"
+  podcidr="$(jv "$aks" .networkProfile.podCidr)"
+  nsgrules=""
+  [ -z "$netrg" ] || nsgrules="$(nodes_nsg_rules "$netrg")"
+  if [ -z "$nsgrules" ]; then
+    skip "03-network 의 노드 NSG 규칙을 읽을 수 없어 Pod CIDR 허용 규칙 확인을 건너뜁니다"
+  else
+    jq_ok "노드 NSG 가 Pod CIDR(${podcidr}) 간 인바운드를 허용 (03-network 와 05-aks 의 pod_cidr 일치)" "$nsgrules" \
+      "any(.[]; .name == \"AllowPodsToPods\" and .access == \"Allow\" and .sourceAddressPrefix == \"$podcidr\" and .destinationAddressPrefix == \"$podcidr\")"
+  fi
   expect_eq "API 서버 VNet Integration" "$(jv "$aks" .apiServerAccessProfile.enableVnetIntegration)" "true"
   if [ "$(jv "$aks" .apiServerAccessProfile.enablePrivateCluster)" = "true" ]; then
     pass "프라이빗 클러스터 (API 서버는 VNet 안에서만 접근)"

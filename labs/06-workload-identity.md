@@ -416,9 +416,12 @@ resource "kubernetes_deployment_v1" "app" {
             }
           }
 
+          # kubernetes provider 는 컨테이너 security_context 에서 생략한 값을 false 로 보냅니다.
+          # run_as_non_root 를 명시하지 않으면 파드 수준의 true 를 덮어써 PSS restricted 에 막힙니다.
           security_context {
             allow_privilege_escalation = false
             read_only_root_filesystem  = true
+            run_as_non_root            = true
 
             capabilities {
               drop = ["ALL"]
@@ -511,7 +514,7 @@ run "plan" {
 ECR 의 *pull through cache* 처럼 외부 이미지를 직접 쓰지 않고 **사설 레지스트리를 경유**하는 것이 Best practice 입니다. (Lab 04 에서 이미 했다면 건너뛰세요.)
 
 ```bash
-ACR=$(terraform -chdir=../04-platform output -raw acr_name)
+ACR=$(terraform -chdir=terraform/04-platform output -raw acr_name)     # 저장소 루트에서 실행
 az acr import -n "$ACR" --source mcr.microsoft.com/cbl-mariner/busybox:2.0 --image demo/busybox:2.0
 ```
 
@@ -547,9 +550,9 @@ az keyvault secret show --vault-name "$(terraform -chdir=../04-platform output -
 kubectl -n demo exec deploy/kv-demo -- env | grep -E "AZURE_"
 #   AZURE_CLIENT_ID / AZURE_TENANT_ID / AZURE_FEDERATED_TOKEN_FILE / AZURE_AUTHORITY_HOST
 
-# 투영된 SA 토큰의 클레임 (iss / sub / aud)
+# 투영된 SA 토큰의 클레임 (iss / sub / aud). JWT 는 base64url 이라 패딩이 없어서 base64 -d 만으로는 잘리는 경우가 있어 python 으로 풉니다.
 kubectl -n demo exec deploy/kv-demo -- cat /var/run/secrets/azure/tokens/azure-identity-token \
-  | cut -d. -f2 | tr '_-' '/+' | base64 -d 2>/dev/null | python3 -m json.tool
+  | python3 -c 'import sys,base64,json; t=sys.stdin.read().strip().split(".")[1]; print(json.dumps(json.loads(base64.urlsafe_b64decode(t + "=" * (-len(t) % 4))), indent=2))'
 ```
 
 `iss` 는 `oidc_issuer_url`, `sub` 는 `system:serviceaccount:demo:workload-sa`, `aud` 는 `api://AzureADTokenExchange` 이며, 이 세 값이 Federated credential 과 일치해야 토큰 교환이 성공합니다.

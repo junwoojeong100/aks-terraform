@@ -68,14 +68,14 @@
 <text x="366" y="148" font-size="14" class="dg-t dg-b" data-w="266">snet-aks-nodes</text>
 <text x="366" y="166" font-size="11.5" class="dg-m" data-w="266">10.10.0.0/24 · 노드 IP 전용</text>
 <text x="366" y="182.5" font-size="11.5" class="dg-m" data-w="266">Pod 는 오버레이(10.244.0.0/16)라 IP 미사용</text>
-<text x="366" y="199" font-size="11.5" class="dg-m" data-w="266">NSG + NAT Gateway 연결</text>
-<text x="366" y="215.5" font-size="11.5" class="dg-m" data-w="266">기본 아웃바운드 접근 비활성화</text>
+<text x="366" y="199" font-size="11.5" class="dg-m" data-w="266">NSG: Pod · API 서버 · Gateway 인바운드 허용</text>
+<text x="366" y="215.5" font-size="11.5" class="dg-m" data-w="266">NAT Gateway 연결 · 기본 아웃바운드 비활성화</text>
 <rect x="44" y="270" width="290" height="124" rx="10" class="dg-box dg-net"/>
 <text x="56" y="294" font-size="14" class="dg-t dg-b" data-w="266">snet-ingress</text>
 <text x="56" y="312" font-size="11.5" class="dg-m" data-w="266">10.10.2.0/27</text>
 <text x="56" y="328.5" font-size="11.5" class="dg-m" data-w="266">내부 로드밸런서 프런트엔드 IP</text>
 <text x="56" y="345" font-size="11.5" class="dg-m" data-w="266">(internal_gateway = true 일 때)</text>
-<text x="56" y="361.5" font-size="11.5" class="dg-m" data-w="266">NSG 연결</text>
+<text x="56" y="361.5" font-size="11.5" class="dg-m" data-w="266">NSG 연결 (트래픽은 노드 NSG 가 평가)</text>
 <rect x="354" y="270" width="290" height="124" rx="10" class="dg-box dg-net"/>
 <text x="366" y="294" font-size="14" class="dg-t dg-b" data-w="266">snet-private-endpoints</text>
 <text x="366" y="312" font-size="11.5" class="dg-m" data-w="266">10.10.3.0/27</text>

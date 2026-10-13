@@ -336,7 +336,7 @@ figure.code.shell figcaption .file::before { content: '$ '; color: var(--hl-var)
 </header>
 <div class="progress"></div>
 <div class="layout">
-  <nav class="sidebar" aria-label="목차"><h4>시작하기</h4><a class="lab-link" data-lab="readme" href="#lab-readme"><span class="num">★</span><span>개요 · 학습 경로</span></a><div class="sub"><a href="#readme--기준-버전-2026-10-13">기준 버전 (2026-10-13)</a><a href="#readme--학습-경로">학습 경로</a><a href="#readme--아키텍처-개요">아키텍처 개요</a><a href="#readme--빠른-시작">빠른 시작</a><a href="#readme--실습-스크립트">실습 스크립트</a><a href="#readme--저장소-구조">저장소 구조</a><a href="#readme--검증과-html-재생성">검증과 HTML 재생성</a><a href="#readme--참고-자료">참고 자료</a></div><a class="lab-link" data-lab="00-aws-azure-mapping" href="#lab-00-aws-azure-mapping"><span class="num">00</span><span>AWS ↔ Azure 인프라 서비스 비교 (EKS 경험자용)</span></a><div class="sub"><a href="#00-aws-azure-mapping--1-먼저-바꿔야-할-사고방식-10가지">1. 먼저 바꿔야 할 사고방식 10가지</a><a href="#00-aws-azure-mapping--2-조직계정리전">2. 조직·계정·리전</a><a href="#00-aws-azure-mapping--3-네트워킹">3. 네트워킹</a><a href="#00-aws-azure-mapping--4-id권한시크릿">4. ID·권한·시크릿</a><a href="#00-aws-azure-mapping--5-컨테이너쿠버네티스-eks-aks">5. 컨테이너·쿠버네티스 (EKS ↔ AKS)</a><a href="#00-aws-azure-mapping--6-스토리지상태-저장">6. 스토리지·상태 저장</a><a href="#00-aws-azure-mapping--7-비용-관리">7. 비용 관리</a><a href="#00-aws-azure-mapping--8-terraform-관점의-차이">8. Terraform 관점의 차이</a><a href="#00-aws-azure-mapping--9-명령어-치트시트">9. 명령어 치트시트</a><a href="#00-aws-azure-mapping--10-이-실습이-따르는-best-practice-요약">10. 이 실습이 따르는 Best Practice (요약)</a></div><a class="lab-link" data-lab="01-prerequisites" href="#lab-01-prerequisites"><span class="num">01</span><span>Lab 01. 사전 준비: 도구, 로그인, 권한, 환경 변수</span></a><div class="sub"><a href="#01-prerequisites--이번-실습의-목표">이번 실습의 목표</a><a href="#01-prerequisites--1-도구-설치">1. 도구 설치</a><a href="#01-prerequisites--2-로그인과-구독-선택">2. 로그인과 구독 선택</a><a href="#01-prerequisites--3-resource-provider-등록">3. Resource Provider 등록</a><a href="#01-prerequisites--4-vcpu-쿼터-확인">4. vCPU 쿼터 확인</a><a href="#01-prerequisites--5-환경-변수-설정">5. 환경 변수 설정</a><a href="#01-prerequisites--6-한-번에-점검하기-preflight-스크립트">6. 한 번에 점검하기: preflight 스크립트</a><a href="#01-prerequisites--7-저장소-구조">7. 저장소 구조</a><a href="#01-prerequisites--8-선택-azure-없이-코드-검증하기">8. (선택) Azure 없이 코드 검증하기</a><a href="#01-prerequisites--9-비용-안내-대략적인-추정">9. 비용 안내 (대략적인 추정)</a></div><h4>Part 1 · 기반 구축</h4><a class="lab-link" data-lab="02-bootstrap" href="#lab-02-bootstrap"><span class="num">02</span><span>Lab 02. Terraform 원격 State: S3 + DynamoDB ↔ Blob Storage</span></a><div class="sub"><a href="#02-bootstrap--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#02-bootstrap--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#02-bootstrap--공통-모듈-modulesnaming">공통 모듈: modules/naming</a><a href="#02-bootstrap--부트스트랩-스택-코드">부트스트랩 스택 코드</a><a href="#02-bootstrap--실습-따라하기">실습 따라하기</a><a href="#02-bootstrap--이후-모든-스택에서-쓰는-init-패턴">이후 모든 스택에서 쓰는 init 패턴</a><a href="#02-bootstrap--자주-만나는-문제">자주 만나는 문제</a></div><a class="lab-link" data-lab="03-network" href="#lab-03-network"><span class="num">03</span><span>Lab 03. 네트워크: VNet · NSG · NAT Gateway · Private DNS</span></a><div class="sub"><a href="#03-network--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#03-network--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#03-network--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#03-network--코드">코드</a><a href="#03-network--실습-따라하기">실습 따라하기</a><a href="#03-network--자주-만나는-문제">자주 만나는 문제</a></div><a class="lab-link" data-lab="04-platform" href="#lab-04-platform"><span class="num">04</span><span>Lab 04. 플랫폼 서비스: ACR · Key Vault · 모니터링 · AKS 용 ID</span></a><div class="sub"><a href="#04-platform--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#04-platform--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#04-platform--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#04-platform--코드">코드</a><a href="#04-platform--실습-따라하기">실습 따라하기</a><a href="#04-platform--자주-만나는-문제">자주 만나는 문제</a></div><h4>Part 2 · AKS 클러스터</h4><a class="lab-link" data-lab="05-aks" href="#lab-05-aks"><span class="num">05</span><span>Lab 05. AKS 클러스터 (Standard): EKS 와 무엇이 다른가</span></a><div class="sub"><a href="#05-aks--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#05-aks--eks-경험자를-위한-비교">EKS 경험자를 위한 비교</a><a href="#05-aks--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#05-aks--코드">코드</a><a href="#05-aks--실습-따라하기">실습 따라하기</a><a href="#05-aks--심화-실험">심화 실험</a><a href="#05-aks--자주-만나는-문제">자주 만나는 문제</a></div><a class="lab-link" data-lab="06-workload-identity" href="#lab-06-workload-identity"><span class="num">06</span><span>Lab 06. Workload Identity + Key Vault CSI: IRSA 의 Azure 버전</span></a><div class="sub"><a href="#06-workload-identity--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#06-workload-identity--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#06-workload-identity--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#06-workload-identity--코드">코드</a><a href="#06-workload-identity--실습-따라하기">실습 따라하기</a><a href="#06-workload-identity--자주-만나는-문제">자주 만나는 문제</a></div><a class="lab-link" data-lab="07-ingress" href="#lab-07-ingress"><span class="num">07</span><span>Lab 07. 인그레스: ALB Controller → Gateway API (approuting-istio)</span></a><div class="sub"><a href="#07-ingress--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#07-ingress--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#07-ingress--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#07-ingress--코드">코드</a><a href="#07-ingress--실습-따라하기">실습 따라하기</a><a href="#07-ingress--자주-만나는-문제">자주 만나는 문제</a></div><h4>Part 3 · 거버넌스 · 운영</h4><a class="lab-link" data-lab="08-governance" href="#lab-08-governance"><span class="num">08</span><span>Lab 08. 거버넌스와 보안: Azure Policy · Defender · 잠금 · 예산</span></a><div class="sub"><a href="#08-governance--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#08-governance--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#08-governance--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#08-governance--코드">코드</a><a href="#08-governance--실습-따라하기">실습 따라하기</a><a href="#08-governance--자주-만나는-문제">자주 만나는 문제</a></div><a class="lab-link" data-lab="09-operations" href="#lab-09-operations"><span class="num">09</span><span>Lab 09. Day-2 운영: 업그레이드 · 스케일링 · 노드 교체 · 테스트</span></a><div class="sub"><a href="#09-operations--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#09-operations--1-업그레이드-전략">1. 업그레이드 전략</a><a href="#09-operations--2-스케일링">2. 스케일링</a><a href="#09-operations--3-노드-풀-변경과-교체">3. 노드 풀 변경과 교체</a><a href="#09-operations--4-비용을-아끼는-운영-습관">4. 비용을 아끼는 운영 습관</a><a href="#09-operations--5-백업-재해-복구-개념">5. 백업 · 재해 복구 (개념)</a><a href="#09-operations--6-terraform-코드-품질과-ci">6. Terraform 코드 품질과 CI</a></div><a class="lab-link" data-lab="10-aks-automatic" href="#lab-10-aks-automatic"><span class="num">10</span><span>Lab 10. AKS Automatic: EKS Auto Mode 에 해당하는 &quot;운영까지 맡기는&quot; 모드</span></a><div class="sub"><a href="#10-aks-automatic--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#10-aks-automatic--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#10-aks-automatic--standard-vs-automatic-무엇을-고를까">Standard vs Automatic: 무엇을 고를까</a><a href="#10-aks-automatic--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#10-aks-automatic--코드">코드</a><a href="#10-aks-automatic--실습-따라하기">실습 따라하기</a><a href="#10-aks-automatic--자주-만나는-문제">자주 만나는 문제</a></div><a class="lab-link" data-lab="11-cleanup" href="#lab-11-cleanup"><span class="num">11</span><span>Lab 11. 정리: 비용이 새지 않게 모두 삭제하기</span></a><div class="sub"><a href="#11-cleanup--가장-쉬운-방법-정리-스크립트">가장 쉬운 방법: 정리 스크립트</a><a href="#11-cleanup--삭제-순서-생성의-역순">삭제 순서 (생성의 역순)</a><a href="#11-cleanup--사전-점검-잠금과-구독-단위-설정">사전 점검 (잠금과 구독 단위 설정)</a><a href="#11-cleanup--1단계-스택별-destroy">1단계. 스택별 destroy</a><a href="#11-cleanup--2단계-부트스트랩state-저장소-삭제">2단계. 부트스트랩(state 저장소) 삭제</a><a href="#11-cleanup--3단계-정리-확인">3단계. 정리 확인</a><a href="#11-cleanup--비상-정리-terraform-이-실패할-때">비상 정리 (Terraform 이 실패할 때)</a><a href="#11-cleanup--비용-확인">비용 확인</a></div><h4>부록</h4><a class="lab-link" data-lab="99-appendix" href="#lab-99-appendix"><span class="num">A</span><span>부록. 트러블슈팅 · 프로덕션 체크리스트 · 참고 자료 · 테스트 코드</span></a><div class="sub"><a href="#99-appendix--a-이-가이드를-검증한-방법과-한계">A. 이 가이드를 검증한 방법과 한계</a><a href="#99-appendix--b-트러블슈팅-모음">B. 트러블슈팅 모음</a><a href="#99-appendix--c-프로덕션으로-가기-전-체크리스트">C. 프로덕션으로 가기 전 체크리스트</a><a href="#99-appendix--d-참고-자료">D. 참고 자료</a><a href="#99-appendix--e-terraform-파일-전체-목록-어느-lab-에-있나">E. Terraform 파일 전체 목록 (어느 Lab 에 있나)</a><a href="#99-appendix--f-테스트도구-코드-전체">F. 테스트/도구 코드 전체</a><a href="#99-appendix--g-검증-정리-스크립트">G. 검증 · 정리 스크립트</a></div></nav>
+  <nav class="sidebar" aria-label="목차"><h4>시작하기</h4><a class="lab-link" data-lab="readme" href="#lab-readme"><span class="num">★</span><span>개요 · 학습 경로</span></a><div class="sub"><a href="#readme--기준-버전-2026-10-13">기준 버전 (2026-10-13)</a><a href="#readme--학습-경로">학습 경로</a><a href="#readme--아키텍처-개요">아키텍처 개요</a><a href="#readme--빠른-시작">빠른 시작</a><a href="#readme--실습-스크립트">실습 스크립트</a><a href="#readme--저장소-구조">저장소 구조</a><a href="#readme--검증과-html-재생성">검증과 HTML 재생성</a><a href="#readme--참고-자료">참고 자료</a></div><a class="lab-link" data-lab="00-aws-azure-mapping" href="#lab-00-aws-azure-mapping"><span class="num">00</span><span>AWS ↔ Azure 인프라 서비스 비교 (EKS 경험자용)</span></a><div class="sub"><a href="#00-aws-azure-mapping--1-먼저-바꿔야-할-사고방식-10가지">1. 먼저 바꿔야 할 사고방식 10가지</a><a href="#00-aws-azure-mapping--2-조직계정리전">2. 조직·계정·리전</a><a href="#00-aws-azure-mapping--3-네트워킹">3. 네트워킹</a><a href="#00-aws-azure-mapping--4-id권한시크릿">4. ID·권한·시크릿</a><a href="#00-aws-azure-mapping--5-컨테이너쿠버네티스-eks-aks">5. 컨테이너·쿠버네티스 (EKS ↔ AKS)</a><a href="#00-aws-azure-mapping--6-스토리지상태-저장">6. 스토리지·상태 저장</a><a href="#00-aws-azure-mapping--7-비용-관리">7. 비용 관리</a><a href="#00-aws-azure-mapping--8-terraform-관점의-차이">8. Terraform 관점의 차이</a><a href="#00-aws-azure-mapping--9-명령어-치트시트">9. 명령어 치트시트</a><a href="#00-aws-azure-mapping--10-이-실습이-따르는-best-practice-요약">10. 이 실습이 따르는 Best Practice (요약)</a></div><a class="lab-link" data-lab="01-prerequisites" href="#lab-01-prerequisites"><span class="num">01</span><span>Lab 01. 사전 준비: 도구, 로그인, 권한, 환경 변수</span></a><div class="sub"><a href="#01-prerequisites--이번-실습의-목표">이번 실습의 목표</a><a href="#01-prerequisites--1-도구-설치">1. 도구 설치</a><a href="#01-prerequisites--2-로그인과-구독-선택">2. 로그인과 구독 선택</a><a href="#01-prerequisites--3-resource-provider-등록">3. Resource Provider 등록</a><a href="#01-prerequisites--4-vcpu-쿼터-확인">4. vCPU 쿼터 확인</a><a href="#01-prerequisites--5-환경-변수-설정">5. 환경 변수 설정</a><a href="#01-prerequisites--6-한-번에-점검하기-preflight-스크립트">6. 한 번에 점검하기: preflight 스크립트</a><a href="#01-prerequisites--7-저장소-구조">7. 저장소 구조</a><a href="#01-prerequisites--8-선택-azure-없이-코드-검증하기">8. (선택) Azure 없이 코드 검증하기</a><a href="#01-prerequisites--9-비용-안내-대략적인-추정">9. 비용 안내 (대략적인 추정)</a></div><h4>Part 1 · 기반 구축</h4><a class="lab-link" data-lab="02-bootstrap" href="#lab-02-bootstrap"><span class="num">02</span><span>Lab 02. Terraform 원격 State: S3 + DynamoDB ↔ Blob Storage</span></a><div class="sub"><a href="#02-bootstrap--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#02-bootstrap--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#02-bootstrap--공통-모듈-modulesnaming">공통 모듈: modules/naming</a><a href="#02-bootstrap--부트스트랩-스택-코드">부트스트랩 스택 코드</a><a href="#02-bootstrap--실습-따라하기">실습 따라하기</a><a href="#02-bootstrap--이후-모든-스택에서-쓰는-init-패턴">이후 모든 스택에서 쓰는 init 패턴</a><a href="#02-bootstrap--자주-만나는-문제">자주 만나는 문제</a></div><a class="lab-link" data-lab="03-network" href="#lab-03-network"><span class="num">03</span><span>Lab 03. 네트워크: VNet · NSG · NAT Gateway · Private DNS</span></a><div class="sub"><a href="#03-network--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#03-network--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#03-network--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#03-network--nsg-인바운드-규칙">NSG 인바운드 규칙</a><a href="#03-network--코드">코드</a><a href="#03-network--실습-따라하기">실습 따라하기</a><a href="#03-network--자주-만나는-문제">자주 만나는 문제</a></div><a class="lab-link" data-lab="04-platform" href="#lab-04-platform"><span class="num">04</span><span>Lab 04. 플랫폼 서비스: ACR · Key Vault · 모니터링 · AKS 용 ID</span></a><div class="sub"><a href="#04-platform--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#04-platform--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#04-platform--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#04-platform--코드">코드</a><a href="#04-platform--실습-따라하기">실습 따라하기</a><a href="#04-platform--자주-만나는-문제">자주 만나는 문제</a></div><h4>Part 2 · AKS 클러스터</h4><a class="lab-link" data-lab="05-aks" href="#lab-05-aks"><span class="num">05</span><span>Lab 05. AKS 클러스터 (Standard): EKS 와 무엇이 다른가</span></a><div class="sub"><a href="#05-aks--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#05-aks--eks-경험자를-위한-비교">EKS 경험자를 위한 비교</a><a href="#05-aks--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#05-aks--코드">코드</a><a href="#05-aks--실습-따라하기">실습 따라하기</a><a href="#05-aks--심화-실험">심화 실험</a><a href="#05-aks--자주-만나는-문제">자주 만나는 문제</a></div><a class="lab-link" data-lab="06-workload-identity" href="#lab-06-workload-identity"><span class="num">06</span><span>Lab 06. Workload Identity + Key Vault CSI: IRSA 의 Azure 버전</span></a><div class="sub"><a href="#06-workload-identity--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#06-workload-identity--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#06-workload-identity--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#06-workload-identity--코드">코드</a><a href="#06-workload-identity--실습-따라하기">실습 따라하기</a><a href="#06-workload-identity--자주-만나는-문제">자주 만나는 문제</a></div><a class="lab-link" data-lab="07-ingress" href="#lab-07-ingress"><span class="num">07</span><span>Lab 07. 인그레스: ALB Controller → Gateway API (approuting-istio)</span></a><div class="sub"><a href="#07-ingress--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#07-ingress--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#07-ingress--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#07-ingress--코드">코드</a><a href="#07-ingress--실습-따라하기">실습 따라하기</a><a href="#07-ingress--자주-만나는-문제">자주 만나는 문제</a></div><h4>Part 3 · 거버넌스 · 운영</h4><a class="lab-link" data-lab="08-governance" href="#lab-08-governance"><span class="num">08</span><span>Lab 08. 거버넌스와 보안: Azure Policy · Defender · 잠금 · 예산</span></a><div class="sub"><a href="#08-governance--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#08-governance--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#08-governance--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#08-governance--코드">코드</a><a href="#08-governance--실습-따라하기">실습 따라하기</a><a href="#08-governance--자주-만나는-문제">자주 만나는 문제</a></div><a class="lab-link" data-lab="09-operations" href="#lab-09-operations"><span class="num">09</span><span>Lab 09. Day-2 운영: 업그레이드 · 스케일링 · 노드 교체 · 테스트</span></a><div class="sub"><a href="#09-operations--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#09-operations--1-업그레이드-전략">1. 업그레이드 전략</a><a href="#09-operations--2-스케일링">2. 스케일링</a><a href="#09-operations--3-노드-풀-변경과-교체">3. 노드 풀 변경과 교체</a><a href="#09-operations--4-비용을-아끼는-운영-습관">4. 비용을 아끼는 운영 습관</a><a href="#09-operations--5-백업-재해-복구-개념">5. 백업 · 재해 복구 (개념)</a><a href="#09-operations--6-terraform-코드-품질과-ci">6. Terraform 코드 품질과 CI</a></div><a class="lab-link" data-lab="10-aks-automatic" href="#lab-10-aks-automatic"><span class="num">10</span><span>Lab 10. AKS Automatic: EKS Auto Mode 에 해당하는 &quot;운영까지 맡기는&quot; 모드</span></a><div class="sub"><a href="#10-aks-automatic--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#10-aks-automatic--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#10-aks-automatic--standard-vs-automatic-무엇을-고를까">Standard vs Automatic: 무엇을 고를까</a><a href="#10-aks-automatic--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#10-aks-automatic--코드">코드</a><a href="#10-aks-automatic--실습-따라하기">실습 따라하기</a><a href="#10-aks-automatic--자주-만나는-문제">자주 만나는 문제</a></div><a class="lab-link" data-lab="11-cleanup" href="#lab-11-cleanup"><span class="num">11</span><span>Lab 11. 정리: 비용이 새지 않게 모두 삭제하기</span></a><div class="sub"><a href="#11-cleanup--가장-쉬운-방법-정리-스크립트">가장 쉬운 방법: 정리 스크립트</a><a href="#11-cleanup--삭제-순서-생성의-역순">삭제 순서 (생성의 역순)</a><a href="#11-cleanup--사전-점검-잠금과-구독-단위-설정">사전 점검 (잠금과 구독 단위 설정)</a><a href="#11-cleanup--1단계-스택별-destroy">1단계. 스택별 destroy</a><a href="#11-cleanup--2단계-부트스트랩state-저장소-삭제">2단계. 부트스트랩(state 저장소) 삭제</a><a href="#11-cleanup--3단계-정리-확인">3단계. 정리 확인</a><a href="#11-cleanup--비상-정리-terraform-이-실패할-때">비상 정리 (Terraform 이 실패할 때)</a><a href="#11-cleanup--비용-확인">비용 확인</a></div><h4>부록</h4><a class="lab-link" data-lab="99-appendix" href="#lab-99-appendix"><span class="num">A</span><span>부록. 트러블슈팅 · 프로덕션 체크리스트 · 참고 자료 · 테스트 코드</span></a><div class="sub"><a href="#99-appendix--a-이-가이드를-검증한-방법과-한계">A. 이 가이드를 검증한 방법과 한계</a><a href="#99-appendix--b-트러블슈팅-모음">B. 트러블슈팅 모음</a><a href="#99-appendix--c-프로덕션으로-가기-전-체크리스트">C. 프로덕션으로 가기 전 체크리스트</a><a href="#99-appendix--d-참고-자료">D. 참고 자료</a><a href="#99-appendix--e-terraform-파일-전체-목록-어느-lab-에-있나">E. Terraform 파일 전체 목록 (어느 Lab 에 있나)</a><a href="#99-appendix--f-테스트도구-코드-전체">F. 테스트/도구 코드 전체</a><a href="#99-appendix--g-검증-정리-스크립트">G. 검증 · 정리 스크립트</a></div></nav>
   <main class="content">
     <div class="content-inner">
       <div class="hero">
@@ -364,7 +364,7 @@ figure.code.shell figcaption .file::before { content: '$ '; color: var(--hl-var)
 </tr>
 </tbody></table>
 </div>
-<aside class="callout important"><div class="callout-title"><span>❗</span><span>중요</span></div><p>이 가이드의 코드는 <strong>정적 검증</strong>(<code>terraform fmt</code>, <code>validate</code>, mock provider 기반 <code>terraform test</code>)까지 마친 상태입니다. 실제 Azure 구독에 <code>apply</code> 해서 확인한 결과가 아니므로, 처음 실행할 때는 <code>terraform plan</code> 결과를 꼭 읽어 보세요. 실습 후에는 <a href="#lab-11-cleanup">Lab 11</a> 로 반드시 정리하세요(클러스터를 켜 둔 채 방치하면 비용이 계속 발생합니다).</p>
+<aside class="callout important"><div class="callout-title"><span>❗</span><span>중요</span></div><p>이 가이드의 코드는 <strong>정적 검증</strong>(<code>terraform fmt</code>, <code>validate</code>, mock provider 기반 <code>terraform test</code>)에 더해, 2026-10-13 에 <strong>실제 Azure 구독에서 Lab 01–11 을 처음부터 끝까지 실행</strong>해 확인했습니다. 그때 발견한 불일치는 고쳤고, 확인하지 못한 항목(Spot 스케일 업, 업그레이드 실행 등)은 <a href="#lab-99-appendix">부록 A</a>에 적어 두었습니다. 구독의 쿼터 · 조직 정책 · 리전 용량에 따라 결과가 다를 수 있으니 처음 실행할 때는 <code>terraform plan</code> 결과를 꼭 읽어 보세요. 실습 후에는 <a href="#lab-11-cleanup">Lab 11</a> 로 반드시 정리하세요(클러스터를 켜 둔 채 방치하면 비용이 계속 발생합니다).</p>
 </aside>
 <h2 id="readme--기준-버전-2026-10-13">기준 버전 (2026-10-13)<a class="anchor" href="#readme--기준-버전-2026-10-13" aria-label="이 제목 링크">#</a></h2>
 <div class="table-wrap"><table>
@@ -1880,6 +1880,27 @@ Microsoft.Security Microsoft.Authorization Microsoft.Consumption Microsoft.CostM
 <span class="hljs-keyword">for</span> rp <span class="hljs-keyword">in</span> <span class="hljs-variable">$RPS</span>; <span class="hljs-keyword">do</span> <span class="hljs-built_in">printf</span> <span class="hljs-string">&quot;%-36s %s\n&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$rp</span>&quot;</span> <span class="hljs-string">&quot;<span class="hljs-subst">$(az provider show -n <span class="hljs-string">&quot;<span class="hljs-variable">$rp</span>&quot;</span> --query registrationState -o tsv)</span>&quot;</span>; <span class="hljs-keyword">done</span></code></pre></div></figure>
 <h2 id="01-prerequisites--4-vcpu-쿼터-확인">4. vCPU 쿼터 확인<a class="anchor" href="#01-prerequisites--4-vcpu-쿼터-확인" aria-label="이 제목 링크">#</a></h2>
 <p>기본 구성은 <strong>D4ds_v5 (4 vCPU)</strong> 노드를 최소 6대(System 3 + User 3) 쓰고, 업그레이드 시 임시 노드(surge)가 더 생깁니다. 권장 여유는 <strong>40 vCPU</strong> 입니다(최소 24 vCPU + surge 분).</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>쿼터 (<code>az vm list-usage</code> 의 이름)</th>
+<th>필요량</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>standardDDSv5Family</code> (D4ds_v5 의 패밀리 쿼터)</td>
+<td>6대 = 24 → 업그레이드 surge 포함 28 → 오토스케일 최대(System 5 + User 6 = 11대) 44</td>
+</tr>
+<tr>
+<td><code>cores</code> (Total Regional vCPUs, 모든 패밀리의 합계)</td>
+<td>위 값 + Lab 10 의 AKS Automatic 노드(약 8)를 함께 쓰면 36 이상</td>
+</tr>
+<tr>
+<td>Spot vCPUs (선택: Lab 05 의 Spot 풀)</td>
+<td>5대 × 4 = 20. 일반 vCPU 쿼터와 별도로 계산됩니다</td>
+</tr>
+</tbody></table>
+</div>
 <figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 5줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">az vm list-usage --location koreacentral \
   --query <span class="hljs-string">&quot;[?name.value==&#x27;cores&#x27; || name.value==&#x27;standardDDSv5Family&#x27;].{name:name.localizedValue, used:currentValue, limit:limit}&quot;</span> -o table
 
@@ -1887,6 +1908,13 @@ Microsoft.Security Microsoft.Authorization Microsoft.Consumption Microsoft.CostM
 az vm list-skus --location koreacentral --size Standard_D4ds_v5 --query <span class="hljs-string">&quot;[].{name:name, zones:locationInfo[0].zones, restrictions:restrictions}&quot;</span> -o json</code></pre></div></figure>
 <aside class="callout warning"><div class="callout-title"><span>⚠️</span><span>주의</span></div><p><code>restrictions</code> 에 <code>NotAvailableForSubscription</code> 이 있으면 그 VM 크기/영역은 구독에서 쓸 수 없습니다. 쿼터가 부족하면 포털의 <em>쿼터</em> 메뉴나 지원 요청으로 증설하거나, 변수 <code>system_node_vm_size</code>/<code>user_node_vm_size</code>(Lab 05)를 바꾸세요.</p>
 </aside>
+<p>Visual Studio 구독처럼 기본 쿼터가 작다면(예: 패밀리 20, 전체 32) CLI 로 증설을 요청할 수 있습니다. 소규모 증설은 요청 즉시 반영되기도 하지만 구독 유형에 따라 다를 수 있으니, 반영 여부는 위의 <code>az vm list-usage</code> 로 확인하세요.</p>
+<figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 5줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">az extension add --name quota
+az provider register --namespace Microsoft.Quota           <span class="hljs-comment"># 등록이 끝난 뒤(Registered) 요청하세요</span>
+SCOPE=<span class="hljs-string">&quot;/subscriptions/<span class="hljs-subst">$(az account show --query id -o tsv)</span>/providers/Microsoft.Compute/locations/koreacentral&quot;</span>
+az quota create --resource-name standardDDSv5Family --scope <span class="hljs-string">&quot;<span class="hljs-variable">$SCOPE</span>&quot;</span> --limit-object value=48 --resource-type dedicated
+az quota create --resource-name cores               --scope <span class="hljs-string">&quot;<span class="hljs-variable">$SCOPE</span>&quot;</span> --limit-object value=64 --resource-type dedicated</code></pre></div></figure>
+<p>증설하지 않고 <code>system_node_vm_size</code>/<code>user_node_vm_size</code> 를 <code>Standard_D2ds_v5</code>(2 vCPU)로 줄여도 같은 패밀리 쿼터(20) 안에서 실습할 수 있습니다(6대 = 12 vCPU).</p>
 <h2 id="01-prerequisites--5-환경-변수-설정">5. 환경 변수 설정<a class="anchor" href="#01-prerequisites--5-환경-변수-설정" aria-label="이 제목 링크">#</a></h2>
 <p>모든 스택이 공통으로 읽는 값입니다. <strong>새 터미널을 열 때마다 다시 실행</strong>하세요(<code>env.sh</code> 파일로 저장해 두면 편합니다).</p>
 <figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 7줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-built_in">export</span> ARM_SUBSCRIPTION_ID=<span class="hljs-string">&quot;<span class="hljs-subst">$(az account show --query id -o tsv)</span>&quot;</span>   <span class="hljs-comment"># azurerm 4.x 이후 필수</span>
@@ -1946,7 +1974,7 @@ az vm list-skus --location koreacentral --size Standard_D4ds_v5 --query <span cl
 </tr>
 </tbody></table>
 </div>
-<figure class="code collapsed"><figcaption><span class="file">scripts/preflight.sh</span><span class="meta">bash · 140줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-meta">#!/usr/bin/env bash</span>
+<figure class="code collapsed"><figcaption><span class="file">scripts/preflight.sh</span><span class="meta">bash · 142줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-meta">#!/usr/bin/env bash</span>
 <span class="hljs-comment"># 실습 시작 전 점검 (읽기 전용): 도구 · 로그인 · 환경 변수 · Resource Provider · vCPU 쿼터 · VM 크기 · 권한</span>
 <span class="hljs-comment"># Lab 01 의 확인 절차를 한 번에 실행합니다. 아무것도 만들거나 바꾸지 않습니다.</span>
 <span class="hljs-comment">#</span>
@@ -2073,7 +2101,9 @@ sku=<span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="h
 <span class="hljs-keyword">fi</span>
 
 section <span class="hljs-string">&quot;7. 권한 (이 실습은 역할 할당을 많이 만듭니다)&quot;</span>
-me=<span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="hljs-string">&quot;<span class="hljs-variable">$acct</span>&quot;</span> .user.name)</span>&quot;</span>
+<span class="hljs-comment"># 게스트/개인(MSA) 계정은 로그인 이름(user.name)으로 조회가 안 되므로 객체 ID 를 우선 씁니다 (서비스 주체는 appId 로 대체).</span>
+me=<span class="hljs-string">&quot;<span class="hljs-subst">$(az ad signed-in-user show --query id -o tsv 2&gt;/dev/null)</span>&quot;</span>
+[ -n <span class="hljs-string">&quot;<span class="hljs-variable">$me</span>&quot;</span> ] || me=<span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="hljs-string">&quot;<span class="hljs-variable">$acct</span>&quot;</span> .user.name)</span>&quot;</span>
 roles=<span class="hljs-string">&quot;<span class="hljs-subst">$(az role assignment list --assignee <span class="hljs-string">&quot;<span class="hljs-variable">$me</span>&quot;</span> --all --include-inherited --query &#x27;[].roleDefinitionName&#x27; -o tsv 2&gt;/dev/null)</span>&quot;</span>
 <span class="hljs-keyword">if</span> <span class="hljs-built_in">printf</span> <span class="hljs-string">&#x27;%s\n&#x27;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$roles</span>&quot;</span> | grep -qx <span class="hljs-string">&#x27;Owner&#x27;</span>; <span class="hljs-keyword">then</span>
   pass <span class="hljs-string">&quot;Owner 역할 보유&quot;</span>
@@ -2085,7 +2115,7 @@ roles=<span class="hljs-string">&quot;<span class="hljs-subst">$(az role assignm
   warn <span class="hljs-string">&quot;Owner 또는 Contributor + User Access Administrator 가 필요합니다. 확인된 역할: <span class="hljs-subst">$(printf &#x27;%s&#x27; <span class="hljs-string">&quot;<span class="hljs-variable">$roles</span>&quot;</span> | tr &#x27;\n&#x27; &#x27;,&#x27;)</span>&quot;</span>
 <span class="hljs-keyword">fi</span>
 
-summary</code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (140줄) ▼">전체 코드 보기 (140줄) ▼</button></figure>
+summary</code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (142줄) ▼">전체 코드 보기 (142줄) ▼</button></figure>
 <aside class="callout note"><div class="callout-title"><span>ℹ️</span><span>참고</span></div><p>스크립트들이 함께 쓰는 공통 함수(<code>scripts/lib/common.sh</code>)는 <a href="#lab-99-appendix">부록 G</a> 에 있습니다. 실행 결과의 <code>✓ 통과 / ✗ 실패 / ! 경고 / - 건너뜀</code> 은 모든 검증 스크립트가 같은 형식으로 보여 줍니다.</p>
 </aside>
 <h2 id="01-prerequisites--7-저장소-구조">7. 저장소 구조<a class="anchor" href="#01-prerequisites--7-저장소-구조" aria-label="이 제목 링크">#</a></h2>
@@ -2960,14 +2990,14 @@ scripts/verify.sh 02-bootstrap</code></pre></div></figure>
 <text x="366" y="148" font-size="14" class="dg-t dg-b" data-w="266">snet-aks-nodes</text>
 <text x="366" y="166" font-size="11.5" class="dg-m" data-w="266">10.10.0.0/24 · 노드 IP 전용</text>
 <text x="366" y="182.5" font-size="11.5" class="dg-m" data-w="266">Pod 는 오버레이(10.244.0.0/16)라 IP 미사용</text>
-<text x="366" y="199" font-size="11.5" class="dg-m" data-w="266">NSG + NAT Gateway 연결</text>
-<text x="366" y="215.5" font-size="11.5" class="dg-m" data-w="266">기본 아웃바운드 접근 비활성화</text>
+<text x="366" y="199" font-size="11.5" class="dg-m" data-w="266">NSG: Pod · API 서버 · Gateway 인바운드 허용</text>
+<text x="366" y="215.5" font-size="11.5" class="dg-m" data-w="266">NAT Gateway 연결 · 기본 아웃바운드 비활성화</text>
 <rect x="44" y="270" width="290" height="124" rx="10" class="dg-box dg-net"/>
 <text x="56" y="294" font-size="14" class="dg-t dg-b" data-w="266">snet-ingress</text>
 <text x="56" y="312" font-size="11.5" class="dg-m" data-w="266">10.10.2.0/27</text>
 <text x="56" y="328.5" font-size="11.5" class="dg-m" data-w="266">내부 로드밸런서 프런트엔드 IP</text>
 <text x="56" y="345" font-size="11.5" class="dg-m" data-w="266">(internal_gateway = true 일 때)</text>
-<text x="56" y="361.5" font-size="11.5" class="dg-m" data-w="266">NSG 연결</text>
+<text x="56" y="361.5" font-size="11.5" class="dg-m" data-w="266">NSG 연결 (트래픽은 노드 NSG 가 평가)</text>
 <rect x="354" y="270" width="290" height="124" rx="10" class="dg-box dg-net"/>
 <text x="366" y="294" font-size="14" class="dg-t dg-b" data-w="266">snet-private-endpoints</text>
 <text x="366" y="312" font-size="11.5" class="dg-m" data-w="266">10.10.3.0/27</text>
@@ -3007,7 +3037,7 @@ scripts/verify.sh 02-bootstrap</code></pre></div></figure>
 NAT Gateway  (StandardV2, 영역 중복)  ── 서브넷 연결 ──►  snet-aks-nodes
 
 VNet 10.10.0.0/16   (rg-…-network)
-  ├─ snet-aks-nodes          10.10.0.0/24   AKS 노드 · NSG · NAT Gateway 연결
+  ├─ snet-aks-nodes          10.10.0.0/24   AKS 노드 · NSG(Pod · API 서버 · Gateway 인바운드 허용) · NAT Gateway 연결
   ├─ snet-aks-apiserver      10.10.1.0/28   API Server VNet Integration (AKS 전용으로 위임)
   ├─ snet-ingress            10.10.2.0/27   내부 로드밸런서 프런트엔드 IP · NSG
   └─ snet-private-endpoints  10.10.3.0/27   ACR / Key Vault Private Endpoint · NSG (노드 서브넷의 443 만 허용)
@@ -3081,8 +3111,12 @@ Private DNS Zone (VNet 링크):  privatelink.azurecr.io  ·  privatelink.vaultco
 <td>Private Endpoint 에 NSG 를 적용하려면 <code>private_endpoint_network_policies = &quot;Enabled&quot;</code> 가 필요합니다. 최소 권한 네트워크 분리.</td>
 </tr>
 <tr>
-<td>노드/인그레스 NSG 는 <strong>빈 NSG</strong></td>
-<td>AKS 가 <code>Service(type=LoadBalancer)</code> 생성 시 필요한 규칙을 자동으로 추가합니다. Terraform 이 이를 덮어쓰지 않도록 규칙을 정의하지 않습니다.</td>
+<td>노드 서브넷 NSG: <strong>인바운드 허용 규칙을 Terraform 으로 직접 정의</strong></td>
+<td>AKS 는 직접 만들어 서브넷에 연결한 NSG 를 수정하지 않습니다(Service 용 규칙도 자동으로 추가되지 않음). 공용 Gateway 는 이 규칙이 없으면 접속이 안 됩니다. Pod · API 서버 트래픽은 기본 규칙으로도 통과하지만 Deny 규칙을 더하는 순간 끊기므로 허용 규칙을 미리 둡니다(모두 실제 구독에서 확인). 아래 <em>NSG 인바운드 규칙</em> 참고.</td>
+</tr>
+<tr>
+<td>인그레스 서브넷 NSG 는 <strong>규칙 없음</strong></td>
+<td>이 서브넷에는 내부 LB 프런트엔드 IP 만 있고 VM(NIC)이 없습니다. 로드밸런서를 거친 트래픽은 백엔드인 노드 서브넷 NSG 가 평가합니다.</td>
 </tr>
 <tr>
 <td>Private DNS Zone 을 네트워크 스택에서 관리</td>
@@ -3090,6 +3124,68 @@ Private DNS Zone (VNet 링크):  privatelink.azurecr.io  ·  privatelink.vaultco
 </tr>
 </tbody></table>
 </div>
+<h2 id="03-network--nsg-인바운드-규칙">NSG 인바운드 규칙<a class="anchor" href="#03-network--nsg-인바운드-규칙" aria-label="이 제목 링크">#</a></h2>
+<p>NSG 는 우선순위 숫자가 낮은 규칙부터 평가하고, 맞는 규칙이 없으면 기본 규칙(<code>AllowVnetInBound</code> 65000 → <code>AllowAzureLoadBalancerInBound</code> 65001 → <code>DenyAllInBound</code> 65500)을 적용합니다. 이 스택의 인바운드 트래픽과 허용 방법은 다음과 같습니다. <strong>구분</strong> 열의 결과는 실제 구독에서 규칙을 지우거나 Deny 규칙을 더해 확인한 값입니다(<a href="#lab-99-appendix">부록 A</a>).</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>NSG</th>
+<th>트래픽</th>
+<th>규칙</th>
+<th>구분</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>노드</td>
+<td>노드 ↔ 노드 · VNet 안의 클라이언트 → 내부 Gateway</td>
+<td>기본 규칙 <code>AllowVnetInBound</code></td>
+<td>기본 규칙으로 통과</td>
+</tr>
+<tr>
+<td>노드</td>
+<td>Azure Load Balancer 상태 프로브</td>
+<td>기본 규칙 <code>AllowAzureLoadBalancerInBound</code></td>
+<td>기본 규칙으로 통과</td>
+</tr>
+<tr>
+<td>노드</td>
+<td>인터넷 → 공용 Gateway (HTTP/HTTPS)</td>
+<td><code>AllowGatewayHttpHttps</code> (200): <code>gateway_allowed_source_prefixes</code>(기본 <code>Internet</code>) → TCP 80 · 443</td>
+<td><strong>필수</strong> — 지우면 접속 불가</td>
+</tr>
+<tr>
+<td>노드</td>
+<td>노드 → Pod · Pod ↔ Pod (DNS 포함)</td>
+<td><code>AllowNodesToPods</code> (100): 노드 CIDR → <code>pod_cidr</code> · <code>AllowPodsToPods</code> (110): <code>pod_cidr</code> → <code>pod_cidr</code></td>
+<td>방어용 — 기본 규칙으로 통과, Deny 를 더하면 끊김</td>
+</tr>
+<tr>
+<td>노드</td>
+<td>API 서버 → 노드(kubelet 10250: <code>kubectl exec</code> · logs) · Pod</td>
+<td><code>AllowApiServerToCluster</code> (120): API 서버 서브넷 → 노드 CIDR · <code>pod_cidr</code></td>
+<td>방어용 — 기본 규칙으로 통과, Deny 를 더하면 <code>exec</code> 가 끊김</td>
+</tr>
+<tr>
+<td>Private Endpoint</td>
+<td>노드 → ACR · Key Vault</td>
+<td><code>AllowAksNodesHttps</code> (100): 노드 CIDR → TCP 443. 나머지 VNet 트래픽은 <code>DenyOtherVnetInbound</code> (4000) 로 거부</td>
+<td>설계</td>
+</tr>
+<tr>
+<td>인그레스</td>
+<td>없음</td>
+<td>규칙을 두지 않습니다 (위 <em>설계 결정</em> 참고)</td>
+<td>—</td>
+</tr>
+</tbody></table>
+</div>
+<aside class="callout important"><div class="callout-title"><span>❗</span><span>중요</span></div><p><strong>AKS 는 직접 만들어 서브넷에 연결한 NSG 를 수정하지 않습니다.</strong> Service(<code>LoadBalancer</code>) 용 규칙은 AKS 가 관리하는 리소스에만 자동으로 추가됩니다(<a href="https://learn.microsoft.com/azure/aks/concepts-network#network-security-groups" target="_blank" rel="noopener noreferrer">AKS 네트워킹 개념</a>). 실제로 AKS 는 노드 리소스 그룹에 자체 NSG(<code>aks-agentpool-…-nsg</code>)를 만들어 노드 NIC 에 연결하고 <code>k8s-azure-lb_allow_…</code> 규칙을 거기에만 추가하며, 우리 서브넷 NSG 는 그대로입니다. 인바운드는 서브넷 NSG 와 NIC NSG 를 모두 통과해야 하므로, 서브넷 NSG 에 허용 규칙이 없으면 공용 Gateway 가 열리지 않습니다.</p>
+</aside>
+<aside class="callout important"><div class="callout-title"><span>❗</span><span>중요</span></div><p><strong>Pod 트래픽도 서브넷 NSG 의 평가 대상입니다.</strong> Azure CNI Overlay 의 Pod 트래픽은 캡슐화되지 않으므로 서브넷 NSG 가 적용됩니다(<a href="https://learn.microsoft.com/azure/aks/concepts-network-azure-cni-overlay#network-security-groups" target="_blank" rel="noopener noreferrer">Azure CNI Overlay: NSG</a>). 기본 규칙만 있을 때는 노드 간 Pod 통신과 DNS 가 그대로 통과하지만, 조직 정책이나 하드닝으로 Deny 규칙(예: 4000 번 Deny)을 더하는 순간 끊깁니다. <code>AllowNodesToPods</code> / <code>AllowPodsToPods</code> 가 있으면 Deny 가 있어도 통과합니다. 그래서 <strong><code>pod_cidr</code> 는 05-aks 와 같은 값</strong>(기본 <code>10.244.0.0/16</code>)이어야 하며, <code>scripts/verify.sh 05-aks</code> 가 두 값이 맞는지 확인합니다.</p>
+</aside>
+<aside class="callout note"><div class="callout-title"><span>ℹ️</span><span>참고</span></div><p>공용 Gateway 를 특정 IP 에만 열려면 <code>-var &#39;gateway_allowed_source_prefixes=[&quot;203.0.113.10/32&quot;]&#39;</code>, 내부 Gateway 만 쓴다면 <code>-var &#39;gateway_allowed_source_prefixes=[]&#39;</code>(규칙을 만들지 않음)를 지정하세요. 443 은 Lab 07 의 TLS 리스너를 추가할 때 NSG 를 다시 고치지 않도록 미리 허용했습니다.</p>
+<p><code>snet-aks-apiserver</code> 에는 NSG 를 연결하지 않았습니다(위임 서브넷, VNet 안의 트래픽은 기본 허용). NSG 를 붙인다면 노드 서브넷 → API 서버 서브넷 TCP 443 · 4443, <code>AzureLoadBalancer</code> → API 서버 서브넷 TCP 9988 인바운드를 먼저 허용해야 합니다(<a href="https://learn.microsoft.com/azure/aks/api-server-vnet-integration#network-security-group-nsg-security-rules" target="_blank" rel="noopener noreferrer">API Server VNet Integration</a>).</p>
+</aside>
 <h2 id="03-network--코드">코드<a class="anchor" href="#03-network--코드" aria-label="이 제목 링크">#</a></h2>
 <figure class="code"><figcaption><span class="file">terraform/03-network/versions.tf</span><span class="meta">hcl · 16줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-keyword">terraform</span> {
 <span class="hljs-attr">  required_version</span> = <span class="hljs-string">&quot;~&gt; 1.16&quot;</span>
@@ -3117,7 +3213,7 @@ Private DNS Zone (VNet 링크):  privatelink.azurecr.io  ·  privatelink.vaultco
     }
   }
 }</code></pre></div></figure>
-<figure class="code collapsed"><figcaption><span class="file">terraform/03-network/variables.tf</span><span class="meta">hcl · 67줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-keyword">variable</span> <span class="hljs-string">&quot;workload&quot;</span> {
+<figure class="code collapsed"><figcaption><span class="file">terraform/03-network/variables.tf</span><span class="meta">hcl · 103줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-keyword">variable</span> <span class="hljs-string">&quot;workload&quot;</span> {
 <span class="hljs-attr">  description</span> = <span class="hljs-string">&quot;워크로드 이름 (소문자/숫자 3~8자)&quot;</span>
 <span class="hljs-attr">  type</span>        = string
 <span class="hljs-attr">  default</span>     = <span class="hljs-string">&quot;aksdemo&quot;</span>
@@ -3174,6 +3270,21 @@ Private DNS Zone (VNet 링크):  privatelink.azurecr.io  ·  privatelink.vaultco
   }
 }
 
+<span class="hljs-keyword">variable</span> <span class="hljs-string">&quot;pod_cidr&quot;</span> {
+<span class="hljs-attr">  description</span> = <span class="hljs-string">&lt;&lt;-EOT
+    Azure CNI Overlay 의 Pod CIDR. 05-aks 의 pod_cidr 와 같은 값을 쓰세요.
+    노드 NSG 에 이 대역을 허용하는 인바운드 규칙을 만듭니다. 기본 규칙만 있을 때는 없어도 통신되지만,
+    나중에 Deny 규칙을 추가해도 노드 간 Pod 통신(DNS 포함)이 끊기지 않게 하는 방어용입니다.
+  EOT</span>
+<span class="hljs-attr">  type</span>        = string
+<span class="hljs-attr">  default</span>     = <span class="hljs-string">&quot;10.244.0.0/16&quot;</span>
+
+  validation {
+<span class="hljs-attr">    condition</span>     = <span class="hljs-title function_">can</span>(<span class="hljs-title function_">cidrhost</span>(<span class="hljs-variable">var.pod_cidr</span>, <span class="hljs-number">0</span>))
+<span class="hljs-attr">    error_message</span> = <span class="hljs-string">&quot;pod_cidr 는 올바른 CIDR 이어야 합니다. 예: 10.244.0.0/16&quot;</span>
+  }
+}
+
 <span class="hljs-keyword">variable</span> <span class="hljs-string">&quot;nat_gateway_sku&quot;</span> {
 <span class="hljs-attr">  description</span> = <span class="hljs-string">&quot;NAT Gateway SKU. StandardV2 는 가용 영역 중복(zone-redundant)이며 대부분의 리전에서 사용 가능합니다.&quot;</span>
 <span class="hljs-attr">  type</span>        = string
@@ -3183,8 +3294,29 @@ Private DNS Zone (VNet 링크):  privatelink.azurecr.io  ·  privatelink.vaultco
 <span class="hljs-attr">    condition</span>     = <span class="hljs-title function_">contains</span>([<span class="hljs-string">&quot;Standard&quot;</span>, <span class="hljs-string">&quot;StandardV2&quot;</span>], <span class="hljs-variable">var.nat_gateway_sku</span>)
 <span class="hljs-attr">    error_message</span> = <span class="hljs-string">&quot;nat_gateway_sku 는 Standard 또는 StandardV2 여야 합니다.&quot;</span>
   }
-}</code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (67줄) ▼">전체 코드 보기 (67줄) ▼</button></figure>
-<figure class="code collapsed"><figcaption><span class="file">terraform/03-network/main.tf</span><span class="meta">hcl · 232줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-keyword">data</span> <span class="hljs-string">&quot;azurerm_client_config&quot;</span> <span class="hljs-string">&quot;current&quot;</span> {}
+}
+
+<span class="hljs-keyword">variable</span> <span class="hljs-string">&quot;gateway_allowed_source_prefixes&quot;</span> {
+<span class="hljs-attr">  description</span> = <span class="hljs-string">&lt;&lt;-EOT
+    공용 Gateway(07-ingress 의 internal_gateway = false)로 들어오는 HTTP(80)/HTTPS(443) 를 허용할 출발지.
+    Internet 서비스 태그 또는 CIDR 목록이며, 특정 IP 만 열려면 [&quot;203.0.113.10/32&quot;] 처럼 지정하세요.
+    내부 Gateway 만 쓴다면 [] 로 두세요. 규칙을 만들지 않으며, VNet 안의 클라이언트는 기본 규칙(AllowVnetInBound)으로 접근합니다.
+  EOT</span>
+<span class="hljs-attr">  type</span>        = <span class="hljs-title function_">list</span>(string)
+<span class="hljs-attr">  default</span>     = [<span class="hljs-string">&quot;Internet&quot;</span>]
+
+  validation {
+<span class="hljs-attr">    condition</span>     = <span class="hljs-title function_">alltrue</span>([<span class="hljs-keyword">for</span> prefix <span class="hljs-keyword">in</span> <span class="hljs-variable">var.gateway_allowed_source_prefixes</span> <span class="hljs-operator">:</span> prefix <span class="hljs-operator">==</span> <span class="hljs-string">&quot;Internet&quot;</span> <span class="hljs-operator">||</span> <span class="hljs-title function_">can</span>(<span class="hljs-title function_">cidrhost</span>(prefix, <span class="hljs-number">0</span>))])
+<span class="hljs-attr">    error_message</span> = <span class="hljs-string">&quot;gateway_allowed_source_prefixes 의 값은 Internet 또는 올바른 CIDR 이어야 합니다.&quot;</span>
+  }
+
+  <span class="hljs-comment"># NSG 규칙은 서비스 태그를 목록(복수) 속성에 넣을 수 없습니다.</span>
+  validation {
+<span class="hljs-attr">    condition</span>     = !<span class="hljs-title function_">contains</span>(<span class="hljs-variable">var.gateway_allowed_source_prefixes</span>, <span class="hljs-string">&quot;Internet&quot;</span>) <span class="hljs-operator">||</span> <span class="hljs-title function_">length</span>(<span class="hljs-variable">var.gateway_allowed_source_prefixes</span>) <span class="hljs-operator">==</span> <span class="hljs-number">1</span>
+<span class="hljs-attr">    error_message</span> = <span class="hljs-string">&quot;Internet 서비스 태그는 다른 값과 함께 쓸 수 없습니다. [\&quot;Internet\&quot;] 이거나 CIDR 목록이어야 합니다.&quot;</span>
+  }
+}</code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (103줄) ▼">전체 코드 보기 (103줄) ▼</button></figure>
+<figure class="code collapsed"><figcaption><span class="file">terraform/03-network/main.tf</span><span class="meta">hcl · 324줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-keyword">data</span> <span class="hljs-string">&quot;azurerm_client_config&quot;</span> <span class="hljs-string">&quot;current&quot;</span> {}
 
 <span class="hljs-keyword">module</span> <span class="hljs-string">&quot;naming&quot;</span> {
 <span class="hljs-attr">  source</span> = <span class="hljs-string">&quot;../modules/naming&quot;</span>
@@ -3214,6 +3346,9 @@ Private DNS Zone (VNet 링크):  privatelink.azurecr.io  ·  privatelink.vaultco
 <span class="hljs-attr">    acr</span>       = <span class="hljs-string">&quot;privatelink.azurecr.io&quot;</span>
 <span class="hljs-attr">    key_vault</span> = <span class="hljs-string">&quot;privatelink.vaultcore.azure.net&quot;</span>
   }
+
+  <span class="hljs-comment"># 같은 출발지를 두 번 적어도 NSG 규칙에는 한 번만 들어가도록 중복을 제거합니다.</span>
+<span class="hljs-attr">  gateway_sources</span> = <span class="hljs-title function_">distinct</span>(<span class="hljs-variable">var.gateway_allowed_source_prefixes</span>)
 }
 
 <span class="hljs-comment"># ---------------------------------------------------------------------------</span>
@@ -3288,8 +3423,8 @@ Private DNS Zone (VNet 링크):  privatelink.azurecr.io  ·  privatelink.vaultco
 <span class="hljs-comment"># ---------------------------------------------------------------------------</span>
 <span class="hljs-comment"># NSG (AWS 의 Security Group + NACL 역할을 겸함)</span>
 <span class="hljs-comment"># - 상태 저장(stateful), 서브넷/NIC 에 연결, 우선순위 숫자가 낮을수록 먼저 평가, Allow/Deny 모두 가능</span>
-<span class="hljs-comment"># - 노드/인그레스 서브넷의 규칙은 AKS 가 Service(LoadBalancer) 생성 시 자동으로 추가하므로</span>
-<span class="hljs-comment">#   Terraform 에서는 빈 NSG 만 만들어 둡니다.</span>
+<span class="hljs-comment"># - AKS 는 &quot;내가 서브넷에 연결한 NSG&quot; 를 수정하지 않습니다. Service(LoadBalancer) 용 규칙도 자동으로 추가되지 않으므로</span>
+<span class="hljs-comment">#   노드 서브넷에 필요한 인바운드 허용 규칙은 아래에서 Terraform 으로 직접 정의합니다.</span>
 <span class="hljs-comment"># ---------------------------------------------------------------------------</span>
 <span class="hljs-keyword">resource</span> <span class="hljs-string">&quot;azurerm_network_security_group&quot;</span> <span class="hljs-string">&quot;aks_nodes&quot;</span> {
 <span class="hljs-attr">  name</span>                = <span class="hljs-variable">module.naming.names.nsg_aks_nodes</span>
@@ -3298,6 +3433,8 @@ Private DNS Zone (VNet 링크):  privatelink.azurecr.io  ·  privatelink.vaultco
 <span class="hljs-attr">  tags</span>                = <span class="hljs-variable">local.tags</span>
 }
 
+<span class="hljs-comment"># snet-ingress 에는 내부 LB 프런트엔드 IP 만 있고 VM(NIC)이 없습니다. 내부 Gateway 로 들어오는 트래픽은</span>
+<span class="hljs-comment"># 백엔드인 노드 서브넷의 NSG 가 평가하므로 이 NSG 에는 규칙을 두지 않습니다.</span>
 <span class="hljs-keyword">resource</span> <span class="hljs-string">&quot;azurerm_network_security_group&quot;</span> <span class="hljs-string">&quot;ingress&quot;</span> {
 <span class="hljs-attr">  name</span>                = <span class="hljs-variable">module.naming.names.nsg_ingress</span>
 <span class="hljs-attr">  location</span>            = azurerm_resource_group.network.location
@@ -3340,6 +3477,93 @@ Private DNS Zone (VNet 링크):  privatelink.azurecr.io  ·  privatelink.vaultco
 <span class="hljs-attr">  destination_address_prefix</span>  = <span class="hljs-string">&quot;*&quot;</span>
 <span class="hljs-attr">  resource_group_name</span>         = azurerm_resource_group.network.name
 <span class="hljs-attr">  network_security_group_name</span> = azurerm_network_security_group.private_endpoints.name
+}
+
+<span class="hljs-comment"># ---------------------------------------------------------------------------</span>
+<span class="hljs-comment"># 노드 서브넷 NSG 인바운드 허용 규칙 (우선순위: 100번대 = 클러스터 내부 통신, 200번대 = Gateway)</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># 기본 규칙만으로 통과하는 것 (실측: 규칙을 지워도 막히지 않음)</span>
+<span class="hljs-comment">#   - 노드 ↔ 노드, API 서버 서브넷 → 노드(kubelet 10250), VNet 안의 클라이언트 → 내부 Gateway : AllowVnetInBound (65000)</span>
+<span class="hljs-comment">#   - Azure Load Balancer 상태 프로브                                                      : AllowAzureLoadBalancerInBound (65001)</span>
+<span class="hljs-comment">#   - Azure CNI Overlay 의 노드 → Pod, Pod ↔ Pod (DNS 포함)                                 : 기본 규칙으로 통과</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># 직접 허용해야 하는 것 (필수)</span>
+<span class="hljs-comment">#   - 공용 Gateway: Standard LB 는 인바운드가 기본적으로 닫혀 있어 NSG 에서 허용해야 합니다 (AllowGatewayHttpHttps).</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-comment"># 미리 허용해 두는 것 (방어용)</span>
+<span class="hljs-comment">#   - Overlay 의 Pod 트래픽은 캡슐화되지 않아 서브넷 NSG 가 그대로 적용됩니다. 지금은 기본 규칙이 허용하지만, 나중에 조직 정책이나</span>
+<span class="hljs-comment">#     하드닝으로 Deny 규칙(예: 4000 번 DenyAllInBound)을 더하면 노드 간 Pod 통신과 DNS 가 끊깁니다 (실측: Deny 를 더하면 타임아웃,</span>
+<span class="hljs-comment">#     아래 허용 규칙이 있으면 통과). AKS 문서가 요구하는 허용 규칙(노드 → Pod, Pod → Pod)을 미리 만들어 둡니다.</span>
+<span class="hljs-comment"># ---------------------------------------------------------------------------</span>
+<span class="hljs-keyword">resource</span> <span class="hljs-string">&quot;azurerm_network_security_rule&quot;</span> <span class="hljs-string">&quot;nodes_allow_nodes_to_pods&quot;</span> {
+<span class="hljs-attr">  name</span>                        = <span class="hljs-string">&quot;AllowNodesToPods&quot;</span>
+<span class="hljs-attr">  description</span>                 = <span class="hljs-string">&quot;Service 트래픽 라우팅: 노드 -&gt; Pod (Azure CNI Overlay)&quot;</span>
+<span class="hljs-attr">  priority</span>                    = <span class="hljs-number">100</span>
+<span class="hljs-attr">  direction</span>                   = <span class="hljs-string">&quot;Inbound&quot;</span>
+<span class="hljs-attr">  access</span>                      = <span class="hljs-string">&quot;Allow&quot;</span>
+<span class="hljs-attr">  protocol</span>                    = <span class="hljs-string">&quot;*&quot;</span>
+<span class="hljs-attr">  source_port_range</span>           = <span class="hljs-string">&quot;*&quot;</span>
+<span class="hljs-attr">  destination_port_range</span>      = <span class="hljs-string">&quot;*&quot;</span>
+<span class="hljs-attr">  source_address_prefix</span>       = <span class="hljs-variable">var.subnet_cidrs.aks_nodes</span>
+<span class="hljs-attr">  destination_address_prefix</span>  = <span class="hljs-variable">var.pod_cidr</span>
+<span class="hljs-attr">  resource_group_name</span>         = azurerm_resource_group.network.name
+<span class="hljs-attr">  network_security_group_name</span> = azurerm_network_security_group.aks_nodes.name
+}
+
+<span class="hljs-keyword">resource</span> <span class="hljs-string">&quot;azurerm_network_security_rule&quot;</span> <span class="hljs-string">&quot;nodes_allow_pods_to_pods&quot;</span> {
+<span class="hljs-attr">  name</span>                        = <span class="hljs-string">&quot;AllowPodsToPods&quot;</span>
+<span class="hljs-attr">  description</span>                 = <span class="hljs-string">&quot;Pod 간, Pod -&gt; Service 트래픽(DNS 포함) (Azure CNI Overlay)&quot;</span>
+<span class="hljs-attr">  priority</span>                    = <span class="hljs-number">110</span>
+<span class="hljs-attr">  direction</span>                   = <span class="hljs-string">&quot;Inbound&quot;</span>
+<span class="hljs-attr">  access</span>                      = <span class="hljs-string">&quot;Allow&quot;</span>
+<span class="hljs-attr">  protocol</span>                    = <span class="hljs-string">&quot;*&quot;</span>
+<span class="hljs-attr">  source_port_range</span>           = <span class="hljs-string">&quot;*&quot;</span>
+<span class="hljs-attr">  destination_port_range</span>      = <span class="hljs-string">&quot;*&quot;</span>
+<span class="hljs-attr">  source_address_prefix</span>       = <span class="hljs-variable">var.pod_cidr</span>
+<span class="hljs-attr">  destination_address_prefix</span>  = <span class="hljs-variable">var.pod_cidr</span>
+<span class="hljs-attr">  resource_group_name</span>         = azurerm_resource_group.network.name
+<span class="hljs-attr">  network_security_group_name</span> = azurerm_network_security_group.aks_nodes.name
+}
+
+<span class="hljs-comment"># API Server VNet Integration: API 서버(위임 서브넷)에서 노드로 들어오는 트래픽 (kubectl exec · logs · port-forward 는 kubelet 10250 으로 갑니다).</span>
+<span class="hljs-comment"># 기본 규칙(AllowVnetInBound)으로도 통과하지만 나중에 Deny 규칙을 더하면 끊깁니다 (실측: Deny 를 더하면 exec 가 connection reset,</span>
+<span class="hljs-comment"># 이 규칙이 있으면 통과). Pod CIDR 대상은 웹훅 호출 경로에서는 필요가 확인되지 않아 방어적으로만 둡니다.</span>
+<span class="hljs-keyword">resource</span> <span class="hljs-string">&quot;azurerm_network_security_rule&quot;</span> <span class="hljs-string">&quot;nodes_allow_apiserver&quot;</span> {
+<span class="hljs-attr">  name</span>                         = <span class="hljs-string">&quot;AllowApiServerToCluster&quot;</span>
+<span class="hljs-attr">  description</span>                  = <span class="hljs-string">&quot;API 서버 -&gt; 노드(kubelet 10250: exec, logs), Pod. Deny 를 더해도 kubectl exec 가 끊기지 않게&quot;</span>
+<span class="hljs-attr">  priority</span>                     = <span class="hljs-number">120</span>
+<span class="hljs-attr">  direction</span>                    = <span class="hljs-string">&quot;Inbound&quot;</span>
+<span class="hljs-attr">  access</span>                       = <span class="hljs-string">&quot;Allow&quot;</span>
+<span class="hljs-attr">  protocol</span>                     = <span class="hljs-string">&quot;*&quot;</span>
+<span class="hljs-attr">  source_port_range</span>            = <span class="hljs-string">&quot;*&quot;</span>
+<span class="hljs-attr">  destination_port_range</span>       = <span class="hljs-string">&quot;*&quot;</span>
+<span class="hljs-attr">  source_address_prefix</span>        = <span class="hljs-variable">var.subnet_cidrs.aks_apiserver</span>
+<span class="hljs-attr">  destination_address_prefixes</span> = [<span class="hljs-variable">var.subnet_cidrs.aks_nodes</span>, <span class="hljs-variable">var.pod_cidr]</span>
+<span class="hljs-attr">  resource_group_name</span>          = azurerm_resource_group.network.name
+<span class="hljs-attr">  network_security_group_name</span>  = azurerm_network_security_group.aks_nodes.name
+}
+
+<span class="hljs-comment"># 공용 Gateway(Standard LB): 허용한 출발지 → HTTP/HTTPS 리스너.</span>
+<span class="hljs-comment"># 공용 LB 의 공인 IP 는 AKS 가 나중에 만들어 plan 시점에는 알 수 없고, 노드에는 공인 IP 가 없어 LB 가 80/443 으로 연 서비스(Gateway)만</span>
+<span class="hljs-comment"># 인터넷에서 닿습니다. 그래서 목적지는 * 로 둡니다. (443 은 Lab 07 의 TLS 리스너를 추가할 때 NSG 를 다시 고치지 않게 미리 허용)</span>
+<span class="hljs-comment"># 출발지 값이 1개면 단수, 여러 개면 복수 속성에 담습니다 (둘 중 하나만 지정 가능, 서비스 태그는 단수에만 쓸 수 있음).</span>
+<span class="hljs-comment"># gateway_allowed_source_prefixes = [] 이면 규칙을 만들지 않습니다 (내부 Gateway 전용).</span>
+<span class="hljs-keyword">resource</span> <span class="hljs-string">&quot;azurerm_network_security_rule&quot;</span> <span class="hljs-string">&quot;nodes_allow_gateway&quot;</span> {
+<span class="hljs-attr">  count</span> = <span class="hljs-title function_">length</span>(<span class="hljs-variable">local.gateway_sources</span>) &gt; <span class="hljs-number">0</span> <span class="hljs-operator">?</span> <span class="hljs-number">1</span> <span class="hljs-operator">:</span> <span class="hljs-number">0</span>
+<span class="hljs-attr">
+  name</span>                        = <span class="hljs-string">&quot;AllowGatewayHttpHttps&quot;</span>
+<span class="hljs-attr">  description</span>                 = <span class="hljs-string">&quot;공용 Gateway(Standard LB) 인바운드 HTTP/HTTPS&quot;</span>
+<span class="hljs-attr">  priority</span>                    = <span class="hljs-number">200</span>
+<span class="hljs-attr">  direction</span>                   = <span class="hljs-string">&quot;Inbound&quot;</span>
+<span class="hljs-attr">  access</span>                      = <span class="hljs-string">&quot;Allow&quot;</span>
+<span class="hljs-attr">  protocol</span>                    = <span class="hljs-string">&quot;Tcp&quot;</span>
+<span class="hljs-attr">  source_port_range</span>           = <span class="hljs-string">&quot;*&quot;</span>
+<span class="hljs-attr">  destination_port_ranges</span>     = [<span class="hljs-string">&quot;80&quot;</span>, <span class="hljs-string">&quot;443&quot;</span>]
+<span class="hljs-attr">  source_address_prefix</span>       = <span class="hljs-title function_">length</span>(<span class="hljs-variable">local.gateway_sources</span>) <span class="hljs-operator">==</span> <span class="hljs-number">1</span> <span class="hljs-operator">?</span> <span class="hljs-variable">local.gateway_sources[0]</span> <span class="hljs-operator">:</span> <span class="hljs-literal">null</span>
+<span class="hljs-attr">  source_address_prefixes</span>     = <span class="hljs-title function_">length</span>(<span class="hljs-variable">local.gateway_sources</span>) &gt; <span class="hljs-number">1</span> <span class="hljs-operator">?</span> <span class="hljs-variable">local.gateway_sources</span> <span class="hljs-operator">:</span> <span class="hljs-literal">null</span>
+<span class="hljs-attr">  destination_address_prefix</span>  = <span class="hljs-string">&quot;*&quot;</span>
+<span class="hljs-attr">  resource_group_name</span>         = azurerm_resource_group.network.name
+<span class="hljs-attr">  network_security_group_name</span> = azurerm_network_security_group.aks_nodes.name
 }
 
 <span class="hljs-keyword">resource</span> <span class="hljs-string">&quot;azurerm_subnet_network_security_group_association&quot;</span> <span class="hljs-string">&quot;aks_nodes&quot;</span> {
@@ -3415,7 +3639,7 @@ Private DNS Zone (VNet 링크):  privatelink.azurecr.io  ·  privatelink.vaultco
 <span class="hljs-attr">  virtual_network_id</span>   = azurerm_virtual_network.this.id
 <span class="hljs-attr">  registration_enabled</span> = <span class="hljs-literal">false</span>
 <span class="hljs-attr">  tags</span>                 = <span class="hljs-variable">local.tags</span>
-}</code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (232줄) ▼">전체 코드 보기 (232줄) ▼</button></figure>
+}</code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (324줄) ▼">전체 코드 보기 (324줄) ▼</button></figure>
 <figure class="code"><figcaption><span class="file">terraform/03-network/outputs.tf</span><span class="meta">hcl · 29줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-keyword">output</span> <span class="hljs-string">&quot;resource_group_name&quot;</span> {
 <span class="hljs-attr">  description</span> = <span class="hljs-string">&quot;네트워크 리소스 그룹&quot;</span>
 <span class="hljs-attr">  value</span>       = azurerm_resource_group.network.name
@@ -3446,7 +3670,7 @@ Private DNS Zone (VNet 링크):  privatelink.azurecr.io  ·  privatelink.vaultco
 <span class="hljs-attr">  value</span>       = [<span class="hljs-keyword">for</span> zone <span class="hljs-keyword">in</span> azurerm_private_dns_zone.this <span class="hljs-operator">:</span> zone.name]
 }</code></pre></div></figure>
 <p><strong>단위 테스트</strong> (Azure 없이 <code>terraform test</code> 로 plan 로직 검증)</p>
-<figure class="code"><figcaption><span class="file">terraform/03-network/tests/plan.tftest.hcl</span><span class="meta">hcl · 46줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-comment"># Azure 없이 plan 로직만 검증: terraform -chdir=terraform/03-network test</span>
+<figure class="code collapsed"><figcaption><span class="file">terraform/03-network/tests/plan.tftest.hcl</span><span class="meta">hcl · 150줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-comment"># Azure 없이 plan 로직만 검증: terraform -chdir=terraform/03-network test</span>
 <span class="hljs-keyword">mock_provider</span> <span class="hljs-string">&quot;azurerm&quot;</span> {
 <span class="hljs-attr">  source</span> = <span class="hljs-string">&quot;../mocks&quot;</span>
 }
@@ -3478,6 +3702,110 @@ Private DNS Zone (VNet 링크):  privatelink.azurecr.io  ·  privatelink.vaultco
   }
 }
 
+<span class="hljs-comment"># 노드 NSG: AKS 는 서브넷에 연결한 NSG 를 수정하지 않으므로 필요한 인바운드 허용 규칙이 Terraform 에 있어야 합니다.</span>
+<span class="hljs-keyword">run</span> <span class="hljs-string">&quot;nodes_nsg_allows_overlay_and_gateway_traffic&quot;</span> {
+<span class="hljs-attr">  command</span> = plan
+
+  <span class="hljs-keyword">assert</span> {
+<span class="hljs-attr">    condition</span> = (
+      azurerm_network_security_rule.nodes_allow_nodes_to_pods.source_address_prefix <span class="hljs-operator">==</span> <span class="hljs-variable">var.subnet_cidrs.aks_nodes</span> <span class="hljs-operator">&amp;&amp;</span>
+      azurerm_network_security_rule.nodes_allow_nodes_to_pods.destination_address_prefix <span class="hljs-operator">==</span> <span class="hljs-variable">var.pod_cidr</span>
+    )
+<span class="hljs-attr">    error_message</span> = <span class="hljs-string">&quot;노드 서브넷 → Pod CIDR 인바운드를 허용해야 합니다 (Azure CNI Overlay 의 Service 트래픽 라우팅).&quot;</span>
+  }
+
+  <span class="hljs-keyword">assert</span> {
+<span class="hljs-attr">    condition</span> = (
+      azurerm_network_security_rule.nodes_allow_pods_to_pods.source_address_prefix <span class="hljs-operator">==</span> <span class="hljs-variable">var.pod_cidr</span> <span class="hljs-operator">&amp;&amp;</span>
+      azurerm_network_security_rule.nodes_allow_pods_to_pods.destination_address_prefix <span class="hljs-operator">==</span> <span class="hljs-variable">var.pod_cidr</span>
+    )
+<span class="hljs-attr">    error_message</span> = <span class="hljs-string">&quot;Pod CIDR 간 인바운드를 허용해야 합니다 (나중에 Deny 규칙이 추가되어도 노드 간 Pod 통신이 끊기지 않게).&quot;</span>
+  }
+
+  <span class="hljs-keyword">assert</span> {
+<span class="hljs-attr">    condition</span> = (
+      azurerm_network_security_rule.nodes_allow_apiserver.source_address_prefix <span class="hljs-operator">==</span> <span class="hljs-variable">var.subnet_cidrs.aks_apiserver</span> <span class="hljs-operator">&amp;&amp;</span>
+      azurerm_network_security_rule.nodes_allow_apiserver.destination_address_prefixes <span class="hljs-operator">==</span> <span class="hljs-title function_">toset</span>([<span class="hljs-variable">var.subnet_cidrs.aks_nodes</span>, <span class="hljs-variable">var.pod_cidr]</span>)
+    )
+<span class="hljs-attr">    error_message</span> = <span class="hljs-string">&quot;API 서버 서브넷 → 노드/Pod CIDR 인바운드를 허용해야 합니다.&quot;</span>
+  }
+
+  <span class="hljs-keyword">assert</span> {
+<span class="hljs-attr">    condition</span> = (
+      <span class="hljs-title function_">length</span>(azurerm_network_security_rule.nodes_allow_gateway) <span class="hljs-operator">==</span> <span class="hljs-number">1</span> <span class="hljs-operator">&amp;&amp;</span>
+      azurerm_network_security_rule.nodes_allow_gateway[<span class="hljs-number">0</span>].source_address_prefix <span class="hljs-operator">==</span> <span class="hljs-string">&quot;Internet&quot;</span> <span class="hljs-operator">&amp;&amp;</span>
+      azurerm_network_security_rule.nodes_allow_gateway[<span class="hljs-number">0</span>].destination_port_ranges <span class="hljs-operator">==</span> <span class="hljs-title function_">toset</span>([<span class="hljs-string">&quot;80&quot;</span>, <span class="hljs-string">&quot;443&quot;</span>])
+    )
+<span class="hljs-attr">    error_message</span> = <span class="hljs-string">&quot;기본값(공용 Gateway)에서는 인터넷 → 80/443 인바운드를 허용해야 합니다.&quot;</span>
+  }
+}
+
+<span class="hljs-keyword">run</span> <span class="hljs-string">&quot;gateway_rule_with_multiple_cidrs&quot;</span> {
+<span class="hljs-attr">  command</span> = plan
+
+  <span class="hljs-keyword">variables</span> {
+<span class="hljs-attr">    gateway_allowed_source_prefixes</span> = [<span class="hljs-string">&quot;203.0.113.0/24&quot;</span>, <span class="hljs-string">&quot;198.51.100.10/32&quot;</span>]
+  }
+
+  <span class="hljs-keyword">assert</span> {
+<span class="hljs-attr">    condition</span> = (
+      azurerm_network_security_rule.nodes_allow_gateway[<span class="hljs-number">0</span>].source_address_prefixes <span class="hljs-operator">==</span> <span class="hljs-title function_">toset</span>([<span class="hljs-string">&quot;203.0.113.0/24&quot;</span>, <span class="hljs-string">&quot;198.51.100.10/32&quot;</span>]) <span class="hljs-operator">&amp;&amp;</span>
+      azurerm_network_security_rule.nodes_allow_gateway[<span class="hljs-number">0</span>].source_address_prefix <span class="hljs-operator">==</span> <span class="hljs-literal">null</span>
+    )
+<span class="hljs-attr">    error_message</span> = <span class="hljs-string">&quot;출발지가 여러 개이면 복수 속성(source_address_prefixes)만 써야 합니다.&quot;</span>
+  }
+}
+
+<span class="hljs-keyword">run</span> <span class="hljs-string">&quot;gateway_rule_with_single_cidr&quot;</span> {
+<span class="hljs-attr">  command</span> = plan
+
+  <span class="hljs-keyword">variables</span> {
+    <span class="hljs-comment"># 중복은 하나로 합쳐지므로 값이 1개일 때와 같이 단수 속성을 씁니다.</span>
+<span class="hljs-attr">    gateway_allowed_source_prefixes</span> = [<span class="hljs-string">&quot;203.0.113.10/32&quot;</span>, <span class="hljs-string">&quot;203.0.113.10/32&quot;</span>]
+  }
+
+  <span class="hljs-keyword">assert</span> {
+<span class="hljs-attr">    condition</span> = (
+      azurerm_network_security_rule.nodes_allow_gateway[<span class="hljs-number">0</span>].source_address_prefix <span class="hljs-operator">==</span> <span class="hljs-string">&quot;203.0.113.10/32&quot;</span> <span class="hljs-operator">&amp;&amp;</span>
+      azurerm_network_security_rule.nodes_allow_gateway[<span class="hljs-number">0</span>].source_address_prefixes <span class="hljs-operator">==</span> <span class="hljs-literal">null</span>
+    )
+<span class="hljs-attr">    error_message</span> = <span class="hljs-string">&quot;출발지가 하나뿐이면 단수 속성(source_address_prefix)만 써야 합니다.&quot;</span>
+  }
+}
+
+<span class="hljs-keyword">run</span> <span class="hljs-string">&quot;no_gateway_rule_for_internal_only&quot;</span> {
+<span class="hljs-attr">  command</span> = plan
+
+  <span class="hljs-keyword">variables</span> {
+<span class="hljs-attr">    gateway_allowed_source_prefixes</span> = []
+  }
+
+  <span class="hljs-keyword">assert</span> {
+<span class="hljs-attr">    condition</span>     = <span class="hljs-title function_">length</span>(azurerm_network_security_rule.nodes_allow_gateway) <span class="hljs-operator">==</span> <span class="hljs-number">0</span>
+<span class="hljs-attr">    error_message</span> = <span class="hljs-string">&quot;gateway_allowed_source_prefixes = [] 이면 공용 Gateway 허용 규칙을 만들지 않아야 합니다.&quot;</span>
+  }
+}
+
+<span class="hljs-keyword">run</span> <span class="hljs-string">&quot;rejects_internet_tag_mixed_with_cidr&quot;</span> {
+<span class="hljs-attr">  command</span> = plan
+
+  <span class="hljs-keyword">variables</span> {
+<span class="hljs-attr">    gateway_allowed_source_prefixes</span> = [<span class="hljs-string">&quot;Internet&quot;</span>, <span class="hljs-string">&quot;203.0.113.0/24&quot;</span>]
+  }
+<span class="hljs-attr">
+  expect_failures</span> = [<span class="hljs-variable">var.gateway_allowed_source_prefixes]</span>
+}
+
+<span class="hljs-keyword">run</span> <span class="hljs-string">&quot;rejects_invalid_gateway_source&quot;</span> {
+<span class="hljs-attr">  command</span> = plan
+
+  <span class="hljs-keyword">variables</span> {
+<span class="hljs-attr">    gateway_allowed_source_prefixes</span> = [<span class="hljs-string">&quot;not-a-cidr&quot;</span>]
+  }
+<span class="hljs-attr">
+  expect_failures</span> = [<span class="hljs-variable">var.gateway_allowed_source_prefixes]</span>
+}
+
 <span class="hljs-keyword">run</span> <span class="hljs-string">&quot;rejects_invalid_cidr&quot;</span> {
 <span class="hljs-attr">  command</span> = plan
 
@@ -3491,16 +3819,16 @@ Private DNS Zone (VNet 링크):  privatelink.azurecr.io  ·  privatelink.vaultco
   }
 <span class="hljs-attr">
   expect_failures</span> = [<span class="hljs-variable">var.subnet_cidrs]</span>
-}</code></pre></div></figure>
+}</code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (150줄) ▼">전체 코드 보기 (150줄) ▼</button></figure>
 <aside class="callout note"><div class="callout-title"><span>ℹ️</span><span>참고</span></div><p>이 테스트가 참조하는 mock 값은 <a href="#lab-99-appendix">부록</a>의 <code>terraform/mocks/azurerm.tfmock.hcl</code> 에 있습니다.</p>
 </aside>
 <h2 id="03-network--실습-따라하기">실습 따라하기<a class="anchor" href="#03-network--실습-따라하기" aria-label="이 제목 링크">#</a></h2>
 <figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 4줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-built_in">cd</span> terraform/03-network
 terraform init -backend-config=../backend.hcl
-terraform plan -out tfplan        <span class="hljs-comment"># 약 22개 리소스</span>
+terraform plan -out tfplan        <span class="hljs-comment"># 약 26개 리소스</span>
 terraform apply tfplan            <span class="hljs-comment"># 2~4분</span></code></pre></div></figure>
 <h3 id="03-network--검증">검증<a class="anchor" href="#03-network--검증" aria-label="이 제목 링크">#</a></h3>
-<figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 9줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">RG=$(terraform output -raw resource_group_name)
+<figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 13줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">RG=$(terraform output -raw resource_group_name)
 VNET=$(terraform output -raw vnet_name)
 
 az network vnet subnet list -g <span class="hljs-string">&quot;<span class="hljs-variable">$RG</span>&quot;</span> --vnet-name <span class="hljs-string">&quot;<span class="hljs-variable">$VNET</span>&quot;</span> \
@@ -3508,13 +3836,17 @@ az network vnet subnet list -g <span class="hljs-string">&quot;<span class="hljs
 
 terraform output nat_gateway_public_ip         <span class="hljs-comment"># 클러스터의 아웃바운드 고정 IP</span>
 az network nat gateway show -g <span class="hljs-string">&quot;<span class="hljs-variable">$RG</span>&quot;</span> -n <span class="hljs-string">&quot;<span class="hljs-subst">$(az network nat gateway list -g <span class="hljs-string">&quot;<span class="hljs-variable">$RG</span>&quot;</span> --query &#x27;[0].name&#x27; -o tsv)</span>&quot;</span> \
-  --query <span class="hljs-string">&quot;{sku:sku.name, zones:zones, idleTimeout:idleTimeoutInMinutes}&quot;</span> -o json</code></pre></div></figure>
-<p>기대 결과: <code>snet-aks-nodes</code> 에 <code>natGw: true</code>, <code>snet-aks-apiserver</code> 에 delegation <code>Microsoft.ContainerService/managedClusters</code>.</p>
+  --query <span class="hljs-string">&quot;{sku:sku.name, zones:zones, idleTimeout:idleTimeoutInMinutes}&quot;</span> -o json
+
+<span class="hljs-comment"># 노드 NSG 의 인바운드 허용 규칙</span>
+NSG=$(az network nsg list -g <span class="hljs-string">&quot;<span class="hljs-variable">$RG</span>&quot;</span> --query <span class="hljs-string">&quot;[?ends_with(name, &#x27;-aks-nodes&#x27;)].name | [0]&quot;</span> -o tsv)
+az network nsg rule list -g <span class="hljs-string">&quot;<span class="hljs-variable">$RG</span>&quot;</span> --nsg-name <span class="hljs-string">&quot;<span class="hljs-variable">$NSG</span>&quot;</span> -o table</code></pre></div></figure>
+<p>기대 결과: <code>snet-aks-nodes</code> 에 <code>natGw: true</code>, <code>snet-aks-apiserver</code> 에 delegation <code>Microsoft.ContainerService/managedClusters</code>. 노드 NSG 에는 <code>AllowNodesToPods</code>(100) · <code>AllowPodsToPods</code>(110) · <code>AllowApiServerToCluster</code>(120) · <code>AllowGatewayHttpHttps</code>(200) 가 보입니다.</p>
 <h3 id="03-network--자동-검증-스크립트">자동 검증 스크립트<a class="anchor" href="#03-network--자동-검증-스크립트" aria-label="이 제목 링크">#</a></h3>
 <p>서브넷 위임, NAT Gateway 연결과 고정 공인 IP, NSG, Private DNS Zone 의 VNet 연결까지 한 번에 확인합니다 (읽기 전용).</p>
 <figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 2줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-built_in">cd</span> ../..                          <span class="hljs-comment"># 저장소 루트에서 실행</span>
 scripts/verify.sh 03-network</code></pre></div></figure>
-<figure class="code collapsed"><figcaption><span class="file">scripts/verify/03-network.sh</span><span class="meta">bash · 64줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-meta">#!/usr/bin/env bash</span>
+<figure class="code collapsed"><figcaption><span class="file">scripts/verify/03-network.sh</span><span class="meta">bash · 78줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-meta">#!/usr/bin/env bash</span>
 <span class="hljs-comment"># Lab 03 검증: VNet · 서브넷 · NSG · NAT Gateway · Private DNS 가 설계대로 만들어졌는지 확인합니다 (읽기 전용).</span>
 <span class="hljs-comment">#   AWS 비교: VPC + 서브넷 + Security Group/NACL + NAT Gateway + Route 53 private hosted zone</span>
 <span class="hljs-comment"># 사용법: scripts/verify.sh 03-network</span>
@@ -3522,7 +3854,7 @@ scripts/verify.sh 03-network</code></pre></div></figure>
 <span class="hljs-built_in">source</span> <span class="hljs-string">&quot;<span class="hljs-subst">$(dirname <span class="hljs-string">&quot;<span class="hljs-variable">${BASH_SOURCE[0]}</span>&quot;</span>)</span>/../lib/common.sh&quot;</span>
 
 <span class="hljs-function"><span class="hljs-title">verify_stack</span></span>() {
-  <span class="hljs-built_in">local</span> rg vnet_name nat_ip vnet sn nat natsku pips zones zone links
+  <span class="hljs-built_in">local</span> rg vnet_name nat_ip vnet sn nat natsku pips zones zone links rules r
   rg=<span class="hljs-string">&quot;<span class="hljs-subst">$(tf_out 03-network resource_group_name)</span>&quot;</span>
   vnet_name=<span class="hljs-string">&quot;<span class="hljs-subst">$(tf_out 03-network vnet_name)</span>&quot;</span>
   nat_ip=<span class="hljs-string">&quot;<span class="hljs-subst">$(tf_out 03-network nat_gateway_public_ip)</span>&quot;</span>
@@ -3554,6 +3886,20 @@ scripts/verify.sh 03-network</code></pre></div></figure>
     jq_ok <span class="hljs-string">&quot;NSG 연결: <span class="hljs-variable">$sn</span>&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$vnet</span>&quot;</span> <span class="hljs-string">&quot;.subnets[] | select(.name == \&quot;<span class="hljs-variable">$sn</span>\&quot;) | .networkSecurityGroup.id != null&quot;</span>
   <span class="hljs-keyword">done</span>
 
+  <span class="hljs-comment"># AKS 는 서브넷에 연결한 NSG 를 수정하지 않으므로, 노드 NSG 의 인바운드 허용 규칙은 Terraform 이 만든 것이어야 합니다.</span>
+  rules=<span class="hljs-string">&quot;<span class="hljs-subst">$(nodes_nsg_rules <span class="hljs-string">&quot;<span class="hljs-variable">$rg</span>&quot;</span>)</span>&quot;</span>
+  <span class="hljs-keyword">if</span> [ -z <span class="hljs-string">&quot;<span class="hljs-variable">$rules</span>&quot;</span> ]; <span class="hljs-keyword">then</span>
+    fail <span class="hljs-string">&quot;노드 서브넷 NSG(…-aks-nodes)의 규칙을 읽을 수 없습니다&quot;</span>
+  <span class="hljs-keyword">else</span>
+    <span class="hljs-keyword">for</span> r <span class="hljs-keyword">in</span> AllowNodesToPods AllowPodsToPods AllowApiServerToCluster; <span class="hljs-keyword">do</span>
+      jq_ok <span class="hljs-string">&quot;노드 NSG 인바운드 허용: <span class="hljs-variable">$r</span> (Azure CNI Overlay / API Server VNet Integration)&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$rules</span>&quot;</span> \
+        <span class="hljs-string">&quot;any(.[]; .name == \&quot;<span class="hljs-variable">$r</span>\&quot; and .direction == \&quot;Inbound\&quot; and .access == \&quot;Allow\&quot;)&quot;</span>
+    <span class="hljs-keyword">done</span>
+    <span class="hljs-comment"># gateway_allowed_source_prefixes = [] (내부 Gateway 전용)이면 이 규칙이 없는 것이 정상입니다.</span>
+    jq_warn <span class="hljs-string">&quot;노드 NSG 인바운드 허용: AllowGatewayHttpHttps (공용 Gateway 80/443. 내부 Gateway 만 쓴다면 정상)&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$rules</span>&quot;</span> \
+      <span class="hljs-string">&#x27;any(.[]; .name == &quot;AllowGatewayHttpHttps&quot; and .direction == &quot;Inbound&quot; and .access == &quot;Allow&quot;)&#x27;</span>
+  <span class="hljs-keyword">fi</span>
+
   nat=<span class="hljs-string">&quot;<span class="hljs-subst">$(azj network nat gateway list -g <span class="hljs-string">&quot;<span class="hljs-variable">$rg</span>&quot;</span>)</span>&quot;</span>
   natsku=<span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="hljs-string">&quot;<span class="hljs-variable">$nat</span>&quot;</span> &#x27;.[0].sku.name&#x27;)</span>&quot;</span> <span class="hljs-comment"># nat_gateway_sku 변수: StandardV2(기본) / Standard</span>
   <span class="hljs-keyword">case</span> <span class="hljs-string">&quot;<span class="hljs-variable">$natsku</span>&quot;</span> <span class="hljs-keyword">in</span>
@@ -3577,7 +3923,7 @@ scripts/verify.sh 03-network</code></pre></div></figure>
 }
 
 <span class="hljs-comment"># 직접 실행(scripts/verify/03-network.sh)도 가능합니다.</span>
-<span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">${BASH_SOURCE[0]}</span>&quot;</span> = <span class="hljs-string">&quot;<span class="hljs-variable">$0</span>&quot;</span> ]; <span class="hljs-keyword">then</span> verify_stack; summary; <span class="hljs-keyword">fi</span></code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (64줄) ▼">전체 코드 보기 (64줄) ▼</button></figure>
+<span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">${BASH_SOURCE[0]}</span>&quot;</span> = <span class="hljs-string">&quot;<span class="hljs-variable">$0</span>&quot;</span> ]; <span class="hljs-keyword">then</span> verify_stack; summary; <span class="hljs-keyword">fi</span></code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (78줄) ▼">전체 코드 보기 (78줄) ▼</button></figure>
 <h2 id="03-network--자주-만나는-문제">자주 만나는 문제<a class="anchor" href="#03-network--자주-만나는-문제" aria-label="이 제목 링크">#</a></h2>
 <div class="table-wrap"><table>
 <thead>
@@ -3597,6 +3943,18 @@ scripts/verify.sh 03-network</code></pre></div></figure>
 <tr>
 <td>PE 서브넷에서 연결이 안 됨</td>
 <td>NSG 규칙 우선순위(100 허용 → 4000 거부)와 출발지(노드 서브넷 CIDR)를 확인.</td>
+</tr>
+<tr>
+<td>노드 간 Pod 통신 · DNS 가 안 됨 (Lab 05 이후)</td>
+<td>노드 NSG 에 Deny 규칙이 추가되지 않았는지, <code>AllowPodsToPods</code> 가 05-aks 의 <code>pod_cidr</code> 와 같은 대역인지 확인하세요. 다르면 두 스택의 <code>pod_cidr</code> 를 맞추고 03-network 를 다시 apply.</td>
+</tr>
+<tr>
+<td><code>kubectl exec</code> · <code>logs</code> 가 <code>connection reset</code> / 타임아웃</td>
+<td>노드 NSG 에 Deny 규칙이 있다면 <code>AllowApiServerToCluster</code>(API 서버 서브넷 → 노드 10250)가 남아 있는지 확인.</td>
+</tr>
+<tr>
+<td>공용 Gateway 가 타임아웃 (Lab 07)</td>
+<td>노드 NSG 에 <code>AllowGatewayHttpHttps</code> 가 있는지, <code>gateway_allowed_source_prefixes</code> 에 내 IP 가 포함되는지 확인 (<code>az network nsg rule list</code>). 내부 Gateway 는 VNet 밖에서 접근할 수 없습니다.</td>
 </tr>
 </tbody></table>
 </div>
@@ -5044,7 +5402,7 @@ PE_APPROVED=<span class="hljs-string">&#x27;[.[]? | (.privateLinkServiceConnecti
 }
 
 <span class="hljs-keyword">variable</span> <span class="hljs-string">&quot;pod_cidr&quot;</span> {
-<span class="hljs-attr">  description</span> = <span class="hljs-string">&quot;Azure CNI Overlay Pod CIDR. VNet / 온프레미스 대역과 겹치면 안 됩니다.&quot;</span>
+<span class="hljs-attr">  description</span> = <span class="hljs-string">&quot;Azure CNI Overlay Pod CIDR. VNet / 온프레미스 대역과 겹치면 안 됩니다. 03-network 의 pod_cidr(노드 NSG 의 허용 규칙)와 같은 값을 쓰세요.&quot;</span>
 <span class="hljs-attr">  type</span>        = string
 <span class="hljs-attr">  default</span>     = <span class="hljs-string">&quot;10.244.0.0/16&quot;</span>
 }
@@ -5407,7 +5765,7 @@ PE_APPROVED=<span class="hljs-string">&#x27;[.[]? | (.privateLinkServiceConnecti
   }
 }</code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (261줄) ▼">전체 코드 보기 (261줄) ▼</button></figure>
 <p><strong><code>monitoring.tf</code></strong> — Managed Prometheus / Container Insights / 진단 설정</p>
-<figure class="code collapsed"><figcaption><span class="file">terraform/05-aks/monitoring.tf</span><span class="meta">hcl · 162줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-comment"># ---------------------------------------------------------------------------</span>
+<figure class="code collapsed"><figcaption><span class="file">terraform/05-aks/monitoring.tf</span><span class="meta">hcl · 167줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-comment"># ---------------------------------------------------------------------------</span>
 <span class="hljs-comment"># 관측성 연결: AKS ↔ Managed Prometheus / Container Insights</span>
 <span class="hljs-comment">#</span>
 <span class="hljs-comment"># AWS(CloudWatch Container Insights, AMP) 에서는 &quot;에이전트 + 워크스페이스 + IAM&quot; 을 직접 연결하지만,</span>
@@ -5479,8 +5837,13 @@ PE_APPROVED=<span class="hljs-string">&#x27;[.[]? | (.privateLinkServiceConnecti
       }
     }
   }
-<span class="hljs-attr">
-  depends_on</span> = [azurerm_monitor_data_collection_rule_association.prometheus]
+
+  <span class="hljs-comment"># 같은 클러스터에 대한 PUT 이 노드 풀 생성/변경과 겹치면 409 AnotherOperationInProgress 로 실패하므로 노드 풀 뒤에 실행합니다.</span>
+<span class="hljs-attr">  depends_on</span> = [
+    azurerm_monitor_data_collection_rule_association.prometheus,
+    azurerm_kubernetes_cluster_node_pool.user,
+    azurerm_kubernetes_cluster_node_pool.spot,
+  ]
 }
 
 <span class="hljs-comment"># --- Container Insights (로그) -----------------------------------------------------</span>
@@ -5568,7 +5931,7 @@ PE_APPROVED=<span class="hljs-string">&#x27;[.[]? | (.privateLinkServiceConnecti
   enabled_metric {
 <span class="hljs-attr">    category</span> = <span class="hljs-string">&quot;AllMetrics&quot;</span>
   }
-}</code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (162줄) ▼">전체 코드 보기 (162줄) ▼</button></figure>
+}</code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (167줄) ▼">전체 코드 보기 (167줄) ▼</button></figure>
 <p><strong><code>prometheus-rules.tf</code></strong> — 기본 Grafana 대시보드가 쓰는 recording rule (그대로 복사해서 사용)</p>
 <figure class="code collapsed"><figcaption><span class="file">terraform/05-aks/prometheus-rules.tf</span><span class="meta">hcl · 284줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-comment"># ---------------------------------------------------------------------------</span>
 <span class="hljs-comment"># Prometheus Recording Rules</span>
@@ -6068,7 +6431,7 @@ terraform plan -out tfplan</code></pre></div></figure>
 <ul>
 <li><code>check.kubernetes_version_is_supported</code> 경고가 없는지 (지원 버전 목록이 출력됩니다)</li>
 <li><code>azurerm_kubernetes_cluster.this</code> → <code>network_profile</code>, <code>api_server_access_profile</code>, <code>identity</code> 값이 Lab 03/04 결과와 연결되는지</li>
-<li>리소스 수: 약 16개 — 클러스터, User 노드 풀, DCE·DCR·DCRA(Prometheus / Container Insights), Prometheus 규칙 그룹 2개, 진단 설정, AzAPI 업데이트 2개, 역할 할당 2개</li>
+<li>리소스 수: 15개 — 리소스 그룹, 클러스터, User 노드 풀, DCE 1 · DCR 2 · DCRA 2(Prometheus / Container Insights), Prometheus 규칙 그룹 2개, 진단 설정, AzAPI 업데이트 2개, 역할 할당 2개</li>
 </ul>
 <figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 1줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">terraform apply tfplan        <span class="hljs-comment"># 클러스터 생성 10~20분 + azapi 업데이트 5~10분</span></code></pre></div></figure>
 <aside class="callout note"><div class="callout-title"><span>ℹ️</span><span>참고</span></div><p>apply 중 <code>azapi_update_resource</code> 가 한 번 더 클러스터를 업데이트하므로 전체 시간이 길어집니다. 이 시간 동안 아래 <em>설계 결정</em>을 다시 읽어 보세요.</p>
@@ -6234,7 +6597,7 @@ kubectl get nodes -L kubernetes.azure.com/scalesetpriority    <span class="hljs-
 임시 kubeconfig 를 쓰므로 <code>~/.kube/config</code> 는 바뀌지 않습니다.</p>
 <figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 2줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-built_in">cd</span> ../..                          <span class="hljs-comment"># 저장소 루트에서 실행</span>
 scripts/verify.sh 05-aks</code></pre></div></figure>
-<figure class="code collapsed"><figcaption><span class="file">scripts/verify/05-aks.sh</span><span class="meta">bash · 122줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-meta">#!/usr/bin/env bash</span>
+<figure class="code collapsed"><figcaption><span class="file">scripts/verify/05-aks.sh</span><span class="meta">bash · 134줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-meta">#!/usr/bin/env bash</span>
 <span class="hljs-comment"># Lab 05 검증: AKS 클러스터가 설계한 대로 만들어졌는지 확인합니다 (읽기 전용).</span>
 <span class="hljs-comment">#   1) az aks show 한 번으로 클러스터 설정을 읽습니다 (aws eks describe-cluster 에 해당)</span>
 <span class="hljs-comment">#   2) kubectl 로 노드 · 권한 · 애드온을 확인합니다. kubeconfig 는 임시 파일을 써서 ~/.kube/config 를 건드리지 않습니다.</span>
@@ -6243,7 +6606,7 @@ scripts/verify.sh 05-aks</code></pre></div></figure>
 <span class="hljs-built_in">source</span> <span class="hljs-string">&quot;<span class="hljs-subst">$(dirname <span class="hljs-string">&quot;<span class="hljs-variable">${BASH_SOURCE[0]}</span>&quot;</span>)</span>/../lib/common.sh&quot;</span>
 
 <span class="hljs-function"><span class="hljs-title">verify_stack</span></span>() {
-  <span class="hljs-built_in">local</span> rg name aks nodes ready want zones gc pods p bad sku channel
+  <span class="hljs-built_in">local</span> rg name aks nodes ready want zones gc pods p bad sku channel netrg podcidr nsgrules
   rg=<span class="hljs-string">&quot;<span class="hljs-subst">$(tf_out 05-aks resource_group_name)</span>&quot;</span>
   name=<span class="hljs-string">&quot;<span class="hljs-subst">$(tf_out 05-aks cluster_name)</span>&quot;</span>
 
@@ -6279,6 +6642,18 @@ scripts/verify.sh 05-aks</code></pre></div></figure>
   expect_eq <span class="hljs-string">&quot;CNI / 모드&quot;</span> <span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="hljs-string">&quot;<span class="hljs-variable">$aks</span>&quot;</span> &#x27;[.networkProfile.networkPlugin, .networkProfile.networkPluginMode] | join(<span class="hljs-string">&quot;/&quot;</span>)</span>&#x27;)&quot;</span> <span class="hljs-string">&quot;azure/overlay&quot;</span>
   expect_eq <span class="hljs-string">&quot;데이터 플레인 / 네트워크 정책&quot;</span> <span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="hljs-string">&quot;<span class="hljs-variable">$aks</span>&quot;</span> &#x27;[.networkProfile.networkDataplane, .networkProfile.networkPolicy] | join(<span class="hljs-string">&quot;/&quot;</span>)</span>&#x27;)&quot;</span> <span class="hljs-string">&quot;cilium/cilium&quot;</span>
   expect_eq <span class="hljs-string">&quot;아웃바운드 방식 (직접 만든 NAT Gateway)&quot;</span> <span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="hljs-string">&quot;<span class="hljs-variable">$aks</span>&quot;</span> .networkProfile.outboundType)</span>&quot;</span> <span class="hljs-string">&quot;userAssignedNATGateway&quot;</span>
+  <span class="hljs-comment"># 03-network 의 노드 NSG 는 Pod CIDR 간 인바운드를 허용합니다 (오버레이 Pod 트래픽에도 서브넷 NSG 가 적용됨).</span>
+  <span class="hljs-comment"># 두 스택의 pod_cidr 가 다르면, 나중에 NSG 에 Deny 규칙을 더하는 순간 노드 간 Pod 통신(DNS 포함)이 막힙니다.</span>
+  netrg=<span class="hljs-string">&quot;<span class="hljs-subst">$(tf_out 03-network resource_group_name)</span>&quot;</span>
+  podcidr=<span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="hljs-string">&quot;<span class="hljs-variable">$aks</span>&quot;</span> .networkProfile.podCidr)</span>&quot;</span>
+  nsgrules=<span class="hljs-string">&quot;&quot;</span>
+  [ -z <span class="hljs-string">&quot;<span class="hljs-variable">$netrg</span>&quot;</span> ] || nsgrules=<span class="hljs-string">&quot;<span class="hljs-subst">$(nodes_nsg_rules <span class="hljs-string">&quot;<span class="hljs-variable">$netrg</span>&quot;</span>)</span>&quot;</span>
+  <span class="hljs-keyword">if</span> [ -z <span class="hljs-string">&quot;<span class="hljs-variable">$nsgrules</span>&quot;</span> ]; <span class="hljs-keyword">then</span>
+    skip <span class="hljs-string">&quot;03-network 의 노드 NSG 규칙을 읽을 수 없어 Pod CIDR 허용 규칙 확인을 건너뜁니다&quot;</span>
+  <span class="hljs-keyword">else</span>
+    jq_ok <span class="hljs-string">&quot;노드 NSG 가 Pod CIDR(<span class="hljs-variable">${podcidr}</span>) 간 인바운드를 허용 (03-network 와 05-aks 의 pod_cidr 일치)&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$nsgrules</span>&quot;</span> \
+      <span class="hljs-string">&quot;any(.[]; .name == \&quot;AllowPodsToPods\&quot; and .access == \&quot;Allow\&quot; and .sourceAddressPrefix == \&quot;<span class="hljs-variable">$podcidr</span>\&quot; and .destinationAddressPrefix == \&quot;<span class="hljs-variable">$podcidr</span>\&quot;)&quot;</span>
+  <span class="hljs-keyword">fi</span>
   expect_eq <span class="hljs-string">&quot;API 서버 VNet Integration&quot;</span> <span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="hljs-string">&quot;<span class="hljs-variable">$aks</span>&quot;</span> .apiServerAccessProfile.enableVnetIntegration)</span>&quot;</span> <span class="hljs-string">&quot;true&quot;</span>
   <span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="hljs-string">&quot;<span class="hljs-variable">$aks</span>&quot;</span> .apiServerAccessProfile.enablePrivateCluster)</span>&quot;</span> = <span class="hljs-string">&quot;true&quot;</span> ]; <span class="hljs-keyword">then</span>
     pass <span class="hljs-string">&quot;프라이빗 클러스터 (API 서버는 VNet 안에서만 접근)&quot;</span>
@@ -6355,7 +6730,7 @@ scripts/verify.sh 05-aks</code></pre></div></figure>
 }
 
 <span class="hljs-comment"># 직접 실행(scripts/verify/05-aks.sh)도 가능합니다.</span>
-<span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">${BASH_SOURCE[0]}</span>&quot;</span> = <span class="hljs-string">&quot;<span class="hljs-variable">$0</span>&quot;</span> ]; <span class="hljs-keyword">then</span> verify_stack; summary; <span class="hljs-keyword">fi</span></code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (122줄) ▼">전체 코드 보기 (122줄) ▼</button></figure>
+<span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">${BASH_SOURCE[0]}</span>&quot;</span> = <span class="hljs-string">&quot;<span class="hljs-variable">$0</span>&quot;</span> ]; <span class="hljs-keyword">then</span> verify_stack; summary; <span class="hljs-keyword">fi</span></code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (134줄) ▼">전체 코드 보기 (134줄) ▼</button></figure>
 <aside class="callout tip"><div class="callout-title"><span>💡</span><span>팁</span></div><p>kubectl 단계가 &quot;API 서버에 접속하지 못했습니다&quot; 로 실패하면 공인 IP 가 바뀐 경우가 대부분입니다. <code>TF_VAR_allowed_ip_ranges</code> 를 갱신하고 05-aks 를 다시 <code>apply</code> 하세요.
 기본 구성과 다르게 바꾼 설정(<code>sku_tier</code>, <code>enable_gateway_api</code>, 노드 수, Lab 09 의 업그레이드 채널)은 ✗ 대신 값을 보여 주거나 경고·건너뜀으로 표시합니다. 프라이빗 클러스터(<code>enable_private_cluster</code>)는 VNet 밖에서 kubectl 단계를 건너뜁니다.</p>
 </aside>
@@ -6857,7 +7232,7 @@ scripts/verify.sh 05-aks</code></pre></div></figure>
   depends_on</span> = [time_sleep.rbac_propagation]
 }</code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (71줄) ▼">전체 코드 보기 (71줄) ▼</button></figure>
 <p><strong><code>kubernetes.tf</code></strong> — 쿠버네티스 쪽: Namespace, ServiceAccount, SecretProviderClass, Deployment</p>
-<figure class="code collapsed"><figcaption><span class="file">terraform/06-workload/kubernetes.tf</span><span class="meta">hcl · 151줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-comment"># ---------------------------------------------------------------------------</span>
+<figure class="code collapsed"><figcaption><span class="file">terraform/06-workload/kubernetes.tf</span><span class="meta">hcl · 154줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-comment"># ---------------------------------------------------------------------------</span>
 <span class="hljs-comment"># 쿠버네티스 쪽: Namespace / ServiceAccount / SecretProviderClass / Deployment</span>
 <span class="hljs-comment"># ---------------------------------------------------------------------------</span>
 <span class="hljs-keyword">resource</span> <span class="hljs-string">&quot;kubernetes_namespace_v1&quot;</span> <span class="hljs-string">&quot;app&quot;</span> {
@@ -6969,9 +7344,12 @@ scripts/verify.sh 05-aks</code></pre></div></figure>
             }
           }
 
+          <span class="hljs-comment"># kubernetes provider 는 컨테이너 security_context 에서 생략한 값을 false 로 보냅니다.</span>
+          <span class="hljs-comment"># run_as_non_root 를 명시하지 않으면 파드 수준의 true 를 덮어써 PSS restricted 에 막힙니다.</span>
           security_context {
 <span class="hljs-attr">            allow_privilege_escalation</span> = <span class="hljs-literal">false</span>
 <span class="hljs-attr">            read_only_root_filesystem</span>  = <span class="hljs-literal">true</span>
+<span class="hljs-attr">            run_as_non_root</span>            = <span class="hljs-literal">true</span>
 
             capabilities {
 <span class="hljs-attr">              drop</span> = [<span class="hljs-string">&quot;ALL&quot;</span>]
@@ -7007,7 +7385,7 @@ scripts/verify.sh 05-aks</code></pre></div></figure>
     azurerm_role_assignment.app_reads_secrets,
     time_sleep.rbac_propagation,
   ]
-}</code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (151줄) ▼">전체 코드 보기 (151줄) ▼</button></figure>
+}</code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (154줄) ▼">전체 코드 보기 (154줄) ▼</button></figure>
 <figure class="code"><figcaption><span class="file">terraform/06-workload/outputs.tf</span><span class="meta">hcl · 14줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-keyword">output</span> <span class="hljs-string">&quot;app_identity_client_id&quot;</span> {
 <span class="hljs-attr">  description</span> = <span class="hljs-string">&quot;앱 UAMI 의 client ID (ServiceAccount annotation 값)&quot;</span>
 <span class="hljs-attr">  value</span>       = azurerm_user_assigned_identity.app.client_id
@@ -7047,7 +7425,7 @@ scripts/verify.sh 05-aks</code></pre></div></figure>
 <h2 id="06-workload-identity--실습-따라하기">실습 따라하기<a class="anchor" href="#06-workload-identity--실습-따라하기" aria-label="이 제목 링크">#</a></h2>
 <h3 id="06-workload-identity--1단계-데모-이미지를-acr-로-가져오기">1단계. 데모 이미지를 ACR 로 가져오기<a class="anchor" href="#06-workload-identity--1단계-데모-이미지를-acr-로-가져오기" aria-label="이 제목 링크">#</a></h3>
 <p>ECR 의 <em>pull through cache</em> 처럼 외부 이미지를 직접 쓰지 않고 <strong>사설 레지스트리를 경유</strong>하는 것이 Best practice 입니다. (Lab 04 에서 이미 했다면 건너뛰세요.)</p>
-<figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 2줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">ACR=$(terraform -<span class="hljs-built_in">chdir</span>=../04-platform output -raw acr_name)
+<figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 2줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">ACR=$(terraform -<span class="hljs-built_in">chdir</span>=terraform/04-platform output -raw acr_name)     <span class="hljs-comment"># 저장소 루트에서 실행</span>
 az acr import -n <span class="hljs-string">&quot;<span class="hljs-variable">$ACR</span>&quot;</span> --<span class="hljs-built_in">source</span> mcr.microsoft.com/cbl-mariner/busybox:2.0 --image demo/busybox:2.0</code></pre></div></figure>
 <h3 id="06-workload-identity--2단계-적용">2단계. 적용<a class="anchor" href="#06-workload-identity--2단계-적용" aria-label="이 제목 링크">#</a></h3>
 <figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 4줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-built_in">cd</span> terraform/06-workload
@@ -7070,9 +7448,9 @@ az keyvault secret show --vault-name <span class="hljs-string">&quot;<span class
 kubectl -n demo <span class="hljs-built_in">exec</span> deploy/kv-demo -- <span class="hljs-built_in">env</span> | grep -E <span class="hljs-string">&quot;AZURE_&quot;</span>
 <span class="hljs-comment">#   AZURE_CLIENT_ID / AZURE_TENANT_ID / AZURE_FEDERATED_TOKEN_FILE / AZURE_AUTHORITY_HOST</span>
 
-<span class="hljs-comment"># 투영된 SA 토큰의 클레임 (iss / sub / aud)</span>
+<span class="hljs-comment"># 투영된 SA 토큰의 클레임 (iss / sub / aud). JWT 는 base64url 이라 패딩이 없어서 base64 -d 만으로는 잘리는 경우가 있어 python 으로 풉니다.</span>
 kubectl -n demo <span class="hljs-built_in">exec</span> deploy/kv-demo -- <span class="hljs-built_in">cat</span> /var/run/secrets/azure/tokens/azure-identity-token \
-  | <span class="hljs-built_in">cut</span> -d. -f2 | <span class="hljs-built_in">tr</span> <span class="hljs-string">&#x27;_-&#x27;</span> <span class="hljs-string">&#x27;/+&#x27;</span> | <span class="hljs-built_in">base64</span> -d 2&gt;/dev/null | python3 -m json.tool</code></pre></div></figure>
+  | python3 -c <span class="hljs-string">&#x27;import sys,base64,json; t=sys.stdin.read().strip().split(&quot;.&quot;)[1]; print(json.dumps(json.loads(base64.urlsafe_b64decode(t + &quot;=&quot; * (-len(t) % 4))), indent=2))&#x27;</span></code></pre></div></figure>
 <p><code>iss</code> 는 <code>oidc_issuer_url</code>, <code>sub</code> 는 <code>system:serviceaccount:demo:workload-sa</code>, <code>aud</code> 는 <code>api://AzureADTokenExchange</code> 이며, 이 세 값이 Federated credential 과 일치해야 토큰 교환이 성공합니다.</p>
 <h3 id="06-workload-identity--4단계-시크릿-자동-갱신-확인">4단계. 시크릿 자동 갱신 확인<a class="anchor" href="#06-workload-identity--4단계-시크릿-자동-갱신-확인" aria-label="이 제목 링크">#</a></h3>
 <figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 5줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">KV=$(terraform -<span class="hljs-built_in">chdir</span>=../04-platform output -raw key_vault_name)
@@ -7453,6 +7831,10 @@ scripts/verify.sh 06-workload</code></pre></div></figure>
 <td><code>internal_gateway</code> 변수</td>
 <td>공용/내부 노출을 코드 한 줄로 전환. 운영에서는 내부 LB + Application Gateway(WAF) 조합이 일반적입니다.</td>
 </tr>
+<tr>
+<td>공용 Gateway 의 인바운드는 <strong>03-network 노드 NSG</strong> 에서 허용</td>
+<td>Standard LB 는 인바운드가 기본적으로 닫혀 있고, AKS 는 서브넷에 연결한 NSG 에 규칙을 추가하지 않습니다. 03-network 의 <code>AllowGatewayHttpHttps</code>(80/443, 출발지 <code>gateway_allowed_source_prefixes</code>)가 그 역할을 하며, 내부 Gateway 는 VNet 안 트래픽을 기본 규칙(<code>AllowVnetInBound</code>)이 허용합니다.</td>
+</tr>
 </tbody></table>
 </div>
 <h2 id="07-ingress--코드">코드<a class="anchor" href="#07-ingress--코드" aria-label="이 제목 링크">#</a></h2>
@@ -7569,7 +7951,7 @@ scripts/verify.sh 06-workload</code></pre></div></figure>
 <span class="hljs-attr">  resource_group_name</span> = <span class="hljs-variable">module.naming.names.rg_platform</span>
 }</code></pre></div></figure>
 <p><strong><code>app.tf</code></strong> — 데모 앱과 운영 필수 리소스(PDB, HPA, NetworkPolicy)</p>
-<figure class="code collapsed"><figcaption><span class="file">terraform/07-ingress/app.tf</span><span class="meta">hcl · 219줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-comment"># ---------------------------------------------------------------------------</span>
+<figure class="code collapsed"><figcaption><span class="file">terraform/07-ingress/app.tf</span><span class="meta">hcl · 221줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-comment"># ---------------------------------------------------------------------------</span>
 <span class="hljs-comment"># 데모 웹 앱 (ASP.NET 샘플) : Namespace / Deployment / Service / PDB / HPA / NetworkPolicy</span>
 <span class="hljs-comment"># 프로덕션 권장 사항(리소스 요청·제한, probe, 비루트 실행, 영역 분산, PDB, HPA)을 모두 포함합니다.</span>
 <span class="hljs-comment"># ---------------------------------------------------------------------------</span>
@@ -7652,8 +8034,10 @@ scripts/verify.sh 06-workload</code></pre></div></figure>
             }
           }
 
+          <span class="hljs-comment"># kubernetes provider 는 컨테이너 security_context 에서 생략한 값을 false 로 보내므로 run_as_non_root 를 명시합니다.</span>
           security_context {
 <span class="hljs-attr">            allow_privilege_escalation</span> = <span class="hljs-literal">false</span>
+<span class="hljs-attr">            run_as_non_root</span>            = <span class="hljs-literal">true</span>
 
             capabilities {
 <span class="hljs-attr">              drop</span> = [<span class="hljs-string">&quot;ALL&quot;</span>]
@@ -7787,7 +8171,7 @@ scripts/verify.sh 06-workload</code></pre></div></figure>
       }
     }
   }
-}</code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (219줄) ▼">전체 코드 보기 (219줄) ▼</button></figure>
+}</code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (221줄) ▼">전체 코드 보기 (221줄) ▼</button></figure>
 <p><strong><code>gateway.tf</code></strong> — Gateway 와 HTTPRoute</p>
 <figure class="code collapsed"><figcaption><span class="file">terraform/07-ingress/gateway.tf</span><span class="meta">hcl · 97줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-comment"># ---------------------------------------------------------------------------</span>
 <span class="hljs-comment"># Gateway API 로 외부 트래픽 받기  (AWS Load Balancer Controller 의 Ingress/ALB 에 해당)</span>
@@ -7958,8 +8342,8 @@ curl -i <span class="hljs-string">&quot;http://<span class="hljs-variable">$IP</
 kubectl -n web get pods -l app=aspnetapp -o wide
 kubectl -n web get pods -l app=aspnetapp -o jsonpath=<span class="hljs-string">&#x27;{range .items[*]}{.spec.nodeName}{&quot;\n&quot;}{end}&#x27;</span> | <span class="hljs-built_in">sort</span> | <span class="hljs-built_in">uniq</span> -c
 
-<span class="hljs-comment"># 액세스 로그 (Envoy 기본 활성)</span>
-kubectl -n web logs deploy/web-gateway-approuting-istio --<span class="hljs-built_in">tail</span>=5</code></pre></div></figure>
+<span class="hljs-comment"># 액세스 로그 (Envoy 기본 활성, JSON 한 줄). Envoy 파드가 2개라 `deploy/...` 로는 한 파드의 로그만(시작 로그일 수도) 보이므로 라벨로 모두 봅니다</span>
+kubectl -n web logs -l gateway.networking.k8s.io/gateway-name=web-gateway --<span class="hljs-built_in">tail</span>=3 --prefix</code></pre></div></figure>
 <h3 id="07-ingress--4단계-동작-실험">4단계. 동작 실험<a class="anchor" href="#07-ingress--4단계-동작-실험" aria-label="이 제목 링크">#</a></h3>
 <figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 12줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-comment"># (a) 부하를 주고 HPA 가 늘어나는지 관찰</span>
 kubectl -n web get hpa -w &amp;
@@ -7974,7 +8358,7 @@ kubectl run np-test --<span class="hljs-built_in">rm</span> -i --restart=Never -
 terraform apply -var internal_gateway=<span class="hljs-literal">true</span>
 kubectl -n web get gateway web-gateway -o jsonpath=<span class="hljs-string">&#x27;{.status.addresses[0].value}{&quot;\n&quot;}&#x27;</span>   <span class="hljs-comment"># 10.10.2.x</span></code></pre></div></figure>
 <h3 id="07-ingress--tls-https-로-확장하기">TLS (HTTPS) 로 확장하기<a class="anchor" href="#07-ingress--tls-https-로-확장하기" aria-label="이 제목 링크">#</a></h3>
-<p><code>Gateway</code> 에 <code>443/HTTPS</code> 리스너를 추가하고 <code>tls.certificateRefs</code> 로 쿠버네티스 Secret 을 가리킵니다. 인증서는 <strong>Key Vault 에 두고 Secrets Store CSI 의 <code>secretObjects</code></strong> 로 Secret 에 동기화하는 것이 Microsoft 베이스라인 방식입니다(Lab 06 의 SecretProviderClass 패턴과 동일, <code>Key Vault Certificate User</code> 역할 필요). 자세한 절차는 <a href="https://learn.microsoft.com/azure/aks/app-routing-gateway-api-dns-tls" target="_blank" rel="noopener noreferrer">App Routing Gateway API: DNS 와 TLS</a> 를 참고하세요.</p>
+<p><code>Gateway</code> 에 <code>443/HTTPS</code> 리스너를 추가하고 <code>tls.certificateRefs</code> 로 쿠버네티스 Secret 을 가리킵니다. 노드 NSG(03-network)는 80 과 443 을 이미 허용하므로 NSG 를 고칠 필요가 없습니다. 인증서는 <strong>Key Vault 에 두고 Secrets Store CSI 의 <code>secretObjects</code></strong> 로 Secret 에 동기화하는 것이 Microsoft 베이스라인 방식입니다(Lab 06 의 SecretProviderClass 패턴과 동일, <code>Key Vault Certificate User</code> 역할 필요). 자세한 절차는 <a href="https://learn.microsoft.com/azure/aks/app-routing-gateway-api-dns-tls" target="_blank" rel="noopener noreferrer">App Routing Gateway API: DNS 와 TLS</a> 를 참고하세요.</p>
 <h3 id="07-ingress--자동-검증-스크립트">자동 검증 스크립트<a class="anchor" href="#07-ingress--자동-검증-스크립트" aria-label="이 제목 링크">#</a></h3>
 <p>Gateway(Programmed) → HTTPRoute(Accepted) → Deployment/HPA/PDB/NetworkPolicy 를 확인하고, 공용 Gateway 라면 실제로 <code>curl</code> 요청을 보내 <code>200</code> 을 확인합니다(내부 Gateway 는 건너뜀).</p>
 <figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 2줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-built_in">cd</span> ../..                          <span class="hljs-comment"># 저장소 루트에서 실행</span>
@@ -8060,7 +8444,7 @@ scripts/verify.sh 07-ingress</code></pre></div></figure>
 </tr>
 <tr>
 <td><code>curl</code> 이 타임아웃</td>
-<td>노드 서브넷 NSG(AKS 가 규칙을 추가하는 데 시간 필요), 내부 Gateway(<code>internal_gateway=true</code>)인데 VNet 밖에서 접근, 또는 NetworkPolicy.</td>
+<td>03-network 노드 서브넷 NSG 의 <code>AllowGatewayHttpHttps</code> 규칙(AKS 는 서브넷에 연결한 NSG 를 수정하지 않으므로 Terraform 이 만든 규칙이 필요)과 <code>gateway_allowed_source_prefixes</code> 에 내 IP 가 포함되는지 확인, 내부 Gateway(<code>internal_gateway=true</code>)인데 VNet 밖에서 접근, 또는 NetworkPolicy.</td>
 </tr>
 <tr>
 <td>HTTPRoute 가 <code>Accepted: False</code></td>
@@ -8659,7 +9043,7 @@ scripts/verify.sh 07-ingress</code></pre></div></figure>
 <h3 id="08-governance--1단계-기본audit-적용">1단계. 기본(Audit) 적용<a class="anchor" href="#08-governance--1단계-기본audit-적용" aria-label="이 제목 링크">#</a></h3>
 <figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 4줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-built_in">cd</span> terraform/08-governance
 terraform init -backend-config=../backend.hcl
-terraform plan -out tfplan        <span class="hljs-comment"># 정책 할당 8개</span>
+terraform plan -out tfplan        <span class="hljs-comment"># 정책 할당 8개 + 예산 시작일용 time_static 1개 = 9개 추가</span>
 terraform apply tfplan</code></pre></div></figure>
 <h3 id="08-governance--2단계-정책이-클러스터로-동기화되었는지-확인">2단계. 정책이 클러스터로 동기화되었는지 확인<a class="anchor" href="#08-governance--2단계-정책이-클러스터로-동기화되었는지-확인" aria-label="이 제목 링크">#</a></h3>
 <p>Azure Policy 애드온은 약 15분마다 할당을 동기화합니다. 처음에는 시간이 걸립니다.</p>
@@ -8672,13 +9056,15 @@ $(terraform output -raw compliance_command)
 az policy state list -g <span class="hljs-string">&quot;<span class="hljs-subst">$(terraform -chdir=../05-aks output -raw resource_group_name)</span>&quot;</span> \
   --filter <span class="hljs-string">&quot;complianceState eq &#x27;NonCompliant&#x27;&quot;</span> --query <span class="hljs-string">&quot;[].{policy:policyDefinitionName, resource:resourceId}&quot;</span> -o table</code></pre></div></figure>
 <p>기대 결과: 기본 구성에서는 <code>authorized-ip-ranges</code>(O), <code>local-auth-disabled</code>(O) 등이 <strong>Compliant</strong>, Defender 프로필 정책은 <code>enable_defender=false</code> 이므로 <strong>NonCompliant</strong> 로 나옵니다 → 감사가 의도대로 동작하는 것입니다.</p>
+<aside class="callout note"><div class="callout-title"><span>ℹ️</span><span>참고</span></div><p>구독에 <em>Defender for Containers 자동 프로비저닝</em> 정책이 이미 있으면(Defender 가 켜진 구독의 기본값) 그 정책이 클러스터에 Defender 프로필을 직접 붙입니다. 이 경우 Defender 프로필 정책은 처음부터 Compliant 이고, 05-aks 의 <code>plan</code> 에 <code>microsoft_defender</code> 제거 diff 가 계속 보입니다. 05-aks 를 <code>-var enable_defender=true</code> 로 적용해 Terraform 이 같은 상태를 선언하게 맞추세요. 평가 결과에는 구독 단위 이니셔티브(예: ASC 기본 이니셔티브)의 비준수 항목도 함께 나옵니다.</p>
+</aside>
 <h3 id="08-governance--3단계-deny-효과-체험">3단계. Deny 효과 체험<a class="anchor" href="#08-governance--3단계-deny-효과-체험" aria-label="이 제목 링크">#</a></h3>
 <figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 14줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">terraform apply -var policy_effect=Deny      <span class="hljs-comment"># 애드온이 동기화될 때까지 ~15분 대기</span>
 
 <span class="hljs-built_in">cat</span> &lt;&lt;<span class="hljs-string">&#x27;EOF&#x27;</span> | kubectl apply -f -
 apiVersion: v1
 kind: Pod
-metadata: { name: bad-pod, namespace: web }
+metadata: { name: bad-pod, namespace: default }
 spec:
   containers:
   - name: bad
@@ -8687,6 +9073,8 @@ spec:
     securityContext: { privileged: <span class="hljs-literal">true</span> }
 EOF
 <span class="hljs-comment"># → admission webhook &quot;validation.gatekeeper.sh&quot; denied the request: ... Privileged container is not allowed</span></code></pre></div></figure>
+<aside class="callout note"><div class="callout-title"><span>ℹ️</span><span>참고</span></div><p>시험 파드는 <code>web</code> 이 아니라 <strong><code>default</code></strong> 네임스페이스에 만듭니다. <code>web</code> 은 Pod Security Standards(<code>baseline</code> enforce)가 걸려 있어서, 같은 파드가 Azure Policy(Gatekeeper)보다 먼저 <code>violates PodSecurity &quot;baseline:latest&quot;: privileged</code> 로 거부됩니다. 둘 다 거부이지만 이 단계에서 보려는 것은 Azure Policy 의 Deny 효과입니다.</p>
+</aside>
 <p>확인 후에는 <code>terraform apply</code> (기본값 Audit)로 되돌리세요. Deny 상태에서는 06/07 에서 배포한 앱도 정책을 만족해야 합니다(이 가이드의 앱은 만족하도록 작성되었습니다).</p>
 <h3 id="08-governance--4단계-선택-defender-예산-잠금">4단계. (선택) Defender / 예산 / 잠금<a class="anchor" href="#08-governance--4단계-선택-defender-예산-잠금" aria-label="이 제목 링크">#</a></h3>
 <figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 11줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-comment"># Defender for Containers: 구독 단위 플랜 + 클러스터 프로필</span>
@@ -9136,8 +9524,8 @@ kubectl get events -A | grep -i -E <span class="hljs-string">&quot;TriggeredScal
 <aside class="callout tip"><div class="callout-title"><span>💡</span><span>팁</span></div><p><strong>노드 수를 코드에 고정하지 마세요.</strong> <code>auto_scaling_enabled = true</code> 일 때는 <code>min_count</code>/<code>max_count</code> 만 선언합니다. <code>node_count</code> 를 쓰면 오토스케일러가 바꾼 값과 계속 충돌합니다(꼭 써야 한다면 <code>lifecycle.ignore_changes</code>).</p>
 </aside>
 <h2 id="09-operations--3-노드-풀-변경과-교체">3. 노드 풀 변경과 교체<a class="anchor" href="#09-operations--3-노드-풀-변경과-교체" aria-label="이 제목 링크">#</a></h2>
-<p><code>vm_size</code>, <code>os_disk_*</code>, <code>zones</code>, <code>vnet_subnet_id</code> 등을 바꾸면 노드 풀이 <strong>교체</strong>됩니다. 이 실습은 <code>temporary_name_for_rotation</code>(<code>systemtmp</code>, <code>usertmp</code>)을 설정해 임시 풀을 만든 뒤 교체합니다.</p>
-<figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 1줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">terraform plan -var user_node_vm_size=Standard_D8ds_v5   <span class="hljs-comment"># user 풀 교체 계획 확인</span></code></pre></div></figure>
+<p><code>vm_size</code>, <code>os_disk_*</code>, <code>zones</code>, <code>vnet_subnet_id</code> 등을 바꾸면 노드 풀이 <strong>교체</strong>됩니다. 이 실습은 <code>temporary_name_for_rotation</code>(<code>systemtmp</code>, <code>usertmp</code>)을 설정해 임시 풀을 만든 뒤 교체합니다. 그래서 plan 에는 <code>replace</code> 가 아니라 <strong><code>will be updated in-place</code></strong> 로 보이고, 실제 교체(임시 풀 생성 → 이전 풀 제거)는 apply 중에 provider 가 수행합니다.</p>
+<figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 1줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">terraform plan -var user_node_vm_size=Standard_D8ds_v5   <span class="hljs-comment"># vm_size: D4ds_v5 -&gt; D8ds_v5 (user 풀 updated in-place)</span></code></pre></div></figure>
 <aside class="callout caution"><div class="callout-title"><span>🛑</span><span>경고</span></div><p>순환 교체(rotation)는 <strong>cordon/drain 없이</strong> 이전 풀을 제거하므로 파드가 중단될 수 있습니다. 운영에서는 <em>새 풀을 추가 → 기존 풀 cordon/drain → 파드 이동 확인 → 기존 풀 제거</em>(blue-green)가 더 안전합니다. PDB 가 있는 워크로드라도 반드시 점검 시간에 실행하세요.</p>
 </aside>
 <h2 id="09-operations--4-비용을-아끼는-운영-습관">4. 비용을 아끼는 운영 습관<a class="anchor" href="#09-operations--4-비용을-아끼는-운영-습관" aria-label="이 제목 링크">#</a></h2>
@@ -9250,7 +9638,7 @@ az aks start -g &lt;rg&gt; -n &lt;cluster&gt;
   ├─ Azure CNI Overlay + Cilium, 관리형 NAT Gateway
   ├─ Entra ID + Azure RBAC (로컬 계정 없음), Workload Identity/OIDC
   ├─ Deployment Safeguards + Pod Security Standards(baseline) enforce
-  └─ Gateway API(approuting-istio), Standard 티어 + Pod readiness SLA(99.9% / 5분), 자동 업그레이드(stable, N-1)</code></pre></div></figure>
+  └─ approuting-istio(Gateway API 구현; CRD 는 1.36+ 에서 기본 포함), Standard 티어 + Pod readiness SLA(99.9% / 5분), 자동 업그레이드(stable, N-1)</code></pre></div></figure>
 <h2 id="10-aks-automatic--aws-경험자를-위한-비교">AWS 경험자를 위한 비교<a class="anchor" href="#10-aks-automatic--aws-경험자를-위한-비교" aria-label="이 제목 링크">#</a></h2>
 <div class="table-wrap"><table>
 <thead>
@@ -9480,7 +9868,7 @@ az aks start -g &lt;rg&gt; -n &lt;cluster&gt;
 </tr>
 <tr>
 <td>Ingress: <code>web_app_routing_ingress { istio_enabled = true }</code></td>
-<td>NGINX 대신 Gateway API(approuting-istio). 1.36+ 신규 Automatic 의 기본값과 동일.</td>
+<td>NGINX 대신 approuting-istio 구현. Gateway API CRD 까지 기본 포함되는 것은 1.36+ 신규 Automatic 입니다(<code>stable</code> 채널은 N-1 이라 지금은 1.35 로 만들어져 CRD 가 없을 수 있습니다).</td>
 </tr>
 <tr>
 <td><code>api_server_access.authorized_ip_ranges</code></td>
@@ -9854,9 +10242,11 @@ $(terraform output -raw get_credentials_command)</code></pre></div></figure>
 Azure CLI 의 <code>aks-preview</code> 확장이 설치되어 있다면 충돌할 수 있으니 <code>az extension remove -n aks-preview</code> 를 권장합니다.</p>
 </aside>
 <h3 id="10-aks-automatic--2단계-노드가-없는-클러스터를-확인">2단계. 노드가 &quot;없는&quot; 클러스터를 확인<a class="anchor" href="#10-aks-automatic--2단계-노드가-없는-클러스터를-확인" aria-label="이 제목 링크">#</a></h3>
-<figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 3줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">kubectl get nodes              <span class="hljs-comment"># 처음에는 사용자 노드가 없거나 적습니다 (시스템 노드는 AKS 구독에서 호스팅)</span>
-kubectl get nodepools.karpenter.sh 2&gt;/dev/null     <span class="hljs-comment"># NAP 의 NodePool (기본 풀)</span>
-kubectl get gatewayclass       <span class="hljs-comment"># approuting-istio</span></code></pre></div></figure>
+<figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 3줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">kubectl get nodes              <span class="hljs-comment"># 처음에는 사용자 노드가 없거나 적습니다 (관리형 hostedpool 노드 3개 + system-surge 노드 1개가 보입니다)</span>
+kubectl get nodepools.karpenter.sh 2&gt;/dev/null     <span class="hljs-comment"># NAP 의 NodePool (default, system-surge)</span>
+kubectl get gatewayclass       <span class="hljs-comment"># approuting-istio (Gateway API CRD 가 있는 1.36+ 클러스터에서만)</span></code></pre></div></figure>
+<aside class="callout note"><div class="callout-title"><span>ℹ️</span><span>참고</span></div><p>새 Automatic 클러스터는 <code>stable</code> 채널(N-1)이라 <strong>GA 최신 minor 보다 한 단계 낮은 버전</strong>(2026-10 기준 1.35.8)으로 만들어지고, <code>azurerm_kubernetes_automatic_cluster</code> 에서는 버전을 고를 수 없습니다. 이 경우 <code>istio_enabled = true</code> 로 approuting-istio 구현은 켜지지만 Gateway API CRD 는 설치되지 않아 <code>kubectl get gatewayclass</code> 가 <code>the server doesn&#39;t have a resource type &quot;gatewayclass&quot;</code> 로 실패합니다(정상). Gateway/HTTPRoute 를 쓰려면 1.36+ 로 올라간 뒤에 확인하세요.</p>
+</aside>
 <h3 id="10-aks-automatic--3단계-deployment-safeguards-체험">3단계. Deployment Safeguards 체험<a class="anchor" href="#10-aks-automatic--3단계-deployment-safeguards-체험" aria-label="이 제목 링크">#</a></h3>
 <p>보호 장치 없이 만든 배포는 거부(또는 경고)됩니다.</p>
 <figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 2줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">kubectl create deployment naive --image=mcr.microsoft.com/dotnet/samples:aspnetapp --replicas=2
@@ -10055,7 +10445,7 @@ scripts/cleanup.sh --include-bootstrap       <span class="hljs-comment"># (선�
 </tr>
 </tbody></table>
 </div>
-<figure class="code collapsed"><figcaption><span class="file">scripts/cleanup.sh</span><span class="meta">bash · 244줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-meta">#!/usr/bin/env bash</span>
+<figure class="code collapsed"><figcaption><span class="file">scripts/cleanup.sh</span><span class="meta">bash · 259줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-meta">#!/usr/bin/env bash</span>
 <span class="hljs-comment"># 실습 리소스를 &quot;생성의 역순&quot;으로 삭제합니다 (Lab 11 의 절차를 자동화).</span>
 <span class="hljs-comment">#   10-aks-automatic → 08-governance → 07-ingress → 06-workload → 05-aks → 04-platform → 03-network   (+ 02-bootstrap 은 옵션)</span>
 <span class="hljs-comment">#   06/07 은 클러스터가 살아 있어야 kubernetes provider 가 접속해 지울 수 있으므로 05 보다 먼저 지웁니다.</span>
@@ -10137,11 +10527,15 @@ targets=<span class="hljs-string">&quot;&quot;</span>
 <span class="hljs-function"><span class="hljs-title">tf_init</span></span>() { run_quiet terraform -<span class="hljs-built_in">chdir</span>=<span class="hljs-string">&quot;terraform/<span class="hljs-variable">$1</span>&quot;</span> init -backend-config=../backend.hcl -input=<span class="hljs-literal">false</span> -no-color; }
 <span class="hljs-function"><span class="hljs-title">tf_state</span></span>() { terraform -<span class="hljs-built_in">chdir</span>=<span class="hljs-string">&quot;terraform/<span class="hljs-variable">$1</span>&quot;</span> state list 2&gt;/dev/null; }
 
-<span class="hljs-comment"># 05-aks state 에 클러스터가 없으면(= 이미 지움) 0</span>
+<span class="hljs-comment"># 05-aks state 에 클러스터가 없으면(= 이미 지움) 0.</span>
+<span class="hljs-comment"># `tf_state | grep -q` 는 pipefail 에서 grep 이 먼저 끝나면 terraform 이 SIGPIPE 를 받아 결과가 뒤집히므로(클러스터가 있는데도 &quot;없음&quot;),</span>
+<span class="hljs-comment"># 출력을 먼저 변수에 담습니다. state 를 읽지 못하면 &quot;아직 있음&quot;(1)으로 봅니다: 읽기 실패를 &quot;이미 지움&quot;으로 오해하지 않기 위해서입니다.</span>
 <span class="hljs-function"><span class="hljs-title">cluster_gone</span></span>() {
+  <span class="hljs-built_in">local</span> list
   [ <span class="hljs-string">&quot;<span class="hljs-variable">$dry</span>&quot;</span> -eq 1 ] &amp;&amp; <span class="hljs-built_in">return</span> 1
   tf_init 05-aks &gt;/dev/null 2&gt;&amp;1 || <span class="hljs-built_in">return</span> 1
-  ! tf_state 05-aks | grep -q <span class="hljs-string">&#x27;^azurerm_kubernetes_cluster\.this$&#x27;</span>
+  list=<span class="hljs-string">&quot;<span class="hljs-subst">$(tf_state 05-aks)</span>&quot;</span> || <span class="hljs-built_in">return</span> 1
+  ! grep -q <span class="hljs-string">&#x27;^azurerm_kubernetes_cluster\.this$&#x27;</span> &lt;&lt;&lt;<span class="hljs-string">&quot;<span class="hljs-variable">$list</span>&quot;</span>
 }
 
 <span class="hljs-comment"># 클러스터가 이미 없으면 kubernetes provider 가 접속할 수 없으므로, 안에 있던 리소스는 state 에서만 제거합니다.</span>
@@ -10166,10 +10560,14 @@ targets=<span class="hljs-string">&quot;&quot;</span>
   <span class="hljs-keyword">fi</span>
   <span class="hljs-built_in">local</span> unlock=(terraform -<span class="hljs-built_in">chdir</span>=terraform/08-governance destroy -auto-approve -input=<span class="hljs-literal">false</span> -lock-timeout=300s -no-color
     -target=azurerm_management_lock.network -target=azurerm_management_lock.platform)
+  <span class="hljs-built_in">local</span> locks
   <span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">$dry</span>&quot;</span> -eq 1 ]; <span class="hljs-keyword">then</span>
     info <span class="hljs-string">&quot;(잠금이 있을 때만 실행됩니다)&quot;</span>
     run <span class="hljs-string">&quot;<span class="hljs-variable">${unlock[@]}</span>&quot;</span>
-  <span class="hljs-keyword">elif</span> tf_state 08-governance | grep -q <span class="hljs-string">&#x27;^azurerm_management_lock\.&#x27;</span>; <span class="hljs-keyword">then</span>
+  <span class="hljs-keyword">elif</span> ! locks=<span class="hljs-string">&quot;<span class="hljs-subst">$(tf_state 08-governance)</span>&quot;</span>; <span class="hljs-keyword">then</span>
+    fail <span class="hljs-string">&quot;08-governance 의 state 를 읽지 못해 잠금 여부를 확인할 수 없습니다 (backend.hcl · 로그인을 확인하세요)&quot;</span>
+    <span class="hljs-built_in">return</span> 1
+  <span class="hljs-keyword">elif</span> grep -q <span class="hljs-string">&#x27;^azurerm_management_lock\.&#x27;</span> &lt;&lt;&lt;<span class="hljs-string">&quot;<span class="hljs-variable">$locks</span>&quot;</span>; <span class="hljs-keyword">then</span>
     run <span class="hljs-string">&quot;<span class="hljs-variable">${unlock[@]}</span>&quot;</span> || <span class="hljs-built_in">return</span> 1
   <span class="hljs-keyword">else</span>
     skip <span class="hljs-string">&quot;해제할 잠금이 없습니다&quot;</span>
@@ -10177,7 +10575,7 @@ targets=<span class="hljs-string">&quot;&quot;</span>
 }
 
 <span class="hljs-function"><span class="hljs-title">destroy_stack</span></span>() {
-  <span class="hljs-built_in">local</span> s=<span class="hljs-string">&quot;<span class="hljs-variable">$1</span>&quot;</span>
+  <span class="hljs-built_in">local</span> s=<span class="hljs-string">&quot;<span class="hljs-variable">$1</span>&quot;</span> list
   section <span class="hljs-string">&quot;destroy <span class="hljs-variable">$s</span>&quot;</span>
   <span class="hljs-keyword">if</span> [ ! -d <span class="hljs-string">&quot;terraform/<span class="hljs-variable">$s</span>&quot;</span> ]; <span class="hljs-keyword">then</span>
     skip <span class="hljs-string">&quot;스택 디렉터리가 없습니다&quot;</span>
@@ -10187,9 +10585,16 @@ targets=<span class="hljs-string">&quot;&quot;</span>
     fail <span class="hljs-string">&quot;<span class="hljs-variable">$s</span>: init 실패 (terraform/backend.hcl 과 ARM_SUBSCRIPTION_ID 를 확인하세요)&quot;</span>
     <span class="hljs-built_in">return</span> 1
   }
-  <span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">$dry</span>&quot;</span> -eq 0 ] &amp;&amp; [ -z <span class="hljs-string">&quot;<span class="hljs-subst">$(tf_state <span class="hljs-string">&quot;<span class="hljs-variable">$s</span>&quot;</span>)</span>&quot;</span> ]; <span class="hljs-keyword">then</span>
-    skip <span class="hljs-string">&quot;<span class="hljs-variable">$s</span>: state 가 비어 있습니다 (이미 삭제됨)&quot;</span>
-    <span class="hljs-built_in">return</span> 0
+  <span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">$dry</span>&quot;</span> -eq 0 ]; <span class="hljs-keyword">then</span>
+    <span class="hljs-comment"># state 를 읽지 못한 것을 &quot;비어 있음&quot;으로 오해하면 남아 있는 스택을 건너뛰게 되므로, 읽기 실패는 오류로 처리합니다.</span>
+    list=<span class="hljs-string">&quot;<span class="hljs-subst">$(tf_state <span class="hljs-string">&quot;<span class="hljs-variable">$s</span>&quot;</span>)</span>&quot;</span> || {
+      fail <span class="hljs-string">&quot;<span class="hljs-variable">$s</span>: state 를 읽지 못했습니다 (terraform/backend.hcl · 로그인 · 네트워크를 확인하세요)&quot;</span>
+      <span class="hljs-built_in">return</span> 1
+    }
+    <span class="hljs-keyword">if</span> [ -z <span class="hljs-string">&quot;<span class="hljs-variable">$list</span>&quot;</span> ]; <span class="hljs-keyword">then</span>
+      skip <span class="hljs-string">&quot;<span class="hljs-variable">$s</span>: state 가 비어 있습니다 (이미 삭제됨)&quot;</span>
+      <span class="hljs-built_in">return</span> 0
+    <span class="hljs-keyword">fi</span>
   <span class="hljs-keyword">fi</span>
   <span class="hljs-keyword">case</span> <span class="hljs-string">&quot;<span class="hljs-variable">$s</span>&quot;</span> <span class="hljs-keyword">in</span> 06-workload | 07-ingress) drop_k8s_state_if_cluster_gone <span class="hljs-string">&quot;<span class="hljs-variable">$s</span>&quot;</span> ;; <span class="hljs-keyword">esac</span>
   <span class="hljs-keyword">if</span> run terraform -<span class="hljs-built_in">chdir</span>=<span class="hljs-string">&quot;terraform/<span class="hljs-variable">$s</span>&quot;</span> destroy -auto-approve -input=<span class="hljs-literal">false</span> -lock-timeout=300s -no-color; <span class="hljs-keyword">then</span>
@@ -10298,7 +10703,7 @@ section <span class="hljs-string">&quot;삭제 계획&quot;</span>
 <span class="hljs-keyword">fi</span>
 
 report_leftovers
-summary</code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (244줄) ▼">전체 코드 보기 (244줄) ▼</button></figure>
+summary</code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (259줄) ▼">전체 코드 보기 (259줄) ▼</button></figure>
 <aside class="callout note"><div class="callout-title"><span>ℹ️</span><span>참고</span></div><p>아래 <em>삭제 순서</em> 부터 <em>정리 확인</em> 까지는 이 스크립트가 하는 일을 <strong>수동으로</strong> 풀어 쓴 것입니다. 스크립트 없이 직접 진행하거나, 어디서 실패했는지 이해할 때 참고하세요.</p>
 </aside>
 <h2 id="11-cleanup--삭제-순서-생성의-역순">삭제 순서 (생성의 역순)<a class="anchor" href="#11-cleanup--삭제-순서-생성의-역순" aria-label="이 제목 링크">#</a></h2>
@@ -10523,6 +10928,7 @@ az role assignment list --all --query <span class="hljs-string">&quot;[?principa
 </tbody></table>
 </div>
 <h2 id="99-appendix--a-이-가이드를-검증한-방법과-한계">A. 이 가이드를 검증한 방법과 한계<a class="anchor" href="#99-appendix--a-이-가이드를-검증한-방법과-한계" aria-label="이 제목 링크">#</a></h2>
+<h3 id="99-appendix--a-1-정적-검증-azure-불필요">A-1. 정적 검증 (Azure 불필요)<a class="anchor" href="#99-appendix--a-1-정적-검증-azure-불필요" aria-label="이 제목 링크">#</a></h3>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -10543,7 +10949,7 @@ az role assignment list --all --query <span class="hljs-string">&quot;[?principa
 </tr>
 <tr>
 <td><code>terraform test</code> (mock provider)</td>
-<td>모든 스택의 plan 로직 + 변수 검증(<code>naming</code> 모듈 포함 총 28개 run)</td>
+<td>모든 스택의 plan 로직 + 변수 검증(<code>naming</code> 모듈 포함 총 34개 run)</td>
 <td>통과</td>
 </tr>
 <tr>
@@ -10566,25 +10972,282 @@ az role assignment list --all --query <span class="hljs-string">&quot;[?principa
 <td><code>scripts/</code> 전체를 <code>bash -n</code> 과 ShellCheck 로 검사, macOS 기본 bash 3.2 로도 실행</td>
 <td>통과</td>
 </tr>
+</tbody></table>
+</div>
+<h3 id="99-appendix--a-2-실제-azure-구독에서-처음부터-끝까지-실행한-결과-2026-10-13">A-2. 실제 Azure 구독에서 처음부터 끝까지 실행한 결과 (2026-10-13)<a class="anchor" href="#99-appendix--a-2-실제-azure-구독에서-처음부터-끝까지-실행한-결과-2026-10-13" aria-label="이 제목 링크">#</a></h3>
+<p>정적 검증만으로는 알 수 없는 것을 확인하려고, 문서의 명령을 <strong>Lab 01 부터 Lab 11 까지 순서대로 실제 구독에서 실행</strong>하고 각 Lab 의 <code>scripts/verify.sh</code> 로 결과를 확인했습니다. 마지막에 Lab 11 로 모두 삭제했습니다.</p>
+<div class="table-wrap"><table>
+<thead>
 <tr>
-<td><code>scripts/preflight.sh</code></td>
-<td>실제 구독에서 <strong>읽기 전용</strong>으로 실행해 도구 · RP · 쿼터 · VM 크기 · 역할 판정 결과를 확인</td>
-<td>확인</td>
+<th>항목</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>구독</td>
+<td>개인 Visual Studio Enterprise 구독(Owner), 게스트(개인) 계정으로 로그인, 리전 koreacentral</td>
 </tr>
 <tr>
-<td><code>scripts/verify.sh</code></td>
-<td><code>az</code> 가 돌려주는 JSON 의 속성 경로를 같은 종류의 실제 리소스(Storage · VNet · NAT Gateway · ACR · Key Vault · Log Analytics · UAMI · AKS)로 확인. kubectl 단계는 모의 응답으로 로직 확인</td>
-<td>부분 확인</td>
+<td>도구</td>
+<td>Terraform 1.16.5 · azurerm 5.9.0 · azapi 2.13.0 · kubernetes 3.3.0 · Azure CLI 2.86.0 · kubectl 1.37.1 · kubelogin 0.2.8 (macOS, arm64)</td>
 </tr>
 <tr>
-<td><code>scripts/cleanup.sh</code></td>
-<td><code>--dry-run</code> 과 모의 terraform 으로 삭제 순서 · 재실행 · 실패 시 중단 · 확인 입력/구독 불일치 같은 안전장치를 확인. <strong>실제 삭제는 실행하지 않음</strong></td>
-<td>확인</td>
+<td>클러스터</td>
+<td>Standard 1.36.4, Automatic 1.35.8 (<code>stable</code> 채널은 N-1)</td>
+</tr>
+<tr>
+<td>쿼터</td>
+<td>구독 기본값이 패밀리 20 · 전체 32 vCPU 여서 <a href="#lab-01-prerequisites">Lab 01</a> §4 의 방법으로 48 · 64 로 늘린 뒤, 기본 구성(D4ds_v5)으로 실행</td>
 </tr>
 </tbody></table>
 </div>
-<aside class="callout warning"><div class="callout-title"><span>⚠️</span><span>주의</span></div><p><strong>실제 Azure 구독에 <code>apply</code> 한 결과는 아닙니다.</strong> 리전별 용량(VM/NAT StandardV2), 쿼터, 조직 정책(Management group 의 Azure Policy), preview 기능 상태 등은 환경마다 다를 수 있습니다. 처음에는 <code>terraform plan</code> 을 꼼꼼히 읽고, 문제가 있으면 아래 <em>B. 트러블슈팅 모음</em> 과 각 Lab 의 <em>자주 만나는 문제</em> 를 확인하세요. 같은 이유로 <code>scripts/verify.sh</code> 와 <code>scripts/cleanup.sh</code> 도 이 가이드의 스택을 실제로 배포한 환경에서는 실행해 보지 못했으므로, 처음에는 <code>cleanup.sh --dry-run</code> 으로 계획을 먼저 확인하세요.</p>
-</aside>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Lab</th>
+<th>실행한 것</th>
+<th>결과</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="#lab-01-prerequisites">01</a></td>
+<td>도구 설치(<code>brew</code>), RP 등록, 쿼터 · VM 크기 확인, <code>preflight.sh</code></td>
+<td>통과(16/16). 게스트 계정에서 역할 판정이 실패하던 점 수정</td>
+</tr>
+<tr>
+<td><a href="#lab-02-bootstrap">02</a></td>
+<td>naming 테스트, apply(4개, 1분 32초), <code>backend.hcl</code>, state 원격 이전, 블롭 조회 · 키 인증 끔 확인, 동시 plan 잠금과 <code>-lock-timeout</code>, <code>verify.sh</code></td>
+<td>통과(9/9)</td>
+</tr>
+<tr>
+<td><a href="#lab-03-network">03</a></td>
+<td>apply(26개, 2분), 서브넷 · NAT · NSG 확인, <code>verify.sh</code>, NSG 실측(아래), <code>gateway_allowed_source_prefixes</code> 경로 4가지</td>
+<td>통과(19/19)</td>
+</tr>
+<tr>
+<td><a href="#lab-04-platform">04</a></td>
+<td>apply(18개, 4분), ACR · Key Vault · Private Endpoint · DNS 확인, <code>az acr import</code>, Grafana 의 Prometheus 데이터 소스, PromQL <code>count(up)</code>, <code>verify.sh</code></td>
+<td>통과(17/17)</td>
+</tr>
+<tr>
+<td><a href="#lab-05-aks">05</a></td>
+<td>apply, kubeconfig, 노드 · 애드온 · Gateway API 확인, KQL, Spot 풀 추가 · 제거, private 전환 plan, <code>az aks command invoke</code>, <code>verify.sh</code></td>
+<td>통과(33/33). 첫 apply 실패(409 경쟁)를 고침. Spot 스케일 업은 용량 부족으로 미확인</td>
+</tr>
+<tr>
+<td><a href="#lab-06-workload-identity">06</a></td>
+<td>apply, 시크릿 마운트 = Key Vault 값, 토큰 클레임, 2분 자동 갱신, 사설 DNS(10.10.3.x), <code>verify.sh</code></td>
+<td>통과(9/9). 첫 apply 실패(PSS)를 고침</td>
+</tr>
+<tr>
+<td><a href="#lab-07-ingress">07</a></td>
+<td>apply(22초), 공용 Gateway <code>curl</code> 200, HPA 3→10, NetworkPolicy 차단, 내부 Gateway(10.10.2.x) 전환 · 복귀, <code>verify.sh</code></td>
+<td>통과(8/8, 내부 모드 7/7 + 건너뜀 1)</td>
+</tr>
+<tr>
+<td><a href="#lab-08-governance">08</a></td>
+<td>apply(9개), Gatekeeper 제약 동기화, 준수 상태, Deny 효과, 예산, 잠금(<code>ScopeLocked</code>), <code>verify.sh</code></td>
+<td>통과(9, 경고 1). Defender 구독 플랜은 실행하지 않음</td>
+</tr>
+<tr>
+<td><a href="#lab-09-operations">09</a></td>
+<td>업그레이드 사전 점검, 오토스케일러 상태, vm_size 변경 plan, <code>az aks stop</code>(3분) / <code>start</code>(5분)</td>
+<td>일부. 업그레이드 자체는 실행하지 못함</td>
+</tr>
+<tr>
+<td><a href="#lab-10-aks-automatic">10</a></td>
+<td>apply(약 9분), NAP · Deployment Safeguards, BYO VNet 으로 다시 만들기(약 11분)와 삭제, <code>verify.sh</code></td>
+<td>통과(10/10)</td>
+</tr>
+<tr>
+<td><a href="#lab-11-cleanup">11</a></td>
+<td><code>cleanup.sh --dry-run</code>, 실제 삭제, 정리 확인</td>
+<td>아래 <em>A-5</em></td>
+</tr>
+</tbody></table>
+</div>
+<p><strong>NSG 규칙 실측 (Lab 03).</strong> 규칙을 지우거나 Deny 규칙을 더해 확인한 결과입니다. 처음에는 &quot;Pod CIDR 은 기본 Deny 에 막힌다&quot;고 적었다가 실측과 달라 고쳤습니다.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>실험</th>
+<th>결과</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>노드 NSG 에서 <code>AllowPodsToPods</code> 를 지움(기본 규칙만 남김)</td>
+<td>노드 간 Pod 통신과 DNS 는 <strong>정상</strong> → 기본 규칙으로 통과</td>
+</tr>
+<tr>
+<td>위 상태에서 Pod → Pod Deny(4000)를 추가</td>
+<td>타임아웃, DNS 실패. <code>AllowPodsToPods</code>(110)를 되돌리면 정상</td>
+</tr>
+<tr>
+<td><code>AllowGatewayHttpHttps</code> 를 지움</td>
+<td>공용 Gateway 접속 불가(타임아웃). 되돌리면 200 → <strong>필수</strong></td>
+</tr>
+<tr>
+<td>API 서버 서브넷 → 노드 Deny 를 추가하고 <code>AllowApiServerToCluster</code> 를 지움</td>
+<td><code>kubectl exec</code> 가 <code>connection reset</code>. 규칙을 되돌리면 정상</td>
+</tr>
+<tr>
+<td>API 서버 서브넷 → Pod Deny 를 추가하고 규칙을 지움</td>
+<td>Gatekeeper 웹훅 호출은 정상 → Pod 대상은 방어적인 항목</td>
+</tr>
+<tr>
+<td>AKS 가 LB 규칙을 쓰는 곳</td>
+<td>노드 리소스 그룹의 자체 NSG(NIC 에 연결)에만 <code>k8s-azure-lb_allow_…</code> 가 생기고, 서브넷에 연결한 NSG 는 그대로</td>
+</tr>
+<tr>
+<td><code>gateway_allowed_source_prefixes</code></td>
+<td>기본(<code>Internet</code>) · 여러 CIDR(복수 속성) · 한 개(단수 속성) · <code>[]</code>(규칙 삭제) 모두 apply 후 plan 이 깨끗</td>
+</tr>
+</tbody></table>
+</div>
+<h3 id="99-appendix--a-3-실행하다-발견해서-고친-불일치">A-3. 실행하다 발견해서 고친 불일치<a class="anchor" href="#99-appendix--a-3-실행하다-발견해서-고친-불일치" aria-label="이 제목 링크">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>위치</th>
+<th>증상</th>
+<th>수정</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><code>05-aks/monitoring.tf</code></td>
+<td>첫 apply 가 <code>409 AnotherOperationInProgress</code> 로 실패. AzAPI 가 클러스터를 PUT 하는 동안 User 노드 풀 생성과 겹침</td>
+<td><code>azapi_update_resource.control_plane_metrics</code> 가 노드 풀 뒤에 실행되도록 <code>depends_on</code> 추가</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>06-workload/kubernetes.tf</code>, <code>07-ingress/app.tf</code></td>
+<td><code>kv-demo</code> 가 <code>violates PodSecurity &quot;restricted&quot;: runAsNonRoot != true</code> 로 거부되어 10분 롤아웃 대기 후 실패. kubernetes provider 는 컨테이너 <code>security_context</code> 의 생략값을 <code>false</code> 로 보내 파드 수준의 <code>true</code> 를 덮어씀(07 의 앱 컨테이너도 같은 구성이었음)</td>
+<td>컨테이너 <code>security_context</code> 에 <code>run_as_non_root = true</code> 명시</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>scripts/cleanup.sh</code></td>
+<td><code>tf_state | grep -q</code> 가 pipefail 에서 SIGPIPE 로 결과가 뒤집혀, 클러스터가 있는데도 &quot;이미 없음&quot;으로 판단하고 06 의 쿠버네티스 리소스를 state 에서 지움. state 읽기 실패를 &quot;비어 있음&quot;으로 오해해 스택을 건너뛸 수도 있었음</td>
+<td>출력을 먼저 변수에 담고, 읽기 실패는 오류로 처리</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>scripts/preflight.sh</code></td>
+<td>게스트(개인) 계정은 로그인 이름으로 역할을 조회할 수 없어 &quot;역할을 조회하지 못했습니다&quot; 경고</td>
+<td>로그인한 사용자의 객체 ID 로 조회</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Lab 01 §4</td>
+<td>구독 기본 쿼터(예: 패밀리 20 · 전체 32)가 최소 24 vCPU 보다 작을 수 있음</td>
+<td>필요량 표와 <code>az quota create</code> 예시 추가</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Lab 03, <code>03-network</code> 주석</td>
+<td>&quot;Pod CIDR 은 VirtualNetwork 태그에 속하지 않아 기본 Deny 에 막힌다&quot;는 설명이 실측과 다름</td>
+<td>공용 Gateway 규칙만 필수, Pod · API 서버 규칙은 Deny 를 더할 때 필요한 방어용으로 정정</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Lab 06 1단계</td>
+<td><code>terraform -chdir=../04-platform</code> 이 저장소 루트에서 실패</td>
+<td><code>terraform -chdir=terraform/04-platform</code></td>
+</tr>
+<tr>
+<td>8</td>
+<td>Lab 06 3단계</td>
+<td>JWT 를 푸는 <code>base64 -d</code> 가 패딩이 없어 macOS 에서 잘림</td>
+<td>python 으로 패딩을 맞춰 디코드</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Lab 08 3단계</td>
+<td>시험 파드를 <code>web</code> 에 만들면 Pod Security(baseline)가 Gatekeeper 보다 먼저 거부해 문서의 메시지가 나오지 않음</td>
+<td><code>default</code> 네임스페이스에서 시험</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Lab 07 3단계</td>
+<td><code>kubectl logs deploy/…</code> 는 Envoy 파드 2개 중 하나만 보여 시작 로그가 나올 수 있음</td>
+<td>라벨 셀렉터 + <code>--prefix</code></td>
+</tr>
+<tr>
+<td>11</td>
+<td>Lab 09 §3</td>
+<td>vm_size 변경 plan 이 <code>replace</code> 가 아니라 <code>updated in-place</code> 로 표시됨(임시 풀 교체는 apply 중 수행)</td>
+<td>설명 정정</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Lab 10 2단계</td>
+<td>Automatic 이 1.35 로 만들어져 Gateway API CRD 가 없고 <code>kubectl get gatewayclass</code> 가 실패</td>
+<td>1.36+ 에서만 해당한다는 안내 추가</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Lab 05 · 08</td>
+<td>plan 리소스 수 표기가 실제와 다름</td>
+<td>Lab 05 는 16 → 15(리소스 그룹 포함), Lab 08 은 정책 할당 8개 + <code>time_static</code> 1개 = 9개로 정정</td>
+</tr>
+</tbody></table>
+</div>
+<h3 id="99-appendix--a-4-확인하지-못했거나-환경에-따라-다른-것">A-4. 확인하지 못했거나 환경에 따라 다른 것<a class="anchor" href="#99-appendix--a-4-확인하지-못했거나-환경에-따라-다른-것" aria-label="이 제목 링크">#</a></h3>
+<ul>
+<li><strong>Spot 스케일 업(Lab 05 (a))</strong>: 풀 추가 · 제거는 확인했지만, 파드를 올리자 <code>SkuNotAvailable</code>(Capacity Restrictions: <code>Standard_D4ds_v5</code>)로 노드가 늘지 않았습니다. Spot 용량은 리전 · 시간에 따라 다릅니다.</li>
+<li><strong>업그레이드(Lab 09 §1)</strong>: 업그레이드할 GA 버전이 없어서(1.36.4 가 최신 GA, 1.37.0 은 preview, 노드 이미지도 최신) 실행하지 못했습니다. 롤링 교체(surge · PDB)는 미확인입니다.</li>
+<li><strong>Defender 구독 플랜(Lab 08 4단계)</strong>: 이 구독에는 이미 켜져 있어 실행하지 않았습니다(Terraform 으로 관리하면 <code>destroy</code> 때 Free 로 되돌아가 구독의 기존 설정이 바뀔 수 있습니다). 클러스터 단위 <code>enable_defender</code> 만 사용했습니다.</li>
+<li><strong>Defender 자동 프로비저닝 정책이 있는 구독</strong>: 클러스터를 만든 직후 한동안 <code>Updating</code> 이라 <code>verify.sh</code> 의 프로비저닝 상태가 일시적으로 실패하고, 05-aks plan 에 <code>microsoft_defender</code> 제거 diff 가 계속 보입니다. <code>-var enable_defender=true</code> 로 맞추면 사라집니다(<a href="#lab-08-governance">Lab 08</a> 2단계).</li>
+<li><strong>조직 정책이 Storage 공용 접근을 끄는 구독</strong>: 관리 그룹의 Azure Policy(Modify)가 Storage 계정의 공용 네트워크 접근을 <code>Disabled</code> 로 바꾸는 구독에서는 Lab 02 의 원격 state 접근이 <code>403 AuthorizationFailure</code> 로 실패했습니다(Terraform 이 <code>Enabled</code> 로 만들어도 정책이 바꿈). 이 가이드는 공용 엔드포인트 + Entra 인증을 전제로 하므로, 정책 예외를 받거나 다른 구독을 써야 합니다.</li>
+<li><strong><code>terraform plan -detailed-exitcode</code></strong>: provider 가 <code>available_kubernetes_versions</code> 출력 값만 바꿔도 <code>2</code> 를 돌려줍니다(실제 인프라 변경 없음). CI 의 &quot;변경 없음&quot; 판정에는 이 값을 무시하세요.</li>
+<li><strong>실행하지 않은 것</strong>: Windows(PowerShell) 명령, 다른 리전, 팀 환경(Entra 그룹 <code>admin_principal_ids</code>), <code>enable_private_cluster=true</code> 로 실제 배포(plan 만), TLS(443) 리스너, Application Gateway for Containers, Grafana 웹 UI 로그인, <code>az login</code> 의 대화형 로그인, <a href="#lab-09-operations">Lab 09</a> §6 의 GitHub Actions 워크플로 예시.</li>
+<li><strong>Azure CLI 간헐 오류</strong>: <code>az aks get-credentials</code> 가 <code>Error loading command module &#39;serviceconnector&#39;: deadlock</code> 으로 한 번 실패하고 다시 실행하면 성공했습니다(CLI 쪽 문제).</li>
+</ul>
+<h3 id="99-appendix--a-5-정리-결과-lab-11">A-5. 정리 결과 (Lab 11)<a class="anchor" href="#99-appendix--a-5-정리-결과-lab-11" aria-label="이 제목 링크">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>항목</th>
+<th>결과</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>cleanup.sh --dry-run</code></td>
+<td>문서와 같은 순서 · 명령으로 계획이 출력됨</td>
+</tr>
+<tr>
+<td>스택 삭제</td>
+<td><code>cleanup.sh --yes</code> 로 03–10 스택을 삭제했습니다. 오래 걸리는 것은 AKS 클러스터(약 6분), AKS Automatic(약 10분), <strong>Managed Grafana(약 10분)</strong> 이며, 나머지는 몇 초–몇 분입니다</td>
+</tr>
+<tr>
+<td>부트스트랩 삭제</td>
+<td>문서대로 backend 블록을 주석 처리하고 <code>terraform init -migrate-state -force-copy</code> 로 state 를 로컬로 되돌린 뒤 <code>cleanup.sh --yes --include-bootstrap</code> 으로 삭제했습니다(이미 지운 스택은 &quot;state 가 비어 있습니다&quot;로 건너뜀)</td>
+</tr>
+<tr>
+<td>정리 확인</td>
+<td>태그 <code>lab=aks-terraform-guide</code> 리소스 그룹 없음, AKS 노드 리소스 그룹 없음, 리소스 잠금 · 예산 · 정책 할당 없음. 구독의 리소스 그룹과 리소스 수가 실행 전과 같음</td>
+</tr>
+<tr>
+<td>남은 것</td>
+<td>soft-delete 상태의 Key Vault 1개. purge protection 이 켜져 있어 7일 뒤 자동으로 삭제되며 비용은 없습니다</td>
+</tr>
+<tr>
+<td>Terraform 밖의 부산물</td>
+<td>실행 중 Azure 가 자동으로 만든 <code>NetworkWatcherRG</code> 와 Defender 의 기본 Log Analytics 작업 영역(<code>DefaultResourceGroup-…</code>)은 Terraform 이 모르는 리소스라 직접 지웠습니다(작업 영역은 soft-delete 상태에서 복구한 뒤 <code>--force</code> 로 완전 삭제)</td>
+</tr>
+<tr>
+<td>실행 중 찾은 문제</td>
+<td><code>cleanup.sh</code> 의 <code>cluster_gone</code> 오판(A-3 의 3번). 고친 뒤 SIGPIPE 조건 단위 테스트와 실제 정리로 확인</td>
+</tr>
+<tr>
+<td>회귀 확인</td>
+<td>고친 05-aks 를 새로 한 번에 <code>apply</code>(15개, 18분 11초)해 409 없이 성공하는 것을 확인한 뒤 다시 삭제</td>
+</tr>
+</tbody></table>
+</div>
+<p>구독 단위로는 <code>Microsoft.Quota</code> Resource Provider 등록과 vCPU 쿼터 증설(Lab 01 §4)이 남아 있습니다. 둘 다 비용이 없습니다.</p>
 <h2 id="99-appendix--b-트러블슈팅-모음">B. 트러블슈팅 모음<a class="anchor" href="#99-appendix--b-트러블슈팅-모음" aria-label="이 제목 링크">#</a></h2>
 <div class="table-wrap"><table>
 <thead>
@@ -10636,6 +11299,18 @@ az role assignment list --all --query <span class="hljs-string">&quot;[?principa
 <tr>
 <td><code>terraform plan</code> 이 매번 <code>node_count</code> 변경을 요구</td>
 <td>오토스케일러와 충돌. 코드에 <code>node_count</code> 를 쓰지 말고 <code>min_count</code>/<code>max_count</code> 만 사용 (<a href="#lab-09-operations">Lab 09</a>).</td>
+</tr>
+<tr>
+<td><code>409 ... AnotherOperationInProgress</code> (<code>azapi_update_resource</code>)</td>
+<td>같은 클러스터에 대한 다른 작업(노드 풀 생성 등)과 겹친 것입니다. 이 가이드 코드는 <code>depends_on</code> 으로 순서를 고정했고, 겹쳤다면 작업이 끝난 뒤 <code>terraform apply</code> 를 다시 실행하세요.</td>
+</tr>
+<tr>
+<td><code>kubernetes_deployment_v1</code> 이 10분 뒤 <code>Waiting for rollout to finish</code> 로 실패</td>
+<td>파드가 만들어지지 않는 경우입니다. <code>kubectl -n &lt;네임스페이스&gt; get events</code> 의 <code>FailedCreate</code> 사유를 확인하세요(예: <code>violates PodSecurity &quot;restricted&quot;</code> → 컨테이너 <code>security_context</code> 의 <code>run_as_non_root</code>).</td>
+</tr>
+<tr>
+<td><code>terraform init -migrate-state</code> 가 <code>403 AuthorizationFailure</code></td>
+<td>방금 만든 역할 할당이 전파되는 중이면 1–5분 뒤 재시도합니다. 계속되면 <code>az storage account show -n &lt;계정&gt; --query publicNetworkAccess</code> 를 확인하세요. <code>Disabled</code> 라면 조직 정책이 공용 접근을 꺼 둔 것이라 정책 예외나 다른 구독이 필요합니다.</td>
 </tr>
 </tbody></table>
 </div>
@@ -11172,7 +11847,7 @@ scripts/cleanup.sh --dry-run         <span class="hljs-comment"># 삭제 계획�
 <aside class="callout tip"><div class="callout-title"><span>💡</span><span>팁</span></div><p>검증 스크립트는 <strong>읽기 전용</strong>입니다(파드 안에서 <code>printenv</code>/<code>test -s</code> 를 실행하는 것 외에는 아무것도 바꾸지 않습니다). <code>kubectl</code> 은 임시 kubeconfig 를 써서 <code>~/.kube/config</code> 를 수정하지 않습니다. 변수로 고를 수 있는 설정(<code>sku_tier</code>, <code>enable_private_cluster</code>, <code>enable_gateway_api</code>, <code>nat_gateway_sku</code> 등)을 기본값과 다르게 썼다면 실패(✗) 대신 값을 보여 주거나 경고(!)·건너뜀(-)으로 표시합니다. 새 스택용 검증을 추가하려면 <code>scripts/verify/NN-이름.sh</code> 에 <code>verify_stack</code> 함수를 만들고 <code>verify.sh</code> 의 <code>ALL_STACKS</code> 에 이름을 더하세요.</p>
 </aside>
 <p><strong><code>scripts/lib/common.sh</code></strong> — 모든 스크립트의 공통 함수</p>
-<figure class="code collapsed"><figcaption><span class="file">scripts/lib/common.sh</span><span class="meta">bash · 135줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-meta">#!/usr/bin/env bash</span>
+<figure class="code collapsed"><figcaption><span class="file">scripts/lib/common.sh</span><span class="meta">bash · 143줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-meta">#!/usr/bin/env bash</span>
 <span class="hljs-comment"># 검증·정리 스크립트가 함께 쓰는 공통 함수입니다. 직접 실행하지 않고 source 해서 씁니다.</span>
 <span class="hljs-comment">#</span>
 <span class="hljs-comment">#   source &quot;$(dirname &quot;${BASH_SOURCE[0]}&quot;)/../lib/common.sh&quot;      # scripts/verify/*.sh 에서</span>
@@ -11247,6 +11922,14 @@ PASS=0; FAIL=0; WARN=0; SKIP=0
 <span class="hljs-comment"># tf_out 스택 출력이름 : terraform output -raw (값이 없거나 apply 전이면 빈 문자열)</span>
 <span class="hljs-function"><span class="hljs-title">tf_out</span></span>() { terraform -<span class="hljs-built_in">chdir</span>=<span class="hljs-string">&quot;<span class="hljs-variable">${TF_DIR}</span>/<span class="hljs-variable">$1</span>&quot;</span> output -raw <span class="hljs-string">&quot;<span class="hljs-variable">$2</span>&quot;</span> 2&gt;/dev/null || <span class="hljs-literal">true</span>; }
 
+<span class="hljs-comment"># nodes_nsg_rules 네트워크리소스그룹 : 03-network 의 노드 서브넷 NSG(…-aks-nodes) 규칙을 JSON 으로 가져옵니다 (NSG 가 없으면 빈 문자열)</span>
+<span class="hljs-function"><span class="hljs-title">nodes_nsg_rules</span></span>() {
+  <span class="hljs-built_in">local</span> nsg
+  nsg=<span class="hljs-string">&quot;<span class="hljs-subst">$(az network nsg list -g <span class="hljs-string">&quot;<span class="hljs-variable">$1</span>&quot;</span> --query <span class="hljs-string">&quot;[?ends_with(name, &#x27;-aks-nodes&#x27;)].name | [0]&quot;</span> -o tsv 2&gt;/dev/null)</span>&quot;</span>
+  [ -n <span class="hljs-string">&quot;<span class="hljs-variable">$nsg</span>&quot;</span> ] || <span class="hljs-built_in">return</span> 0
+  azj network nsg rule list -g <span class="hljs-string">&quot;<span class="hljs-variable">$1</span>&quot;</span> --nsg-name <span class="hljs-string">&quot;<span class="hljs-variable">$nsg</span>&quot;</span>
+}
+
 <span class="hljs-comment"># tf_applied 스택 : 출력이 하나라도 있으면(= init 과 apply 를 마쳤으면) 0</span>
 <span class="hljs-function"><span class="hljs-title">tf_applied</span></span>() {
   <span class="hljs-built_in">local</span> out
@@ -11306,7 +11989,7 @@ PASS=0; FAIL=0; WARN=0; SKIP=0
 }
 
 <span class="hljs-function"><span class="hljs-title">_aks_lab_cleanup</span></span>() { [ -z <span class="hljs-string">&quot;<span class="hljs-variable">${_KUBECONFIG_TMP:-}</span>&quot;</span> ] || <span class="hljs-built_in">rm</span> -f <span class="hljs-string">&quot;<span class="hljs-variable">$_KUBECONFIG_TMP</span>&quot;</span>; }
-<span class="hljs-built_in">trap</span> _aks_lab_cleanup EXIT</code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (135줄) ▼">전체 코드 보기 (135줄) ▼</button></figure>
+<span class="hljs-built_in">trap</span> _aks_lab_cleanup EXIT</code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (143줄) ▼">전체 코드 보기 (143줄) ▼</button></figure>
 <p><strong><code>scripts/verify.sh</code></strong> — 스택별 검증 스크립트를 호출하는 진입점</p>
 <figure class="code collapsed"><figcaption><span class="file">scripts/verify.sh</span><span class="meta">bash · 66줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-meta">#!/usr/bin/env bash</span>
 <span class="hljs-comment"># 실습 결과 검증 (읽기 전용): 각 스택이 설계한 대로 만들어졌는지 az / kubectl 로 확인합니다.</span>

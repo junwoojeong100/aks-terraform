@@ -19,12 +19,12 @@ function networkTopology() {
   });
   const nodes = d.box(354, 124, 290, 134, {
     tone: 'azure', title: 'snet-aks-nodes', pad: 12, size: 11.5,
-    lines: ['10.10.0.0/24 · 노드 IP 전용', 'Pod 는 오버레이(10.244.0.0/16)라 IP 미사용', 'NSG + NAT Gateway 연결', '기본 아웃바운드 접근 비활성화'],
+    lines: ['10.10.0.0/24 · 노드 IP 전용', 'Pod 는 오버레이(10.244.0.0/16)라 IP 미사용', 'NSG: Pod · API 서버 · Gateway 인바운드 허용', 'NAT Gateway 연결 · 기본 아웃바운드 비활성화'],
   });
   // 아래 줄: Ingress(왼쪽) / Private Endpoint(오른쪽)
   d.box(44, 270, 290, 124, {
     tone: 'net', title: 'snet-ingress', pad: 12, size: 11.5,
-    lines: ['10.10.2.0/27', '내부 로드밸런서 프런트엔드 IP', '(internal_gateway = true 일 때)', 'NSG 연결'],
+    lines: ['10.10.2.0/27', '내부 로드밸런서 프런트엔드 IP', '(internal_gateway = true 일 때)', 'NSG 연결 (트래픽은 노드 NSG 가 평가)'],
   });
   const pe = d.box(354, 270, 290, 124, {
     tone: 'net', title: 'snet-private-endpoints', pad: 12, size: 11.5,

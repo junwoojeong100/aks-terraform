@@ -17,7 +17,7 @@ Internet
 NAT Gateway  (StandardV2, 영역 중복)  ── 서브넷 연결 ──►  snet-aks-nodes
 
 VNet 10.10.0.0/16   (rg-…-network)
-  ├─ snet-aks-nodes          10.10.0.0/24   AKS 노드 · NSG · NAT Gateway 연결
+  ├─ snet-aks-nodes          10.10.0.0/24   AKS 노드 · NSG(Pod · API 서버 · Gateway 인바운드 허용) · NAT Gateway 연결
   ├─ snet-aks-apiserver      10.10.1.0/28   API Server VNet Integration (AKS 전용으로 위임)
   ├─ snet-ingress            10.10.2.0/27   내부 로드밸런서 프런트엔드 IP · NSG
   └─ snet-private-endpoints  10.10.3.0/27   ACR / Key Vault Private Endpoint · NSG (노드 서브넷의 443 만 허용)
@@ -47,8 +47,34 @@ Private DNS Zone (VNet 링크):  privatelink.azurecr.io  ·  privatelink.vaultco
 | `default_outbound_access_enabled = false` | 기본 아웃바운드 IP 는 소유권이 없고 바뀔 수 있어 Azure 가 폐지를 진행 중입니다. 명시적 egress(NAT Gateway)가 권장입니다. |
 | NAT Gateway **StandardV2** | 영역 중복(zone-redundant)이며 AKS `userAssignedNATGateway` 와 함께 사용 가능. 일부 리전(Canada East 등)은 미지원 → 변수 `nat_gateway_sku = "Standard"`. |
 | PE 서브넷 NSG: **노드 서브넷의 443 만 허용 + 나머지 VNet 내부 Deny** | Private Endpoint 에 NSG 를 적용하려면 `private_endpoint_network_policies = "Enabled"` 가 필요합니다. 최소 권한 네트워크 분리. |
-| 노드/인그레스 NSG 는 **빈 NSG** | AKS 가 `Service(type=LoadBalancer)` 생성 시 필요한 규칙을 자동으로 추가합니다. Terraform 이 이를 덮어쓰지 않도록 규칙을 정의하지 않습니다. |
+| 노드 서브넷 NSG: **인바운드 허용 규칙을 Terraform 으로 직접 정의** | AKS 는 직접 만들어 서브넷에 연결한 NSG 를 수정하지 않습니다(Service 용 규칙도 자동으로 추가되지 않음). 공용 Gateway 는 이 규칙이 없으면 접속이 안 됩니다. Pod · API 서버 트래픽은 기본 규칙으로도 통과하지만 Deny 규칙을 더하는 순간 끊기므로 허용 규칙을 미리 둡니다(모두 실제 구독에서 확인). 아래 *NSG 인바운드 규칙* 참고. |
+| 인그레스 서브넷 NSG 는 **규칙 없음** | 이 서브넷에는 내부 LB 프런트엔드 IP 만 있고 VM(NIC)이 없습니다. 로드밸런서를 거친 트래픽은 백엔드인 노드 서브넷 NSG 가 평가합니다. |
 | Private DNS Zone 을 네트워크 스택에서 관리 | 실제 환경에서는 연결(Connectivity) 구독에서 중앙 관리하는 경우가 많습니다. |
+
+## NSG 인바운드 규칙
+
+NSG 는 우선순위 숫자가 낮은 규칙부터 평가하고, 맞는 규칙이 없으면 기본 규칙(`AllowVnetInBound` 65000 → `AllowAzureLoadBalancerInBound` 65001 → `DenyAllInBound` 65500)을 적용합니다. 이 스택의 인바운드 트래픽과 허용 방법은 다음과 같습니다. **구분** 열의 결과는 실제 구독에서 규칙을 지우거나 Deny 규칙을 더해 확인한 값입니다([부록 A](99-appendix.md)).
+
+| NSG | 트래픽 | 규칙 | 구분 |
+|---|---|---|---|
+| 노드 | 노드 ↔ 노드 · VNet 안의 클라이언트 → 내부 Gateway | 기본 규칙 `AllowVnetInBound` | 기본 규칙으로 통과 |
+| 노드 | Azure Load Balancer 상태 프로브 | 기본 규칙 `AllowAzureLoadBalancerInBound` | 기본 규칙으로 통과 |
+| 노드 | 인터넷 → 공용 Gateway (HTTP/HTTPS) | `AllowGatewayHttpHttps` (200): `gateway_allowed_source_prefixes`(기본 `Internet`) → TCP 80 · 443 | **필수** — 지우면 접속 불가 |
+| 노드 | 노드 → Pod · Pod ↔ Pod (DNS 포함) | `AllowNodesToPods` (100): 노드 CIDR → `pod_cidr` · `AllowPodsToPods` (110): `pod_cidr` → `pod_cidr` | 방어용 — 기본 규칙으로 통과, Deny 를 더하면 끊김 |
+| 노드 | API 서버 → 노드(kubelet 10250: `kubectl exec` · logs) · Pod | `AllowApiServerToCluster` (120): API 서버 서브넷 → 노드 CIDR · `pod_cidr` | 방어용 — 기본 규칙으로 통과, Deny 를 더하면 `exec` 가 끊김 |
+| Private Endpoint | 노드 → ACR · Key Vault | `AllowAksNodesHttps` (100): 노드 CIDR → TCP 443. 나머지 VNet 트래픽은 `DenyOtherVnetInbound` (4000) 로 거부 | 설계 |
+| 인그레스 | 없음 | 규칙을 두지 않습니다 (위 *설계 결정* 참고) | — |
+
+> [!IMPORTANT]
+> **AKS 는 직접 만들어 서브넷에 연결한 NSG 를 수정하지 않습니다.** Service(`LoadBalancer`) 용 규칙은 AKS 가 관리하는 리소스에만 자동으로 추가됩니다([AKS 네트워킹 개념](https://learn.microsoft.com/azure/aks/concepts-network#network-security-groups)). 실제로 AKS 는 노드 리소스 그룹에 자체 NSG(`aks-agentpool-…-nsg`)를 만들어 노드 NIC 에 연결하고 `k8s-azure-lb_allow_…` 규칙을 거기에만 추가하며, 우리 서브넷 NSG 는 그대로입니다. 인바운드는 서브넷 NSG 와 NIC NSG 를 모두 통과해야 하므로, 서브넷 NSG 에 허용 규칙이 없으면 공용 Gateway 가 열리지 않습니다.
+
+> [!IMPORTANT]
+> **Pod 트래픽도 서브넷 NSG 의 평가 대상입니다.** Azure CNI Overlay 의 Pod 트래픽은 캡슐화되지 않으므로 서브넷 NSG 가 적용됩니다([Azure CNI Overlay: NSG](https://learn.microsoft.com/azure/aks/concepts-network-azure-cni-overlay#network-security-groups)). 기본 규칙만 있을 때는 노드 간 Pod 통신과 DNS 가 그대로 통과하지만, 조직 정책이나 하드닝으로 Deny 규칙(예: 4000 번 Deny)을 더하는 순간 끊깁니다. `AllowNodesToPods` / `AllowPodsToPods` 가 있으면 Deny 가 있어도 통과합니다. 그래서 **`pod_cidr` 는 05-aks 와 같은 값**(기본 `10.244.0.0/16`)이어야 하며, `scripts/verify.sh 05-aks` 가 두 값이 맞는지 확인합니다.
+
+> [!NOTE]
+> 공용 Gateway 를 특정 IP 에만 열려면 `-var 'gateway_allowed_source_prefixes=["203.0.113.10/32"]'`, 내부 Gateway 만 쓴다면 `-var 'gateway_allowed_source_prefixes=[]'`(규칙을 만들지 않음)를 지정하세요. 443 은 Lab 07 의 TLS 리스너를 추가할 때 NSG 를 다시 고치지 않도록 미리 허용했습니다.
+>
+> `snet-aks-apiserver` 에는 NSG 를 연결하지 않았습니다(위임 서브넷, VNet 안의 트래픽은 기본 허용). NSG 를 붙인다면 노드 서브넷 → API 서버 서브넷 TCP 443 · 4443, `AzureLoadBalancer` → API 서버 서브넷 TCP 9988 인바운드를 먼저 허용해야 합니다([API Server VNet Integration](https://learn.microsoft.com/azure/aks/api-server-vnet-integration#network-security-group-nsg-security-rules)).
 
 ## 코드
 
@@ -147,6 +173,21 @@ variable "subnet_cidrs" {
   }
 }
 
+variable "pod_cidr" {
+  description = <<-EOT
+    Azure CNI Overlay 의 Pod CIDR. 05-aks 의 pod_cidr 와 같은 값을 쓰세요.
+    노드 NSG 에 이 대역을 허용하는 인바운드 규칙을 만듭니다. 기본 규칙만 있을 때는 없어도 통신되지만,
+    나중에 Deny 규칙을 추가해도 노드 간 Pod 통신(DNS 포함)이 끊기지 않게 하는 방어용입니다.
+  EOT
+  type        = string
+  default     = "10.244.0.0/16"
+
+  validation {
+    condition     = can(cidrhost(var.pod_cidr, 0))
+    error_message = "pod_cidr 는 올바른 CIDR 이어야 합니다. 예: 10.244.0.0/16"
+  }
+}
+
 variable "nat_gateway_sku" {
   description = "NAT Gateway SKU. StandardV2 는 가용 영역 중복(zone-redundant)이며 대부분의 리전에서 사용 가능합니다."
   type        = string
@@ -155,6 +196,27 @@ variable "nat_gateway_sku" {
   validation {
     condition     = contains(["Standard", "StandardV2"], var.nat_gateway_sku)
     error_message = "nat_gateway_sku 는 Standard 또는 StandardV2 여야 합니다."
+  }
+}
+
+variable "gateway_allowed_source_prefixes" {
+  description = <<-EOT
+    공용 Gateway(07-ingress 의 internal_gateway = false)로 들어오는 HTTP(80)/HTTPS(443) 를 허용할 출발지.
+    Internet 서비스 태그 또는 CIDR 목록이며, 특정 IP 만 열려면 ["203.0.113.10/32"] 처럼 지정하세요.
+    내부 Gateway 만 쓴다면 [] 로 두세요. 규칙을 만들지 않으며, VNet 안의 클라이언트는 기본 규칙(AllowVnetInBound)으로 접근합니다.
+  EOT
+  type        = list(string)
+  default     = ["Internet"]
+
+  validation {
+    condition     = alltrue([for prefix in var.gateway_allowed_source_prefixes : prefix == "Internet" || can(cidrhost(prefix, 0))])
+    error_message = "gateway_allowed_source_prefixes 의 값은 Internet 또는 올바른 CIDR 이어야 합니다."
+  }
+
+  # NSG 규칙은 서비스 태그를 목록(복수) 속성에 넣을 수 없습니다.
+  validation {
+    condition     = !contains(var.gateway_allowed_source_prefixes, "Internet") || length(var.gateway_allowed_source_prefixes) == 1
+    error_message = "Internet 서비스 태그는 다른 값과 함께 쓸 수 없습니다. [\"Internet\"] 이거나 CIDR 목록이어야 합니다."
   }
 }
 ```
@@ -192,6 +254,9 @@ locals {
     acr       = "privatelink.azurecr.io"
     key_vault = "privatelink.vaultcore.azure.net"
   }
+
+  # 같은 출발지를 두 번 적어도 NSG 규칙에는 한 번만 들어가도록 중복을 제거합니다.
+  gateway_sources = distinct(var.gateway_allowed_source_prefixes)
 }
 
 # ---------------------------------------------------------------------------
@@ -266,8 +331,8 @@ resource "azurerm_subnet" "private_endpoints" {
 # ---------------------------------------------------------------------------
 # NSG (AWS 의 Security Group + NACL 역할을 겸함)
 # - 상태 저장(stateful), 서브넷/NIC 에 연결, 우선순위 숫자가 낮을수록 먼저 평가, Allow/Deny 모두 가능
-# - 노드/인그레스 서브넷의 규칙은 AKS 가 Service(LoadBalancer) 생성 시 자동으로 추가하므로
-#   Terraform 에서는 빈 NSG 만 만들어 둡니다.
+# - AKS 는 "내가 서브넷에 연결한 NSG" 를 수정하지 않습니다. Service(LoadBalancer) 용 규칙도 자동으로 추가되지 않으므로
+#   노드 서브넷에 필요한 인바운드 허용 규칙은 아래에서 Terraform 으로 직접 정의합니다.
 # ---------------------------------------------------------------------------
 resource "azurerm_network_security_group" "aks_nodes" {
   name                = module.naming.names.nsg_aks_nodes
@@ -276,6 +341,8 @@ resource "azurerm_network_security_group" "aks_nodes" {
   tags                = local.tags
 }
 
+# snet-ingress 에는 내부 LB 프런트엔드 IP 만 있고 VM(NIC)이 없습니다. 내부 Gateway 로 들어오는 트래픽은
+# 백엔드인 노드 서브넷의 NSG 가 평가하므로 이 NSG 에는 규칙을 두지 않습니다.
 resource "azurerm_network_security_group" "ingress" {
   name                = module.naming.names.nsg_ingress
   location            = azurerm_resource_group.network.location
@@ -318,6 +385,93 @@ resource "azurerm_network_security_rule" "pe_deny_vnet" {
   destination_address_prefix  = "*"
   resource_group_name         = azurerm_resource_group.network.name
   network_security_group_name = azurerm_network_security_group.private_endpoints.name
+}
+
+# ---------------------------------------------------------------------------
+# 노드 서브넷 NSG 인바운드 허용 규칙 (우선순위: 100번대 = 클러스터 내부 통신, 200번대 = Gateway)
+#
+# 기본 규칙만으로 통과하는 것 (실측: 규칙을 지워도 막히지 않음)
+#   - 노드 ↔ 노드, API 서버 서브넷 → 노드(kubelet 10250), VNet 안의 클라이언트 → 내부 Gateway : AllowVnetInBound (65000)
+#   - Azure Load Balancer 상태 프로브                                                      : AllowAzureLoadBalancerInBound (65001)
+#   - Azure CNI Overlay 의 노드 → Pod, Pod ↔ Pod (DNS 포함)                                 : 기본 규칙으로 통과
+#
+# 직접 허용해야 하는 것 (필수)
+#   - 공용 Gateway: Standard LB 는 인바운드가 기본적으로 닫혀 있어 NSG 에서 허용해야 합니다 (AllowGatewayHttpHttps).
+#
+# 미리 허용해 두는 것 (방어용)
+#   - Overlay 의 Pod 트래픽은 캡슐화되지 않아 서브넷 NSG 가 그대로 적용됩니다. 지금은 기본 규칙이 허용하지만, 나중에 조직 정책이나
+#     하드닝으로 Deny 규칙(예: 4000 번 DenyAllInBound)을 더하면 노드 간 Pod 통신과 DNS 가 끊깁니다 (실측: Deny 를 더하면 타임아웃,
+#     아래 허용 규칙이 있으면 통과). AKS 문서가 요구하는 허용 규칙(노드 → Pod, Pod → Pod)을 미리 만들어 둡니다.
+# ---------------------------------------------------------------------------
+resource "azurerm_network_security_rule" "nodes_allow_nodes_to_pods" {
+  name                        = "AllowNodesToPods"
+  description                 = "Service 트래픽 라우팅: 노드 -> Pod (Azure CNI Overlay)"
+  priority                    = 100
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "*"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = var.subnet_cidrs.aks_nodes
+  destination_address_prefix  = var.pod_cidr
+  resource_group_name         = azurerm_resource_group.network.name
+  network_security_group_name = azurerm_network_security_group.aks_nodes.name
+}
+
+resource "azurerm_network_security_rule" "nodes_allow_pods_to_pods" {
+  name                        = "AllowPodsToPods"
+  description                 = "Pod 간, Pod -> Service 트래픽(DNS 포함) (Azure CNI Overlay)"
+  priority                    = 110
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "*"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = var.pod_cidr
+  destination_address_prefix  = var.pod_cidr
+  resource_group_name         = azurerm_resource_group.network.name
+  network_security_group_name = azurerm_network_security_group.aks_nodes.name
+}
+
+# API Server VNet Integration: API 서버(위임 서브넷)에서 노드로 들어오는 트래픽 (kubectl exec · logs · port-forward 는 kubelet 10250 으로 갑니다).
+# 기본 규칙(AllowVnetInBound)으로도 통과하지만 나중에 Deny 규칙을 더하면 끊깁니다 (실측: Deny 를 더하면 exec 가 connection reset,
+# 이 규칙이 있으면 통과). Pod CIDR 대상은 웹훅 호출 경로에서는 필요가 확인되지 않아 방어적으로만 둡니다.
+resource "azurerm_network_security_rule" "nodes_allow_apiserver" {
+  name                         = "AllowApiServerToCluster"
+  description                  = "API 서버 -> 노드(kubelet 10250: exec, logs), Pod. Deny 를 더해도 kubectl exec 가 끊기지 않게"
+  priority                     = 120
+  direction                    = "Inbound"
+  access                       = "Allow"
+  protocol                     = "*"
+  source_port_range            = "*"
+  destination_port_range       = "*"
+  source_address_prefix        = var.subnet_cidrs.aks_apiserver
+  destination_address_prefixes = [var.subnet_cidrs.aks_nodes, var.pod_cidr]
+  resource_group_name          = azurerm_resource_group.network.name
+  network_security_group_name  = azurerm_network_security_group.aks_nodes.name
+}
+
+# 공용 Gateway(Standard LB): 허용한 출발지 → HTTP/HTTPS 리스너.
+# 공용 LB 의 공인 IP 는 AKS 가 나중에 만들어 plan 시점에는 알 수 없고, 노드에는 공인 IP 가 없어 LB 가 80/443 으로 연 서비스(Gateway)만
+# 인터넷에서 닿습니다. 그래서 목적지는 * 로 둡니다. (443 은 Lab 07 의 TLS 리스너를 추가할 때 NSG 를 다시 고치지 않게 미리 허용)
+# 출발지 값이 1개면 단수, 여러 개면 복수 속성에 담습니다 (둘 중 하나만 지정 가능, 서비스 태그는 단수에만 쓸 수 있음).
+# gateway_allowed_source_prefixes = [] 이면 규칙을 만들지 않습니다 (내부 Gateway 전용).
+resource "azurerm_network_security_rule" "nodes_allow_gateway" {
+  count = length(local.gateway_sources) > 0 ? 1 : 0
+
+  name                        = "AllowGatewayHttpHttps"
+  description                 = "공용 Gateway(Standard LB) 인바운드 HTTP/HTTPS"
+  priority                    = 200
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_ranges     = ["80", "443"]
+  source_address_prefix       = length(local.gateway_sources) == 1 ? local.gateway_sources[0] : null
+  source_address_prefixes     = length(local.gateway_sources) > 1 ? local.gateway_sources : null
+  destination_address_prefix  = "*"
+  resource_group_name         = azurerm_resource_group.network.name
+  network_security_group_name = azurerm_network_security_group.aks_nodes.name
 }
 
 resource "azurerm_subnet_network_security_group_association" "aks_nodes" {
@@ -467,6 +621,110 @@ run "plan_standard_nat" {
   }
 }
 
+# 노드 NSG: AKS 는 서브넷에 연결한 NSG 를 수정하지 않으므로 필요한 인바운드 허용 규칙이 Terraform 에 있어야 합니다.
+run "nodes_nsg_allows_overlay_and_gateway_traffic" {
+  command = plan
+
+  assert {
+    condition = (
+      azurerm_network_security_rule.nodes_allow_nodes_to_pods.source_address_prefix == var.subnet_cidrs.aks_nodes &&
+      azurerm_network_security_rule.nodes_allow_nodes_to_pods.destination_address_prefix == var.pod_cidr
+    )
+    error_message = "노드 서브넷 → Pod CIDR 인바운드를 허용해야 합니다 (Azure CNI Overlay 의 Service 트래픽 라우팅)."
+  }
+
+  assert {
+    condition = (
+      azurerm_network_security_rule.nodes_allow_pods_to_pods.source_address_prefix == var.pod_cidr &&
+      azurerm_network_security_rule.nodes_allow_pods_to_pods.destination_address_prefix == var.pod_cidr
+    )
+    error_message = "Pod CIDR 간 인바운드를 허용해야 합니다 (나중에 Deny 규칙이 추가되어도 노드 간 Pod 통신이 끊기지 않게)."
+  }
+
+  assert {
+    condition = (
+      azurerm_network_security_rule.nodes_allow_apiserver.source_address_prefix == var.subnet_cidrs.aks_apiserver &&
+      azurerm_network_security_rule.nodes_allow_apiserver.destination_address_prefixes == toset([var.subnet_cidrs.aks_nodes, var.pod_cidr])
+    )
+    error_message = "API 서버 서브넷 → 노드/Pod CIDR 인바운드를 허용해야 합니다."
+  }
+
+  assert {
+    condition = (
+      length(azurerm_network_security_rule.nodes_allow_gateway) == 1 &&
+      azurerm_network_security_rule.nodes_allow_gateway[0].source_address_prefix == "Internet" &&
+      azurerm_network_security_rule.nodes_allow_gateway[0].destination_port_ranges == toset(["80", "443"])
+    )
+    error_message = "기본값(공용 Gateway)에서는 인터넷 → 80/443 인바운드를 허용해야 합니다."
+  }
+}
+
+run "gateway_rule_with_multiple_cidrs" {
+  command = plan
+
+  variables {
+    gateway_allowed_source_prefixes = ["203.0.113.0/24", "198.51.100.10/32"]
+  }
+
+  assert {
+    condition = (
+      azurerm_network_security_rule.nodes_allow_gateway[0].source_address_prefixes == toset(["203.0.113.0/24", "198.51.100.10/32"]) &&
+      azurerm_network_security_rule.nodes_allow_gateway[0].source_address_prefix == null
+    )
+    error_message = "출발지가 여러 개이면 복수 속성(source_address_prefixes)만 써야 합니다."
+  }
+}
+
+run "gateway_rule_with_single_cidr" {
+  command = plan
+
+  variables {
+    # 중복은 하나로 합쳐지므로 값이 1개일 때와 같이 단수 속성을 씁니다.
+    gateway_allowed_source_prefixes = ["203.0.113.10/32", "203.0.113.10/32"]
+  }
+
+  assert {
+    condition = (
+      azurerm_network_security_rule.nodes_allow_gateway[0].source_address_prefix == "203.0.113.10/32" &&
+      azurerm_network_security_rule.nodes_allow_gateway[0].source_address_prefixes == null
+    )
+    error_message = "출발지가 하나뿐이면 단수 속성(source_address_prefix)만 써야 합니다."
+  }
+}
+
+run "no_gateway_rule_for_internal_only" {
+  command = plan
+
+  variables {
+    gateway_allowed_source_prefixes = []
+  }
+
+  assert {
+    condition     = length(azurerm_network_security_rule.nodes_allow_gateway) == 0
+    error_message = "gateway_allowed_source_prefixes = [] 이면 공용 Gateway 허용 규칙을 만들지 않아야 합니다."
+  }
+}
+
+run "rejects_internet_tag_mixed_with_cidr" {
+  command = plan
+
+  variables {
+    gateway_allowed_source_prefixes = ["Internet", "203.0.113.0/24"]
+  }
+
+  expect_failures = [var.gateway_allowed_source_prefixes]
+}
+
+run "rejects_invalid_gateway_source" {
+  command = plan
+
+  variables {
+    gateway_allowed_source_prefixes = ["not-a-cidr"]
+  }
+
+  expect_failures = [var.gateway_allowed_source_prefixes]
+}
+
 run "rejects_invalid_cidr" {
   command = plan
 
@@ -492,7 +750,7 @@ run "rejects_invalid_cidr" {
 ```bash
 cd terraform/03-network
 terraform init -backend-config=../backend.hcl
-terraform plan -out tfplan        # 약 22개 리소스
+terraform plan -out tfplan        # 약 26개 리소스
 terraform apply tfplan            # 2~4분
 ```
 
@@ -508,9 +766,13 @@ az network vnet subnet list -g "$RG" --vnet-name "$VNET" \
 terraform output nat_gateway_public_ip         # 클러스터의 아웃바운드 고정 IP
 az network nat gateway show -g "$RG" -n "$(az network nat gateway list -g "$RG" --query '[0].name' -o tsv)" \
   --query "{sku:sku.name, zones:zones, idleTimeout:idleTimeoutInMinutes}" -o json
+
+# 노드 NSG 의 인바운드 허용 규칙
+NSG=$(az network nsg list -g "$RG" --query "[?ends_with(name, '-aks-nodes')].name | [0]" -o tsv)
+az network nsg rule list -g "$RG" --nsg-name "$NSG" -o table
 ```
 
-기대 결과: `snet-aks-nodes` 에 `natGw: true`, `snet-aks-apiserver` 에 delegation `Microsoft.ContainerService/managedClusters`.
+기대 결과: `snet-aks-nodes` 에 `natGw: true`, `snet-aks-apiserver` 에 delegation `Microsoft.ContainerService/managedClusters`. 노드 NSG 에는 `AllowNodesToPods`(100) · `AllowPodsToPods`(110) · `AllowApiServerToCluster`(120) · `AllowGatewayHttpHttps`(200) 가 보입니다.
 
 ### 자동 검증 스크립트
 
@@ -531,7 +793,7 @@ scripts/verify.sh 03-network
 source "$(dirname "${BASH_SOURCE[0]}")/../lib/common.sh"
 
 verify_stack() {
-  local rg vnet_name nat_ip vnet sn nat natsku pips zones zone links
+  local rg vnet_name nat_ip vnet sn nat natsku pips zones zone links rules r
   rg="$(tf_out 03-network resource_group_name)"
   vnet_name="$(tf_out 03-network vnet_name)"
   nat_ip="$(tf_out 03-network nat_gateway_public_ip)"
@@ -562,6 +824,20 @@ verify_stack() {
   for sn in snet-aks-nodes snet-ingress snet-private-endpoints; do
     jq_ok "NSG 연결: $sn" "$vnet" ".subnets[] | select(.name == \"$sn\") | .networkSecurityGroup.id != null"
   done
+
+  # AKS 는 서브넷에 연결한 NSG 를 수정하지 않으므로, 노드 NSG 의 인바운드 허용 규칙은 Terraform 이 만든 것이어야 합니다.
+  rules="$(nodes_nsg_rules "$rg")"
+  if [ -z "$rules" ]; then
+    fail "노드 서브넷 NSG(…-aks-nodes)의 규칙을 읽을 수 없습니다"
+  else
+    for r in AllowNodesToPods AllowPodsToPods AllowApiServerToCluster; do
+      jq_ok "노드 NSG 인바운드 허용: $r (Azure CNI Overlay / API Server VNet Integration)" "$rules" \
+        "any(.[]; .name == \"$r\" and .direction == \"Inbound\" and .access == \"Allow\")"
+    done
+    # gateway_allowed_source_prefixes = [] (내부 Gateway 전용)이면 이 규칙이 없는 것이 정상입니다.
+    jq_warn "노드 NSG 인바운드 허용: AllowGatewayHttpHttps (공용 Gateway 80/443. 내부 Gateway 만 쓴다면 정상)" "$rules" \
+      'any(.[]; .name == "AllowGatewayHttpHttps" and .direction == "Inbound" and .access == "Allow")'
+  fi
 
   nat="$(azj network nat gateway list -g "$rg")"
   natsku="$(jv "$nat" '.[0].sku.name')" # nat_gateway_sku 변수: StandardV2(기본) / Standard
@@ -597,5 +873,8 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then verify_stack; summary; fi
 | `SubnetsHaveNoAddressPrefixes` / CIDR 충돌 | 온프레미스·피어링 VNet 과 겹치지 않는 `address_space` 를 지정하세요. |
 | `StandardV2 NAT gateway is not supported in region` | `-var nat_gateway_sku=Standard` (이 경우 `zones = ["1"]` 단일 영역). |
 | PE 서브넷에서 연결이 안 됨 | NSG 규칙 우선순위(100 허용 → 4000 거부)와 출발지(노드 서브넷 CIDR)를 확인. |
+| 노드 간 Pod 통신 · DNS 가 안 됨 (Lab 05 이후) | 노드 NSG 에 Deny 규칙이 추가되지 않았는지, `AllowPodsToPods` 가 05-aks 의 `pod_cidr` 와 같은 대역인지 확인하세요. 다르면 두 스택의 `pod_cidr` 를 맞추고 03-network 를 다시 apply. |
+| `kubectl exec` · `logs` 가 `connection reset` / 타임아웃 | 노드 NSG 에 Deny 규칙이 있다면 `AllowApiServerToCluster`(API 서버 서브넷 → 노드 10250)가 남아 있는지 확인. |
+| 공용 Gateway 가 타임아웃 (Lab 07) | 노드 NSG 에 `AllowGatewayHttpHttps` 가 있는지, `gateway_allowed_source_prefixes` 에 내 IP 가 포함되는지 확인 (`az network nsg rule list`). 내부 Gateway 는 VNet 밖에서 접근할 수 없습니다. |
 
 다음 → [Lab 04. 플랫폼 서비스: ACR · Key Vault · 모니터링 · AKS 용 ID](04-platform.md)

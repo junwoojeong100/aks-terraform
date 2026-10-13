@@ -159,7 +159,7 @@ variable "maintenance_utc_offset" {
 }
 
 variable "pod_cidr" {
-  description = "Azure CNI Overlay Pod CIDR. VNet / 온프레미스 대역과 겹치면 안 됩니다."
+  description = "Azure CNI Overlay Pod CIDR. VNet / 온프레미스 대역과 겹치면 안 됩니다. 03-network 의 pod_cidr(노드 NSG 의 허용 규칙)와 같은 값을 쓰세요."
   type        = string
   default     = "10.244.0.0/16"
 }

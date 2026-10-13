@@ -6,7 +6,7 @@
 source "$(dirname "${BASH_SOURCE[0]}")/../lib/common.sh"
 
 verify_stack() {
-  local rg vnet_name nat_ip vnet sn nat natsku pips zones zone links
+  local rg vnet_name nat_ip vnet sn nat natsku pips zones zone links rules r
   rg="$(tf_out 03-network resource_group_name)"
   vnet_name="$(tf_out 03-network vnet_name)"
   nat_ip="$(tf_out 03-network nat_gateway_public_ip)"
@@ -37,6 +37,20 @@ verify_stack() {
   for sn in snet-aks-nodes snet-ingress snet-private-endpoints; do
     jq_ok "NSG 연결: $sn" "$vnet" ".subnets[] | select(.name == \"$sn\") | .networkSecurityGroup.id != null"
   done
+
+  # AKS 는 서브넷에 연결한 NSG 를 수정하지 않으므로, 노드 NSG 의 인바운드 허용 규칙은 Terraform 이 만든 것이어야 합니다.
+  rules="$(nodes_nsg_rules "$rg")"
+  if [ -z "$rules" ]; then
+    fail "노드 서브넷 NSG(…-aks-nodes)의 규칙을 읽을 수 없습니다"
+  else
+    for r in AllowNodesToPods AllowPodsToPods AllowApiServerToCluster; do
+      jq_ok "노드 NSG 인바운드 허용: $r (Azure CNI Overlay / API Server VNet Integration)" "$rules" \
+        "any(.[]; .name == \"$r\" and .direction == \"Inbound\" and .access == \"Allow\")"
+    done
+    # gateway_allowed_source_prefixes = [] (내부 Gateway 전용)이면 이 규칙이 없는 것이 정상입니다.
+    jq_warn "노드 NSG 인바운드 허용: AllowGatewayHttpHttps (공용 Gateway 80/443. 내부 Gateway 만 쓴다면 정상)" "$rules" \
+      'any(.[]; .name == "AllowGatewayHttpHttps" and .direction == "Inbound" and .access == "Allow")'
+  fi
 
   nat="$(azj network nat gateway list -g "$rg")"
   natsku="$(jv "$nat" '.[0].sku.name')" # nat_gateway_sku 변수: StandardV2(기본) / Standard

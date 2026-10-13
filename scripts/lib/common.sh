@@ -73,6 +73,14 @@ kj() { kubectl --request-timeout=20s "$@" -o json 2>/dev/null || true; }
 # tf_out 스택 출력이름 : terraform output -raw (값이 없거나 apply 전이면 빈 문자열)
 tf_out() { terraform -chdir="${TF_DIR}/$1" output -raw "$2" 2>/dev/null || true; }
 
+# nodes_nsg_rules 네트워크리소스그룹 : 03-network 의 노드 서브넷 NSG(…-aks-nodes) 규칙을 JSON 으로 가져옵니다 (NSG 가 없으면 빈 문자열)
+nodes_nsg_rules() {
+  local nsg
+  nsg="$(az network nsg list -g "$1" --query "[?ends_with(name, '-aks-nodes')].name | [0]" -o tsv 2>/dev/null)"
+  [ -n "$nsg" ] || return 0
+  azj network nsg rule list -g "$1" --nsg-name "$nsg"
+}
+
 # tf_applied 스택 : 출력이 하나라도 있으면(= init 과 apply 를 마쳤으면) 0
 tf_applied() {
   local out

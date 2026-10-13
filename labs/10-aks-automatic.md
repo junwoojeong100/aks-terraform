@@ -18,7 +18,7 @@ Lab 05 에서 약 250 줄의 `cluster.tf` 와 모니터링/네트워크 설정�
   ├─ Azure CNI Overlay + Cilium, 관리형 NAT Gateway
   ├─ Entra ID + Azure RBAC (로컬 계정 없음), Workload Identity/OIDC
   ├─ Deployment Safeguards + Pod Security Standards(baseline) enforce
-  └─ Gateway API(approuting-istio), Standard 티어 + Pod readiness SLA(99.9% / 5분), 자동 업그레이드(stable, N-1)
+  └─ approuting-istio(Gateway API 구현; CRD 는 1.36+ 에서 기본 포함), Standard 티어 + Pod readiness SLA(99.9% / 5분), 자동 업그레이드(stable, N-1)
 ```
 
 ## AWS 경험자를 위한 비교
@@ -57,7 +57,7 @@ Lab 05 에서 약 250 줄의 `cluster.tf` 와 모니터링/네트워크 설정�
 | 기본은 **managed VNet** (`use_byo_network = false`) | 가장 단순. 기존 네트워크/온프레미스 연동이 필요하면 BYO VNet 으로 시작해야 합니다(이후 변경 불가). |
 | BYO 시: 서브넷 3개(API 서버 위임 /28, user 노드, system 노드) + **UAMI + VNet 에 Network Contributor** | Microsoft 공식 샘플과 동일한 요구 사항. NAP 가 VNet 안에서 노드를 만들기 때문에 VNet 범위 권한이 필요. |
 | system 노드 서브넷의 `ignore_changes = [delegation]` | AKS 가 클러스터 생성 후 서브넷에 위임을 추가해 Terraform 이 되돌리려는 것을 막습니다. |
-| Ingress: `web_app_routing_ingress { istio_enabled = true }` | NGINX 대신 Gateway API(approuting-istio). 1.36+ 신규 Automatic 의 기본값과 동일. |
+| Ingress: `web_app_routing_ingress { istio_enabled = true }` | NGINX 대신 approuting-istio 구현. Gateway API CRD 까지 기본 포함되는 것은 1.36+ 신규 Automatic 입니다(`stable` 채널은 N-1 이라 지금은 1.35 로 만들어져 CRD 가 없을 수 있습니다). |
 | `api_server_access.authorized_ip_ranges` | 공용 엔드포인트는 내 IP 만. |
 | 관리자 권한: `grant_current_user_admin` / `admin_principal_ids` | Automatic 은 로컬 계정이 없어 Azure RBAC 역할이 유일한 접근 수단입니다. 실습은 현재 로그인 사용자에게 부여(기본), 팀/CI 는 `false` 로 끄고 Entra 그룹 Object ID 를 `admin_principal_ids` 로 지정하세요(둘 다 비우면 `validation` 이 막습니다). |
 
@@ -469,10 +469,13 @@ $(terraform output -raw get_credentials_command)
 ### 2단계. 노드가 "없는" 클러스터를 확인
 
 ```bash
-kubectl get nodes              # 처음에는 사용자 노드가 없거나 적습니다 (시스템 노드는 AKS 구독에서 호스팅)
-kubectl get nodepools.karpenter.sh 2>/dev/null     # NAP 의 NodePool (기본 풀)
-kubectl get gatewayclass       # approuting-istio
+kubectl get nodes              # 처음에는 사용자 노드가 없거나 적습니다 (관리형 hostedpool 노드 3개 + system-surge 노드 1개가 보입니다)
+kubectl get nodepools.karpenter.sh 2>/dev/null     # NAP 의 NodePool (default, system-surge)
+kubectl get gatewayclass       # approuting-istio (Gateway API CRD 가 있는 1.36+ 클러스터에서만)
 ```
+
+> [!NOTE]
+> 새 Automatic 클러스터는 `stable` 채널(N-1)이라 **GA 최신 minor 보다 한 단계 낮은 버전**(2026-10 기준 1.35.8)으로 만들어지고, `azurerm_kubernetes_automatic_cluster` 에서는 버전을 고를 수 없습니다. 이 경우 `istio_enabled = true` 로 approuting-istio 구현은 켜지지만 Gateway API CRD 는 설치되지 않아 `kubectl get gatewayclass` 가 `the server doesn't have a resource type "gatewayclass"` 로 실패합니다(정상). Gateway/HTTPRoute 를 쓰려면 1.36+ 로 올라간 뒤에 확인하세요.
 
 ### 3단계. Deployment Safeguards 체험
 

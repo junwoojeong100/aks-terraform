@@ -8,7 +8,7 @@ EKS·VPC·IAM 에 익숙한 엔지니어가 **Azure Best Practice** 로 프로�
 | 전체 약 4–6시간 | 03–05 스택을 켜 둔 동안 시간당 약 $2–2.5 | `terraform/*` | [01. 사전 준비](labs/01-prerequisites.md) |
 
 > [!IMPORTANT]
-> 이 가이드의 코드는 **정적 검증**(`terraform fmt`, `validate`, mock provider 기반 `terraform test`)까지 마친 상태입니다. 실제 Azure 구독에 `apply` 해서 확인한 결과가 아니므로, 처음 실행할 때는 `terraform plan` 결과를 꼭 읽어 보세요. 실습 후에는 [Lab 11](labs/11-cleanup.md) 로 반드시 정리하세요(클러스터를 켜 둔 채 방치하면 비용이 계속 발생합니다).
+> 이 가이드의 코드는 **정적 검증**(`terraform fmt`, `validate`, mock provider 기반 `terraform test`)에 더해, 2026-10-13 에 **실제 Azure 구독에서 Lab 01–11 을 처음부터 끝까지 실행**해 확인했습니다. 그때 발견한 불일치는 고쳤고, 확인하지 못한 항목(Spot 스케일 업, 업그레이드 실행 등)은 [부록 A](labs/99-appendix.md)에 적어 두었습니다. 구독의 쿼터 · 조직 정책 · 리전 용량에 따라 결과가 다를 수 있으니 처음 실행할 때는 `terraform plan` 결과를 꼭 읽어 보세요. 실습 후에는 [Lab 11](labs/11-cleanup.md) 로 반드시 정리하세요(클러스터를 켜 둔 채 방치하면 비용이 계속 발생합니다).
 
 ## 기준 버전 (2026-10-13)
 

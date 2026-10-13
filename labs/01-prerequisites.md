@@ -96,6 +96,12 @@ for rp in $RPS; do printf "%-36s %s\n" "$rp" "$(az provider show -n "$rp" --quer
 
 기본 구성은 **D4ds_v5 (4 vCPU)** 노드를 최소 6대(System 3 + User 3) 쓰고, 업그레이드 시 임시 노드(surge)가 더 생깁니다. 권장 여유는 **40 vCPU** 입니다(최소 24 vCPU + surge 분).
 
+| 쿼터 (`az vm list-usage` 의 이름) | 필요량 |
+|---|---|
+| `standardDDSv5Family` (D4ds_v5 의 패밀리 쿼터) | 6대 = 24 → 업그레이드 surge 포함 28 → 오토스케일 최대(System 5 + User 6 = 11대) 44 |
+| `cores` (Total Regional vCPUs, 모든 패밀리의 합계) | 위 값 + Lab 10 의 AKS Automatic 노드(약 8)를 함께 쓰면 36 이상 |
+| Spot vCPUs (선택: Lab 05 의 Spot 풀) | 5대 × 4 = 20. 일반 vCPU 쿼터와 별도로 계산됩니다 |
+
 ```bash
 az vm list-usage --location koreacentral \
   --query "[?name.value=='cores' || name.value=='standardDDSv5Family'].{name:name.localizedValue, used:currentValue, limit:limit}" -o table
@@ -106,6 +112,18 @@ az vm list-skus --location koreacentral --size Standard_D4ds_v5 --query "[].{nam
 
 > [!WARNING]
 > `restrictions` 에 `NotAvailableForSubscription` 이 있으면 그 VM 크기/영역은 구독에서 쓸 수 없습니다. 쿼터가 부족하면 포털의 *쿼터* 메뉴나 지원 요청으로 증설하거나, 변수 `system_node_vm_size`/`user_node_vm_size`(Lab 05)를 바꾸세요.
+
+Visual Studio 구독처럼 기본 쿼터가 작다면(예: 패밀리 20, 전체 32) CLI 로 증설을 요청할 수 있습니다. 소규모 증설은 요청 즉시 반영되기도 하지만 구독 유형에 따라 다를 수 있으니, 반영 여부는 위의 `az vm list-usage` 로 확인하세요.
+
+```bash
+az extension add --name quota
+az provider register --namespace Microsoft.Quota           # 등록이 끝난 뒤(Registered) 요청하세요
+SCOPE="/subscriptions/$(az account show --query id -o tsv)/providers/Microsoft.Compute/locations/koreacentral"
+az quota create --resource-name standardDDSv5Family --scope "$SCOPE" --limit-object value=48 --resource-type dedicated
+az quota create --resource-name cores               --scope "$SCOPE" --limit-object value=64 --resource-type dedicated
+```
+
+증설하지 않고 `system_node_vm_size`/`user_node_vm_size` 를 `Standard_D2ds_v5`(2 vCPU)로 줄여도 같은 패밀리 쿼터(20) 안에서 실습할 수 있습니다(6대 = 12 vCPU).
 
 ## 5. 환경 변수 설정
 
@@ -282,7 +300,9 @@ else
 fi
 
 section "7. 권한 (이 실습은 역할 할당을 많이 만듭니다)"
-me="$(jv "$acct" .user.name)"
+# 게스트/개인(MSA) 계정은 로그인 이름(user.name)으로 조회가 안 되므로 객체 ID 를 우선 씁니다 (서비스 주체는 appId 로 대체).
+me="$(az ad signed-in-user show --query id -o tsv 2>/dev/null)"
+[ -n "$me" ] || me="$(jv "$acct" .user.name)"
 roles="$(az role assignment list --assignee "$me" --all --include-inherited --query '[].roleDefinitionName' -o tsv 2>/dev/null)"
 if printf '%s\n' "$roles" | grep -qx 'Owner'; then
   pass "Owner 역할 보유"

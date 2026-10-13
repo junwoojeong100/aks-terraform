@@ -450,7 +450,7 @@ run "budget_requires_email" {
 ```bash
 cd terraform/08-governance
 terraform init -backend-config=../backend.hcl
-terraform plan -out tfplan        # 정책 할당 8개
+terraform plan -out tfplan        # 정책 할당 8개 + 예산 시작일용 time_static 1개 = 9개 추가
 terraform apply tfplan
 ```
 
@@ -471,6 +471,9 @@ az policy state list -g "$(terraform -chdir=../05-aks output -raw resource_group
 
 기대 결과: 기본 구성에서는 `authorized-ip-ranges`(O), `local-auth-disabled`(O) 등이 **Compliant**, Defender 프로필 정책은 `enable_defender=false` 이므로 **NonCompliant** 로 나옵니다 → 감사가 의도대로 동작하는 것입니다.
 
+> [!NOTE]
+> 구독에 *Defender for Containers 자동 프로비저닝* 정책이 이미 있으면(Defender 가 켜진 구독의 기본값) 그 정책이 클러스터에 Defender 프로필을 직접 붙입니다. 이 경우 Defender 프로필 정책은 처음부터 Compliant 이고, 05-aks 의 `plan` 에 `microsoft_defender` 제거 diff 가 계속 보입니다. 05-aks 를 `-var enable_defender=true` 로 적용해 Terraform 이 같은 상태를 선언하게 맞추세요. 평가 결과에는 구독 단위 이니셔티브(예: ASC 기본 이니셔티브)의 비준수 항목도 함께 나옵니다.
+
 ### 3단계. Deny 효과 체험
 
 ```bash
@@ -479,7 +482,7 @@ terraform apply -var policy_effect=Deny      # 애드온이 동기화될 때까�
 cat <<'EOF' | kubectl apply -f -
 apiVersion: v1
 kind: Pod
-metadata: { name: bad-pod, namespace: web }
+metadata: { name: bad-pod, namespace: default }
 spec:
   containers:
   - name: bad
@@ -489,6 +492,9 @@ spec:
 EOF
 # → admission webhook "validation.gatekeeper.sh" denied the request: ... Privileged container is not allowed
 ```
+
+> [!NOTE]
+> 시험 파드는 `web` 이 아니라 **`default`** 네임스페이스에 만듭니다. `web` 은 Pod Security Standards(`baseline` enforce)가 걸려 있어서, 같은 파드가 Azure Policy(Gatekeeper)보다 먼저 `violates PodSecurity "baseline:latest": privileged` 로 거부됩니다. 둘 다 거부이지만 이 단계에서 보려는 것은 Azure Policy 의 Deny 효과입니다.
 
 확인 후에는 `terraform apply` (기본값 Audit)로 되돌리세요. Deny 상태에서는 06/07 에서 배포한 앱도 정책을 만족해야 합니다(이 가이드의 앱은 만족하도록 작성되었습니다).
 

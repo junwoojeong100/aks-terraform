@@ -7,7 +7,7 @@
 source "$(dirname "${BASH_SOURCE[0]}")/../lib/common.sh"
 
 verify_stack() {
-  local rg name aks nodes ready want zones gc pods p bad sku channel
+  local rg name aks nodes ready want zones gc pods p bad sku channel netrg podcidr nsgrules
   rg="$(tf_out 05-aks resource_group_name)"
   name="$(tf_out 05-aks cluster_name)"
 
@@ -43,6 +43,18 @@ verify_stack() {
   expect_eq "CNI / 모드" "$(jv "$aks" '[.networkProfile.networkPlugin, .networkProfile.networkPluginMode] | join("/")')" "azure/overlay"
   expect_eq "데이터 플레인 / 네트워크 정책" "$(jv "$aks" '[.networkProfile.networkDataplane, .networkProfile.networkPolicy] | join("/")')" "cilium/cilium"
   expect_eq "아웃바운드 방식 (직접 만든 NAT Gateway)" "$(jv "$aks" .networkProfile.outboundType)" "userAssignedNATGateway"
+  # 03-network 의 노드 NSG 는 Pod CIDR 간 인바운드를 허용합니다 (오버레이 Pod 트래픽에도 서브넷 NSG 가 적용됨).
+  # 두 스택의 pod_cidr 가 다르면, 나중에 NSG 에 Deny 규칙을 더하는 순간 노드 간 Pod 통신(DNS 포함)이 막힙니다.
+  netrg="$(tf_out 03-network resource_group_name)"
+  podcidr="$(jv "$aks" .networkProfile.podCidr)"
+  nsgrules=""
+  [ -z "$netrg" ] || nsgrules="$(nodes_nsg_rules "$netrg")"
+  if [ -z "$nsgrules" ]; then
+    skip "03-network 의 노드 NSG 규칙을 읽을 수 없어 Pod CIDR 허용 규칙 확인을 건너뜁니다"
+  else
+    jq_ok "노드 NSG 가 Pod CIDR(${podcidr}) 간 인바운드를 허용 (03-network 와 05-aks 의 pod_cidr 일치)" "$nsgrules" \
+      "any(.[]; .name == \"AllowPodsToPods\" and .access == \"Allow\" and .sourceAddressPrefix == \"$podcidr\" and .destinationAddressPrefix == \"$podcidr\")"
+  fi
   expect_eq "API 서버 VNet Integration" "$(jv "$aks" .apiServerAccessProfile.enableVnetIntegration)" "true"
   if [ "$(jv "$aks" .apiServerAccessProfile.enablePrivateCluster)" = "true" ]; then
     pass "프라이빗 클러스터 (API 서버는 VNet 안에서만 접근)"

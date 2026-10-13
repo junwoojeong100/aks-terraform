@@ -71,7 +71,12 @@ resource "azapi_update_resource" "control_plane_metrics" {
     }
   }
 
-  depends_on = [azurerm_monitor_data_collection_rule_association.prometheus]
+  # 같은 클러스터에 대한 PUT 이 노드 풀 생성/변경과 겹치면 409 AnotherOperationInProgress 로 실패하므로 노드 풀 뒤에 실행합니다.
+  depends_on = [
+    azurerm_monitor_data_collection_rule_association.prometheus,
+    azurerm_kubernetes_cluster_node_pool.user,
+    azurerm_kubernetes_cluster_node_pool.spot,
+  ]
 }
 
 # --- Container Insights (로그) -----------------------------------------------------

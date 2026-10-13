@@ -127,10 +127,10 @@ kubectl get events -A | grep -i -E "TriggeredScaleUp|ScaleDown"
 
 ## 3. 노드 풀 변경과 교체
 
-`vm_size`, `os_disk_*`, `zones`, `vnet_subnet_id` 등을 바꾸면 노드 풀이 **교체**됩니다. 이 실습은 `temporary_name_for_rotation`(`systemtmp`, `usertmp`)을 설정해 임시 풀을 만든 뒤 교체합니다.
+`vm_size`, `os_disk_*`, `zones`, `vnet_subnet_id` 등을 바꾸면 노드 풀이 **교체**됩니다. 이 실습은 `temporary_name_for_rotation`(`systemtmp`, `usertmp`)을 설정해 임시 풀을 만든 뒤 교체합니다. 그래서 plan 에는 `replace` 가 아니라 **`will be updated in-place`** 로 보이고, 실제 교체(임시 풀 생성 → 이전 풀 제거)는 apply 중에 provider 가 수행합니다.
 
 ```bash
-terraform plan -var user_node_vm_size=Standard_D8ds_v5   # user 풀 교체 계획 확인
+terraform plan -var user_node_vm_size=Standard_D8ds_v5   # vm_size: D4ds_v5 -> D8ds_v5 (user 풀 updated in-place)
 ```
 
 > [!CAUTION]

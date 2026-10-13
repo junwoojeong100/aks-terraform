@@ -774,15 +774,19 @@ figure.code.shell figcaption .file::before { content: '$ '; color: var(--hl-var)
 </svg></div></figure>
 
 <h2 id="readme--빠른-시작">빠른 시작<a class="anchor" href="#readme--빠른-시작" aria-label="이 제목 링크">#</a></h2>
-<figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 9줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">git <span class="hljs-built_in">clone</span> https://github.com/junwoojeong100/aks-terraform.git &amp;&amp; <span class="hljs-built_in">cd</span> aks-terraform
+<figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 13줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">git <span class="hljs-built_in">clone</span> https://github.com/junwoojeong100/aks-terraform.git &amp;&amp; <span class="hljs-built_in">cd</span> aks-terraform
 az login &amp;&amp; az account <span class="hljs-built_in">set</span> --subscription <span class="hljs-string">&quot;&lt;구독&gt;&quot;</span>
 <span class="hljs-built_in">export</span> ARM_SUBSCRIPTION_ID=<span class="hljs-string">&quot;<span class="hljs-subst">$(az account show --query id -o tsv)</span>&quot;</span>
 <span class="hljs-built_in">export</span> TF_VAR_allowed_ip_ranges=<span class="hljs-string">&quot;[\&quot;<span class="hljs-subst">$(curl -s https://api.ipify.org)</span>/32\&quot;]&quot;</span>
+scripts/preflight.sh                  <span class="hljs-comment"># 도구 · 로그인 · 쿼터 · 권한 점검 (읽기 전용)</span>
 
 <span class="hljs-built_in">cd</span> terraform/02-bootstrap &amp;&amp; terraform init &amp;&amp; terraform apply
 terraform output -raw backend_hcl &gt; ../backend.hcl
 <span class="hljs-built_in">cd</span> ../03-network &amp;&amp; terraform init -backend-config=../backend.hcl &amp;&amp; terraform apply
-<span class="hljs-comment"># … 04 → 05 → 06 → 07 → 08 순서로 같은 패턴</span></code></pre></div></figure>
+<span class="hljs-comment"># … 04 → 05 → 06 → 07 → 08 순서로 같은 패턴</span>
+
+<span class="hljs-built_in">cd</span> ../.. &amp;&amp; scripts/verify.sh         <span class="hljs-comment"># apply 한 스택이 설계대로 만들어졌는지 확인 (읽기 전용)</span>
+scripts/cleanup.sh --dry-run          <span class="hljs-comment"># 실습을 마치면: 지울 목록 확인 → scripts/cleanup.sh (Lab 11)</span></code></pre></div></figure>
 <p>자세한 단계는 <a href="#lab-01-prerequisites">Lab 01</a> 부터 따라가세요. <strong>단일 HTML 가이드</strong>는 <code>aks-terraform-guide.html</code> 을 브라우저로 여세요(오프라인 동작, 검색/복사 버튼/다크 모드/진행 체크 지원).</p>
 <h2 id="readme--실습-스크립트">실습 스크립트<a class="anchor" href="#readme--실습-스크립트" aria-label="이 제목 링크">#</a></h2>
 <p>손으로 치던 점검·확인·삭제 명령을 스크립트로 묶었습니다 (macOS · Linux · WSL · Cloud Shell, 필요: <code>terraform</code> <code>az</code> <code>jq</code> + 05 이후 <code>kubectl</code> <code>kubelogin</code>).</p>
@@ -2951,7 +2955,7 @@ scripts/verify.sh 02-bootstrap</code></pre></div></figure>
 <text x="56" y="166" font-size="11.5" class="dg-m" data-w="266">10.10.1.0/28 (AKS 전용, 최소 /28)</text>
 <text x="56" y="182.5" font-size="11.5" class="dg-m" data-w="266">API 서버 엔드포인트가 이 서브넷에 투영</text>
 <text x="56" y="199" font-size="11.5" class="dg-m" data-w="266">위임(delegation): managedClusters</text>
-<text x="56" y="215.5" font-size="11.5" class="dg-m" data-w="266">NSG 없음 (AKS 가 관리)</text>
+<text x="56" y="215.5" font-size="11.5" class="dg-m" data-w="266">NSG 연결 없음 (위임 서브넷)</text>
 <rect x="354" y="124" width="290" height="134" rx="10" class="dg-box dg-azure"/>
 <text x="366" y="148" font-size="14" class="dg-t dg-b" data-w="266">snet-aks-nodes</text>
 <text x="366" y="166" font-size="11.5" class="dg-m" data-w="266">10.10.0.0/24 · 노드 IP 전용</text>
@@ -3510,7 +3514,7 @@ az network nat gateway show -g <span class="hljs-string">&quot;<span class="hljs
 <p>서브넷 위임, NAT Gateway 연결과 고정 공인 IP, NSG, Private DNS Zone 의 VNet 연결까지 한 번에 확인합니다 (읽기 전용).</p>
 <figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 2줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-built_in">cd</span> ../..                          <span class="hljs-comment"># 저장소 루트에서 실행</span>
 scripts/verify.sh 03-network</code></pre></div></figure>
-<figure class="code"><figcaption><span class="file">scripts/verify/03-network.sh</span><span class="meta">bash · 59줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-meta">#!/usr/bin/env bash</span>
+<figure class="code collapsed"><figcaption><span class="file">scripts/verify/03-network.sh</span><span class="meta">bash · 64줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-meta">#!/usr/bin/env bash</span>
 <span class="hljs-comment"># Lab 03 검증: VNet · 서브넷 · NSG · NAT Gateway · Private DNS 가 설계대로 만들어졌는지 확인합니다 (읽기 전용).</span>
 <span class="hljs-comment">#   AWS 비교: VPC + 서브넷 + Security Group/NACL + NAT Gateway + Route 53 private hosted zone</span>
 <span class="hljs-comment"># 사용법: scripts/verify.sh 03-network</span>
@@ -3518,7 +3522,7 @@ scripts/verify.sh 03-network</code></pre></div></figure>
 <span class="hljs-built_in">source</span> <span class="hljs-string">&quot;<span class="hljs-subst">$(dirname <span class="hljs-string">&quot;<span class="hljs-variable">${BASH_SOURCE[0]}</span>&quot;</span>)</span>/../lib/common.sh&quot;</span>
 
 <span class="hljs-function"><span class="hljs-title">verify_stack</span></span>() {
-  <span class="hljs-built_in">local</span> rg vnet_name nat_ip vnet sn nat pips zones zone links
+  <span class="hljs-built_in">local</span> rg vnet_name nat_ip vnet sn nat natsku pips zones zone links
   rg=<span class="hljs-string">&quot;<span class="hljs-subst">$(tf_out 03-network resource_group_name)</span>&quot;</span>
   vnet_name=<span class="hljs-string">&quot;<span class="hljs-subst">$(tf_out 03-network vnet_name)</span>&quot;</span>
   nat_ip=<span class="hljs-string">&quot;<span class="hljs-subst">$(tf_out 03-network nat_gateway_public_ip)</span>&quot;</span>
@@ -3551,7 +3555,12 @@ scripts/verify.sh 03-network</code></pre></div></figure>
   <span class="hljs-keyword">done</span>
 
   nat=<span class="hljs-string">&quot;<span class="hljs-subst">$(azj network nat gateway list -g <span class="hljs-string">&quot;<span class="hljs-variable">$rg</span>&quot;</span>)</span>&quot;</span>
-  expect_eq <span class="hljs-string">&quot;NAT Gateway SKU (영역 중복)&quot;</span> <span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="hljs-string">&quot;<span class="hljs-variable">$nat</span>&quot;</span> &#x27;.[0].sku.name&#x27;)</span>&quot;</span> <span class="hljs-string">&quot;StandardV2&quot;</span>
+  natsku=<span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="hljs-string">&quot;<span class="hljs-variable">$nat</span>&quot;</span> &#x27;.[0].sku.name&#x27;)</span>&quot;</span> <span class="hljs-comment"># nat_gateway_sku 변수: StandardV2(기본) / Standard</span>
+  <span class="hljs-keyword">case</span> <span class="hljs-string">&quot;<span class="hljs-variable">$natsku</span>&quot;</span> <span class="hljs-keyword">in</span>
+    StandardV2) pass <span class="hljs-string">&quot;NAT Gateway SKU = StandardV2 (영역 중복)&quot;</span> ;;
+    Standard) warn <span class="hljs-string">&quot;NAT Gateway SKU = Standard (영역 중복이 아님. StandardV2 를 지원하지 않는 리전에서만 쓰세요)&quot;</span> ;;
+    *) fail <span class="hljs-string">&quot;NAT Gateway SKU: 기대 StandardV2 또는 Standard / 실제 &#x27;<span class="hljs-variable">${natsku:-(없음)}</span>&#x27;&quot;</span> ;;
+  <span class="hljs-keyword">esac</span>
   pips=<span class="hljs-string">&quot;<span class="hljs-subst">$(azj network public-ip list -g <span class="hljs-string">&quot;<span class="hljs-variable">$rg</span>&quot;</span>)</span>&quot;</span>
   expect_eq <span class="hljs-string">&quot;NAT 공인 IP = terraform output&quot;</span> <span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="hljs-string">&quot;<span class="hljs-variable">$pips</span>&quot;</span> &#x27;[.[] | select(.name | startswith(<span class="hljs-string">&quot;pip-ng-&quot;</span>)</span>)][0].ipAddress&#x27;)&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$nat_ip</span>&quot;</span>
 
@@ -3568,7 +3577,7 @@ scripts/verify.sh 03-network</code></pre></div></figure>
 }
 
 <span class="hljs-comment"># 직접 실행(scripts/verify/03-network.sh)도 가능합니다.</span>
-<span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">${BASH_SOURCE[0]}</span>&quot;</span> = <span class="hljs-string">&quot;<span class="hljs-variable">$0</span>&quot;</span> ]; <span class="hljs-keyword">then</span> verify_stack; summary; <span class="hljs-keyword">fi</span></code></pre></div></figure>
+<span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">${BASH_SOURCE[0]}</span>&quot;</span> = <span class="hljs-string">&quot;<span class="hljs-variable">$0</span>&quot;</span> ]; <span class="hljs-keyword">then</span> verify_stack; summary; <span class="hljs-keyword">fi</span></code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (64줄) ▼">전체 코드 보기 (64줄) ▼</button></figure>
 <h2 id="03-network--자주-만나는-문제">자주 만나는 문제<a class="anchor" href="#03-network--자주-만나는-문제" aria-label="이 제목 링크">#</a></h2>
 <div class="table-wrap"><table>
 <thead>
@@ -6192,7 +6201,7 @@ kubectl get pods -n aks-istio-system</code></pre></div></figure>
 <text x="688" y="388.5" font-size="11.5" class="dg-m" data-w="236">+ recording rule (대시보드용)</text>
 <rect x="676" y="444" width="260" height="62" rx="10" class="dg-box dg-ok"/>
 <text x="688" y="467.5" font-size="13.5" class="dg-t dg-b" data-w="236">Managed Grafana</text>
-<text x="688" y="485" font-size="11" class="dg-m" data-w="236">데이터 소스: Prometheus + Log Analytics</text>
+<text x="688" y="485" font-size="11" class="dg-m" data-w="236">Prometheus 데이터 소스 자동 연결</text>
 <path d="M634 156 L676 156" class="dg-line dg-net" marker-end="url(#observability-pipeline-ah-net)"/>
 <path d="M634 268 L676 268" class="dg-line dg-id" marker-end="url(#observability-pipeline-ah-id)"/>
 <path d="M634 380 L676 380" class="dg-line dg-azure" marker-end="url(#observability-pipeline-ah-azure)"/>
@@ -6225,7 +6234,7 @@ kubectl get nodes -L kubernetes.azure.com/scalesetpriority    <span class="hljs-
 임시 kubeconfig 를 쓰므로 <code>~/.kube/config</code> 는 바뀌지 않습니다.</p>
 <figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 2줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-built_in">cd</span> ../..                          <span class="hljs-comment"># 저장소 루트에서 실행</span>
 scripts/verify.sh 05-aks</code></pre></div></figure>
-<figure class="code collapsed"><figcaption><span class="file">scripts/verify/05-aks.sh</span><span class="meta">bash · 101줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-meta">#!/usr/bin/env bash</span>
+<figure class="code collapsed"><figcaption><span class="file">scripts/verify/05-aks.sh</span><span class="meta">bash · 122줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-meta">#!/usr/bin/env bash</span>
 <span class="hljs-comment"># Lab 05 검증: AKS 클러스터가 설계한 대로 만들어졌는지 확인합니다 (읽기 전용).</span>
 <span class="hljs-comment">#   1) az aks show 한 번으로 클러스터 설정을 읽습니다 (aws eks describe-cluster 에 해당)</span>
 <span class="hljs-comment">#   2) kubectl 로 노드 · 권한 · 애드온을 확인합니다. kubeconfig 는 임시 파일을 써서 ~/.kube/config 를 건드리지 않습니다.</span>
@@ -6234,7 +6243,7 @@ scripts/verify.sh 05-aks</code></pre></div></figure>
 <span class="hljs-built_in">source</span> <span class="hljs-string">&quot;<span class="hljs-subst">$(dirname <span class="hljs-string">&quot;<span class="hljs-variable">${BASH_SOURCE[0]}</span>&quot;</span>)</span>/../lib/common.sh&quot;</span>
 
 <span class="hljs-function"><span class="hljs-title">verify_stack</span></span>() {
-  <span class="hljs-built_in">local</span> rg name aks nodes ready zones gc pods p bad
+  <span class="hljs-built_in">local</span> rg name aks nodes ready want zones gc pods p bad sku channel
   rg=<span class="hljs-string">&quot;<span class="hljs-subst">$(tf_out 05-aks resource_group_name)</span>&quot;</span>
   name=<span class="hljs-string">&quot;<span class="hljs-subst">$(tf_out 05-aks cluster_name)</span>&quot;</span>
 
@@ -6252,7 +6261,12 @@ scripts/verify.sh 05-aks</code></pre></div></figure>
   <span class="hljs-comment"># --- 상태 ---</span>
   expect_eq <span class="hljs-string">&quot;프로비저닝 상태&quot;</span> <span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="hljs-string">&quot;<span class="hljs-variable">$aks</span>&quot;</span> .provisioningState)</span>&quot;</span> <span class="hljs-string">&quot;Succeeded&quot;</span>
   expect_eq <span class="hljs-string">&quot;전원 상태&quot;</span> <span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="hljs-string">&quot;<span class="hljs-variable">$aks</span>&quot;</span> .powerState.code)</span>&quot;</span> <span class="hljs-string">&quot;Running&quot;</span>
-  expect_eq <span class="hljs-string">&quot;SKU 등급 (업타임 SLA)&quot;</span> <span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="hljs-string">&quot;<span class="hljs-variable">$aks</span>&quot;</span> .sku.tier)</span>&quot;</span> <span class="hljs-string">&quot;Standard&quot;</span>
+  sku=<span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="hljs-string">&quot;<span class="hljs-variable">$aks</span>&quot;</span> .sku.tier)</span>&quot;</span> <span class="hljs-comment"># sku_tier 변수: Free / Standard(기본) / Premium</span>
+  <span class="hljs-keyword">case</span> <span class="hljs-string">&quot;<span class="hljs-variable">$sku</span>&quot;</span> <span class="hljs-keyword">in</span>
+    Standard | Premium) pass <span class="hljs-string">&quot;SKU 등급 = <span class="hljs-variable">$sku</span> (업타임 SLA 포함)&quot;</span> ;;
+    Free) warn <span class="hljs-string">&quot;SKU 등급 = Free (업타임 SLA 없음. 비용을 줄이려고 sku_tier 를 바꾼 것이 아니라면 Standard 로 올리세요)&quot;</span> ;;
+    *) fail <span class="hljs-string">&quot;SKU 등급: 기대 Standard 또는 Premium / 실제 &#x27;<span class="hljs-variable">${sku:-(없음)}</span>&#x27;&quot;</span> ;;
+  <span class="hljs-keyword">esac</span>
   expect_set <span class="hljs-string">&quot;Kubernetes 버전&quot;</span> <span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="hljs-string">&quot;<span class="hljs-variable">$aks</span>&quot;</span> .currentKubernetesVersion)</span>&quot;</span>
 
   <span class="hljs-comment"># --- 보안 / ID ---</span>
@@ -6273,7 +6287,13 @@ scripts/verify.sh 05-aks</code></pre></div></figure>
   <span class="hljs-keyword">fi</span>
 
   <span class="hljs-comment"># --- 업그레이드 / 애드온 ---</span>
-  expect_eq <span class="hljs-string">&quot;자동 업그레이드 채널 / 노드 OS 채널&quot;</span> <span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="hljs-string">&quot;<span class="hljs-variable">$aks</span>&quot;</span> &#x27;[.autoUpgradeProfile.upgradeChannel, .autoUpgradeProfile.nodeOsUpgradeChannel] | join(<span class="hljs-string">&quot;/&quot;</span>)</span>&#x27;)&quot;</span> <span class="hljs-string">&quot;patch/NodeImage&quot;</span>
+  expect_eq <span class="hljs-string">&quot;노드 OS 업그레이드 채널&quot;</span> <span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="hljs-string">&quot;<span class="hljs-variable">$aks</span>&quot;</span> .autoUpgradeProfile.nodeOsUpgradeChannel)</span>&quot;</span> <span class="hljs-string">&quot;NodeImage&quot;</span>
+  channel=<span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="hljs-string">&quot;<span class="hljs-variable">$aks</span>&quot;</span> .autoUpgradeProfile.upgradeChannel)</span>&quot;</span> <span class="hljs-comment"># 기본 patch. Lab 09 의 A / C-1 방식으로 바꿨다면 다른 값이 정상입니다.</span>
+  <span class="hljs-keyword">case</span> <span class="hljs-string">&quot;<span class="hljs-variable">$channel</span>&quot;</span> <span class="hljs-keyword">in</span>
+    patch) pass <span class="hljs-string">&quot;자동 업그레이드 채널 = patch (기본 구성)&quot;</span> ;;
+    none | stable | rapid | node-image) pass <span class="hljs-string">&quot;자동 업그레이드 채널 = <span class="hljs-variable">$channel</span> (기본값 patch 에서 바꾼 값 - Lab 09)&quot;</span> ;;
+    *) fail <span class="hljs-string">&quot;자동 업그레이드 채널: 기대 patch (또는 none/stable/rapid/node-image) / 실제 &#x27;<span class="hljs-variable">${channel:-(없음)}</span>&#x27;&quot;</span> ;;
+  <span class="hljs-keyword">esac</span>
   jq_ok <span class="hljs-string">&quot;Azure Policy 애드온&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$aks</span>&quot;</span> <span class="hljs-string">&#x27;.addonProfiles.azurepolicy.enabled == true&#x27;</span>
   jq_ok <span class="hljs-string">&quot;Container Insights (ama-logs)&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$aks</span>&quot;</span> <span class="hljs-string">&#x27;.addonProfiles.omsagent.enabled == true or .azureMonitorProfile.containerInsights.enabled == true&#x27;</span>
   jq_ok <span class="hljs-string">&quot;Key Vault Secrets Store CSI 드라이버&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$aks</span>&quot;</span> <span class="hljs-string">&#x27;.addonProfiles.azureKeyvaultSecretsProvider.enabled == true&#x27;</span>
@@ -6299,11 +6319,17 @@ scripts/verify.sh 05-aks</code></pre></div></figure>
   <span class="hljs-keyword">fi</span>
   nodes=<span class="hljs-string">&quot;<span class="hljs-subst">$(kj get nodes)</span>&quot;</span>
   <span class="hljs-keyword">if</span> [ -z <span class="hljs-string">&quot;<span class="hljs-variable">$nodes</span>&quot;</span> ]; <span class="hljs-keyword">then</span>
-    fail <span class="hljs-string">&quot;API 서버에 접속하지 못했습니다. 공인 IP 가 바뀌었다면 TF_VAR_allowed_ip_ranges 를 갱신하고 05-aks 를 apply 하세요.&quot;</span>
+    <span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="hljs-string">&quot;<span class="hljs-variable">$aks</span>&quot;</span> .apiServerAccessProfile.enablePrivateCluster)</span>&quot;</span> = <span class="hljs-string">&quot;true&quot;</span> ]; <span class="hljs-keyword">then</span>
+      skip <span class="hljs-string">&quot;프라이빗 클러스터의 API 서버에 접속할 수 없어 kubectl 확인을 건너뜁니다 (VNet 안의 점프 호스트·VPN 에서 다시 실행하세요)&quot;</span>
+    <span class="hljs-keyword">else</span>
+      fail <span class="hljs-string">&quot;API 서버에 접속하지 못했습니다. 공인 IP 가 바뀌었다면 TF_VAR_allowed_ip_ranges 를 갱신하고 05-aks 를 apply 하세요.&quot;</span>
+    <span class="hljs-keyword">fi</span>
     <span class="hljs-built_in">return</span>
   <span class="hljs-keyword">fi</span>
   ready=<span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="hljs-string">&quot;<span class="hljs-variable">$nodes</span>&quot;</span> &#x27;[.items[] | select(any(.status.conditions[]; .type == <span class="hljs-string">&quot;Ready&quot;</span> and .status == <span class="hljs-string">&quot;True&quot;</span>)</span>)] | length&#x27;)&quot;</span>
-  expect_ge <span class="hljs-string">&quot;Ready 노드 수 (system 3 + user 3)&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$ready</span>&quot;</span> 6
+  <span class="hljs-comment"># 오토스케일 풀은 minCount 아래로 내려가지 않으므로, 풀별 최소 노드 수의 합(기본 system 3 + user 3)을 기준으로 삼습니다.</span>
+  want=<span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="hljs-string">&quot;<span class="hljs-variable">$aks</span>&quot;</span> &#x27;[.agentPoolProfiles[] | if .enableAutoScaling == true then (.minCount // 0)</span> else (.count // 0) end] | add&#x27;)&quot;</span>
+  expect_ge <span class="hljs-string">&quot;Ready 노드 수 (풀별 최소 노드 수의 합)&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$ready</span>&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">${want:-1}</span>&quot;</span>
   zones=<span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="hljs-string">&quot;<span class="hljs-variable">$nodes</span>&quot;</span> &#x27;[.items[].metadata.labels[<span class="hljs-string">&quot;topology.kubernetes.io/zone&quot;</span>]] | unique | length&#x27;)</span>&quot;</span>
   expect_ge <span class="hljs-string">&quot;노드가 분산된 가용 영역 수&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$zones</span>&quot;</span> 2
 
@@ -6313,8 +6339,12 @@ scripts/verify.sh 05-aks</code></pre></div></figure>
     fail <span class="hljs-string">&quot;cluster-admin 권한이 없습니다 (역할 전파에 최대 5분, grant_current_user_admin / admin_principal_ids 확인)&quot;</span>
   <span class="hljs-keyword">fi</span>
 
-  gc=<span class="hljs-string">&quot;<span class="hljs-subst">$(kj get gatewayclass approuting-istio)</span>&quot;</span>
-  jq_ok <span class="hljs-string">&quot;GatewayClass approuting-istio 가 Accepted&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$gc</span>&quot;</span> <span class="hljs-string">&#x27;.status.conditions[]? | select(.type == &quot;Accepted&quot;) | .status == &quot;True&quot;&#x27;</span>
+  <span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;<span class="hljs-subst">$(jv <span class="hljs-string">&quot;<span class="hljs-variable">$aks</span>&quot;</span> &#x27;(.ingressProfile.gatewayApi // .ingressProfile.gatewayAPI // {})</span>.installation&#x27;)&quot;</span> = <span class="hljs-string">&quot;Standard&quot;</span> ]; <span class="hljs-keyword">then</span>
+    gc=<span class="hljs-string">&quot;<span class="hljs-subst">$(kj get gatewayclass approuting-istio)</span>&quot;</span>
+    jq_ok <span class="hljs-string">&quot;GatewayClass approuting-istio 가 Accepted&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$gc</span>&quot;</span> <span class="hljs-string">&#x27;.status.conditions[]? | select(.type == &quot;Accepted&quot;) | .status == &quot;True&quot;&#x27;</span>
+  <span class="hljs-keyword">else</span>
+    skip <span class="hljs-string">&quot;Gateway API 가 꺼져 있어 GatewayClass 확인을 건너뜁니다 (enable_gateway_api = false)&quot;</span>
+  <span class="hljs-keyword">fi</span>
 
   pods=<span class="hljs-string">&quot;<span class="hljs-subst">$(kj get pods -n kube-system)</span>&quot;</span>
   <span class="hljs-keyword">for</span> p <span class="hljs-keyword">in</span> ama-logs ama-metrics cilium coredns; <span class="hljs-keyword">do</span>
@@ -6325,8 +6355,9 @@ scripts/verify.sh 05-aks</code></pre></div></figure>
 }
 
 <span class="hljs-comment"># 직접 실행(scripts/verify/05-aks.sh)도 가능합니다.</span>
-<span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">${BASH_SOURCE[0]}</span>&quot;</span> = <span class="hljs-string">&quot;<span class="hljs-variable">$0</span>&quot;</span> ]; <span class="hljs-keyword">then</span> verify_stack; summary; <span class="hljs-keyword">fi</span></code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (101줄) ▼">전체 코드 보기 (101줄) ▼</button></figure>
-<aside class="callout tip"><div class="callout-title"><span>💡</span><span>팁</span></div><p>kubectl 단계가 &quot;API 서버에 접속하지 못했습니다&quot; 로 실패하면 공인 IP 가 바뀐 경우가 대부분입니다. <code>TF_VAR_allowed_ip_ranges</code> 를 갱신하고 05-aks 를 다시 <code>apply</code> 하세요.</p>
+<span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">${BASH_SOURCE[0]}</span>&quot;</span> = <span class="hljs-string">&quot;<span class="hljs-variable">$0</span>&quot;</span> ]; <span class="hljs-keyword">then</span> verify_stack; summary; <span class="hljs-keyword">fi</span></code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (122줄) ▼">전체 코드 보기 (122줄) ▼</button></figure>
+<aside class="callout tip"><div class="callout-title"><span>💡</span><span>팁</span></div><p>kubectl 단계가 &quot;API 서버에 접속하지 못했습니다&quot; 로 실패하면 공인 IP 가 바뀐 경우가 대부분입니다. <code>TF_VAR_allowed_ip_ranges</code> 를 갱신하고 05-aks 를 다시 <code>apply</code> 하세요.
+기본 구성과 다르게 바꾼 설정(<code>sku_tier</code>, <code>enable_gateway_api</code>, 노드 수, Lab 09 의 업그레이드 채널)은 ✗ 대신 값을 보여 주거나 경고·건너뜀으로 표시합니다. 프라이빗 클러스터(<code>enable_private_cluster</code>)는 VNet 밖에서 kubectl 단계를 건너뜁니다.</p>
 </aside>
 <h2 id="05-aks--자주-만나는-문제">자주 만나는 문제<a class="anchor" href="#05-aks--자주-만나는-문제" aria-label="이 제목 링크">#</a></h2>
 <div class="table-wrap"><table>
@@ -8669,7 +8700,7 @@ terraform apply -var enable_budget=<span class="hljs-literal">true</span> -var <
 <span class="hljs-comment"># 삭제 방지 잠금</span>
 terraform apply -var enable_resource_locks=<span class="hljs-literal">true</span>
 az group delete -n <span class="hljs-string">&quot;<span class="hljs-subst">$(terraform -chdir=../03-network output -raw resource_group_name)</span>&quot;</span> --<span class="hljs-built_in">yes</span>   <span class="hljs-comment"># → ScopeLocked 로 실패해야 정상</span></code></pre></div></figure>
-<aside class="callout warning"><div class="callout-title"><span>⚠️</span><span>주의</span></div><p>잠금(<code>enable_resource_locks</code>)을 켠 채로 정리하면 <code>terraform destroy</code> 가 실패합니다. <strong>정리 전에 먼저 <code>-var enable_resource_locks=false</code> 로 apply</strong> 하세요 → <a href="#lab-11-cleanup">Lab 11</a>.</p>
+<aside class="callout warning"><div class="callout-title"><span>⚠️</span><span>주의</span></div><p>잠금(<code>enable_resource_locks</code>)을 켠 채로 정리하면 <code>terraform destroy</code> 가 실패합니다. <strong>정리 전에 먼저 잠금 리소스만 지우세요</strong>: <code>terraform destroy -target=azurerm_management_lock.network -target=azurerm_management_lock.platform</code> (이 스택에서 실행). <code>scripts/cleanup.sh</code> 는 이 과정을 자동으로 수행합니다 → <a href="#lab-11-cleanup">Lab 11</a>.</p>
 </aside>
 <h3 id="08-governance--자동-검증-스크립트">자동 검증 스크립트<a class="anchor" href="#08-governance--자동-검증-스크립트" aria-label="이 제목 링크">#</a></h3>
 <p>정책 할당과 준수 상태, Defender 플랜, 리소스 잠금을 확인합니다. 정책 효과가 기본값 <code>Audit</code> 이면 비준수 리소스가 있어도 <strong>경고(!)</strong> 로만 표시합니다 (평가는 할당 직후 최대 수십 분 걸립니다).</p>
@@ -9034,6 +9065,8 @@ terraform apply tfplan          <span class="hljs-comment"># 컨트롤 플레인
 <figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 3줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">kubectl get nodes -w                         <span class="hljs-comment"># 임시(surge) 노드 추가 → cordon/drain → 이전 노드 제거</span>
 kubectl get pdb -A                           <span class="hljs-comment"># PDB 가 드레인 속도를 제한 (Lab 07 의 앱은 maxUnavailable=1)</span>
 kubectl get events -A --field-selector reason=Evicted</code></pre></div></figure>
+<aside class="callout tip"><div class="callout-title"><span>💡</span><span>팁</span></div><p>업그레이드가 끝나면 저장소 루트에서 <code>scripts/verify.sh 05-aks</code> 를 실행해 노드가 모두 Ready 인지, 애드온 파드가 Running 인지 읽기 전용으로 확인하세요. 업그레이드 채널(방식 A / C-1)을 바꿨다면 바뀐 값이 그대로 표시됩니다.</p>
+</aside>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -10005,6 +10038,10 @@ scripts/cleanup.sh --include-bootstrap       <span class="hljs-comment"># (선�
 <td>스택을 어떤 순서로 입력해도 항상 안전한 삭제 순서(06/07 → 05 → 04 → 03)로 정렬합니다.</td>
 </tr>
 <tr>
+<td>리소스 잠금</td>
+<td>08 의 <code>CanNotDelete</code> 잠금이 있으면 잠금 리소스만 <code>-target</code> 으로 먼저 지웁니다. 정책 효과 같은 08 의 다른 설정은 그대로 두었다가 순서에 맞춰 삭제합니다.</td>
+</tr>
+<tr>
 <td>재실행</td>
 <td>이미 지운 스택(빈 state)은 건너뜁니다. 중간에 실패해도 원인을 해결하고 같은 명령을 다시 실행하면 됩니다.</td>
 </tr>
@@ -10018,7 +10055,7 @@ scripts/cleanup.sh --include-bootstrap       <span class="hljs-comment"># (선�
 </tr>
 </tbody></table>
 </div>
-<figure class="code collapsed"><figcaption><span class="file">scripts/cleanup.sh</span><span class="meta">bash · 233줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-meta">#!/usr/bin/env bash</span>
+<figure class="code collapsed"><figcaption><span class="file">scripts/cleanup.sh</span><span class="meta">bash · 244줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-meta">#!/usr/bin/env bash</span>
 <span class="hljs-comment"># 실습 리소스를 &quot;생성의 역순&quot;으로 삭제합니다 (Lab 11 의 절차를 자동화).</span>
 <span class="hljs-comment">#   10-aks-automatic → 08-governance → 07-ingress → 06-workload → 05-aks → 04-platform → 03-network   (+ 02-bootstrap 은 옵션)</span>
 <span class="hljs-comment">#   06/07 은 클러스터가 살아 있어야 kubernetes provider 가 접속해 지울 수 있으므로 05 보다 먼저 지웁니다.</span>
@@ -10119,17 +10156,21 @@ targets=<span class="hljs-string">&quot;&quot;</span>
 }
 
 <span class="hljs-comment"># 08 이 건 리소스 잠금(CanNotDelete)이 있으면 destroy 가 ScopeLocked 로 실패하므로 먼저 해제합니다.</span>
+<span class="hljs-comment"># apply -var enable_resource_locks=false 는 정책 효과·Defender 같은 다른 설정까지 되돌리므로,</span>
+<span class="hljs-comment"># 잠금 리소스만 -target 으로 지웁니다 (08 스택의 나머지는 그대로 두었다가 순서에 맞춰 destroy).</span>
 <span class="hljs-function"><span class="hljs-title">unlock_resource_locks</span></span>() {
   section <span class="hljs-string">&quot;리소스 잠금 해제 (08-governance)&quot;</span>
   <span class="hljs-keyword">if</span> ! tf_init 08-governance; <span class="hljs-keyword">then</span>
     warn <span class="hljs-string">&quot;08-governance 를 초기화하지 못해 잠금 확인을 건너뜁니다&quot;</span>
     <span class="hljs-built_in">return</span> 0
   <span class="hljs-keyword">fi</span>
+  <span class="hljs-built_in">local</span> unlock=(terraform -<span class="hljs-built_in">chdir</span>=terraform/08-governance destroy -auto-approve -input=<span class="hljs-literal">false</span> -lock-timeout=300s -no-color
+    -target=azurerm_management_lock.network -target=azurerm_management_lock.platform)
   <span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">$dry</span>&quot;</span> -eq 1 ]; <span class="hljs-keyword">then</span>
     info <span class="hljs-string">&quot;(잠금이 있을 때만 실행됩니다)&quot;</span>
-    run terraform -<span class="hljs-built_in">chdir</span>=terraform/08-governance apply -auto-approve -input=<span class="hljs-literal">false</span> -no-color -var enable_resource_locks=<span class="hljs-literal">false</span>
+    run <span class="hljs-string">&quot;<span class="hljs-variable">${unlock[@]}</span>&quot;</span>
   <span class="hljs-keyword">elif</span> tf_state 08-governance | grep -q <span class="hljs-string">&#x27;^azurerm_management_lock\.&#x27;</span>; <span class="hljs-keyword">then</span>
-    run terraform -<span class="hljs-built_in">chdir</span>=terraform/08-governance apply -auto-approve -input=<span class="hljs-literal">false</span> -no-color -var enable_resource_locks=<span class="hljs-literal">false</span> || <span class="hljs-built_in">return</span> 1
+    run <span class="hljs-string">&quot;<span class="hljs-variable">${unlock[@]}</span>&quot;</span> || <span class="hljs-built_in">return</span> 1
   <span class="hljs-keyword">else</span>
     skip <span class="hljs-string">&quot;해제할 잠금이 없습니다&quot;</span>
   <span class="hljs-keyword">fi</span>
@@ -10152,9 +10193,16 @@ targets=<span class="hljs-string">&quot;&quot;</span>
   <span class="hljs-keyword">fi</span>
   <span class="hljs-keyword">case</span> <span class="hljs-string">&quot;<span class="hljs-variable">$s</span>&quot;</span> <span class="hljs-keyword">in</span> 06-workload | 07-ingress) drop_k8s_state_if_cluster_gone <span class="hljs-string">&quot;<span class="hljs-variable">$s</span>&quot;</span> ;; <span class="hljs-keyword">esac</span>
   <span class="hljs-keyword">if</span> run terraform -<span class="hljs-built_in">chdir</span>=<span class="hljs-string">&quot;terraform/<span class="hljs-variable">$s</span>&quot;</span> destroy -auto-approve -input=<span class="hljs-literal">false</span> -lock-timeout=300s -no-color; <span class="hljs-keyword">then</span>
-    <span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">$dry</span>&quot;</span> -eq 1 ]; <span class="hljs-keyword">then</span> info <span class="hljs-string">&quot;(dry-run) 실제로 실행하면 <span class="hljs-variable">$s</span> 가 삭제됩니다&quot;</span>; <span class="hljs-keyword">else</span> pass <span class="hljs-string">&quot;<span class="hljs-variable">$s</span> 삭제 완료&quot;</span>; <span class="hljs-keyword">fi</span>
+    <span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">$dry</span>&quot;</span> -eq 1 ]; <span class="hljs-keyword">then</span> info <span class="hljs-string">&quot;(dry-run) 실제로 실행하면 <span class="hljs-variable">$s</span> 스택이 삭제됩니다&quot;</span>; <span class="hljs-keyword">else</span> pass <span class="hljs-string">&quot;<span class="hljs-variable">$s</span> 삭제 완료&quot;</span>; <span class="hljs-keyword">fi</span>
   <span class="hljs-keyword">else</span>
     fail <span class="hljs-string">&quot;<span class="hljs-variable">$s</span>: destroy 실패 → 위 오류를 해결한 뒤 같은 명령을 다시 실행하세요 (이미 지운 스택은 건너뜁니다)&quot;</span>
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&quot;<span class="hljs-variable">$s</span>&quot;</span> <span class="hljs-keyword">in</span>
+      06-workload | 07-ingress) info <span class="hljs-string">&quot;API 서버에 접속하지 못했다면 공인 IP 가 바뀐 경우가 많습니다. TF_VAR_allowed_ip_ranges 를 갱신하고 05-aks 를 apply 하세요.&quot;</span> ;;
+      03-network | 04-platform)
+        info <span class="hljs-string">&quot;ScopeLocked 오류라면 CanNotDelete 잠금이 남아 있는 것입니다 (08 의 잠금은 이 스크립트가 먼저 해제합니다).&quot;</span>
+        info <span class="hljs-string">&quot;확인: az lock list -o table  →  직접 만든 잠금 삭제: az lock delete -n &lt;잠금 이름&gt; -g &lt;리소스 그룹&gt;&quot;</span>
+        ;;
+    <span class="hljs-keyword">esac</span>
     <span class="hljs-built_in">return</span> 1
   <span class="hljs-keyword">fi</span>
 }
@@ -10250,7 +10298,7 @@ section <span class="hljs-string">&quot;삭제 계획&quot;</span>
 <span class="hljs-keyword">fi</span>
 
 report_leftovers
-summary</code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (233줄) ▼">전체 코드 보기 (233줄) ▼</button></figure>
+summary</code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (244줄) ▼">전체 코드 보기 (244줄) ▼</button></figure>
 <aside class="callout note"><div class="callout-title"><span>ℹ️</span><span>참고</span></div><p>아래 <em>삭제 순서</em> 부터 <em>정리 확인</em> 까지는 이 스크립트가 하는 일을 <strong>수동으로</strong> 풀어 쓴 것입니다. 스크립트 없이 직접 진행하거나, 어디서 실패했는지 이해할 때 참고하세요.</p>
 </aside>
 <h2 id="11-cleanup--삭제-순서-생성의-역순">삭제 순서 (생성의 역순)<a class="anchor" href="#11-cleanup--삭제-순서-생성의-역순" aria-label="이 제목 링크">#</a></h2>
@@ -10382,14 +10430,18 @@ summary</code></pre></div><button class="expand" type="button" data-label="전�
 <p><code>06/07</code> 은 클러스터가 살아 있어야 <code>kubernetes</code> provider 가 접속해 삭제할 수 있으므로 <strong>05 보다 먼저</strong> 지웁니다.</p>
 <figure class="code diagram"><figcaption><span class="file">다이어그램</span><span class="meta">text · 1줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-text">10-aks-automatic → 08-governance → 07-ingress → 06-workload → 05-aks → 04-platform → 03-network → 02-bootstrap</code></pre></div></figure>
 <h2 id="11-cleanup--사전-점검-잠금과-구독-단위-설정">사전 점검 (잠금과 구독 단위 설정)<a class="anchor" href="#11-cleanup--사전-점검-잠금과-구독-단위-설정" aria-label="이 제목 링크">#</a></h2>
-<figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 8줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-built_in">cd</span> terraform
+<figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 10줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-built_in">cd</span> terraform
 
 <span class="hljs-comment"># 1) 08 에서 잠금을 켰다면 먼저 해제 (잠금이 있으면 destroy 가 ScopeLocked 로 실패)</span>
-terraform -<span class="hljs-built_in">chdir</span>=08-governance apply -auto-approve -var enable_resource_locks=<span class="hljs-literal">false</span>
+<span class="hljs-comment">#    apply -var enable_resource_locks=false 는 정책 효과 같은 다른 설정까지 기본값으로 되돌리므로, 잠금 리소스만 지웁니다.</span>
+terraform -<span class="hljs-built_in">chdir</span>=08-governance destroy -auto-approve \
+  -target=azurerm_management_lock.network -target=azurerm_management_lock.platform
 
 <span class="hljs-comment"># 2) Defender 구독 플랜을 켰다면 08 destroy 로 함께 꺼집니다. (Terraform 밖에서 켰다면 직접 끄기)</span>
 az security pricing show -n Containers --query pricingTier -o tsv
 <span class="hljs-comment"># az security pricing create -n Containers --tier free</span></code></pre></div></figure>
+<aside class="callout tip"><div class="callout-title"><span>💡</span><span>팁</span></div><p>잠금을 포털이나 <code>az lock create</code> 로 직접 만들었다면 Terraform 이 모릅니다. <code>az lock list -o table</code> 로 확인하고 <code>az lock delete -n &lt;잠금 이름&gt; -g &lt;리소스 그룹&gt;</code> 으로 지우세요.</p>
+</aside>
 <h2 id="11-cleanup--1단계-스택별-destroy">1단계. 스택별 destroy<a class="anchor" href="#11-cleanup--1단계-스택별-destroy" aria-label="이 제목 링크">#</a></h2>
 <figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 5줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-keyword">for</span> s <span class="hljs-keyword">in</span> 10-aks-automatic 08-governance 07-ingress 06-workload 05-aks 04-platform 03-network; <span class="hljs-keyword">do</span>
   <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;================ destroy <span class="hljs-variable">$s</span>&quot;</span>
@@ -10439,13 +10491,15 @@ az role assignment list --all --query <span class="hljs-string">&quot;[?principa
 </li>
 <li><p>예산(Lab 08)을 만들었다면 정리와 함께 삭제됩니다.</p>
 </li>
-<li class="task"><p><input type="checkbox" data-task="0"> 모든 스택을 destroy 했다</p>
+<li class="task"><p><input type="checkbox" data-task="0"> (정리 스크립트를 썼다면) <code>--dry-run</code> 으로 지울 목록을 먼저 확인했다</p>
 </li>
-<li class="task"><p><input type="checkbox" data-task="1"> 리소스 그룹 목록이 비어 있다 (<code>lab=aks-terraform-guide</code>)</p>
+<li class="task"><p><input type="checkbox" data-task="1"> 모든 스택을 destroy 했다</p>
 </li>
-<li class="task"><p><input type="checkbox" data-task="2"> (사용했다면) Defender 구독 플랜을 <code>free</code> 로 되돌렸다</p>
+<li class="task"><p><input type="checkbox" data-task="2"> 리소스 그룹 목록이 비어 있다 (<code>lab=aks-terraform-guide</code>)</p>
 </li>
-<li class="task"><p><input type="checkbox" data-task="3"> 로컬 <code>.terraform/</code>, <code>backend.hcl</code>, <code>tfplan</code> 파일을 삭제했다</p>
+<li class="task"><p><input type="checkbox" data-task="3"> (사용했다면) Defender 구독 플랜을 <code>free</code> 로 되돌렸다</p>
+</li>
+<li class="task"><p><input type="checkbox" data-task="4"> 로컬 <code>.terraform/</code>, <code>backend.hcl</code>, <code>tfplan</code> 파일을 삭제했다</p>
 </li>
 </ul>
 <p>다음 → <a href="#lab-99-appendix">부록</a></p>
@@ -11115,7 +11169,7 @@ terraform.tfvars
 <figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 3줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">scripts/verify.sh                    <span class="hljs-comment"># apply 한 모든 스택 검증 (안 한 스택은 건너뜀)</span>
 scripts/verify.sh 05-aks 07-ingress  <span class="hljs-comment"># 특정 스택만</span>
 scripts/cleanup.sh --dry-run         <span class="hljs-comment"># 삭제 계획만 보기</span></code></pre></div></figure>
-<aside class="callout tip"><div class="callout-title"><span>💡</span><span>팁</span></div><p>검증 스크립트는 <strong>읽기 전용</strong>입니다(파드 안에서 <code>printenv</code>/<code>test -s</code> 를 실행하는 것 외에는 아무것도 바꾸지 않습니다). <code>kubectl</code> 은 임시 kubeconfig 를 써서 <code>~/.kube/config</code> 를 수정하지 않습니다. 새 스택용 검증을 추가하려면 <code>scripts/verify/NN-이름.sh</code> 에 <code>verify_stack</code> 함수를 만들고 <code>verify.sh</code> 의 <code>ALL_STACKS</code> 에 이름을 더하세요.</p>
+<aside class="callout tip"><div class="callout-title"><span>💡</span><span>팁</span></div><p>검증 스크립트는 <strong>읽기 전용</strong>입니다(파드 안에서 <code>printenv</code>/<code>test -s</code> 를 실행하는 것 외에는 아무것도 바꾸지 않습니다). <code>kubectl</code> 은 임시 kubeconfig 를 써서 <code>~/.kube/config</code> 를 수정하지 않습니다. 변수로 고를 수 있는 설정(<code>sku_tier</code>, <code>enable_private_cluster</code>, <code>enable_gateway_api</code>, <code>nat_gateway_sku</code> 등)을 기본값과 다르게 썼다면 실패(✗) 대신 값을 보여 주거나 경고(!)·건너뜀(-)으로 표시합니다. 새 스택용 검증을 추가하려면 <code>scripts/verify/NN-이름.sh</code> 에 <code>verify_stack</code> 함수를 만들고 <code>verify.sh</code> 의 <code>ALL_STACKS</code> 에 이름을 더하세요.</p>
 </aside>
 <p><strong><code>scripts/lib/common.sh</code></strong> — 모든 스크립트의 공통 함수</p>
 <figure class="code collapsed"><figcaption><span class="file">scripts/lib/common.sh</span><span class="meta">bash · 135줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-meta">#!/usr/bin/env bash</span>

@@ -24,6 +24,7 @@ scripts/cleanup.sh --include-bootstrap       # (선택) 02-bootstrap(state 저�
 | 확인 입력 | `--yes` 가 없으면 `delete` 를 입력해야 시작합니다. 입력이 없으면(파이프/CI) 취소됩니다. |
 | 구독 확인 | `ARM_SUBSCRIPTION_ID` 와 `az` 의 현재 구독이 다르면 시작하지 않습니다. |
 | 순서 | 스택을 어떤 순서로 입력해도 항상 안전한 삭제 순서(06/07 → 05 → 04 → 03)로 정렬합니다. |
+| 리소스 잠금 | 08 의 `CanNotDelete` 잠금이 있으면 잠금 리소스만 `-target` 으로 먼저 지웁니다. 정책 효과 같은 08 의 다른 설정은 그대로 두었다가 순서에 맞춰 삭제합니다. |
 | 재실행 | 이미 지운 스택(빈 state)은 건너뜁니다. 중간에 실패해도 원인을 해결하고 같은 명령을 다시 실행하면 됩니다. |
 | 클러스터가 먼저 사라진 경우 | 06/07 의 쿠버네티스 리소스는 state 에서만 제거하고 Azure 리소스를 삭제합니다. |
 | 02-bootstrap | state 가 아직 원격에 있으면 지우지 않고 로컬로 되돌리는 방법을 안내합니다. |
@@ -131,17 +132,21 @@ drop_k8s_state_if_cluster_gone() {
 }
 
 # 08 이 건 리소스 잠금(CanNotDelete)이 있으면 destroy 가 ScopeLocked 로 실패하므로 먼저 해제합니다.
+# apply -var enable_resource_locks=false 는 정책 효과·Defender 같은 다른 설정까지 되돌리므로,
+# 잠금 리소스만 -target 으로 지웁니다 (08 스택의 나머지는 그대로 두었다가 순서에 맞춰 destroy).
 unlock_resource_locks() {
   section "리소스 잠금 해제 (08-governance)"
   if ! tf_init 08-governance; then
     warn "08-governance 를 초기화하지 못해 잠금 확인을 건너뜁니다"
     return 0
   fi
+  local unlock=(terraform -chdir=terraform/08-governance destroy -auto-approve -input=false -lock-timeout=300s -no-color
+    -target=azurerm_management_lock.network -target=azurerm_management_lock.platform)
   if [ "$dry" -eq 1 ]; then
     info "(잠금이 있을 때만 실행됩니다)"
-    run terraform -chdir=terraform/08-governance apply -auto-approve -input=false -no-color -var enable_resource_locks=false
+    run "${unlock[@]}"
   elif tf_state 08-governance | grep -q '^azurerm_management_lock\.'; then
-    run terraform -chdir=terraform/08-governance apply -auto-approve -input=false -no-color -var enable_resource_locks=false || return 1
+    run "${unlock[@]}" || return 1
   else
     skip "해제할 잠금이 없습니다"
   fi
@@ -164,9 +169,16 @@ destroy_stack() {
   fi
   case "$s" in 06-workload | 07-ingress) drop_k8s_state_if_cluster_gone "$s" ;; esac
   if run terraform -chdir="terraform/$s" destroy -auto-approve -input=false -lock-timeout=300s -no-color; then
-    if [ "$dry" -eq 1 ]; then info "(dry-run) 실제로 실행하면 $s 가 삭제됩니다"; else pass "$s 삭제 완료"; fi
+    if [ "$dry" -eq 1 ]; then info "(dry-run) 실제로 실행하면 $s 스택이 삭제됩니다"; else pass "$s 삭제 완료"; fi
   else
     fail "$s: destroy 실패 → 위 오류를 해결한 뒤 같은 명령을 다시 실행하세요 (이미 지운 스택은 건너뜁니다)"
+    case "$s" in
+      06-workload | 07-ingress) info "API 서버에 접속하지 못했다면 공인 IP 가 바뀐 경우가 많습니다. TF_VAR_allowed_ip_ranges 를 갱신하고 05-aks 를 apply 하세요." ;;
+      03-network | 04-platform)
+        info "ScopeLocked 오류라면 CanNotDelete 잠금이 남아 있는 것입니다 (08 의 잠금은 이 스크립트가 먼저 해제합니다)."
+        info "확인: az lock list -o table  →  직접 만든 잠금 삭제: az lock delete -n <잠금 이름> -g <리소스 그룹>"
+        ;;
+    esac
     return 1
   fi
 }
@@ -285,12 +297,17 @@ summary
 cd terraform
 
 # 1) 08 에서 잠금을 켰다면 먼저 해제 (잠금이 있으면 destroy 가 ScopeLocked 로 실패)
-terraform -chdir=08-governance apply -auto-approve -var enable_resource_locks=false
+#    apply -var enable_resource_locks=false 는 정책 효과 같은 다른 설정까지 기본값으로 되돌리므로, 잠금 리소스만 지웁니다.
+terraform -chdir=08-governance destroy -auto-approve \
+  -target=azurerm_management_lock.network -target=azurerm_management_lock.platform
 
 # 2) Defender 구독 플랜을 켰다면 08 destroy 로 함께 꺼집니다. (Terraform 밖에서 켰다면 직접 끄기)
 az security pricing show -n Containers --query pricingTier -o tsv
 # az security pricing create -n Containers --tier free
 ```
+
+> [!TIP]
+> 잠금을 포털이나 `az lock create` 로 직접 만들었다면 Terraform 이 모릅니다. `az lock list -o table` 로 확인하고 `az lock delete -n <잠금 이름> -g <리소스 그룹>` 으로 지우세요.
 
 ## 1단계. 스택별 destroy
 
@@ -365,6 +382,7 @@ done
 - 삭제한 다음 날 비용이 0 에 수렴하는지 확인합니다(일부 항목은 하루 늦게 반영).
 - 예산(Lab 08)을 만들었다면 정리와 함께 삭제됩니다.
 
+- [ ] (정리 스크립트를 썼다면) `--dry-run` 으로 지울 목록을 먼저 확인했다
 - [ ] 모든 스택을 destroy 했다
 - [ ] 리소스 그룹 목록이 비어 있다 (`lab=aks-terraform-guide`)
 - [ ] (사용했다면) Defender 구독 플랜을 `free` 로 되돌렸다

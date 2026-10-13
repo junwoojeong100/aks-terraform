@@ -433,7 +433,7 @@ scripts/cleanup.sh --dry-run         # 삭제 계획만 보기
 ```
 
 > [!TIP]
-> 검증 스크립트는 **읽기 전용**입니다(파드 안에서 `printenv`/`test -s` 를 실행하는 것 외에는 아무것도 바꾸지 않습니다). `kubectl` 은 임시 kubeconfig 를 써서 `~/.kube/config` 를 수정하지 않습니다. 새 스택용 검증을 추가하려면 `scripts/verify/NN-이름.sh` 에 `verify_stack` 함수를 만들고 `verify.sh` 의 `ALL_STACKS` 에 이름을 더하세요.
+> 검증 스크립트는 **읽기 전용**입니다(파드 안에서 `printenv`/`test -s` 를 실행하는 것 외에는 아무것도 바꾸지 않습니다). `kubectl` 은 임시 kubeconfig 를 써서 `~/.kube/config` 를 수정하지 않습니다. 변수로 고를 수 있는 설정(`sku_tier`, `enable_private_cluster`, `enable_gateway_api`, `nat_gateway_sku` 등)을 기본값과 다르게 썼다면 실패(✗) 대신 값을 보여 주거나 경고(!)·건너뜀(-)으로 표시합니다. 새 스택용 검증을 추가하려면 `scripts/verify/NN-이름.sh` 에 `verify_stack` 함수를 만들고 `verify.sh` 의 `ALL_STACKS` 에 이름을 더하세요.
 
 **`scripts/lib/common.sh`** — 모든 스크립트의 공통 함수
 

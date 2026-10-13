@@ -1438,7 +1438,7 @@ scripts/verify.sh 05-aks
 source "$(dirname "${BASH_SOURCE[0]}")/../lib/common.sh"
 
 verify_stack() {
-  local rg name aks nodes ready zones gc pods p bad
+  local rg name aks nodes ready want zones gc pods p bad sku channel
   rg="$(tf_out 05-aks resource_group_name)"
   name="$(tf_out 05-aks cluster_name)"
 
@@ -1456,7 +1456,12 @@ verify_stack() {
   # --- 상태 ---
   expect_eq "프로비저닝 상태" "$(jv "$aks" .provisioningState)" "Succeeded"
   expect_eq "전원 상태" "$(jv "$aks" .powerState.code)" "Running"
-  expect_eq "SKU 등급 (업타임 SLA)" "$(jv "$aks" .sku.tier)" "Standard"
+  sku="$(jv "$aks" .sku.tier)" # sku_tier 변수: Free / Standard(기본) / Premium
+  case "$sku" in
+    Standard | Premium) pass "SKU 등급 = $sku (업타임 SLA 포함)" ;;
+    Free) warn "SKU 등급 = Free (업타임 SLA 없음. 비용을 줄이려고 sku_tier 를 바꾼 것이 아니라면 Standard 로 올리세요)" ;;
+    *) fail "SKU 등급: 기대 Standard 또는 Premium / 실제 '${sku:-(없음)}'" ;;
+  esac
   expect_set "Kubernetes 버전" "$(jv "$aks" .currentKubernetesVersion)"
 
   # --- 보안 / ID ---
@@ -1477,7 +1482,13 @@ verify_stack() {
   fi
 
   # --- 업그레이드 / 애드온 ---
-  expect_eq "자동 업그레이드 채널 / 노드 OS 채널" "$(jv "$aks" '[.autoUpgradeProfile.upgradeChannel, .autoUpgradeProfile.nodeOsUpgradeChannel] | join("/")')" "patch/NodeImage"
+  expect_eq "노드 OS 업그레이드 채널" "$(jv "$aks" .autoUpgradeProfile.nodeOsUpgradeChannel)" "NodeImage"
+  channel="$(jv "$aks" .autoUpgradeProfile.upgradeChannel)" # 기본 patch. Lab 09 의 A / C-1 방식으로 바꿨다면 다른 값이 정상입니다.
+  case "$channel" in
+    patch) pass "자동 업그레이드 채널 = patch (기본 구성)" ;;
+    none | stable | rapid | node-image) pass "자동 업그레이드 채널 = $channel (기본값 patch 에서 바꾼 값 - Lab 09)" ;;
+    *) fail "자동 업그레이드 채널: 기대 patch (또는 none/stable/rapid/node-image) / 실제 '${channel:-(없음)}'" ;;
+  esac
   jq_ok "Azure Policy 애드온" "$aks" '.addonProfiles.azurepolicy.enabled == true'
   jq_ok "Container Insights (ama-logs)" "$aks" '.addonProfiles.omsagent.enabled == true or .azureMonitorProfile.containerInsights.enabled == true'
   jq_ok "Key Vault Secrets Store CSI 드라이버" "$aks" '.addonProfiles.azureKeyvaultSecretsProvider.enabled == true'
@@ -1503,11 +1514,17 @@ verify_stack() {
   fi
   nodes="$(kj get nodes)"
   if [ -z "$nodes" ]; then
-    fail "API 서버에 접속하지 못했습니다. 공인 IP 가 바뀌었다면 TF_VAR_allowed_ip_ranges 를 갱신하고 05-aks 를 apply 하세요."
+    if [ "$(jv "$aks" .apiServerAccessProfile.enablePrivateCluster)" = "true" ]; then
+      skip "프라이빗 클러스터의 API 서버에 접속할 수 없어 kubectl 확인을 건너뜁니다 (VNet 안의 점프 호스트·VPN 에서 다시 실행하세요)"
+    else
+      fail "API 서버에 접속하지 못했습니다. 공인 IP 가 바뀌었다면 TF_VAR_allowed_ip_ranges 를 갱신하고 05-aks 를 apply 하세요."
+    fi
     return
   fi
   ready="$(jv "$nodes" '[.items[] | select(any(.status.conditions[]; .type == "Ready" and .status == "True"))] | length')"
-  expect_ge "Ready 노드 수 (system 3 + user 3)" "$ready" 6
+  # 오토스케일 풀은 minCount 아래로 내려가지 않으므로, 풀별 최소 노드 수의 합(기본 system 3 + user 3)을 기준으로 삼습니다.
+  want="$(jv "$aks" '[.agentPoolProfiles[] | if .enableAutoScaling == true then (.minCount // 0) else (.count // 0) end] | add')"
+  expect_ge "Ready 노드 수 (풀별 최소 노드 수의 합)" "$ready" "${want:-1}"
   zones="$(jv "$nodes" '[.items[].metadata.labels["topology.kubernetes.io/zone"]] | unique | length')"
   expect_ge "노드가 분산된 가용 영역 수" "$zones" 2
 
@@ -1517,8 +1534,12 @@ verify_stack() {
     fail "cluster-admin 권한이 없습니다 (역할 전파에 최대 5분, grant_current_user_admin / admin_principal_ids 확인)"
   fi
 
-  gc="$(kj get gatewayclass approuting-istio)"
-  jq_ok "GatewayClass approuting-istio 가 Accepted" "$gc" '.status.conditions[]? | select(.type == "Accepted") | .status == "True"'
+  if [ "$(jv "$aks" '(.ingressProfile.gatewayApi // .ingressProfile.gatewayAPI // {}).installation')" = "Standard" ]; then
+    gc="$(kj get gatewayclass approuting-istio)"
+    jq_ok "GatewayClass approuting-istio 가 Accepted" "$gc" '.status.conditions[]? | select(.type == "Accepted") | .status == "True"'
+  else
+    skip "Gateway API 가 꺼져 있어 GatewayClass 확인을 건너뜁니다 (enable_gateway_api = false)"
+  fi
 
   pods="$(kj get pods -n kube-system)"
   for p in ama-logs ama-metrics cilium coredns; do
@@ -1535,6 +1556,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then verify_stack; summary; fi
 
 > [!TIP]
 > kubectl 단계가 "API 서버에 접속하지 못했습니다" 로 실패하면 공인 IP 가 바뀐 경우가 대부분입니다. `TF_VAR_allowed_ip_ranges` 를 갱신하고 05-aks 를 다시 `apply` 하세요.
+> 기본 구성과 다르게 바꾼 설정(`sku_tier`, `enable_gateway_api`, 노드 수, Lab 09 의 업그레이드 채널)은 ✗ 대신 값을 보여 주거나 경고·건너뜀으로 표시합니다. 프라이빗 클러스터(`enable_private_cluster`)는 VNet 밖에서 kubectl 단계를 건너뜁니다.
 
 ## 자주 만나는 문제
 

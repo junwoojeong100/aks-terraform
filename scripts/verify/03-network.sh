@@ -6,7 +6,7 @@
 source "$(dirname "${BASH_SOURCE[0]}")/../lib/common.sh"
 
 verify_stack() {
-  local rg vnet_name nat_ip vnet sn nat pips zones zone links
+  local rg vnet_name nat_ip vnet sn nat natsku pips zones zone links
   rg="$(tf_out 03-network resource_group_name)"
   vnet_name="$(tf_out 03-network vnet_name)"
   nat_ip="$(tf_out 03-network nat_gateway_public_ip)"
@@ -39,7 +39,12 @@ verify_stack() {
   done
 
   nat="$(azj network nat gateway list -g "$rg")"
-  expect_eq "NAT Gateway SKU (영역 중복)" "$(jv "$nat" '.[0].sku.name')" "StandardV2"
+  natsku="$(jv "$nat" '.[0].sku.name')" # nat_gateway_sku 변수: StandardV2(기본) / Standard
+  case "$natsku" in
+    StandardV2) pass "NAT Gateway SKU = StandardV2 (영역 중복)" ;;
+    Standard) warn "NAT Gateway SKU = Standard (영역 중복이 아님. StandardV2 를 지원하지 않는 리전에서만 쓰세요)" ;;
+    *) fail "NAT Gateway SKU: 기대 StandardV2 또는 Standard / 실제 '${natsku:-(없음)}'" ;;
+  esac
   pips="$(azj network public-ip list -g "$rg")"
   expect_eq "NAT 공인 IP = terraform output" "$(jv "$pips" '[.[] | select(.name | startswith("pip-ng-"))][0].ipAddress')" "$nat_ip"
 

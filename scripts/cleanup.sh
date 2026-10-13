@@ -99,17 +99,21 @@ drop_k8s_state_if_cluster_gone() {
 }
 
 # 08 이 건 리소스 잠금(CanNotDelete)이 있으면 destroy 가 ScopeLocked 로 실패하므로 먼저 해제합니다.
+# apply -var enable_resource_locks=false 는 정책 효과·Defender 같은 다른 설정까지 되돌리므로,
+# 잠금 리소스만 -target 으로 지웁니다 (08 스택의 나머지는 그대로 두었다가 순서에 맞춰 destroy).
 unlock_resource_locks() {
   section "리소스 잠금 해제 (08-governance)"
   if ! tf_init 08-governance; then
     warn "08-governance 를 초기화하지 못해 잠금 확인을 건너뜁니다"
     return 0
   fi
+  local unlock=(terraform -chdir=terraform/08-governance destroy -auto-approve -input=false -lock-timeout=300s -no-color
+    -target=azurerm_management_lock.network -target=azurerm_management_lock.platform)
   if [ "$dry" -eq 1 ]; then
     info "(잠금이 있을 때만 실행됩니다)"
-    run terraform -chdir=terraform/08-governance apply -auto-approve -input=false -no-color -var enable_resource_locks=false
+    run "${unlock[@]}"
   elif tf_state 08-governance | grep -q '^azurerm_management_lock\.'; then
-    run terraform -chdir=terraform/08-governance apply -auto-approve -input=false -no-color -var enable_resource_locks=false || return 1
+    run "${unlock[@]}" || return 1
   else
     skip "해제할 잠금이 없습니다"
   fi
@@ -132,9 +136,16 @@ destroy_stack() {
   fi
   case "$s" in 06-workload | 07-ingress) drop_k8s_state_if_cluster_gone "$s" ;; esac
   if run terraform -chdir="terraform/$s" destroy -auto-approve -input=false -lock-timeout=300s -no-color; then
-    if [ "$dry" -eq 1 ]; then info "(dry-run) 실제로 실행하면 $s 가 삭제됩니다"; else pass "$s 삭제 완료"; fi
+    if [ "$dry" -eq 1 ]; then info "(dry-run) 실제로 실행하면 $s 스택이 삭제됩니다"; else pass "$s 삭제 완료"; fi
   else
     fail "$s: destroy 실패 → 위 오류를 해결한 뒤 같은 명령을 다시 실행하세요 (이미 지운 스택은 건너뜁니다)"
+    case "$s" in
+      06-workload | 07-ingress) info "API 서버에 접속하지 못했다면 공인 IP 가 바뀐 경우가 많습니다. TF_VAR_allowed_ip_ranges 를 갱신하고 05-aks 를 apply 하세요." ;;
+      03-network | 04-platform)
+        info "ScopeLocked 오류라면 CanNotDelete 잠금이 남아 있는 것입니다 (08 의 잠금은 이 스크립트가 먼저 해제합니다)."
+        info "확인: az lock list -o table  →  직접 만든 잠금 삭제: az lock delete -n <잠금 이름> -g <리소스 그룹>"
+        ;;
+    esac
     return 1
   fi
 }

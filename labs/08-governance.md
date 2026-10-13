@@ -509,7 +509,7 @@ az group delete -n "$(terraform -chdir=../03-network output -raw resource_group_
 ```
 
 > [!WARNING]
-> 잠금(`enable_resource_locks`)을 켠 채로 정리하면 `terraform destroy` 가 실패합니다. **정리 전에 먼저 `-var enable_resource_locks=false` 로 apply** 하세요 → [Lab 11](11-cleanup.md).
+> 잠금(`enable_resource_locks`)을 켠 채로 정리하면 `terraform destroy` 가 실패합니다. **정리 전에 먼저 잠금 리소스만 지우세요**: `terraform destroy -target=azurerm_management_lock.network -target=azurerm_management_lock.platform` (이 스택에서 실행). `scripts/cleanup.sh` 는 이 과정을 자동으로 수행합니다 → [Lab 11](11-cleanup.md).
 
 ### 자동 검증 스크립트
 

@@ -15,7 +15,7 @@ function networkTopology() {
   // 위 줄: API 서버(왼쪽) / 노드(오른쪽)
   d.box(44, 124, 290, 134, {
     tone: 'net', title: 'snet-aks-apiserver', pad: 12, size: 11.5,
-    lines: ['10.10.1.0/28 (AKS 전용, 최소 /28)', 'API 서버 엔드포인트가 이 서브넷에 투영', '위임(delegation): managedClusters', 'NSG 없음 (AKS 가 관리)'],
+    lines: ['10.10.1.0/28 (AKS 전용, 최소 /28)', 'API 서버 엔드포인트가 이 서브넷에 투영', '위임(delegation): managedClusters', 'NSG 연결 없음 (위임 서브넷)'],
   });
   const nodes = d.box(354, 124, 290, 134, {
     tone: 'azure', title: 'snet-aks-nodes', pad: 12, size: 11.5,
@@ -141,7 +141,7 @@ function observability() {
     lines: ['컨테이너 로그 (ContainerLogV2 …)', '컨트롤 플레인 로그 (AKSAudit …)', '', 'KQL 로 질의 · 일일 수집 상한으로', '비용 폭주 방지', '', '≈ CloudWatch Logs + Logs Insights'],
   });
   const amw = d.box(676, 332, 260, 96, { tone: 'ok', title: 'Azure Monitor workspace', lines: ['Managed Prometheus', '+ recording rule (대시보드용)'], pad: 12, titleSize: 13, size: 11.5 });
-  const g = d.box(676, 444, 260, 62, { tone: 'ok', title: 'Managed Grafana', lines: ['데이터 소스: Prometheus + Log Analytics'], pad: 12, titleSize: 13.5, size: 11 });
+  const g = d.box(676, 444, 260, 62, { tone: 'ok', title: 'Managed Grafana', lines: ['Prometheus 데이터 소스 자동 연결'], pad: 12, titleSize: 13.5, size: 11 });
 
   d.arrow([[logs.r, logs.cy], [la.l, 156]], { tone: 'net' });
   d.arrow([[cpl.r, cpl.cy], [la.l, 268]], { tone: 'id' });

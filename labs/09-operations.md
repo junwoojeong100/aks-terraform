@@ -94,6 +94,9 @@ kubectl get pdb -A                           # PDB 가 드레인 속도를 제�
 kubectl get events -A --field-selector reason=Evicted
 ```
 
+> [!TIP]
+> 업그레이드가 끝나면 저장소 루트에서 `scripts/verify.sh 05-aks` 를 실행해 노드가 모두 Ready 인지, 애드온 파드가 Running 인지 읽기 전용으로 확인하세요. 업그레이드 채널(방식 A / C-1)을 바꿨다면 바뀐 값이 그대로 표시됩니다.
+
 | 체크리스트 | 이유 |
 |---|---|
 | PDB, 레플리카 ≥ 2, readiness probe | 드레인 중 가용성 |

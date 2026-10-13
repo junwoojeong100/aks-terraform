@@ -54,11 +54,15 @@ git clone https://github.com/junwoojeong100/aks-terraform.git && cd aks-terrafor
 az login && az account set --subscription "<구독>"
 export ARM_SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
 export TF_VAR_allowed_ip_ranges="[\"$(curl -s https://api.ipify.org)/32\"]"
+scripts/preflight.sh                  # 도구 · 로그인 · 쿼터 · 권한 점검 (읽기 전용)
 
 cd terraform/02-bootstrap && terraform init && terraform apply
 terraform output -raw backend_hcl > ../backend.hcl
 cd ../03-network && terraform init -backend-config=../backend.hcl && terraform apply
 # … 04 → 05 → 06 → 07 → 08 순서로 같은 패턴
+
+cd ../.. && scripts/verify.sh         # apply 한 스택이 설계대로 만들어졌는지 확인 (읽기 전용)
+scripts/cleanup.sh --dry-run          # 실습을 마치면: 지울 목록 확인 → scripts/cleanup.sh (Lab 11)
 ```
 
 자세한 단계는 [Lab 01](labs/01-prerequisites.md) 부터 따라가세요. **단일 HTML 가이드**는 `aks-terraform-guide.html` 을 브라우저로 여세요(오프라인 동작, 검색/복사 버튼/다크 모드/진행 체크 지원).

@@ -2,7 +2,7 @@
 
 | 소요 시간 | 예상 비용 | Terraform 스택 | 선행 실습 |
 |---|---|---|---|
-| 30분 | ACR Premium + Managed Grafana + Private Endpoint (시간당 약 $0.2~0.3) | `terraform/04-platform` | [03. 네트워크](03-network.md) |
+| 30분 | ACR Premium + Managed Grafana + Private Endpoint (시간당 약 $0.2–0.3) | `terraform/04-platform` | [03. 네트워크](03-network.md) |
 
 ## 이번 실습에서 만드는 것
 

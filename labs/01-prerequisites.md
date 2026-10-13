@@ -2,7 +2,7 @@
 
 | 소요 시간 | 예상 비용 | Terraform 스택 | 선행 실습 |
 |---|---|---|---|
-| 20~30분 | 없음 | (없음) | [00. AWS ↔ Azure 비교](00-aws-azure-mapping.md) |
+| 20–30분 | 없음 | (없음) | [00. AWS ↔ Azure 비교](00-aws-azure-mapping.md) |
 
 ## 이번 실습의 목표
 
@@ -166,10 +166,10 @@ tools/validate-all.sh 05-aks     # 특정 스택만
 |---|---|---|
 | 02 | Storage(소량) | 거의 0 |
 | 03 | NAT Gateway + Public IP | 약 $0.05 + 데이터 처리량 |
-| 04 | ACR Premium, Managed Grafana, Private Endpoint 2개, Log Analytics | 약 $0.2~0.3 |
-| 05 | **AKS Standard 티어 + D4ds_v5 노드 6대 이상** | **약 $1.7~2** |
-| 06~07 | 앱 파드 + 로드밸런서/공인 IP | 소액 |
-| 10 | AKS Automatic(Standard 티어) + 자동 프로비저닝 노드 | 약 $0.5~1.5 |
+| 04 | ACR Premium, Managed Grafana, Private Endpoint 2개, Log Analytics | 약 $0.2–0.3 |
+| 05 | **AKS Standard 티어 + D4ds_v5 노드 6대 이상** | **약 $1.7–2** |
+| 06–07 | 앱 파드 + 로드밸런서/공인 IP | 소액 |
+| 10 | AKS Automatic(Standard 티어) + 자동 프로비저닝 노드 | 약 $0.5–1.5 |
 
 > [!CAUTION]
 > 위 금액은 리전·환율·시점에 따라 달라지는 **추정치**입니다. 정확한 금액은 [Azure 가격 계산기](https://azure.microsoft.com/pricing/calculator/)로 확인하세요.

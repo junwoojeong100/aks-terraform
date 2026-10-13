@@ -6,9 +6,9 @@
   "description": "실습 가이드 빌드 도구: md 안의 Terraform 코드 동기화 + 단일 HTML 생성",
   "scripts": {
     "sync": "node sync-code.mjs",
-    "check": "node sync-code.mjs --check",
+    "check": "node sync-code.mjs --check && node check-docs.mjs",
     "html": "node build-html.mjs",
-    "build": "node sync-code.mjs && node build-html.mjs"
+    "build": "node sync-code.mjs && node check-docs.mjs && node build-html.mjs"
   },
   "dependencies": {
     "highlight.js": "^11.12.0",

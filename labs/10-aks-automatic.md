@@ -2,7 +2,7 @@
 
 | 소요 시간 | 예상 비용 | Terraform 스택 | 선행 실습 |
 |---|---|---|---|
-| 30분 (apply 10~15분) | AKS Standard 티어 + 자동 프로비저닝 노드 (실습 후 바로 삭제) | `terraform/10-aks-automatic` | [02. 원격 State](02-bootstrap.md) (Lab 03~05 와 독립) |
+| 30분 (apply 10–15분) | AKS Standard 티어 + 자동 프로비저닝 노드 (실습 후 바로 삭제) | `terraform/10-aks-automatic` | [02. 원격 State](02-bootstrap.md) (Lab 03–05 와 독립) |
 
 > [!NOTE]
 > 2026 년 현재 Microsoft 의 Well-Architected 가이드는 *"대부분의 신규 프로덕션 워크로드에는 AKS Automatic 을 선택하고, Windows 노드·LTS·특수한 네트워크/플랫폼 커스터마이징이 필요할 때만 Standard 를 선택하라"* 고 권장합니다. Lab 05 에서 직접 설계한 것을 이 모드는 **기본값으로 제공**합니다.

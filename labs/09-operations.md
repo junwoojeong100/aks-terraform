@@ -105,7 +105,7 @@ kubectl get events -A --field-selector reason=Evicted
 |---|---|---|
 | 파드 수 | **HPA** (CPU/메모리), **KEDA**(이벤트 기반: Service Bus, Kafka …) | HPA: Lab 07 / KEDA: `workload_autoscaler_profile.keda_enabled` |
 | 파드 크기 | **VPA** (요청/제한 권장) | `vertical_pod_autoscaler_enabled` |
-| 노드 수 | **Cluster Autoscaler** (노드 풀별 min/max) | system 3~5, user 3~6 |
+| 노드 수 | **Cluster Autoscaler** (노드 풀별 min/max) | system 3–5, user 3–6 |
 | 노드 종류 | **NAP**(Karpenter) | Lab 10 에서 체험 |
 | 비용 | **Spot 풀** | `-var enable_spot_pool=true` |
 

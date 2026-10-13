@@ -5,7 +5,7 @@ EKS·VPC·IAM 에 익숙한 엔지니어가 **Azure Best Practice** 로 프로�
 
 | 소요 시간 | 예상 비용 | Terraform 스택 | 선행 실습 |
 |---|---|---|---|
-| 전체 약 4~6시간 | 03~05 스택을 켜 둔 동안 시간당 약 $2~2.5 | `terraform/*` | [01. 사전 준비](labs/01-prerequisites.md) |
+| 전체 약 4–6시간 | 03–05 스택을 켜 둔 동안 시간당 약 $2–2.5 | `terraform/*` | [01. 사전 준비](labs/01-prerequisites.md) |
 
 > [!IMPORTANT]
 > 이 가이드의 코드는 **정적 검증**(`terraform fmt`, `validate`, mock provider 기반 `terraform test`)까지 마친 상태입니다. 실제 Azure 구독에 `apply` 해서 확인한 결과가 아니므로, 처음 실행할 때는 `terraform plan` 결과를 꼭 읽어 보세요. 실습 후에는 [Lab 11](labs/11-cleanup.md) 로 반드시 정리하세요(클러스터를 켜 둔 채 방치하면 비용이 계속 발생합니다).

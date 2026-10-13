@@ -157,8 +157,10 @@ function loadSections() {
   files.sort((a, b) => order.indexOf(a[0]) - order.indexOf(b[0]));
 
   return files.map(([labId, path]) => {
-    const source = readFileSync(path, 'utf8').replace(/<!-- \/?tf:include[^>]*-->\n?/g, '');
-    const ctx = { labId, title: '', toc: [], ids: new Set(), taskIndex: 0 };
+    const source = readFileSync(path, 'utf8')
+      .replace(/<!-- \/?tf:include[^>]*-->\n?/g, '')
+      .replace(/<!-- \/?count[^>]*-->/g, '');
+    const ctx = { labId, dir: dirname(path), title: '', toc: [], ids: new Set(), taskIndex: 0 };
     const html = createMarked(ctx).parse(source);
     return { labId, ctx, html };
   });
@@ -168,6 +170,28 @@ function labNumber(labId) {
   if (labId === 'readme') return '★';
   if (labId === '99-appendix') return 'A';
   return labId.slice(0, 2);
+}
+
+// 빌드 결과 검증: 깨진 렌더링/링크가 있으면 HTML 을 만들지 않고 실패합니다.
+function verifyOutput(sections, body, sidebar) {
+  // 이 가이드는 취소선을 쓰지 않습니다. `$2~2.5` 같은 범위 표기가 취소선으로 해석된 경우입니다.
+  const struck = sections.filter((s) => /<del[\s>]/.test(s.html)).map((s) => s.labId);
+  if (struck.length) {
+    throw new Error(`취소선(<del>)이 생성되었습니다: ${struck.join(', ')} — 범위 표기의 ~ 를 – 로 바꾸세요 (node tools/check-docs.mjs 로 위치 확인)`);
+  }
+
+  const ids = new Set([...body.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
+  const broken = new Set();
+  for (const m of (body + sidebar).matchAll(/href="#([^"]+)"/g)) {
+    let id = m[1];
+    try {
+      id = decodeURIComponent(id);
+    } catch {
+      /* 그대로 비교 */
+    }
+    if (!ids.has(id)) broken.add(id);
+  }
+  if (broken.size) throw new Error(`깨진 내부 링크(#): ${[...broken].join(', ')}`);
 }
 
 function build() {
@@ -216,6 +240,8 @@ function build() {
 
   const badges = VERSIONS.map(([k, v]) => `<span class="badge">${esc(k)} <b>${esc(v)}</b></span>`).join('');
   const first = ordered[0] ? ordered[0].labId : 'readme';
+
+  verifyOutput(ordered, body, sidebar);
 
   const html = `<!doctype html>
 <html lang="ko" data-theme="light">

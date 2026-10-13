@@ -633,7 +633,7 @@ kubectl -n web get gateway web-gateway -o jsonpath='{.status.addresses[0].value}
 
 | 증상 | 원인 / 해결 |
 |---|---|
-| `Gateway` 의 `ADDRESS` 가 비어 있음 | LB 프로비저닝 대기(1~3분). `kubectl -n web describe gateway web-gateway` 의 Conditions 와 `kubectl -n web get events` 확인. 공인 IP 쿼터 부족일 수 있습니다. |
+| `Gateway` 의 `ADDRESS` 가 비어 있음 | LB 프로비저닝 대기(1–3분). `kubectl -n web describe gateway web-gateway` 의 Conditions 와 `kubectl -n web get events` 확인. 공인 IP 쿼터 부족일 수 있습니다. |
 | plan 오류 `no matches for kind "Gateway"` / GatewayClass 없음 | Lab 05 의 `azapi_update_resource.gateway_api` 가 적용되지 않음 (`enable_gateway_api=false` 였는지 확인). `kubectl get gatewayclass`. |
 | `ImagePullBackOff` | `az acr import` 누락(이미지 경로 `demo/aspnetapp:v1`). `kubectl describe pod` 확인. |
 | `curl` 이 타임아웃 | 노드 서브넷 NSG(AKS 가 규칙을 추가하는 데 시간 필요), 내부 Gateway(`internal_gateway=true`)인데 VNet 밖에서 접근, 또는 NetworkPolicy. |

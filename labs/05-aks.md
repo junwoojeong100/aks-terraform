@@ -2,7 +2,7 @@
 
 | 소요 시간 | 예상 비용 | Terraform 스택 | 선행 실습 |
 |---|---|---|---|
-| 40분 (apply 15~25분) | **시간당 약 $1.7~2** (Standard 티어 + 노드 6대 이상) | `terraform/05-aks` | [04. 플랫폼 서비스](04-platform.md) |
+| 40분 (apply 15–25분) | **시간당 약 $1.7–2** (Standard 티어 + 노드 6대 이상) | `terraform/05-aks` | [04. 플랫폼 서비스](04-platform.md) |
 
 ## 이번 실습에서 만드는 것
 
@@ -50,7 +50,7 @@
 | `kubernetes_version` | `"1.36"` (2026-10 GA 최신) | **생성 시점의 minor alias** 입니다. 이후 patch/minor 는 AKS 가 관리하므로 `lifecycle { ignore_changes }` 로 Terraform 이 되돌리지 않게 했습니다(alias 와 실제 patch 버전이 달라 생기는 영구 diff 방지). AKS 기본값은 1.35 이며, 보수적인 운영이라면 N-1(1.35)도 좋은 선택입니다. 1.37 은 GA 예정(현재 preview). `check` 블록이 리전 지원 여부를 경고. |
 | `automatic_upgrade_channel` / `node_os_upgrade_channel` | `patch` / `NodeImage` | 보안 패치는 유지보수 창에 자동, **minor 업그레이드는 사전 점검(Lab 09)을 거쳐 직접**. 시간은 `maintenance_window_*` 로 통제. |
 | System 풀 | D4ds_v5 ×3(영역별 1대), `only_critical_addons_enabled` | 시스템 파드와 앱 분리, 영역 장애 내성. 4 vCPU 이상 권장. |
-| User 풀 | D4ds_v5 ×3~6 (autoscaler) | 앱 전용. 최소 3대(3개 영역에 걸친 풀이라 영역별 1대씩 배치되는 것이 일반적)로 영역 장애에도 가용성 유지. 오토스케일 확장 시 영역 균형은 best-effort 입니다. 엄격한 균형이 필요하면 영역별로 풀을 따로 만들고 `balance_similar_node_groups` 를 쓰세요. |
+| User 풀 | D4ds_v5 ×3–6 (autoscaler) | 앱 전용. 최소 3대(3개 영역에 걸친 풀이라 영역별 1대씩 배치되는 것이 일반적)로 영역 장애에도 가용성 유지. 오토스케일 확장 시 영역 균형은 best-effort 입니다. 엄격한 균형이 필요하면 영역별로 풀을 따로 만들고 `balance_similar_node_groups` 를 쓰세요. |
 | OS | `AzureLinux3` + Ephemeral OS 디스크(64GB) | 경량/강화 OS, 빠른 노드 교체, 디스크 비용 없음. (Azure Linux 2.0 은 2026-10-31 이미지 제거) |
 | 네트워크 | CNI Overlay + Cilium, `userAssignedNATGateway` | IP 절약, eBPF 데이터 플레인, 고정 egress IP. kubenet 은 신규에 비권장. |
 | API 서버 | VNet Integration + authorized IP ranges | 공용이지만 내 IP 만. `enable_private_cluster = true` 로 완전 프라이빗 전환 가능(아래 심화). |
@@ -60,7 +60,7 @@
 | 포함하지 않은 것 | Azure Firewall egress, App Gateway+WAF, 멀티 리전 | 비용/복잡도. 부록의 "프로덕션 체크리스트" 참고. |
 
 > [!IMPORTANT]
-> **azurerm 4.x~5.x 에서 바뀐 점**: `node_provisioning_profile { mode = "Manual" }` 블록이 5.x 에서 **필수**입니다(없으면 `validate` 오류). `oidc_issuer_enabled` 기본값은 5.x 에서 `true`, `default_node_pool` 의 `enable_auto_scaling` 은 `auto_scaling_enabled` 로 바뀌었고, `os_disk_type`/`only_critical_addons_enabled`/`vm_size` 등을 바꿀 때는 `temporary_name_for_rotation` 이 필요합니다.
+> **azurerm 4.x–5.x 에서 바뀐 점**: `node_provisioning_profile { mode = "Manual" }` 블록이 5.x 에서 **필수**입니다(없으면 `validate` 오류). `oidc_issuer_enabled` 기본값은 5.x 에서 `true`, `default_node_pool` 의 `enable_auto_scaling` 은 `auto_scaling_enabled` 로 바뀌었고, `os_disk_type`/`only_critical_addons_enabled`/`vm_size` 등을 바꿀 때는 `temporary_name_for_rotation` 이 필요합니다.
 
 > [!NOTE]
 > **AzAPI 를 쓰는 이유**: azurerm 5.9 는 *컨트롤 플레인 메트릭*과 *Gateway API*(Managed Gateway API CRD + 애플리케이션 라우팅 Istio 구현) 설정을 아직 노출하지 않습니다. 같은 클러스터를 AzAPI 의 `azapi_update_resource` 로 **부분 업데이트**합니다. 두 업데이트가 같은 클러스터에 동시에 PUT 하지 않도록 `depends_on` 으로 직렬화했습니다.
@@ -1373,7 +1373,7 @@ kubectl get nodes -o wide
 ```
 
 > [!TIP]
-> 로컬 계정이 꺼져 있으므로 `--admin` 옵션은 동작하지 않습니다. `kubectl` 은 `az login` 세션으로 토큰을 받고, 권한은 Lab 05 의 `access.tf` 에서 부여한 *Azure Kubernetes Service RBAC Cluster Admin* 역할로 결정됩니다. 역할 전파에 1~5분 걸릴 수 있습니다(`Forbidden` 이면 잠시 후 재시도).
+> 로컬 계정이 꺼져 있으므로 `--admin` 옵션은 동작하지 않습니다. `kubectl` 은 `az login` 세션으로 토큰을 받고, 권한은 Lab 05 의 `access.tf` 에서 부여한 *Azure Kubernetes Service RBAC Cluster Admin* 역할로 결정됩니다. 역할 전파에 1–5분 걸릴 수 있습니다(`Forbidden` 이면 잠시 후 재시도).
 
 ### 3단계. 검증
 
@@ -1401,7 +1401,7 @@ kubectl get pods -n aks-istio-system
 
 ### 4단계. 관측성 확인
 
-데이터가 쌓이기까지 5~10분 걸립니다.
+데이터가 쌓이기까지 5–10분 걸립니다.
 
 ```bash
 # 수집 에이전트 파드

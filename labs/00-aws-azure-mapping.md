@@ -105,7 +105,7 @@
 
 | AWS | Azure | 차이 / 주의 |
 |---|---|---|
-| S3 | **Blob Storage** (Storage Account → Container) | 계정 이름이 전역 고유(소문자+숫자 3~24자). 버전 관리·소프트 삭제는 계정 옵션. |
+| S3 | **Blob Storage** (Storage Account → Container) | 계정 이름이 전역 고유(소문자+숫자 3–24자). 버전 관리·소프트 삭제는 계정 옵션. |
 | DynamoDB(락) | (불필요) | azurerm backend 는 blob lease 로 잠금. |
 | EBS | **Managed Disk** | Premium SSD v2 / Ultra 등. Ephemeral OS 디스크는 노드 로컬 저장소 사용. |
 | EFS | **Azure Files** (NFS/SMB) | AKS 기본 CSI 드라이버 포함. |

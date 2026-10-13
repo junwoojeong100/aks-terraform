@@ -22,7 +22,7 @@
 
 | AWS | Azure | 차이 / 주의 |
 |---|---|---|
-| S3 bucket | Storage Account + **Blob container** | Storage Account 이름이 **전역 고유**(소문자·숫자 3~24자). |
+| S3 bucket | Storage Account + **Blob container** | Storage Account 이름이 **전역 고유**(소문자·숫자 3–24자). |
 | DynamoDB lock table | (불필요) | azurerm backend 가 **blob lease** 로 잠금을 처리합니다. |
 | S3 Versioning | `blob_properties.versioning_enabled` | 잘못 덮어쓴 state 를 이전 버전으로 복구. |
 | Block Public Access | `allow_nested_items_to_be_public = false` | 컨테이너 공개 접근 차단. |
@@ -525,7 +525,7 @@ use_azuread_auth     = true
 ### 4단계. (선택) 부트스트랩 스택의 state 도 원격으로 이전
 
 1. `terraform/02-bootstrap/versions.tf` 의 `backend "azurerm"` 블록 주석을 해제합니다.
-2. 역할 할당이 전파되는 데 1~5분 걸릴 수 있습니다. 아래 명령이 `403` 으로 실패하면 잠시 후 다시 실행하세요.
+2. 역할 할당이 전파되는 데 1–5분 걸릴 수 있습니다. 아래 명령이 `403` 으로 실패하면 잠시 후 다시 실행하세요.
 
 ```bash
 terraform init -migrate-state -backend-config=../backend.hcl
@@ -556,7 +556,7 @@ terraform init -backend-config=../backend.hcl
 
 | 증상 | 원인 / 해결 |
 |---|---|
-| `AuthorizationPermissionMismatch` (init 시 403) | 역할 할당 전파 지연. 1~5분 후 재시도. `Storage Blob Data Contributor` 가 **컨테이너/계정** 범위에 있는지 확인. |
+| `AuthorizationPermissionMismatch` (init 시 403) | 역할 할당 전파 지연. 1–5분 후 재시도. `Storage Blob Data Contributor` 가 **컨테이너/계정** 범위에 있는지 확인. |
 | `StorageAccountAlreadyTaken` | 이름이 전역 중복. `TF_VAR_workload` 를 바꾸면 해시가 달라집니다. |
 | `subscription_id is required` | `ARM_SUBSCRIPTION_ID` 환경 변수 미설정(Lab 01 의 5단계). |
 | `Error: Failed to get existing workspaces` | 현재 사용자에게 데이터 평면 역할이 없거나 `use_azuread_auth` 가 빠짐. |

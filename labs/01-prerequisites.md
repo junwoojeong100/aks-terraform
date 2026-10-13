@@ -1,32 +1,36 @@
-# Lab 01. 사전 준비: 도구, 로그인, 권한, 환경 변수
+<!-- lang-switch -->
+**English** | [한국어](ko/01-prerequisites.md)
+<!-- /lang-switch -->
 
-| 소요 시간 | 예상 비용 | Terraform 스택 | 선행 실습 |
+# Lab 01. Prerequisites: tools, sign-in, permissions, environment variables
+
+| Duration | Estimated cost | Terraform stack | Prerequisite |
 |---|---|---|---|
-| 20–30분 | 없음 | (없음) | [00. AWS ↔ Azure 비교](00-aws-azure-mapping.md) |
+| 20–30 min | None | (none) | [00. AWS ↔ Azure comparison](00-aws-azure-mapping.md) |
 
-## 이번 실습의 목표
+## Goals of this lab
 
-- Azure CLI·Terraform·kubectl·kubelogin·jq 설치와 버전 확인
-- Azure 로그인, 구독 선택, 필요한 권한 확인
-- **Resource Provider(RP) 등록**과 vCPU **쿼터** 확인 (AWS 에는 없는 단계입니다)
-- 이후 모든 실습에서 공유할 **환경 변수** 설정
-- **`scripts/preflight.sh`** 한 번으로 위 항목을 자동 점검
+- Install Azure CLI, Terraform, kubectl, kubelogin, and jq, and verify their versions
+- Sign in to Azure, select a subscription, and check the permissions you need
+- Register **Resource Providers (RPs)** and check your vCPU **quota** (AWS has no equivalent step)
+- Set the **environment variables** that every later lab shares
+- Check all of the above automatically with a single run of **`scripts/preflight.sh`**
 
-- [ ] Azure 구독이 있고 **Owner**(또는 Contributor + User Access Administrator) 권한이 있다
-- [ ] `terraform version` 이 1.16 이상이다
-- [ ] `az version` 의 azure-cli 가 2.86 이상이다
-- [ ] kubectl, kubelogin, jq 가 설치되어 있다
-- [ ] `scripts/preflight.sh` 가 실패(✗) 없이 끝난다
+- [ ] You have an Azure subscription and **Owner** permission (or Contributor + User Access Administrator)
+- [ ] `terraform version` reports 1.16 or later
+- [ ] The azure-cli version in `az version` is 2.86 or later
+- [ ] kubectl, kubelogin, and jq are installed
+- [ ] `scripts/preflight.sh` finishes with no failures (✗)
 
-## 1. 도구 설치
+## 1. Install the tools
 
-| 도구 | 최소 버전 | 용도 |
+| Tool | Minimum version | Purpose |
 |---|---|---|
-| Terraform | 1.16 | IaC (이 가이드는 1.16.5 로 검증) |
-| Azure CLI | 2.86 | 로그인, 쿼터/RP 조회, `az acr import`, `az aks get-credentials` |
-| kubectl | 클러스터 ±1 minor | 쿠버네티스 CLI |
-| kubelogin | 최신 | Entra ID 토큰으로 kubectl / Terraform `kubernetes` provider 인증 |
-| jq | 최신 | 검증 스크립트(`scripts/verify.sh`)가 `az`/`kubectl` 의 JSON 결과를 읽을 때 사용 |
+| Terraform | 1.16 | IaC (this guide is verified with 1.16.5) |
+| Azure CLI | 2.86 | Sign-in, quota/RP queries, `az acr import`, `az aks get-credentials` |
+| kubectl | Cluster version ±1 minor | Kubernetes CLI |
+| kubelogin | Latest | Authenticates kubectl and the Terraform `kubernetes` provider with Entra ID tokens |
+| jq | Latest | Used by the verification script (`scripts/verify.sh`) to read JSON output from `az`/`kubectl` |
 
 ```bash
 # macOS (Homebrew)
@@ -40,45 +44,45 @@ winget install Hashicorp.Terraform Microsoft.AzureCLI Kubernetes.kubectl Azure.K
 ```
 
 > [!NOTE]
-> `scripts/` 의 셸 스크립트는 **macOS · Linux · WSL · Azure Cloud Shell(bash)** 에서 동작합니다. Windows PowerShell 에서는 WSL 또는 Git Bash 를 쓰세요.
+> The shell scripts in `scripts/` run on **macOS · Linux · WSL · Azure Cloud Shell (bash)**. On Windows PowerShell, use WSL or Git Bash.
 
 > [!TIP]
-> 어느 OS 에서든 Azure CLI 만 설치했다면 `az aks install-cli` 한 번으로 **kubectl 과 kubelogin** 을 함께 설치할 수 있습니다.
+> On any OS, if you have installed only the Azure CLI, a single `az aks install-cli` installs **both kubectl and kubelogin**.
 
 ```bash
 terraform version        # Terraform v1.16.x
-az version -o table      # azure-cli 2.86 이상
+az version -o table      # azure-cli 2.86 or later
 kubectl version --client
 kubelogin --version
 ```
 
-## 2. 로그인과 구독 선택
+## 2. Sign in and select a subscription
 
-AWS 의 `aws sso login` / `AWS_PROFILE` 에 해당하는 단계입니다. Terraform 은 **Azure CLI 로그인 정보**를 그대로 사용합니다.
+This is the equivalent of `aws sso login` / `AWS_PROFILE` in AWS. Terraform uses your **Azure CLI sign-in** directly.
 
 ```bash
-az login                                   # 브라우저 로그인 (MFA 포함)
-az account list -o table                   # 구독 목록
-az account set --subscription "<구독 이름 또는 ID>"
-az account show -o table                   # 현재 구독/테넌트/사용자 확인
+az login                                   # Browser sign-in (including MFA)
+az account list -o table                   # List subscriptions
+az account set --subscription "<subscription name or ID>"
+az account show -o table                   # Check the current subscription, tenant, and user
 ```
 
-### 필요한 권한
+### Required permissions
 
-| 작업 | 필요한 Azure RBAC 역할 | 이유 |
+| Task | Required Azure RBAC role | Why |
 |---|---|---|
-| 리소스 생성 | Contributor | RG, VNet, AKS, ACR 등 |
-| 역할 할당 생성 | **User Access Administrator** 또는 Owner | 이 실습은 `azurerm_role_assignment` 를 많이 만듭니다 (AcrPull, Network Contributor …) |
-| 정책 할당 (Lab 08) | Resource Policy Contributor 또는 Owner | `azurerm_resource_group_policy_assignment` |
+| Create resources | Contributor | RG, VNet, AKS, ACR, and so on |
+| Create role assignments | **User Access Administrator** or Owner | This lab creates many `azurerm_role_assignment` resources (AcrPull, Network Contributor …) |
+| Assign policies (Lab 08) | Resource Policy Contributor or Owner | `azurerm_resource_group_policy_assignment` |
 
 > [!NOTE]
-> `azuread` provider(Entra 그룹 생성 등)는 사용하지 않으므로 **Entra ID 관리자 권한은 필요하지 않습니다.**
-> 실습 편의상 클러스터 관리자(Lab 05/10), ACR Push·Grafana Admin(Lab 04) 같은 사람용 권한은 "현재 로그인한 사용자"에게 Azure RBAC 역할로 부여합니다(`grant_current_user_admin` / `grant_current_user_roles` 변수, 기본값 `true`).
-> **팀/CI 환경에서는 이 변수를 `false` 로 두고 Entra 그룹의 Object ID 를 `admin_principal_ids` 로 지정**하세요. 개인 계정에 직접 권한을 주면 담당자가 바뀔 때마다 코드가 흔들립니다.
+> This lab doesn't use the `azuread` provider (to create Entra groups, for example), so you **don't need Entra ID administrator permissions.**
+> For lab convenience, human-facing permissions such as cluster admin (Labs 05/10) and ACR Push and Grafana Admin (Lab 04) are granted to "the currently signed-in user" as Azure RBAC roles (the `grant_current_user_admin` / `grant_current_user_roles` variables, default `true`).
+> **In team and CI environments, set these variables to `false` and specify the object IDs of Entra groups in `admin_principal_ids`.** Granting permissions directly to personal accounts means the code has to change every time the person in charge changes.
 
-## 3. Resource Provider 등록
+## 3. Register Resource Providers
 
-Azure 는 서비스별로 **Resource Provider(RP)** 를 구독에 등록해야 해당 리소스를 만들 수 있습니다. azurerm 5.x 부터는 provider 가 RP 를 자동 등록하지 않으므로(기본값 `none`), 한 번만 직접 등록합니다.
+In Azure, you must register the **Resource Provider (RP)** for each service in your subscription before you can create that service's resources. Starting with azurerm 5.x, the provider doesn't register RPs automatically (the default is `none`), so you register them manually, just once.
 
 ```bash
 RPS="Microsoft.ContainerService Microsoft.Compute Microsoft.Network Microsoft.Storage Microsoft.KeyVault \
@@ -88,53 +92,53 @@ Microsoft.Security Microsoft.Authorization Microsoft.Consumption Microsoft.CostM
 
 for rp in $RPS; do az provider register --namespace "$rp" > /dev/null; done
 
-# 등록은 비동기입니다. 모두 Registered 가 될 때까지 확인 (보통 1~5분)
+# Registration is asynchronous. Check until all of them show Registered (usually 1–5 min)
 for rp in $RPS; do printf "%-36s %s\n" "$rp" "$(az provider show -n "$rp" --query registrationState -o tsv)"; done
 ```
 
-## 4. vCPU 쿼터 확인
+## 4. Check your vCPU quota
 
-기본 구성은 **D4ds_v5 (4 vCPU)** 노드를 최소 6대(System 3 + User 3) 쓰고, 업그레이드 시 임시 노드(surge)가 더 생깁니다. 권장 여유는 **40 vCPU** 입니다(최소 24 vCPU + surge 분).
+The default configuration uses at least six **D4ds_v5 (4 vCPU)** nodes (3 System + 3 User), and upgrades create extra temporary (surge) nodes. The recommended headroom is **40 vCPUs** (24 vCPUs minimum plus the surge nodes).
 
-| 쿼터 (`az vm list-usage` 의 이름) | 필요량 |
+| Quota (name in `az vm list-usage`) | Required |
 |---|---|
-| `standardDDSv5Family` (D4ds_v5 의 패밀리 쿼터) | 6대 = 24 → 업그레이드 surge 포함 28 → 오토스케일 최대(System 5 + User 6 = 11대) 44 |
-| `cores` (Total Regional vCPUs, 모든 패밀리의 합계) | 위 값 + Lab 10 의 AKS Automatic 노드(약 8)를 함께 쓰면 36 이상 |
-| Spot vCPUs (선택: Lab 05 의 Spot 풀) | 5대 × 4 = 20. 일반 vCPU 쿼터와 별도로 계산됩니다 |
+| `standardDDSv5Family` (family quota for D4ds_v5) | 6 nodes = 24 → 28 with upgrade surge → 44 at the autoscale maximum (System 5 + User 6 = 11 nodes) |
+| `cores` (Total Regional vCPUs, the sum of all families) | The value above + the AKS Automatic nodes from Lab 10 (about 8), if you use both: 36 or more |
+| Spot vCPUs (optional: the Spot pool in Lab 05) | 5 nodes × 4 = 20. Counted separately from the regular vCPU quota |
 
 ```bash
 az vm list-usage --location koreacentral \
   --query "[?name.value=='cores' || name.value=='standardDDSv5Family'].{name:name.localizedValue, used:currentValue, limit:limit}" -o table
 
-# 사용할 VM 크기가 해당 리전/영역에서 사용 가능한지 확인
+# Check that the VM size you plan to use is available in the region/zones
 az vm list-skus --location koreacentral --size Standard_D4ds_v5 --query "[].{name:name, zones:locationInfo[0].zones, restrictions:restrictions}" -o json
 ```
 
 > [!WARNING]
-> `restrictions` 에 `NotAvailableForSubscription` 이 있으면 그 VM 크기/영역은 구독에서 쓸 수 없습니다. 쿼터가 부족하면 포털의 *쿼터* 메뉴나 지원 요청으로 증설하거나, 변수 `system_node_vm_size`/`user_node_vm_size`(Lab 05)를 바꾸세요.
+> If `restrictions` contains `NotAvailableForSubscription`, you can't use that VM size/zone in your subscription. If your quota is too low, request an increase from the *Quotas* menu in the portal or through a support request, or change the `system_node_vm_size`/`user_node_vm_size` variables (Lab 05).
 
-Visual Studio 구독처럼 기본 쿼터가 작다면(예: 패밀리 20, 전체 32) CLI 로 증설을 요청할 수 있습니다. 소규모 증설은 요청 즉시 반영되기도 하지만 구독 유형에 따라 다를 수 있으니, 반영 여부는 위의 `az vm list-usage` 로 확인하세요.
+If your default quota is small, as with a Visual Studio subscription (for example, 20 for the family and 32 in total), you can request an increase from the CLI. A small increase is sometimes applied as soon as you request it, but this depends on the subscription type, so confirm that it took effect with the `az vm list-usage` command above.
 
 ```bash
 az extension add --name quota
-az provider register --namespace Microsoft.Quota           # 등록이 끝난 뒤(Registered) 요청하세요
+az provider register --namespace Microsoft.Quota           # Request only after registration finishes (Registered)
 SCOPE="/subscriptions/$(az account show --query id -o tsv)/providers/Microsoft.Compute/locations/koreacentral"
 az quota create --resource-name standardDDSv5Family --scope "$SCOPE" --limit-object value=48 --resource-type dedicated
 az quota create --resource-name cores               --scope "$SCOPE" --limit-object value=64 --resource-type dedicated
 ```
 
-증설하지 않고 `system_node_vm_size`/`user_node_vm_size` 를 `Standard_D2ds_v5`(2 vCPU)로 줄여도 같은 패밀리 쿼터(20) 안에서 실습할 수 있습니다(6대 = 12 vCPU).
+Instead of requesting an increase, you can reduce `system_node_vm_size`/`user_node_vm_size` to `Standard_D2ds_v5` (2 vCPU) and still do the lab within the same family quota (20): 6 nodes = 12 vCPUs.
 
-## 5. 환경 변수 설정
+## 5. Set environment variables
 
-모든 스택이 공통으로 읽는 값입니다. **새 터미널을 열 때마다 다시 실행**하세요(`env.sh` 파일로 저장해 두면 편합니다).
+These are the values that every stack reads. **Run the commands again each time you open a new terminal** (saving them to an `env.sh` file makes this easier).
 
 ```bash
-export ARM_SUBSCRIPTION_ID="$(az account show --query id -o tsv)"   # azurerm 4.x 이후 필수
-export TF_VAR_workload="aksdemo"        # 3~8자 소문자/숫자. 리소스 이름에 사용됩니다
+export ARM_SUBSCRIPTION_ID="$(az account show --query id -o tsv)"   # Required since azurerm 4.x
+export TF_VAR_workload="aksdemo"        # 3–8 lowercase letters or digits. Used in resource names
 export TF_VAR_environment="dev"         # dev | test | prod
-export TF_VAR_location="koreacentral"   # AKS Automatic 도 지원하는 리전
-# API 서버/ACR/Key Vault 방화벽에서 허용할 "내 공인 IP" (JSON 배열 형식)
+export TF_VAR_location="koreacentral"   # A region that also supports AKS Automatic
+# Your public IP to allow through the API server/ACR/Key Vault firewalls (JSON array format)
 export TF_VAR_allowed_ip_ranges="[\"$(curl -s https://api.ipify.org)/32\"]"
 echo "$TF_VAR_allowed_ip_ranges"
 ```
@@ -150,38 +154,39 @@ $env:TF_VAR_allowed_ip_ranges = "[`"$ip/32`"]"
 ```
 
 > [!IMPORTANT]
-> 회사 VPN/프록시를 쓰거나 네트워크가 바뀌면 공인 IP 가 달라집니다. 그러면 Key Vault·ACR·API 서버 접근이 막히므로 `TF_VAR_allowed_ip_ranges` 를 갱신하고 해당 스택을 다시 `apply` 하세요.
+> Your public IP changes if you use a corporate VPN/proxy or switch networks. Access to Key Vault, ACR, and the API server is then blocked, so update `TF_VAR_allowed_ip_ranges` and `apply` the affected stacks again.
 
-## 6. 한 번에 점검하기: preflight 스크립트
+## 6. Check everything at once: the preflight script
 
-위 3–5단계를 손으로 하나씩 확인하는 대신, **읽기 전용** 점검 스크립트를 실행하세요. 아무것도 만들거나 바꾸지 않습니다.
+Instead of checking steps 3–5 above by hand one at a time, run the **read-only** preflight script. It doesn't create or change anything.
 
 ```bash
 scripts/preflight.sh
-# 다른 리전을 쓴다면: LOCATION=japaneast scripts/preflight.sh
+# To use a different region: LOCATION=japaneast scripts/preflight.sh
 ```
 
-| 점검 항목 | 실패하면 |
+| Check | If it fails |
 |---|---|
-| 도구와 버전 (terraform 1.16+, az 2.86+, kubectl, kubelogin, jq) | 설치 안내가 함께 출력됩니다 |
-| Azure 로그인과 구독 | `az login` |
-| `ARM_SUBSCRIPTION_ID`, `TF_VAR_allowed_ip_ranges` 형식 | 5단계의 `export` 를 다시 실행 |
-| 필수 Resource Provider 17개 등록 여부 | 등록 명령(`az provider register …`)을 그대로 출력 |
-| vCPU 쿼터 (D4ds_v5 패밀리 · 리전 전체, 최소 24 / 권장 40) | 포털에서 증설 |
-| VM 크기가 영역 1·2·3 에서 사용 가능하고 제한이 없는지 | `zones`/VM 크기 변수 조정 |
-| Owner 등 역할 할당 권한 | 권한 요청 (그룹으로 받은 권한은 목록에 안 보일 수 있어 경고로 표시) |
+| Tools and versions (terraform 1.16+, az 2.86+, kubectl, kubelogin, jq) | Install instructions are printed along with the failure message |
+| Azure sign-in and subscription | `az login` |
+| Format of `ARM_SUBSCRIPTION_ID` and `TF_VAR_allowed_ip_ranges` | Run the `export` commands from step 5 again |
+| Whether the 17 required Resource Providers are registered | Prints the registration command (`az provider register …`) ready to run |
+| vCPU quota (D4ds_v5 family · whole region, minimum 24 / recommended 40) | Request an increase in the portal |
+| Whether the VM size is available in zones 1, 2, and 3 and has no restrictions | Adjust the `zones` / VM size variables |
+| Role assignment permissions, such as Owner | Request permissions (permissions granted through a group may not be listed, so this is reported as a warning) |
 
 <!-- tf:include path="scripts/preflight.sh" -->
 ```bash title="scripts/preflight.sh"
 #!/usr/bin/env bash
-# 실습 시작 전 점검 (읽기 전용): 도구 · 로그인 · 환경 변수 · Resource Provider · vCPU 쿼터 · VM 크기 · 권한
-# Lab 01 의 확인 절차를 한 번에 실행합니다. 아무것도 만들거나 바꾸지 않습니다.
+# Preflight check before starting the labs (read-only): tools · sign-in · environment variables ·
+# Resource Providers · vCPU quota · VM size · permissions
+# Runs the checks from Lab 01 in one go. Creates and changes nothing.
 #
-# 사용법:
+# Usage:
 #   scripts/preflight.sh
-#   LOCATION=japaneast scripts/preflight.sh      # 다른 리전 (기본: TF_VAR_location 또는 koreacentral)
+#   LOCATION=japaneast scripts/preflight.sh      # another region (default: TF_VAR_location or koreacentral)
 #
-# 종료 코드: 실패 항목이 없으면 0, 있으면 1
+# Exit codes: 0 if nothing failed, 1 otherwise
 set -uo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -190,19 +195,19 @@ source "${HERE}/lib/common.sh"
 
 LOCATION="${LOCATION:-${TF_VAR_location:-koreacentral}}"
 VM_SIZE="${VM_SIZE:-Standard_D4ds_v5}"
-VM_FAMILY="${VM_FAMILY:-standardDDSv5Family}" # VM_SIZE 를 바꿨다면 `az vm list-usage` 의 패밀리 이름으로 함께 바꾸세요.
-MIN_VCPU=24                                   # 기본 구성의 최소 노드 6대 x 4 vCPU
-REC_VCPU=40                                   # 업그레이드 임시 노드(surge)와 오토스케일 여유까지
+VM_FAMILY="${VM_FAMILY:-standardDDSv5Family}" # If you change VM_SIZE, also set the family name from `az vm list-usage`.
+MIN_VCPU=24                                   # default setup: minimum 6 nodes x 4 vCPU
+REC_VCPU=40                                   # plus headroom for upgrade surge nodes and autoscaling
 RESOURCE_PROVIDERS="Microsoft.ContainerService Microsoft.Compute Microsoft.Network Microsoft.Storage Microsoft.KeyVault
 Microsoft.ContainerRegistry Microsoft.OperationalInsights Microsoft.Insights Microsoft.Monitor Microsoft.Dashboard
 Microsoft.AlertsManagement Microsoft.ManagedIdentity Microsoft.PolicyInsights Microsoft.Security Microsoft.Authorization
 Microsoft.Consumption Microsoft.CostManagement"
 
-# need 명령 최소버전 설치안내 : 명령이 있고 버전이 충분한지 확인
+# need command min-version install-hint : check that the command exists and its version is sufficient
 need() {
   local cmd="$1" min="$2" hint="$3" ver=""
   if ! command -v "$cmd" >/dev/null 2>&1; then
-    fail "$cmd 가 없습니다 → $hint"
+    fail "$cmd not found → $hint"
     return
   fi
   case "$cmd" in
@@ -211,107 +216,108 @@ need() {
     kubectl) ver="$(kubectl version --client -o json 2>/dev/null | jq -r '.clientVersion.gitVersion // empty' 2>/dev/null)" ;;
   esac
   if [ -n "$min" ] && [ -n "$ver" ]; then
-    if version_ge "$ver" "$min"; then pass "$cmd $ver (최소 $min)"; else fail "$cmd $ver → 최소 $min 필요: $hint"; fi
+    if version_ge "$ver" "$min"; then pass "$cmd $ver (min $min)"; else fail "$cmd $ver → $min or later required: $hint"; fi
   else
     pass "$cmd${ver:+ $ver}"
   fi
 }
 
-# check_quota 이름 여유vCPU
+# check_quota name free-vCPUs
 check_quota() {
   if [ -z "$2" ]; then
-    warn "$1: 조회하지 못했습니다 (az vm list-usage -l $LOCATION)"
+    warn "$1: couldn't query (az vm list-usage -l $LOCATION)"
   elif [ "$2" -lt "$MIN_VCPU" ]; then
-    fail "$1 여유 $2 vCPU → 최소 $MIN_VCPU 필요 (포털 → 구독 → 사용량 + 할당량 에서 증설)"
+    fail "$1: $2 vCPU free → at least $MIN_VCPU required (request an increase in the portal → Subscriptions → Usage + quotas)"
   elif [ "$2" -lt "$REC_VCPU" ]; then
-    warn "$1 여유 $2 vCPU (업그레이드 임시 노드까지 고려하면 $REC_VCPU 권장)"
+    warn "$1: $2 vCPU free ($REC_VCPU recommended to cover upgrade surge nodes)"
   else
-    pass "$1 여유 $2 vCPU"
+    pass "$1: $2 vCPU free"
   fi
 }
 
-section "1. 도구"
-need terraform 1.16 "brew install hashicorp/tap/terraform (또는 tfenv)"
+section "1. Tools"
+need terraform 1.16 "brew install hashicorp/tap/terraform (or tfenv)"
 need az 2.86 "brew install azure-cli"
 need kubectl "" "az aks install-cli"
 need kubelogin "" "az aks install-cli"
-need jq "" "brew install jq  /  sudo apt install jq   (검증 스크립트가 사용)"
-need curl "" "OS 패키지 관리자로 설치"
+need jq "" "brew install jq  /  sudo apt install jq   (used by the verify scripts)"
+need curl "" "install it with your OS package manager"
 
-section "2. Azure 로그인"
+section "2. Azure sign-in"
 acct=""
 if command -v az >/dev/null 2>&1; then acct="$(azj account show)"; fi
 if [ -z "$acct" ]; then
-  fail "로그인되어 있지 않습니다 → az login"
+  fail "Not signed in → az login"
   summary
   exit 1
 fi
 sub_id="$(jv "$acct" .id)"
-pass "구독: $(jv "$acct" .name) ($sub_id)"
-info "테넌트 $(jv "$acct" .tenantId) · 로그인 $(jv "$acct" .user.name)"
+pass "Subscription: $(jv "$acct" .name) ($sub_id)"
+info "Tenant $(jv "$acct" .tenantId) · signed in as $(jv "$acct" .user.name)"
 
-section "3. 환경 변수"
+section "3. Environment variables"
 if [ -z "${ARM_SUBSCRIPTION_ID:-}" ]; then
-  fail "ARM_SUBSCRIPTION_ID 가 없습니다 → export ARM_SUBSCRIPTION_ID=\"\$(az account show --query id -o tsv)\""
+  fail "ARM_SUBSCRIPTION_ID is not set → export ARM_SUBSCRIPTION_ID=\"\$(az account show --query id -o tsv)\""
 elif [ "$ARM_SUBSCRIPTION_ID" != "$sub_id" ]; then
-  warn "ARM_SUBSCRIPTION_ID($ARM_SUBSCRIPTION_ID)가 현재 az 구독($sub_id)과 다릅니다"
+  warn "ARM_SUBSCRIPTION_ID ($ARM_SUBSCRIPTION_ID) differs from the current az subscription ($sub_id)"
 else
-  pass "ARM_SUBSCRIPTION_ID 가 현재 구독과 일치합니다"
+  pass "ARM_SUBSCRIPTION_ID matches the current subscription"
 fi
 if [ -z "${TF_VAR_allowed_ip_ranges:-}" ]; then
-  fail "TF_VAR_allowed_ip_ranges 가 없습니다 → export TF_VAR_allowed_ip_ranges='[\"<내 공인 IP>/32\"]'"
+  fail "TF_VAR_allowed_ip_ranges is not set → export TF_VAR_allowed_ip_ranges='[\"<your public IP>/32\"]'"
 elif jq -e 'type == "array" and length > 0 and all(.[]; type == "string" and test("^[0-9]{1,3}(\\.[0-9]{1,3}){3}/[0-9]{1,2}$"))' \
   >/dev/null 2>&1 <<<"$TF_VAR_allowed_ip_ranges"; then
   pass "TF_VAR_allowed_ip_ranges = $TF_VAR_allowed_ip_ranges"
 else
-  fail "TF_VAR_allowed_ip_ranges 형식 오류 (CIDR 문자열의 JSON 배열이어야 합니다): $TF_VAR_allowed_ip_ranges"
+  fail "TF_VAR_allowed_ip_ranges has an invalid format (must be a JSON array of CIDR strings): $TF_VAR_allowed_ip_ranges"
 fi
 if [ -n "${TF_VAR_workload:-}" ]; then
-  if printf '%s' "$TF_VAR_workload" | grep -Eq '^[a-z0-9]{3,8}$'; then pass "TF_VAR_workload = $TF_VAR_workload"; else fail "TF_VAR_workload 는 소문자/숫자 3–8자여야 합니다: $TF_VAR_workload"; fi
+  if printf '%s' "$TF_VAR_workload" | grep -Eq '^[a-z0-9]{3,8}$'; then pass "TF_VAR_workload = $TF_VAR_workload"; else fail "TF_VAR_workload must be 3–8 lowercase letters or digits: $TF_VAR_workload"; fi
 fi
 
-section "4. Resource Provider 등록 (azurerm 5.x 는 자동 등록하지 않습니다)"
+section "4. Resource Provider registration (azurerm 5.x does not register them automatically)"
 registered="$(az provider list --query "[?registrationState=='Registered'].namespace" -o tsv 2>/dev/null)"
 missing=""
 for rp in $RESOURCE_PROVIDERS; do
   printf '%s\n' "$registered" | grep -qix "$rp" || missing="$missing $rp"
 done
 if [ -z "$missing" ]; then
-  pass "필요한 Resource Provider 모두 등록됨"
+  pass "All required Resource Providers are registered"
 else
-  fail "미등록:$missing"
-  info "등록: for rp in$missing; do az provider register --namespace \$rp; done   (1–5분 소요)"
+  fail "Not registered:$missing"
+  info "Register: for rp in$missing; do az provider register --namespace \$rp; done   (takes 1–5 min)"
 fi
 
-section "5. vCPU 쿼터 ($LOCATION)"
+section "5. vCPU quota ($LOCATION)"
 usage="$(azj vm list-usage -l "$LOCATION")"
-check_quota "$VM_FAMILY 패밀리" "$(jv "$usage" ".[] | select(.name.value == \"$VM_FAMILY\") | (.limit | tonumber) - (.currentValue | tonumber)")"
-check_quota "리전 전체(Total Regional vCPUs)" "$(jv "$usage" '.[] | select(.name.value == "cores") | (.limit | tonumber) - (.currentValue | tonumber)')"
+check_quota "VM family $VM_FAMILY" "$(jv "$usage" ".[] | select(.name.value == \"$VM_FAMILY\") | (.limit | tonumber) - (.currentValue | tonumber)")"
+check_quota "Regional total (Total Regional vCPUs)" "$(jv "$usage" '.[] | select(.name.value == "cores") | (.limit | tonumber) - (.currentValue | tonumber)')"
 
-section "6. VM 크기 ($VM_SIZE @ $LOCATION)"
+section "6. VM size ($VM_SIZE @ $LOCATION)"
 skus="$(azj vm list-skus -l "$LOCATION" --size "$VM_SIZE" --resource-type virtualMachines)"
 sku="$(jv "$skus" "[.[] | select(.name == \"$VM_SIZE\")][0]")"
 if [ -z "$sku" ] || [ "$sku" = "null" ]; then
-  fail "$VM_SIZE 를 $LOCATION 에서 찾을 수 없습니다 (다른 크기/리전을 쓰려면 Lab 05 의 *_node_vm_size, location 변수를 바꾸세요)"
+  fail "$VM_SIZE not found in $LOCATION (to use another size/region, change the *_node_vm_size and location variables from Lab 05)"
 else
   zones="$(jv "$sku" '[.locationInfo[0].zones[]?] | sort | join(",")')"
-  if [ "$zones" = "1,2,3" ]; then pass "가용 영역 1,2,3 모두 사용 가능"; else warn "사용 가능한 영역: ${zones:-없음} (var.zones 를 이에 맞게 줄이세요)"; fi
-  if [ "$(jv "$sku" '[.restrictions[]?] | length')" = "0" ]; then pass "구독 제한(restrictions) 없음"; else fail "이 구독에서 $VM_SIZE 사용이 제한되어 있습니다 (restrictions)"; fi
+  if [ "$zones" = "1,2,3" ]; then pass "Availability zones 1,2,3 are all available"; else warn "Available zones: ${zones:-none} (reduce var.zones to match)"; fi
+  if [ "$(jv "$sku" '[.restrictions[]?] | length')" = "0" ]; then pass "No subscription restrictions"; else fail "$VM_SIZE is restricted in this subscription (restrictions)"; fi
 fi
 
-section "7. 권한 (이 실습은 역할 할당을 많이 만듭니다)"
-# 게스트/개인(MSA) 계정은 로그인 이름(user.name)으로 조회가 안 되므로 객체 ID 를 우선 씁니다 (서비스 주체는 appId 로 대체).
+section "7. Permissions (this lab creates many role assignments)"
+# Guest/personal (MSA) accounts can't be looked up by sign-in name (user.name), so prefer the object ID
+# (a service principal falls back to its appId).
 me="$(az ad signed-in-user show --query id -o tsv 2>/dev/null)"
 [ -n "$me" ] || me="$(jv "$acct" .user.name)"
 roles="$(az role assignment list --assignee "$me" --all --include-inherited --query '[].roleDefinitionName' -o tsv 2>/dev/null)"
 if printf '%s\n' "$roles" | grep -qx 'Owner'; then
-  pass "Owner 역할 보유"
+  pass "Has the Owner role"
 elif printf '%s\n' "$roles" | grep -qx 'Contributor' && printf '%s\n' "$roles" | grep -qxE 'User Access Administrator|Role Based Access Control Administrator'; then
-  pass "Contributor + 역할 할당 권한 보유"
+  pass "Has Contributor + permission to assign roles"
 elif [ -z "$roles" ]; then
-  warn "역할을 조회하지 못했습니다 (그룹으로 받은 권한은 보이지 않을 수 있음). 포털 → 구독 → 액세스 제어(IAM)에서 확인하세요."
+  warn "Couldn't query roles (permissions granted through groups may not be listed). Check in the portal → Subscriptions → Access control (IAM)."
 else
-  warn "Owner 또는 Contributor + User Access Administrator 가 필요합니다. 확인된 역할: $(printf '%s' "$roles" | tr '\n' ',')"
+  warn "Owner, or Contributor + User Access Administrator, is required. Roles found: $(printf '%s' "$roles" | tr '\n' ',')"
 fi
 
 summary
@@ -319,59 +325,62 @@ summary
 <!-- /tf:include -->
 
 > [!NOTE]
-> 스크립트들이 함께 쓰는 공통 함수(`scripts/lib/common.sh`)는 [부록 G](99-appendix.md) 에 있습니다. 실행 결과의 `✓ 통과 / ✗ 실패 / ! 경고 / - 건너뜀` 은 모든 검증 스크립트가 같은 형식으로 보여 줍니다.
+> The common functions shared by the scripts (`scripts/lib/common.sh`) are in [Appendix G](99-appendix.md). All the verification scripts report their results in the same format: `✓ passed / ✗ failed / ! warnings / - skipped`.
 
-## 7. 저장소 구조
+## 7. Repository structure
 
 ```text
 aks-terraform/
-├── README.md                    # 개요
-├── aks-terraform-guide.html     # ← 이 가이드의 단일 HTML 버전
-├── labs/                        # 실습별 문서(md)
-│   └── diagrams/                # 문서에 쓰인 다이어그램(SVG)
+├── README.md                    # Overview (English, default)
+├── README.ko.md                 # Overview (Korean)
+├── aks-terraform-guide.html     # ← Single-file HTML version of this guide (English, default)
+├── aks-terraform-guide.ko.html  # ← Korean single-file HTML version
+├── labs/                        # Lab docs (md), English
+│   ├── diagrams/                # Diagrams used in the docs (SVG)
+│   └── ko/                      # Korean lab docs + their own diagrams/
 ├── terraform/
-│   ├── modules/naming/          # 모든 스택이 공유하는 이름 규칙 모듈 (+ terraform test)
-│   ├── mocks/                   # terraform test 용 azurerm mock 값
-│   ├── 02-bootstrap/            # Lab 02  원격 state 저장소
+│   ├── modules/naming/          # Naming-convention module shared by all stacks (+ terraform test)
+│   ├── mocks/                   # azurerm mock values for terraform test
+│   ├── 02-bootstrap/            # Lab 02  Remote state storage
 │   ├── 03-network/              # Lab 03  VNet / NSG / NAT Gateway / Private DNS
-│   ├── 04-platform/             # Lab 04  ACR / Key Vault / 모니터링 / AKS 용 ID
-│   ├── 05-aks/                  # Lab 05  AKS 클러스터 + 노드 풀 + 관측성
+│   ├── 04-platform/             # Lab 04  ACR / Key Vault / monitoring / identities for AKS
+│   ├── 05-aks/                  # Lab 05  AKS cluster + node pools + observability
 │   ├── 06-workload/             # Lab 06  Workload Identity + Key Vault CSI
-│   ├── 07-ingress/              # Lab 07  Gateway API + 데모 앱
-│   ├── 08-governance/           # Lab 08  Azure Policy / Defender / 예산
-│   └── 10-aks-automatic/        # Lab 10  AKS Automatic (선택)
-├── scripts/                     # 실습 중 실행하는 스크립트
-│   ├── preflight.sh             #   시작 전 점검 (Lab 01)
-│   ├── verify.sh, verify/       #   스택별 결과 검증 (Lab 02–10)
-│   ├── cleanup.sh               #   역순 삭제 (Lab 11)
-│   └── lib/common.sh            #   공통 함수
-└── tools/                       # md 코드 동기화 + HTML 빌드 + 문서 검사, 전체 정적 검증 스크립트
+│   ├── 07-ingress/              # Lab 07  Gateway API + demo app
+│   ├── 08-governance/           # Lab 08  Azure Policy / Defender / budgets
+│   └── 10-aks-automatic/        # Lab 10  AKS Automatic (optional)
+├── scripts/                     # Scripts you run during the labs
+│   ├── preflight.sh             #   Preflight check (Lab 01)
+│   ├── verify.sh, verify/       #   Per-stack result verification (Lab 02–10)
+│   ├── cleanup.sh               #   Delete in reverse order (Lab 11)
+│   └── lib/common.sh            #   Shared functions
+└── tools/                       # md code sync + HTML build + docs checks, full static validation script
 ```
 
-각 `terraform/NN-*` 디렉터리가 **독립된 Terraform 루트 모듈(= 독립된 state)** 입니다. 실습 N 의 문서에 실린 코드는 해당 디렉터리의 파일과 동일합니다.
+Each `terraform/NN-*` directory is an **independent Terraform root module (= independent state)**. The code shown in the doc for lab N is identical to the files in the corresponding directory.
 
-## 8. (선택) Azure 없이 코드 검증하기
+## 8. (Optional) Validate the code without Azure
 
-로그인이나 구독 없이도 모든 스택의 `fmt` → `validate` → `terraform test`(mock provider)를 실행할 수 있습니다. 전체 실행에는 `scripts/` 의 셸 스크립트 문법 검사(`bash -n`, shellcheck 가 있으면 함께)도 포함됩니다.
+You can run `fmt` → `validate` → `terraform test` (mock provider) for every stack without signing in or having a subscription. The full run also includes a syntax check of the shell scripts in `scripts/` (`bash -n`, plus shellcheck if it is installed).
 
 ```bash
-tools/validate-all.sh            # 전체 스택
-tools/validate-all.sh 05-aks     # 특정 스택만
+tools/validate-all.sh            # All stacks
+tools/validate-all.sh 05-aks     # A single stack only
 ```
 
-## 9. 비용 안내 (대략적인 추정)
+## 9. Cost overview (rough estimates)
 
-| 실습 | 주요 과금 항목 | 대략적인 시간당 비용 |
+| Lab | Main billable items | Approximate hourly cost |
 |---|---|---|
-| 02 | Storage(소량) | 거의 0 |
-| 03 | NAT Gateway + Public IP | 약 $0.05 + 데이터 처리량 |
-| 04 | ACR Premium, Managed Grafana, Private Endpoint 2개, Log Analytics | 약 $0.2–0.3 |
-| 05 | **AKS Standard 티어 + D4ds_v5 노드 6대 이상** | **약 $1.7–2** |
-| 06–07 | 앱 파드 + 로드밸런서/공인 IP | 소액 |
-| 10 | AKS Automatic(Standard 티어) + 자동 프로비저닝 노드 | 약 $0.5–1.5 |
+| 02 | Storage (small amount) | Almost 0 |
+| 03 | NAT Gateway + Public IP | About $0.05 + data processed |
+| 04 | ACR Premium, Managed Grafana, 2 Private Endpoints, Log Analytics | About $0.2–0.3 |
+| 05 | **AKS Standard tier + 6 or more D4ds_v5 nodes** | **About $1.7–2** |
+| 06–07 | App pods + load balancer/public IP | Small amount |
+| 10 | AKS Automatic (Standard tier) + automatically provisioned nodes | About $0.5–1.5 |
 
 > [!CAUTION]
-> 위 금액은 리전·환율·시점에 따라 달라지는 **추정치**입니다. 정확한 금액은 [Azure 가격 계산기](https://azure.microsoft.com/pricing/calculator/)로 확인하세요.
-> 클러스터를 켜 둔 채 방치하면 하루 수십 달러가 청구될 수 있으므로, 실습이 끝나면 반드시 [Lab 11. 정리](11-cleanup.md)를 진행하세요.
+> The amounts above are **estimates** that vary by region, exchange rate, and time. Check exact amounts with the [Azure pricing calculator](https://azure.microsoft.com/pricing/calculator/).
+> If you leave a cluster running unattended, you can be billed tens of dollars a day, so always work through [11. Cleanup](11-cleanup.md) when you finish the labs.
 
-다음 → [Lab 02. Terraform 원격 State (S3 + DynamoDB ↔ Blob)](02-bootstrap.md)
+Next → [Lab 02. Terraform remote state: S3 + DynamoDB ↔ Blob Storage](02-bootstrap.md)

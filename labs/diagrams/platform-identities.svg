@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 960 560" width="960" height="560" role="img" aria-labelledby="platform-identities-t platform-identities-d"><title id="platform-identities-t">누가 무엇을 할 수 있는가: 주체 → 역할 → 범위</title><desc id="platform-identities-d">클러스터 UAMI 는 네트워크 RG 에 Network Contributor 와 kubelet UAMI 에 Managed Identity Operator, kubelet UAMI 는 ACR 에 AcrPull, Grafana 관리 ID 는 Monitor workspace 에 Monitoring Data Reader, 운영자는 ACR 에 AcrPush 와 Grafana 에 Grafana Admin, 앱 UAMI 는 Key Vault 에 Key Vault Secrets User 역할이 할당된다.</desc><style>svg.dg{--dg-bg:#ffffff;--dg-fg:#1f2328;--dg-muted:#59636e;--dg-line:#6e7781;--dg-card:#f6f8fa;--dg-border:#d1d9e0;--dg-aws:#c2590a;--dg-aws-soft:#fff1e5;--dg-azure:#0b6ed0;--dg-azure-soft:#e5f1ff;--dg-ok:#1a7f37;--dg-ok-soft:#e6f6ea;--dg-id:#8250df;--dg-id-soft:#f3ecff;--dg-net:#0e7490;--dg-net-soft:#e0f4f8;--dg-warn:#9a6700;--dg-warn-soft:#fff6d6;--dg-danger:#cf222e;--dg-danger-soft:#ffebe9;font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", "Segoe UI", Roboto, sans-serif}
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 960 560" width="960" height="560" role="img" aria-labelledby="platform-identities-t platform-identities-d"><title id="platform-identities-t">Who can do what: principal → role → scope</title><desc id="platform-identities-d">The cluster UAMI gets Network Contributor on the network RG and Managed Identity Operator on the kubelet UAMI. The kubelet UAMI gets AcrPull on ACR. The Grafana managed identity gets Monitoring Data Reader on the Azure Monitor workspace. The operator gets AcrPush on ACR and Grafana Admin on Grafana. The app UAMI gets Key Vault Secrets User on Key Vault.</desc><style>svg.dg{--dg-bg:#ffffff;--dg-fg:#1f2328;--dg-muted:#59636e;--dg-line:#6e7781;--dg-card:#f6f8fa;--dg-border:#d1d9e0;--dg-aws:#c2590a;--dg-aws-soft:#fff1e5;--dg-azure:#0b6ed0;--dg-azure-soft:#e5f1ff;--dg-ok:#1a7f37;--dg-ok-soft:#e6f6ea;--dg-id:#8250df;--dg-id-soft:#f3ecff;--dg-net:#0e7490;--dg-net-soft:#e0f4f8;--dg-warn:#9a6700;--dg-warn-soft:#fff6d6;--dg-danger:#cf222e;--dg-danger-soft:#ffebe9;font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", "Segoe UI", Roboto, sans-serif}
 @media (prefers-color-scheme:dark){svg.dg{--dg-bg:#0d1117;--dg-fg:#e6edf3;--dg-muted:#9198a1;--dg-line:#8b949e;--dg-card:#151b23;--dg-border:#30363d;--dg-aws:#f0883e;--dg-aws-soft:#2b1c10;--dg-azure:#58a6ff;--dg-azure-soft:#0f2238;--dg-ok:#3fb950;--dg-ok-soft:#0f2417;--dg-id:#b392f0;--dg-id-soft:#221a36;--dg-net:#39c5cf;--dg-net-soft:#0d2a2f;--dg-warn:#d29922;--dg-warn-soft:#2d2208;--dg-danger:#ff7b72;--dg-danger-soft:#3a1517}}
 .dg-bg{fill:var(--dg-bg)}
 .dg-t{fill:var(--dg-fg)}
@@ -54,24 +54,24 @@
 .dg-line.dg-danger{stroke:var(--dg-danger)}
 .dg-ah.dg-danger{fill:var(--dg-danger)}
 .dg-on{fill:#fff}</style><defs><marker id="platform-identities-ah-line" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah"/></marker><marker id="platform-identities-ah-id" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-id"/></marker><marker id="platform-identities-ah-ok" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-ok"/></marker><marker id="platform-identities-ah-warn" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-warn"/></marker></defs><rect width="960" height="560" class="dg-bg" rx="12"/>
-<text x="24" y="32" font-size="18" class="dg-t dg-b">누가 무엇을 할 수 있는가: 주체 → 역할 → 범위</text>
-<text x="24" y="54" font-size="12.5" class="dg-m">Azure 는 JSON 정책 대신 &quot;주체 + 내장 역할 + 범위&quot;를 역할 할당으로 연결합니다 (AWS 의 IAM Role + 정책 연결에 해당).</text>
-<text x="24" y="104" font-size="12.5" class="dg-m dg-b">주체 (Principal)</text>
-<text x="344" y="104" font-size="12.5" class="dg-m dg-b">역할 (Role)</text>
-<text x="636" y="104" font-size="12.5" class="dg-m dg-b">범위 (Scope)</text>
+<text x="24" y="32" font-size="18" class="dg-t dg-b">Who can do what: principal → role → scope</text>
+<text x="24" y="54" font-size="12.5" class="dg-m">Instead of JSON policies, Azure uses a role assignment: &quot;principal + built-in role + scope&quot; (≈ AWS IAM role + attached policy).</text>
+<text x="24" y="104" font-size="12.5" class="dg-m dg-b">Principal</text>
+<text x="344" y="104" font-size="12.5" class="dg-m dg-b">Role</text>
+<text x="636" y="104" font-size="12.5" class="dg-m dg-b">Scope</text>
 <rect x="24" y="116" width="250" height="48" rx="10" class="dg-box dg-id"/>
-<text x="36" y="145" font-size="13" class="dg-t dg-b" data-w="226">클러스터 UAMI</text>
+<text x="36" y="145" font-size="13" class="dg-t dg-b" data-w="226">Cluster UAMI</text>
 <rect x="630" y="116" width="306" height="48" rx="10" class="dg-box dg-ok"/>
-<text x="638" y="135" font-size="13" class="dg-t dg-b" data-w="290">네트워크 RG</text>
-<text x="638" y="152" font-size="11" class="dg-m" data-w="290">서브넷 join · NAT GW 사용</text>
+<text x="638" y="135" font-size="13" class="dg-t dg-b" data-w="290">Network RG</text>
+<text x="638" y="152" font-size="11" class="dg-m" data-w="290">Join subnets · use NAT GW</text>
 <path d="M274 140 L630 140" class="dg-line dg-id" marker-end="url(#platform-identities-ah-id)"/>
 <rect x="380" y="130" width="144" height="20" rx="6" class="dg-chip"/>
 <text x="452" y="144" font-size="11.5" text-anchor="middle" class="dg-tx-id dg-b">Network Contributor</text>
 <rect x="24" y="176" width="250" height="48" rx="10" class="dg-box dg-id"/>
-<text x="36" y="205" font-size="13" class="dg-t dg-b" data-w="226">클러스터 UAMI</text>
+<text x="36" y="205" font-size="13" class="dg-t dg-b" data-w="226">Cluster UAMI</text>
 <rect x="630" y="176" width="306" height="48" rx="10" class="dg-box dg-ok"/>
 <text x="638" y="195" font-size="13" class="dg-t dg-b" data-w="290">kubelet UAMI</text>
-<text x="638" y="212" font-size="11" class="dg-m" data-w="290">노드에 kubelet ID 부착</text>
+<text x="638" y="212" font-size="11" class="dg-m" data-w="290">Attach the kubelet identity to nodes</text>
 <path d="M274 200 L630 200" class="dg-line dg-id" marker-end="url(#platform-identities-ah-id)"/>
 <rect x="359.5" y="190" width="185" height="20" rx="6" class="dg-chip"/>
 <text x="452" y="204" font-size="11.5" text-anchor="middle" class="dg-tx-id dg-b">Managed Identity Operator</text>
@@ -79,41 +79,41 @@
 <text x="36" y="265" font-size="13" class="dg-t dg-b" data-w="226">kubelet UAMI</text>
 <rect x="630" y="236" width="306" height="48" rx="10" class="dg-box dg-ok"/>
 <text x="638" y="255" font-size="13" class="dg-t dg-b" data-w="290">ACR</text>
-<text x="638" y="272" font-size="11" class="dg-m" data-w="290">노드가 이미지를 pull (ECR 권한)</text>
+<text x="638" y="272" font-size="11" class="dg-m" data-w="290">Nodes pull images (≈ ECR permissions)</text>
 <path d="M274 260 L630 260" class="dg-line dg-id" marker-end="url(#platform-identities-ah-id)"/>
 <rect x="421" y="250" width="62" height="20" rx="6" class="dg-chip"/>
 <text x="452" y="264" font-size="11.5" text-anchor="middle" class="dg-tx-id dg-b">AcrPull</text>
 <rect x="24" y="296" width="250" height="48" rx="10" class="dg-box dg-id"/>
-<text x="36" y="325" font-size="13" class="dg-t dg-b" data-w="226">Grafana 관리 ID</text>
+<text x="36" y="325" font-size="13" class="dg-t dg-b" data-w="226">Grafana managed identity</text>
 <rect x="630" y="296" width="306" height="48" rx="10" class="dg-box dg-ok"/>
 <text x="638" y="315" font-size="13" class="dg-t dg-b" data-w="290">Azure Monitor workspace</text>
-<text x="638" y="332" font-size="11" class="dg-m" data-w="290">Grafana 가 Prometheus 쿼리</text>
+<text x="638" y="332" font-size="11" class="dg-m" data-w="290">Grafana queries Prometheus</text>
 <path d="M274 320 L630 320" class="dg-line dg-id" marker-end="url(#platform-identities-ah-id)"/>
 <rect x="370" y="310" width="164" height="20" rx="6" class="dg-chip"/>
 <text x="452" y="324" font-size="11.5" text-anchor="middle" class="dg-tx-id dg-b">Monitoring Data Reader</text>
 <rect x="24" y="356" width="250" height="48" rx="10" class="dg-box"/>
-<text x="36" y="385" font-size="13" class="dg-t dg-b" data-w="226">운영자 (현재 사용자)</text>
+<text x="36" y="385" font-size="13" class="dg-t dg-b" data-w="226">Operator (current user)</text>
 <rect x="630" y="356" width="306" height="48" rx="10" class="dg-box dg-ok"/>
 <text x="638" y="375" font-size="13" class="dg-t dg-b" data-w="290">ACR</text>
-<text x="638" y="392" font-size="11" class="dg-m" data-w="290">이미지 push · az acr import</text>
+<text x="638" y="392" font-size="11" class="dg-m" data-w="290">Push images · az acr import</text>
 <path d="M274 380 L630 380" class="dg-line" marker-end="url(#platform-identities-ah-line)"/>
 <rect x="421" y="370" width="62" height="20" rx="6" class="dg-chip"/>
 <text x="452" y="384" font-size="11.5" text-anchor="middle" class="dg-t dg-b">AcrPush</text>
 <rect x="24" y="416" width="250" height="48" rx="10" class="dg-box"/>
-<text x="36" y="445" font-size="13" class="dg-t dg-b" data-w="226">운영자 (현재 사용자)</text>
+<text x="36" y="445" font-size="13" class="dg-t dg-b" data-w="226">Operator (current user)</text>
 <rect x="630" y="416" width="306" height="48" rx="10" class="dg-box dg-ok"/>
 <text x="638" y="435" font-size="13" class="dg-t dg-b" data-w="290">Managed Grafana</text>
-<text x="638" y="452" font-size="11" class="dg-m" data-w="290">대시보드 로그인</text>
+<text x="638" y="452" font-size="11" class="dg-m" data-w="290">Sign in to dashboards</text>
 <path d="M274 440 L630 440" class="dg-line" marker-end="url(#platform-identities-ah-line)"/>
 <rect x="401" y="430" width="102" height="20" rx="6" class="dg-chip"/>
 <text x="452" y="444" font-size="11.5" text-anchor="middle" class="dg-t dg-b">Grafana Admin</text>
 <rect x="24" y="476" width="250" height="48" rx="10" class="dg-box dg-warn"/>
-<text x="36" y="505" font-size="13" class="dg-t dg-b" data-w="226">앱 UAMI (Lab 06)</text>
+<text x="36" y="505" font-size="13" class="dg-t dg-b" data-w="226">App UAMI (Lab 06)</text>
 <rect x="630" y="476" width="306" height="48" rx="10" class="dg-box dg-ok"/>
 <text x="638" y="495" font-size="13" class="dg-t dg-b" data-w="290">Key Vault</text>
-<text x="638" y="512" font-size="11" class="dg-m" data-w="290">시크릿 읽기 전용 (최소 권한)</text>
+<text x="638" y="512" font-size="11" class="dg-m" data-w="290">Read-only access to secrets (least privilege)</text>
 <path d="M274 500 L630 500" class="dg-line dg-warn" marker-end="url(#platform-identities-ah-warn)"/>
 <rect x="371" y="490" width="162" height="20" rx="6" class="dg-chip"/>
 <text x="452" y="504" font-size="11.5" text-anchor="middle" class="dg-tx-warn dg-b">Key Vault Secrets User</text>
-<text x="24" y="546" font-size="11.5" class="dg-m" data-w="912">실습자가 아니라 팀/CI 환경이라면 &quot;운영자&quot; 역할은 Entra 그룹이나 CI 서비스 주체에 부여하세요 (grant_current_user_roles = false).</text>
+<text x="24" y="546" font-size="11.5" class="dg-m" data-w="912">In a team or CI environment, grant the &quot;operator&quot; roles to an Entra group or a CI service principal (grant_current_user_roles = false).</text>
 </svg>

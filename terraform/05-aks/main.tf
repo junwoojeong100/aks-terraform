@@ -22,7 +22,7 @@ locals {
 }
 
 # ---------------------------------------------------------------------------
-# 앞선 스택(03-network, 04-platform)의 산출물을 이름 규칙으로 조회
+# Look up the outputs of the earlier stacks (03-network, 04-platform) by naming convention
 # ---------------------------------------------------------------------------
 data "azurerm_subnet" "aks_nodes" {
   name                 = module.naming.names.snet_aks_nodes
@@ -56,25 +56,25 @@ data "azurerm_monitor_workspace" "this" {
   resource_group_name = module.naming.names.rg_platform
 }
 
-# 리전에서 지원하는 GA Kubernetes 버전 목록 (az aks get-versions 와 같은 정보)
+# List of GA Kubernetes versions supported in the region (same information as az aks get-versions)
 data "azurerm_kubernetes_service_versions" "current" {
   location        = var.location
   include_preview = false
 }
 
-# check 블록은 apply 를 막지 않는 "경고용 검증"입니다. 지원되지 않는 버전을 넣으면 plan 단계에서 알려줍니다.
+# A check block is a "warning-only validation" that does not block apply. An unsupported version is reported at plan time.
 check "kubernetes_version_is_supported" {
   assert {
     condition = anytrue([
       for v in data.azurerm_kubernetes_service_versions.current.versions :
       v == var.kubernetes_version || startswith(v, "${var.kubernetes_version}.")
     ])
-    error_message = "kubernetes_version=${var.kubernetes_version} 은(는) ${var.location} 에서 GA 로 지원되지 않습니다. 지원 목록: ${join(", ", data.azurerm_kubernetes_service_versions.current.versions)}"
+    error_message = "kubernetes_version=${var.kubernetes_version} is not a supported GA version in ${var.location}. Supported versions: ${join(", ", data.azurerm_kubernetes_service_versions.current.versions)}"
   }
 }
 
 # ---------------------------------------------------------------------------
-# 클러스터 리소스 그룹 (노드 리소스 그룹 'rg-...-aks-nodes' 는 AKS 가 별도로 생성/관리)
+# Cluster resource group (the node resource group 'rg-...-aks-nodes' is created and managed separately by AKS)
 # ---------------------------------------------------------------------------
 resource "azurerm_resource_group" "aks" {
   name     = module.naming.names.rg_aks

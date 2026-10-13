@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# 모든 Terraform 스택을 Azure 자격 증명/구독 없이 정적 검증합니다.
+# Statically validates every Terraform stack without Azure credentials/subscription.
 #   fmt -check  →  init -backend=false  →  validate  →  terraform test (mock provider)
-#   (modules/naming 은 provider 가 없으므로 terraform test 만 실행)
-# 인자 없이 전체를 실행할 때는 scripts/ 의 셸 스크립트도 검사합니다 (bash -n, ShellCheck 가 있으면 함께).
+#   (modules/naming has no provider, so only terraform test is really needed there)
+# When run without arguments it also checks the shell scripts in scripts/ (bash -n, plus ShellCheck if installed).
 #
-# 사용법:
-#   tools/validate-all.sh              # 전체 스택 + 셸 스크립트
-#   tools/validate-all.sh 05-aks       # 특정 스택만
+# Usage:
+#   tools/validate-all.sh              # all stacks + shell scripts
+#   tools/validate-all.sh 05-aks       # a single stack
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -39,7 +39,7 @@ for stack in "${stacks[@]}"; do
   terraform -chdir="${stack}" fmt -check -diff
   terraform -chdir="${stack}" init -backend=false -input=false -no-color >/dev/null
   terraform -chdir="${stack}" validate -no-color
-  # Azure 없이 mock provider 로 plan 로직(변수 검증, count/for_each, 조건식)을 검증합니다.
+  # Validates the plan logic (variable validation, count/for_each, conditionals) with the mock provider, without Azure.
   terraform -chdir="${stack}" test -no-color
 done
 
@@ -50,9 +50,9 @@ if [ "$#" -eq 0 ]; then
   for f in "${scripts[@]}"; do bash -n "$f"; done
   if command -v shellcheck >/dev/null 2>&1; then
     shellcheck "${scripts[@]}"
-    echo "OK (${#scripts[@]}개 스크립트)"
+    echo "OK (${#scripts[@]} scripts)"
   else
-    echo "shellcheck 가 없어 문법 검사(bash -n)만 실행했습니다 (brew install shellcheck)."
+    echo "shellcheck is not installed, so only the syntax check (bash -n) ran (brew install shellcheck)."
   fi
 fi
 

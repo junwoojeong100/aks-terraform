@@ -1,23 +1,23 @@
 variable "workload" {
-  description = "워크로드 이름 (소문자/숫자 3~8자)"
+  description = "Workload name (3–8 lowercase letters or digits)"
   type        = string
   default     = "aksdemo"
 }
 
 variable "environment" {
-  description = "환경 구분 (dev, test, prod)"
+  description = "Environment (dev, test, prod)"
   type        = string
   default     = "dev"
 }
 
 variable "location" {
-  description = "Azure 리전"
+  description = "Azure region"
   type        = string
   default     = "koreacentral"
 }
 
 variable "tags" {
-  description = "모든 리소스에 추가로 붙일 태그"
+  description = "Additional tags to apply to all resources"
   type        = map(string)
   default     = {}
 }

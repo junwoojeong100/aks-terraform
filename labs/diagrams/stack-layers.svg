@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 960 530" width="960" height="530" role="img" aria-labelledby="stack-layers-t stack-layers-d"><title id="stack-layers-t">Terraform 스택 계층과 실행 순서</title><desc id="stack-layers-d">02-bootstrap 에서 03-network, 04-platform, 05-aks, 06-workload, 07-ingress, 08-governance 순서로 apply 하고, 삭제는 역순으로 한다. 10-aks-automatic 은 독립적인 선택 스택이다. 모든 스택의 state 는 02 가 만든 Blob 컨테이너에 저장된다.</desc><style>svg.dg{--dg-bg:#ffffff;--dg-fg:#1f2328;--dg-muted:#59636e;--dg-line:#6e7781;--dg-card:#f6f8fa;--dg-border:#d1d9e0;--dg-aws:#c2590a;--dg-aws-soft:#fff1e5;--dg-azure:#0b6ed0;--dg-azure-soft:#e5f1ff;--dg-ok:#1a7f37;--dg-ok-soft:#e6f6ea;--dg-id:#8250df;--dg-id-soft:#f3ecff;--dg-net:#0e7490;--dg-net-soft:#e0f4f8;--dg-warn:#9a6700;--dg-warn-soft:#fff6d6;--dg-danger:#cf222e;--dg-danger-soft:#ffebe9;font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", "Segoe UI", Roboto, sans-serif}
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 960 530" width="960" height="530" role="img" aria-labelledby="stack-layers-t stack-layers-d"><title id="stack-layers-t">Terraform stack layers and execution order</title><desc id="stack-layers-d">Apply the stacks in this order: 02-bootstrap, 03-network, 04-platform, 05-aks, 06-workload, 07-ingress, 08-governance. Destroy them in reverse order. 10-aks-automatic is an optional, independent stack. Every stack keeps its state in the Blob container created by 02.</desc><style>svg.dg{--dg-bg:#ffffff;--dg-fg:#1f2328;--dg-muted:#59636e;--dg-line:#6e7781;--dg-card:#f6f8fa;--dg-border:#d1d9e0;--dg-aws:#c2590a;--dg-aws-soft:#fff1e5;--dg-azure:#0b6ed0;--dg-azure-soft:#e5f1ff;--dg-ok:#1a7f37;--dg-ok-soft:#e6f6ea;--dg-id:#8250df;--dg-id-soft:#f3ecff;--dg-net:#0e7490;--dg-net-soft:#e0f4f8;--dg-warn:#9a6700;--dg-warn-soft:#fff6d6;--dg-danger:#cf222e;--dg-danger-soft:#ffebe9;font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", "Segoe UI", Roboto, sans-serif}
 @media (prefers-color-scheme:dark){svg.dg{--dg-bg:#0d1117;--dg-fg:#e6edf3;--dg-muted:#9198a1;--dg-line:#8b949e;--dg-card:#151b23;--dg-border:#30363d;--dg-aws:#f0883e;--dg-aws-soft:#2b1c10;--dg-azure:#58a6ff;--dg-azure-soft:#0f2238;--dg-ok:#3fb950;--dg-ok-soft:#0f2417;--dg-id:#b392f0;--dg-id-soft:#221a36;--dg-net:#39c5cf;--dg-net-soft:#0d2a2f;--dg-warn:#d29922;--dg-warn-soft:#2d2208;--dg-danger:#ff7b72;--dg-danger-soft:#3a1517}}
 .dg-bg{fill:var(--dg-bg)}
 .dg-t{fill:var(--dg-fg)}
@@ -54,19 +54,19 @@
 .dg-line.dg-danger{stroke:var(--dg-danger)}
 .dg-ah.dg-danger{fill:var(--dg-danger)}
 .dg-on{fill:#fff}</style><defs><marker id="stack-layers-ah-line" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah"/></marker><marker id="stack-layers-ah-net" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-net"/></marker><marker id="stack-layers-ah-ok" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-ok"/></marker><marker id="stack-layers-ah-azure" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-azure"/></marker><marker id="stack-layers-ah-id" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-id"/></marker><marker id="stack-layers-ah-warn" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-warn"/></marker><marker id="stack-layers-ah-danger" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-danger"/></marker></defs><rect width="960" height="530" class="dg-bg" rx="12"/>
-<text x="24" y="32" font-size="18" class="dg-t dg-b">Terraform 스택 계층과 실행 순서</text>
-<text x="24" y="54" font-size="12.5" class="dg-m">수명주기가 다른 것을 스택(= 독립된 state)으로 나눕니다. apply 는 화살표 방향, destroy 는 그 반대입니다.</text>
+<text x="24" y="32" font-size="18" class="dg-t dg-b">Terraform stack layers and execution order</text>
+<text x="24" y="54" font-size="12.5" class="dg-m">Resources with different lifecycles are split into stacks (= separate state). Apply follows the arrows; destroy goes in reverse.</text>
 <rect x="24" y="106" width="204" height="124" rx="10" class="dg-box"/>
 <text x="36" y="130" font-size="14" class="dg-t dg-b" data-w="180">02-bootstrap</text>
-<text x="36" y="148" font-size="12.5" class="dg-m" data-w="180">state 저장소 (Blob)</text>
-<text x="36" y="165.5" font-size="12.5" class="dg-m" data-w="180">처음엔 로컬 state</text>
-<text x="36" y="183" font-size="12.5" class="dg-m" data-w="180">→ 마지막에 원격으로 이전</text>
+<text x="36" y="148" font-size="12.5" class="dg-m" data-w="180">State store (Blob)</text>
+<text x="36" y="165.5" font-size="12.5" class="dg-m" data-w="180">Local state at first</text>
+<text x="36" y="183" font-size="12.5" class="dg-m" data-w="180">→ remote at the end</text>
 <rect x="38" y="95" width="58" height="22" rx="11" class="dg-box"/>
 <text x="67" y="110" font-size="11" text-anchor="middle" class="dg-t dg-b">Lab 02</text>
 <text x="36" y="218" font-size="11" class="dg-m" data-w="180">key: 02-bootstrap.tfstate</text>
 <rect x="260" y="106" width="204" height="124" rx="10" class="dg-box dg-net"/>
 <text x="272" y="130" font-size="14" class="dg-t dg-b" data-w="180">03-network</text>
-<text x="272" y="148" font-size="12.5" class="dg-m" data-w="180">VNet · 서브넷 · NSG</text>
+<text x="272" y="148" font-size="12.5" class="dg-m" data-w="180">VNet · subnets · NSG</text>
 <text x="272" y="165.5" font-size="12.5" class="dg-m" data-w="180">NAT Gateway</text>
 <text x="272" y="183" font-size="12.5" class="dg-m" data-w="180">Private DNS Zone</text>
 <rect x="274" y="95" width="58" height="22" rx="11" class="dg-box dg-net"/>
@@ -76,29 +76,30 @@
 <text x="508" y="130" font-size="14" class="dg-t dg-b" data-w="180">04-platform</text>
 <text x="508" y="148" font-size="12.5" class="dg-m" data-w="180">ACR · Key Vault</text>
 <text x="508" y="165.5" font-size="12.5" class="dg-m" data-w="180">Log Analytics · Grafana</text>
-<text x="508" y="183" font-size="12.5" class="dg-m" data-w="180">Prometheus · AKS 용 UAMI</text>
+<text x="508" y="183" font-size="12.5" class="dg-m" data-w="180">Prometheus · AKS UAMI</text>
 <rect x="510" y="95" width="58" height="22" rx="11" class="dg-box dg-ok"/>
 <text x="539" y="110" font-size="11" text-anchor="middle" class="dg-tx-ok dg-b">Lab 04</text>
 <text x="508" y="218" font-size="11" class="dg-m" data-w="180">key: 04-platform.tfstate</text>
 <rect x="732" y="106" width="204" height="124" rx="10" class="dg-box dg-azure"/>
 <text x="744" y="130" font-size="14" class="dg-t dg-b" data-w="180">05-aks</text>
-<text x="744" y="148" font-size="12.5" class="dg-m" data-w="180">AKS 클러스터 · 노드 풀</text>
-<text x="744" y="165.5" font-size="12.5" class="dg-m" data-w="180">관측성(DCR) · Gateway API</text>
-<text x="744" y="183" font-size="12.5" class="dg-m" data-w="180">Entra RBAC 역할 할당</text>
+<text x="744" y="148" font-size="12.5" class="dg-m" data-w="180">AKS cluster · node pools</text>
+<text x="744" y="165.5" font-size="12.5" class="dg-m" data-w="180">Observability (DCR)</text>
+<text x="744" y="183" font-size="12.5" class="dg-m" data-w="180">Gateway API</text>
+<text x="744" y="200.5" font-size="12.5" class="dg-m" data-w="180">RBAC role assignments</text>
 <rect x="746" y="95" width="58" height="22" rx="11" class="dg-box dg-azure"/>
 <text x="775" y="110" font-size="11" text-anchor="middle" class="dg-tx-azure dg-b">Lab 05</text>
 <text x="744" y="218" font-size="11" class="dg-m" data-w="180">key: 05-aks.tfstate</text>
 <rect x="732" y="274" width="204" height="124" rx="10" class="dg-box dg-id"/>
 <text x="744" y="298" font-size="14" class="dg-t dg-b" data-w="180">06-workload</text>
 <text x="744" y="316" font-size="12.5" class="dg-m" data-w="180">Workload Identity</text>
-<text x="744" y="333.5" font-size="12.5" class="dg-m" data-w="180">Key Vault CSI 데모</text>
+<text x="744" y="333.5" font-size="12.5" class="dg-m" data-w="180">Key Vault CSI demo</text>
 <rect x="746" y="263" width="58" height="22" rx="11" class="dg-box dg-id"/>
 <text x="775" y="278" font-size="11" text-anchor="middle" class="dg-tx-id dg-b">Lab 06</text>
 <text x="744" y="386" font-size="11" class="dg-m" data-w="180">key: 06-workload.tfstate</text>
 <rect x="496" y="274" width="204" height="124" rx="10" class="dg-box dg-id"/>
 <text x="508" y="298" font-size="14" class="dg-t dg-b" data-w="180">07-ingress</text>
 <text x="508" y="316" font-size="12.5" class="dg-m" data-w="180">Gateway · HTTPRoute</text>
-<text x="508" y="333.5" font-size="12.5" class="dg-m" data-w="180">데모 앱 · PDB · HPA</text>
+<text x="508" y="333.5" font-size="12.5" class="dg-m" data-w="180">Demo app · PDB · HPA</text>
 <text x="508" y="351" font-size="12.5" class="dg-m" data-w="180">NetworkPolicy</text>
 <rect x="510" y="263" width="58" height="22" rx="11" class="dg-box dg-id"/>
 <text x="539" y="278" font-size="11" text-anchor="middle" class="dg-tx-id dg-b">Lab 07</text>
@@ -106,15 +107,16 @@
 <rect x="260" y="274" width="204" height="124" rx="10" class="dg-box dg-warn"/>
 <text x="272" y="298" font-size="14" class="dg-t dg-b" data-w="180">08-governance</text>
 <text x="272" y="316" font-size="12.5" class="dg-m" data-w="180">Azure Policy · Defender</text>
-<text x="272" y="333.5" font-size="12.5" class="dg-m" data-w="180">리소스 잠금 · 예산</text>
+<text x="272" y="333.5" font-size="12.5" class="dg-m" data-w="180">Resource locks · budgets</text>
 <rect x="274" y="263" width="58" height="22" rx="11" class="dg-box dg-warn"/>
 <text x="303" y="278" font-size="11" text-anchor="middle" class="dg-tx-warn dg-b">Lab 08</text>
 <text x="272" y="386" font-size="11" class="dg-m" data-w="180">key: 08-governance.tfstate</text>
 <rect x="24" y="274" width="204" height="124" rx="10" class="dg-box dg-dash"/>
 <text x="36" y="298" font-size="14" class="dg-t dg-b" data-w="180">10-aks-automatic</text>
-<text x="36" y="316" font-size="12.5" class="dg-m" data-w="180">AKS Automatic (선택)</text>
-<text x="36" y="333.5" font-size="12.5" class="dg-m" data-w="180">= EKS Auto Mode 에 해당</text>
-<text x="36" y="351" font-size="12.5" class="dg-m" data-w="180">위 스택과 독립적으로 실행</text>
+<text x="36" y="316" font-size="12.5" class="dg-m" data-w="180">AKS Automatic (optional)</text>
+<text x="36" y="333.5" font-size="12.5" class="dg-m" data-w="180">≈ EKS Auto Mode</text>
+<text x="36" y="351" font-size="12.5" class="dg-m" data-w="180">Runs independently of</text>
+<text x="36" y="368.5" font-size="12.5" class="dg-m" data-w="180">the stacks above</text>
 <rect x="38" y="263" width="58" height="22" rx="11" class="dg-box"/>
 <text x="67" y="278" font-size="11" text-anchor="middle" class="dg-t dg-b">Lab 10</text>
 <text x="36" y="386" font-size="11" class="dg-m" data-w="180">key: 10-aks-automatic.tfstate</text>
@@ -127,8 +129,8 @@
 <path d="M732 336 L700 336" class="dg-line dg-azure" marker-end="url(#stack-layers-ah-azure)"/>
 <path d="M496 336 L464 336" class="dg-line dg-azure" marker-end="url(#stack-layers-ah-azure)"/>
 <rect x="24" y="432" width="912" height="58" rx="10" class="dg-box"/>
-<text x="36" y="456" font-size="14" class="dg-t dg-b" data-w="888">Azure Blob 컨테이너 tfstate (02-bootstrap 이 생성)</text>
-<text x="36" y="474" font-size="12" class="dg-m" data-w="888">모든 스택의 state 저장 · Entra ID 인증(계정 키 차단) · 버전 관리 · blob lease 로 잠금   ≈   S3 버킷 + DynamoDB 락 테이블</text>
+<text x="36" y="456" font-size="14" class="dg-t dg-b" data-w="888">Azure Blob container tfstate (created by 02-bootstrap)</text>
+<text x="36" y="474" font-size="12" class="dg-m" data-w="888">State of every stack · Entra ID auth (account keys disabled) · versioning · blob lease locking   ≈   S3 bucket + DynamoDB lock table</text>
 <path d="M916 512 L44 512" class="dg-line dg-danger dg-dash" marker-end="url(#stack-layers-ah-danger)"/>
-<text x="480" y="507" font-size="12" text-anchor="middle" class="dg-tx-danger dg-b">destroy(삭제)는 역순: 10 → 08 → 07 → 06 → 05 → 04 → 03 → 02   (Lab 11 · scripts/cleanup.sh)</text>
+<text x="480" y="507" font-size="12" text-anchor="middle" class="dg-tx-danger dg-b">Destroy in reverse order: 10 → 08 → 07 → 06 → 05 → 04 → 03 → 02   (Lab 11 · scripts/cleanup.sh)</text>
 </svg>

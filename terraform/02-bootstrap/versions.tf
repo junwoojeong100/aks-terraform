@@ -8,8 +8,9 @@ terraform {
     }
   }
 
-  # 부트스트랩 스택은 처음에는 로컬 state 를 사용합니다 (state 저장소를 만드는 스택이므로 "닭과 달걀" 문제).
-  # Lab 02 마지막 단계에서 아래 주석을 해제하고 `terraform init -migrate-state -backend-config=../backend.hcl` 로 state 를 이전합니다.
+  # The bootstrap stack starts with local state (it creates the state storage itself: a "chicken-and-egg" problem).
+  # In the last step of Lab 02, uncomment the block below and migrate state with
+  # `terraform init -migrate-state -backend-config=../backend.hcl`.
   #
   # backend "azurerm" {
   #   use_azuread_auth = true

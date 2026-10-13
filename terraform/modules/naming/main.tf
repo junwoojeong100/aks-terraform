@@ -1,5 +1,5 @@
 locals {
-  # Cloud Adoption Framework(CAF) 약어를 따르되, 리전은 짧은 코드로 줄여 사용합니다.
+  # Follows the Cloud Adoption Framework (CAF) abbreviations, but shortens regions to short codes.
   region_codes = {
     koreacentral       = "krc"
     koreasouth         = "krs"
@@ -24,12 +24,12 @@ locals {
   base        = "${var.workload}-${var.environment}-${local.region_code}"
   flat        = "${var.workload}${var.environment}${local.region_code}"
 
-  # 구독+워크로드로 결정되는 해시. 모든 스택이 같은 값을 재현하므로
-  # remote state 없이도 "전역 고유 이름"(ACR, Key Vault, Storage)을 서로 찾아갈 수 있습니다.
+  # A hash determined by subscription + workload. Every stack reproduces the same value, so
+  # they can find each other's "globally unique names" (ACR, Key Vault, Storage) without remote state.
   suffix = substr(sha256("${var.subscription_id}/${var.workload}/${var.environment}"), 0, 5)
 
   names = {
-    # Resource groups (수명주기별로 분리)
+    # Resource groups (separated by lifecycle)
     rg_tfstate   = "rg-${local.base}-tfstate"
     rg_network   = "rg-${local.base}-network"
     rg_platform  = "rg-${local.base}-platform"
@@ -37,7 +37,7 @@ locals {
     rg_aks_nodes = "rg-${local.base}-aks-nodes"
     rg_workload  = "rg-${local.base}-workload"
 
-    # Terraform state (3~24자, 소문자+숫자)
+    # Terraform state (3–24 characters, lowercase letters + digits)
     st_tfstate = "sttfstate${var.workload}${local.suffix}"
 
     # Network

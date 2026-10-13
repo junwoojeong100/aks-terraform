@@ -1,25 +1,24 @@
 #!/usr/bin/env node
-// 가이드(md) 안의 코드 블록과 숫자를 실제 소스와 동기화합니다.
+// Keeps the code blocks and numbers in the guide (md) in sync with the real sources.
 //
-// 1) 마커 한 쌍을 쓰면, 두 마커 사이가 실제 파일 내용으로 채워집니다 (Terraform, 셸 스크립트 등).
+// 1) A marker pair is filled with the content of a real file (Terraform, shell scripts, ...):
 //
 //      <!-- tf:include path="terraform/03-network/main.tf" -->
 //      <!-- /tf:include -->
 //
-//    이렇게 하면 "문서에 있는 코드 == terraform validate/test 를 통과한 코드" 가 항상 보장됩니다.
+//    This guarantees "the code in the docs == the code that passed terraform validate/test".
+//    The English and the Korean docs include the same (English) source files.
 //
-// 2) 문서 속 숫자는 소스에서 계산해 채웁니다 (사용 가능: test-runs, test-files, tf-files).
+// 2) Numbers in the text are computed from the sources (available: test-runs, test-files, tf-files):
 //
 //      <!-- count:test-runs -->28<!-- /count -->
 //
-//   node tools/sync-code.mjs           # md 를 갱신
-//   node tools/sync-code.mjs --check   # 갱신이 필요하면 실패(CI 용)
+//   node tools/sync-code.mjs           # update the md files
+//   node tools/sync-code.mjs --check   # fail if an update is needed (for CI)
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
-import { dirname, extname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { extname, join } from 'node:path';
+import { LANGS, ROOT, docFiles } from './docs-config.mjs';
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const LABS = join(ROOT, 'labs');
 const check = process.argv.includes('--check');
 
 const LANG = {
@@ -36,7 +35,7 @@ const LANG = {
 
 const MARKER = /<!-- tf:include path="([^"]+)"(?: lines="(\d+)-(\d+)")? -->[\s\S]*?<!-- \/tf:include -->/g;
 
-// 문서 속 숫자를 소스에서 계산해 자동으로 채웁니다 (손으로 쓴 숫자가 낡는 문제 방지).
+// Numbers in the text are computed from the sources, so hand-written numbers can't go stale.
 //   <!-- count:test-runs -->28<!-- /count -->
 const COUNT_MARKER = /<!-- count:([\w-]+) -->[^<]*<!-- \/count -->/g;
 
@@ -58,22 +57,22 @@ const COUNTERS = {
 let changed = 0;
 let included = 0;
 
-const targets = [join(ROOT, 'README.md'), ...readdirSync(LABS).filter((f) => f.endsWith('.md')).sort().map((f) => join(LABS, f))];
+const targets = Object.keys(LANGS).flatMap((lang) => docFiles(lang));
 
-for (const mdPath of targets) {
-  const file = mdPath.slice(ROOT.length + 1);
+for (const file of targets) {
+  const mdPath = join(ROOT, file);
   const original = readFileSync(mdPath, 'utf8');
 
   const withCounts = original.replace(COUNT_MARKER, (_whole, name) => {
     const counter = COUNTERS[name];
-    if (!counter) throw new Error(`${file}: 알 수 없는 count 마커 → ${name} (사용 가능: ${Object.keys(COUNTERS).join(', ')})`);
+    if (!counter) throw new Error(`${file}: unknown count marker → ${name} (available: ${Object.keys(COUNTERS).join(', ')})`);
     return `<!-- count:${name} -->${counter()}<!-- /count -->`;
   });
 
   const updated = withCounts.replace(MARKER, (_whole, relPath, from, to) => {
     const srcPath = join(ROOT, relPath);
     if (!existsSync(srcPath)) {
-      throw new Error(`${file}: 포함할 파일이 없습니다 → ${relPath}`);
+      throw new Error(`${file}: file to include does not exist → ${relPath}`);
     }
 
     let lines = readFileSync(srcPath, 'utf8').replace(/\s+$/, '').split('\n');
@@ -94,13 +93,13 @@ for (const mdPath of targets) {
   if (updated !== original) {
     changed += 1;
     if (check) {
-      console.error(`✗ ${file}: 코드 블록/숫자가 소스와 다릅니다. node tools/sync-code.mjs 를 실행하세요.`);
+      console.error(`✗ ${file}: code blocks/numbers differ from the sources. Run node tools/sync-code.mjs.`);
     } else {
       writeFileSync(mdPath, updated);
-      console.log(`✓ ${file}: 코드 블록/숫자 갱신`);
+      console.log(`✓ ${file}: code blocks/numbers updated`);
     }
   }
 }
 
-console.log(`코드 포함 ${included}곳 확인, ${changed}개 파일 ${check ? '불일치' : '갱신'}.`);
+console.log(`Checked ${included} code includes in ${targets.length} files; ${changed} file(s) ${check ? 'out of date' : 'updated'}.`);
 if (check && changed > 0) process.exit(1);

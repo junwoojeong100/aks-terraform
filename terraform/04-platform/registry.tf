@@ -1,7 +1,7 @@
 # ---------------------------------------------------------------------------
-# Azure Container Registry  (Amazon ECR 에 해당)
-#   - ECR 은 리전/계정 단위 레지스트리 + 리포지토리, ACR 은 "레지스트리 1개 = 로그인 서버 1개" 입니다.
-#   - Private Endpoint / 방화벽 규칙 / 영역 중복은 Premium SKU 에서 제공합니다.
+# Azure Container Registry  (equivalent to Amazon ECR)
+#   - ECR is a per-region/per-account registry plus repositories, while ACR is "one registry = one login server".
+#   - Private Endpoint / firewall rules / zone redundancy are available in the Premium SKU.
 # ---------------------------------------------------------------------------
 resource "azurerm_container_registry" "this" {
   name                = module.naming.names.acr
@@ -9,14 +9,14 @@ resource "azurerm_container_registry" "this" {
   resource_group_name = azurerm_resource_group.platform.name
   sku                 = "Premium"
 
-  admin_enabled            = false # 정적 admin 계정 대신 Entra ID + RBAC 사용
+  admin_enabled            = false # Use Entra ID + RBAC instead of a static admin account
   anonymous_pull_enabled   = false
   zone_redundancy_enabled  = true
-  retention_policy_in_days = 7 # 태그 없는(untagged) 매니페스트 자동 정리 (ECR 라이프사이클 정책과 유사)
+  retention_policy_in_days = 7 # Automatically clean up untagged manifests (similar to ECR lifecycle policies)
 
-  # 공용 엔드포인트는 "관리자 IP + 신뢰된 Azure 서비스(network_rule_bypass_option 기본값 AzureServices)" 만 허용하고 나머지는 Deny.
-  # 노드/파드는 Private Endpoint 로 pull 합니다.
-  # (azurerm 5.x 에서는 network_rule_set 이 중첩 속성이라 `= [{ ... }]` 형태로 작성합니다.)
+  # The public endpoint allows only "admin IPs + trusted Azure services (network_rule_bypass_option defaults to
+  # AzureServices)" and denies everything else. Nodes/pods pull through the Private Endpoint.
+  # (In azurerm 5.x, network_rule_set is a nested attribute, so it is written as `= [{ ... }]`.)
   public_network_access_enabled = true
 
   network_rule_set = [{
@@ -51,7 +51,7 @@ resource "azurerm_private_endpoint" "acr" {
   tags = local.tags
 }
 
-# 레지스트리 로그인/이미지 push·pull 이벤트를 Log Analytics 로 전송 (CloudTrail data events 와 유사)
+# Send registry login and image push/pull events to Log Analytics (similar to CloudTrail data events)
 resource "azurerm_monitor_diagnostic_setting" "acr" {
   name                       = "diag-to-log-analytics"
   target_resource_id         = azurerm_container_registry.this.id

@@ -1,8 +1,8 @@
-# terraform test 용 azurerm provider 모의(mock) 값.
+# Mock values for the azurerm provider, for use with terraform test.
 #
-# Azure 구독/로그인 없이 `terraform test` 로 plan 단계의 로직(변수 검증, count/for_each, 조건식, merge 등)을
-# 검증하기 위해 "올바른 형식의 ID/UUID" 를 돌려주도록 정의합니다.
-# 각 스택의 tests/plan.tftest.hcl 에서 `mock_provider "azurerm" { source = "../mocks" }` 로 불러 씁니다.
+# So that `terraform test` can verify plan-stage logic (variable validation, count/for_each, conditionals, merge, etc.)
+# without an Azure subscription or sign-in, these definitions return "correctly formatted IDs/UUIDs".
+# Each stack's tests/plan.tftest.hcl loads this with `mock_provider "azurerm" { source = "../mocks" }`.
 
 mock_data "azurerm_client_config" {
   defaults = {

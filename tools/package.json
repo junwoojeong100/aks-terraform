@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "실습 가이드 빌드 도구: md 안의 Terraform 코드 동기화 + 단일 HTML 생성",
+  "description": "Guide build tools: sync the Terraform code in the md files with the sources, generate the diagrams, and build the single-file HTML guides (English and Korean)",
   "scripts": {
     "diagrams": "node gen-diagrams.mjs",
     "sync": "node sync-code.mjs",

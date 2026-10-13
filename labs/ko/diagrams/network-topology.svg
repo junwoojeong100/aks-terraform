@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 960 550" width="960" height="550" role="img" aria-labelledby="network-topology-t network-topology-d"><title id="network-topology-t">VNet 설계: 서브넷 · NSG · NAT Gateway · Private DNS</title><desc id="network-topology-d">10.10.0.0/16 VNet 안에 노드, API 서버, Ingress, Private Endpoint 서브넷이 있고, 노드 서브넷은 NAT Gateway 로 인터넷에 나가며, Private Endpoint 는 Private DNS Zone 과 함께 ACR·Key Vault 에 사설로 접근한다.</desc><style>svg.dg{--dg-bg:#ffffff;--dg-fg:#1f2328;--dg-muted:#59636e;--dg-line:#6e7781;--dg-card:#f6f8fa;--dg-border:#d1d9e0;--dg-aws:#c2590a;--dg-aws-soft:#fff1e5;--dg-azure:#0b6ed0;--dg-azure-soft:#e5f1ff;--dg-ok:#1a7f37;--dg-ok-soft:#e6f6ea;--dg-id:#8250df;--dg-id-soft:#f3ecff;--dg-net:#0e7490;--dg-net-soft:#e0f4f8;--dg-warn:#9a6700;--dg-warn-soft:#fff6d6;--dg-danger:#cf222e;--dg-danger-soft:#ffebe9;font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", "Segoe UI", Roboto, sans-serif}
+@media (prefers-color-scheme:dark){svg.dg{--dg-bg:#0d1117;--dg-fg:#e6edf3;--dg-muted:#9198a1;--dg-line:#8b949e;--dg-card:#151b23;--dg-border:#30363d;--dg-aws:#f0883e;--dg-aws-soft:#2b1c10;--dg-azure:#58a6ff;--dg-azure-soft:#0f2238;--dg-ok:#3fb950;--dg-ok-soft:#0f2417;--dg-id:#b392f0;--dg-id-soft:#221a36;--dg-net:#39c5cf;--dg-net-soft:#0d2a2f;--dg-warn:#d29922;--dg-warn-soft:#2d2208;--dg-danger:#ff7b72;--dg-danger-soft:#3a1517}}
+.dg-bg{fill:var(--dg-bg)}
+.dg-t{fill:var(--dg-fg)}
+.dg-m{fill:var(--dg-muted)}
+.dg-b{font-weight:650}
+.dg-box,.dg-grp,.dg-chip{stroke-width:1.4}
+.dg-box{fill:var(--dg-card);stroke:var(--dg-border)}
+.dg-grp{fill:none;stroke:var(--dg-border)}
+.dg-dash{stroke-dasharray:6 4}
+.dg-chip{fill:var(--dg-bg);stroke:none}
+.dg-line{fill:none;stroke:var(--dg-line);stroke-width:1.8}
+.dg-ah{fill:var(--dg-line)}
+.dg-box.dg-aws{fill:var(--dg-aws-soft);stroke:var(--dg-aws)}
+.dg-grp.dg-aws{stroke:var(--dg-aws)}
+.dg-fill-aws{fill:var(--dg-aws)}
+.dg-tx-aws{fill:var(--dg-aws)}
+.dg-line.dg-aws{stroke:var(--dg-aws)}
+.dg-ah.dg-aws{fill:var(--dg-aws)}
+.dg-box.dg-azure{fill:var(--dg-azure-soft);stroke:var(--dg-azure)}
+.dg-grp.dg-azure{stroke:var(--dg-azure)}
+.dg-fill-azure{fill:var(--dg-azure)}
+.dg-tx-azure{fill:var(--dg-azure)}
+.dg-line.dg-azure{stroke:var(--dg-azure)}
+.dg-ah.dg-azure{fill:var(--dg-azure)}
+.dg-box.dg-ok{fill:var(--dg-ok-soft);stroke:var(--dg-ok)}
+.dg-grp.dg-ok{stroke:var(--dg-ok)}
+.dg-fill-ok{fill:var(--dg-ok)}
+.dg-tx-ok{fill:var(--dg-ok)}
+.dg-line.dg-ok{stroke:var(--dg-ok)}
+.dg-ah.dg-ok{fill:var(--dg-ok)}
+.dg-box.dg-id{fill:var(--dg-id-soft);stroke:var(--dg-id)}
+.dg-grp.dg-id{stroke:var(--dg-id)}
+.dg-fill-id{fill:var(--dg-id)}
+.dg-tx-id{fill:var(--dg-id)}
+.dg-line.dg-id{stroke:var(--dg-id)}
+.dg-ah.dg-id{fill:var(--dg-id)}
+.dg-box.dg-net{fill:var(--dg-net-soft);stroke:var(--dg-net)}
+.dg-grp.dg-net{stroke:var(--dg-net)}
+.dg-fill-net{fill:var(--dg-net)}
+.dg-tx-net{fill:var(--dg-net)}
+.dg-line.dg-net{stroke:var(--dg-net)}
+.dg-ah.dg-net{fill:var(--dg-net)}
+.dg-box.dg-warn{fill:var(--dg-warn-soft);stroke:var(--dg-warn)}
+.dg-grp.dg-warn{stroke:var(--dg-warn)}
+.dg-fill-warn{fill:var(--dg-warn)}
+.dg-tx-warn{fill:var(--dg-warn)}
+.dg-line.dg-warn{stroke:var(--dg-warn)}
+.dg-ah.dg-warn{fill:var(--dg-warn)}
+.dg-box.dg-danger{fill:var(--dg-danger-soft);stroke:var(--dg-danger)}
+.dg-grp.dg-danger{stroke:var(--dg-danger)}
+.dg-fill-danger{fill:var(--dg-danger)}
+.dg-tx-danger{fill:var(--dg-danger)}
+.dg-line.dg-danger{stroke:var(--dg-danger)}
+.dg-ah.dg-danger{fill:var(--dg-danger)}
+.dg-on{fill:#fff}</style><defs><marker id="network-topology-ah-line" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah"/></marker><marker id="network-topology-ah-net" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-net"/></marker><marker id="network-topology-ah-azure" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-azure"/></marker><marker id="network-topology-ah-ok" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-ok"/></marker><marker id="network-topology-ah-id" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-id"/></marker></defs><rect width="960" height="550" class="dg-bg" rx="12"/>
+<text x="24" y="32" font-size="18" class="dg-t dg-b">VNet 설계: 서브넷 · NSG · NAT Gateway · Private DNS</text>
+<text x="24" y="54" font-size="12.5" class="dg-m">서브넷은 리전 전체에 걸치며(AZ 에 묶이지 않음) 역할별로 나눕니다. 이후 모든 스택이 이 VNet 을 data source 로 조회합니다.</text>
+<rect x="24" y="92" width="640" height="438" rx="14" class="dg-grp dg-net"/>
+<text x="38" y="112" font-size="12.5" class="dg-tx-net dg-b" data-w="612">VNet vnet-aksdemo-dev-krc · 10.10.0.0/16 · koreacentral 리전 전체</text>
+<rect x="44" y="124" width="290" height="134" rx="10" class="dg-box dg-net"/>
+<text x="56" y="148" font-size="14" class="dg-t dg-b" data-w="266">snet-aks-apiserver</text>
+<text x="56" y="166" font-size="11.5" class="dg-m" data-w="266">10.10.1.0/28 (AKS 전용, 최소 /28)</text>
+<text x="56" y="182.5" font-size="11.5" class="dg-m" data-w="266">API 서버 엔드포인트가 이 서브넷에 투영</text>
+<text x="56" y="199" font-size="11.5" class="dg-m" data-w="266">위임(delegation): managedClusters</text>
+<text x="56" y="215.5" font-size="11.5" class="dg-m" data-w="266">NSG 연결 없음 (위임 서브넷)</text>
+<rect x="354" y="124" width="290" height="134" rx="10" class="dg-box dg-azure"/>
+<text x="366" y="148" font-size="14" class="dg-t dg-b" data-w="266">snet-aks-nodes</text>
+<text x="366" y="166" font-size="11.5" class="dg-m" data-w="266">10.10.0.0/24 · 노드 IP 전용</text>
+<text x="366" y="182.5" font-size="11.5" class="dg-m" data-w="266">Pod 는 오버레이(10.244.0.0/16)라 IP 미사용</text>
+<text x="366" y="199" font-size="11.5" class="dg-m" data-w="266">NSG: Pod · API 서버 · Gateway 인바운드 허용</text>
+<text x="366" y="215.5" font-size="11.5" class="dg-m" data-w="266">NAT Gateway 연결 · 기본 아웃바운드 비활성화</text>
+<rect x="44" y="270" width="290" height="124" rx="10" class="dg-box dg-net"/>
+<text x="56" y="294" font-size="14" class="dg-t dg-b" data-w="266">snet-ingress</text>
+<text x="56" y="312" font-size="11.5" class="dg-m" data-w="266">10.10.2.0/27</text>
+<text x="56" y="328.5" font-size="11.5" class="dg-m" data-w="266">내부 로드밸런서 프런트엔드 IP</text>
+<text x="56" y="345" font-size="11.5" class="dg-m" data-w="266">(internal_gateway = true 일 때)</text>
+<text x="56" y="361.5" font-size="11.5" class="dg-m" data-w="266">NSG 연결 (트래픽은 노드 NSG 가 평가)</text>
+<rect x="354" y="270" width="290" height="124" rx="10" class="dg-box dg-net"/>
+<text x="366" y="294" font-size="14" class="dg-t dg-b" data-w="266">snet-private-endpoints</text>
+<text x="366" y="312" font-size="11.5" class="dg-m" data-w="266">10.10.3.0/27</text>
+<text x="366" y="328.5" font-size="11.5" class="dg-m" data-w="266">ACR · Key Vault 의 Private Endpoint</text>
+<text x="366" y="345" font-size="11.5" class="dg-m" data-w="266">NSG: 노드 서브넷의 443 만 허용,</text>
+<text x="366" y="361.5" font-size="11.5" class="dg-m" data-w="266">나머지 VNet 내부 인바운드는 거부</text>
+<rect x="44" y="408" width="600" height="108" rx="10" class="dg-box dg-dash"/>
+<text x="56" y="432" font-size="14" class="dg-t dg-b" data-w="576">알아 둘 점</text>
+<text x="56" y="450" font-size="12" class="dg-m" data-w="576">서브넷은 가용 영역(AZ)에 묶이지 않습니다. 영역은 노드 풀·로드밸런서의 속성입니다 (AWS 와 다름).</text>
+<text x="56" y="467" font-size="12" class="dg-m" data-w="576">NAT Gateway 는 서브넷에 직접 연결합니다. 라우트 테이블 수정이 필요 없습니다.</text>
+<text x="56" y="484" font-size="12" class="dg-m" data-w="576">VNet 주소 공간은 온프레미스·피어링 대상과 겹치지 않게 정하세요.</text>
+<rect x="690" y="132" width="246" height="84" rx="10" class="dg-box dg-net"/>
+<text x="702" y="155" font-size="13" class="dg-t dg-b" data-w="222">NAT Gateway (StandardV2)</text>
+<text x="702" y="172" font-size="11.5" class="dg-m" data-w="222">영역 중복 · 고정 공용 IP</text>
+<text x="702" y="188.5" font-size="11.5" class="dg-m" data-w="222">노드 서브넷에 직접 연결</text>
+<rect x="690" y="232" width="246" height="44" rx="10" class="dg-box"/>
+<text x="813" y="255" font-size="13" text-anchor="middle" class="dg-t dg-b" data-w="222">인터넷 (고정 egress IP)</text>
+<rect x="690" y="292" width="246" height="80" rx="10" class="dg-box dg-ok"/>
+<text x="702" y="315" font-size="13" class="dg-t dg-b" data-w="222">ACR · Key Vault (PaaS)</text>
+<text x="702" y="332" font-size="11.5" class="dg-m" data-w="222">공용 접근은 관리자 IP 만(기본 Deny)</text>
+<text x="702" y="348.5" font-size="11.5" class="dg-m" data-w="222">노드·파드는 Private Endpoint 로</text>
+<rect x="690" y="392" width="246" height="104" rx="10" class="dg-box dg-id"/>
+<text x="702" y="415" font-size="13" class="dg-t dg-b" data-w="222">Private DNS Zone ×2</text>
+<text x="702" y="432" font-size="11.5" class="dg-m" data-w="222">privatelink.azurecr.io</text>
+<text x="702" y="448.5" font-size="11.5" class="dg-m" data-w="222">privatelink.vaultcore.azure.net</text>
+<text x="702" y="465" font-size="11.5" class="dg-m" data-w="222">VNet 링크로 사설 IP 로 해석</text>
+<path d="M644 191 L667 191 L667 174 L690 174" class="dg-line dg-net" marker-end="url(#network-topology-ah-net)"/>
+<path d="M813 216 L813 232" class="dg-line dg-net" marker-end="url(#network-topology-ah-net)"/>
+<path d="M644 332 L690 332" class="dg-line dg-ok" marker-end="url(#network-topology-ah-ok)"/>
+<path d="M690 444 L664 444" class="dg-line dg-id" marker-end="url(#network-topology-ah-id)"/>
+</svg>

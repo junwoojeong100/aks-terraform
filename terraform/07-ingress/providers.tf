@@ -1,11 +1,11 @@
 provider "azurerm" {
-  # subscription_id 는 ARM_SUBSCRIPTION_ID 환경 변수에서 읽습니다.
+  # subscription_id is read from the ARM_SUBSCRIPTION_ID environment variable.
   resource_provider_registrations = "none"
 
   features {}
 }
 
-# 06-workload 와 동일: kubelogin 으로 Entra ID 토큰을 받아 API 서버에 접속합니다.
+# Same as 06-workload: kubelogin gets an Entra ID token to connect to the API server.
 provider "kubernetes" {
   host                   = data.azurerm_kubernetes_cluster.this.kube_config[0].host
   cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.this.kube_config[0].cluster_ca_certificate)

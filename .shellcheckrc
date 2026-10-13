@@ -1,4 +1,4 @@
-# ShellCheck 설정: source 경로를 스크립트 위치 기준으로 해석합니다.
+# ShellCheck configuration: resolve source paths relative to the script location.
 #   shellcheck scripts/*.sh scripts/lib/*.sh scripts/verify/*.sh tools/*.sh
 source-path=SCRIPTDIR
 external-sources=true

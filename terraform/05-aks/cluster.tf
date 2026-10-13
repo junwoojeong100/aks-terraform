@@ -1,11 +1,13 @@
 # ---------------------------------------------------------------------------
-# AKS 클러스터 (Standard 모드: 플랫폼을 직접 설계/운영)
+# AKS cluster (Standard mode: you design and operate the platform yourself)
 #
-# EKS 와 비교
-#   - 컨트롤 플레인은 Azure 가 운영 (EKS 와 동일). sku_tier = Standard 가 업타임 SLA 를 제공합니다.
-#   - 노드는 VMSS(Virtual Machine Scale Set) 기반 "node pool" (≈ EKS managed node group / ASG)
-#   - 노드 VM 은 별도의 "노드 리소스 그룹"(rg-...-aks-nodes)에 생성됩니다. EKS 는 내 계정에 EC2 가 그대로 보입니다.
-#   - 인증은 Entra ID + Azure RBAC (≈ IAM + EKS access entries), 파드 권한은 Workload Identity (≈ IRSA/Pod Identity)
+# Compared with EKS
+#   - Azure operates the control plane (same as EKS). sku_tier = Standard provides the uptime SLA.
+#   - Nodes are "node pools" built on VMSS (Virtual Machine Scale Sets) (≈ EKS managed node group / ASG)
+#   - Node VMs are created in a separate "node resource group" (rg-...-aks-nodes).
+#     With EKS, the EC2 instances appear directly in your own account.
+#   - Authentication uses Entra ID + Azure RBAC (≈ IAM + EKS access entries);
+#     pod permissions use Workload Identity (≈ IRSA/Pod Identity)
 # ---------------------------------------------------------------------------
 resource "azurerm_kubernetes_cluster" "this" {
   name                = module.naming.names.aks
@@ -14,15 +16,16 @@ resource "azurerm_kubernetes_cluster" "this" {
   node_resource_group = module.naming.names.rg_aks_nodes
   dns_prefix          = module.naming.names.aks
 
-  # --- 버전 / 업그레이드 -----------------------------------------------------
-  # kubernetes_version 은 생성 시점에만 사용됩니다(아래 lifecycle.ignore_changes). 이후 patch 는 AKS 가 자동 적용합니다.
+  # --- Version / upgrades --------------------------------------------------------
+  # kubernetes_version is used only at creation time (see lifecycle.ignore_changes below).
+  # After that, AKS applies patches automatically.
   kubernetes_version        = var.kubernetes_version
   sku_tier                  = var.sku_tier
   support_plan              = "KubernetesOfficial"
-  automatic_upgrade_channel = "patch"     # 같은 minor 안에서 최신 patch 를 유지보수 창에 자동 적용 (minor 는 Lab 09 절차로 직접 올림)
-  node_os_upgrade_channel   = "NodeImage" # 노드 OS 이미지는 주간 유지보수 창에서 자동 교체
+  automatic_upgrade_channel = "patch"     # latest patch auto-applied in the maintenance window (minor: manual, Lab 09)
+  node_os_upgrade_channel   = "NodeImage" # node OS image auto-replaced in the weekly maintenance window
 
-  # --- 보안: Entra ID 인증 + Azure RBAC, 로컬 계정(정적 kubeconfig) 차단 ----------
+  # --- Security: Entra ID auth + Azure RBAC, local accounts (static kubeconfig) disabled ---
   role_based_access_control_enabled = true
   local_account_disabled            = true
 
@@ -31,19 +34,19 @@ resource "azurerm_kubernetes_cluster" "this" {
     tenant_id          = data.azurerm_client_config.current.tenant_id
   }
 
-  # --- 워크로드 ID (IRSA / EKS Pod Identity 에 해당) -----------------------------
+  # --- Workload identity (equivalent to IRSA / EKS Pod Identity) -----------------
   oidc_issuer_enabled       = true
   workload_identity_enabled = true
 
-  # --- 거버넌스 / 운영 기능 -------------------------------------------------------
-  azure_policy_enabled         = true # Azure Policy for Kubernetes (OPA Gatekeeper 기반)
-  image_cleaner_enabled        = true # 취약한 미사용 이미지 자동 삭제
+  # --- Governance / operations features ------------------------------------------
+  azure_policy_enabled         = true # Azure Policy for Kubernetes (based on OPA Gatekeeper)
+  image_cleaner_enabled        = true # automatically removes unused, vulnerable images
   image_cleaner_interval_hours = 48
-  cost_analysis_enabled        = var.sku_tier != "Free" # 네임스페이스/워크로드별 비용 분석 (Standard 이상)
+  cost_analysis_enabled        = var.sku_tier != "Free" # per-namespace/workload cost analysis (Standard tier or higher)
 
-  # --- API 서버 접근 -------------------------------------------------------------
-  # API Server VNet Integration: API 서버 엔드포인트를 위임된 서브넷(내 VNet)에 투영합니다.
-  # EKS 의 "Public + Private endpoint, CIDR 제한" 구성과 비슷하게 authorized IP ranges 로 공용 접근을 제한합니다.
+  # --- API server access ---------------------------------------------------------
+  # API Server VNet Integration: projects the API server endpoint into a delegated subnet in your own VNet.
+  # Like the EKS "public + private endpoint with restricted CIDRs" setup, authorized IP ranges limit public access.
   private_cluster_enabled             = var.enable_private_cluster
   private_cluster_public_fqdn_enabled = false
 
@@ -53,7 +56,7 @@ resource "azurerm_kubernetes_cluster" "this" {
     authorized_ip_ranges                = var.enable_private_cluster ? null : var.allowed_ip_ranges
   }
 
-  # --- Identity: 직접 만든 UAMI 사용 (04-platform 에서 역할 할당까지 끝낸 상태) -------------
+  # --- Identity: use your own UAMI (roles already assigned in 04-platform) -------
   identity {
     type         = "UserAssigned"
     identity_ids = [data.azurerm_user_assigned_identity.cluster.id]
@@ -65,22 +68,22 @@ resource "azurerm_kubernetes_cluster" "this" {
     user_assigned_identity_id = data.azurerm_user_assigned_identity.kubelet.id
   }
 
-  # --- 네트워크: Azure CNI Overlay + Cilium, 아웃바운드는 내 NAT Gateway ----------------
+  # --- Network: Azure CNI Overlay + Cilium, outbound through your own NAT Gateway ----
   network_profile {
     network_plugin      = "azure"
-    network_plugin_mode = "overlay" # Pod 는 별도 CIDR 사용 → VNet IP 를 거의 소모하지 않음 (EKS VPC CNI 와의 가장 큰 차이)
-    network_data_plane  = "cilium"  # eBPF 데이터 플레인 (kube-proxy 대체)
-    network_policy      = "cilium"  # NetworkPolicy 강제
+    network_plugin_mode = "overlay" # pods use a separate CIDR: almost no VNet IPs (the key difference from EKS VPC CNI)
+    network_data_plane  = "cilium"  # eBPF data plane (replaces kube-proxy)
+    network_policy      = "cilium"  # enforces NetworkPolicy
 
     pod_cidr       = var.pod_cidr
     service_cidr   = var.service_cidr
     dns_service_ip = var.dns_service_ip
 
     load_balancer_sku = "standard"
-    outbound_type     = "userAssignedNATGateway" # 03-network 에서 서브넷에 연결해 둔 NAT Gateway 로 egress
+    outbound_type     = "userAssignedNATGateway" # egress through the NAT Gateway attached to the subnet in 03-network
   }
 
-  # --- 노드 풀: System 풀은 시스템 컴포넌트 전용 ------------------------------------
+  # --- Node pools: the System pool is dedicated to system components -------------
   default_node_pool {
     name                         = "system"
     vm_size                      = var.system_node_vm_size
@@ -88,14 +91,14 @@ resource "azurerm_kubernetes_cluster" "this" {
     vnet_subnet_id               = data.azurerm_subnet.aks_nodes.id
     orchestrator_version         = var.kubernetes_version
     os_sku                       = "AzureLinux3"
-    os_disk_type                 = "Ephemeral" # 노드 로컬 디스크에 OS 배치: 빠르고 디스크 요금 없음
+    os_disk_type                 = "Ephemeral" # OS on the node's local disk: fast, no disk charge
     os_disk_size_gb              = 64
-    only_critical_addons_enabled = true # CriticalAddonsOnly 테인트 → 앱 파드는 User 풀로
+    only_critical_addons_enabled = true # CriticalAddonsOnly taint → app pods go to the User pool
     auto_scaling_enabled         = true
     min_count                    = var.system_node_min_count
     max_count                    = var.system_node_max_count
 
-    # vm_size 등 일부 속성을 바꿀 때 임시 풀로 교체(rotation)하기 위한 이름
+    # Name of the temporary pool used for rotation when changing properties such as vm_size
     temporary_name_for_rotation = "systemtmp"
 
     upgrade_settings {
@@ -107,21 +110,21 @@ resource "azurerm_kubernetes_cluster" "this" {
     tags = local.tags
   }
 
-  # Cluster Autoscaler(EKS 의 cluster-autoscaler 와 동일 계열) 사용 → 노드 풀을 직접 관리하는 "Manual" 모드.
-  # Karpenter 기반 Node Auto Provisioning 을 쓰려면 mode = "Auto" (단, 노드 풀 autoscaler 는 꺼야 함).
-  # AKS Automatic 은 NAP 가 기본값입니다 → Lab 10 참고.
+  # Uses Cluster Autoscaler (same family as EKS cluster-autoscaler) → "Manual" mode: you manage the node pools.
+  # To use Karpenter-based Node Auto Provisioning, set mode = "Auto" (the node pool autoscaler must then be off).
+  # AKS Automatic uses NAP by default → see Lab 10.
   node_provisioning_profile {
     mode = "Manual"
   }
 
   auto_scaler_profile {
-    balance_similar_node_groups   = true # 여러 가용 영역 풀의 노드 수를 균형 있게
+    balance_similar_node_groups   = true # balance node counts across pools in different availability zones
     expander                      = "least-waste"
-    skip_nodes_with_local_storage = true # AKS 기본값과 동일하게 명시 (블록을 쓰면 Terraform 이 false 를 보내므로)
+    skip_nodes_with_local_storage = true # explicitly set to the AKS default (the block makes Terraform send false)
     skip_nodes_with_system_pods   = true
   }
 
-  # --- 유지보수 창: 업그레이드가 "언제" 일어날지 통제 (EKS 에는 없는 기능) -----------------
+  # --- Maintenance windows: control "when" upgrades happen (no EKS equivalent) ----
   maintenance_window_auto_upgrade {
     frequency   = "Weekly"
     interval    = 1
@@ -140,23 +143,23 @@ resource "azurerm_kubernetes_cluster" "this" {
     utc_offset  = var.maintenance_utc_offset
   }
 
-  # --- 애드온 ---------------------------------------------------------------------
+  # --- Add-ons -------------------------------------------------------------------
   # Secrets Store CSI Driver + Azure Key Vault Provider (≈ AWS Secrets Manager CSI provider)
   key_vault_secrets_provider {
     secret_rotation_enabled  = true
     secret_rotation_interval = "2m"
   }
 
-  # Container Insights (로그): ama-logs 에이전트가 Log Analytics 로 전송. DCR 은 monitoring.tf 에서 정의.
+  # Container Insights (logs): the ama-logs agent sends data to Log Analytics. The DCR is defined in monitoring.tf.
   oms_agent {
     log_analytics_workspace_id      = data.azurerm_log_analytics_workspace.this.id
     msi_auth_for_monitoring_enabled = true
   }
 
-  # Managed Prometheus (메트릭): DCR/DCE 는 monitoring.tf 에서 정의.
+  # Managed Prometheus (metrics): the DCR/DCE are defined in monitoring.tf.
   monitor_metrics {}
 
-  # KEDA(이벤트 기반 오토스케일) + VPA(요청/제한 권장)
+  # KEDA (event-driven autoscaling) + VPA (requests/limits recommendations)
   workload_autoscaler_profile {
     keda_enabled                    = true
     vertical_pod_autoscaler_enabled = true
@@ -173,9 +176,10 @@ resource "azurerm_kubernetes_cluster" "this" {
   tags = local.tags
 
   lifecycle {
-    # 버전은 생성 시점에만 Terraform 이 정하고, 이후에는 AKS 자동 업그레이드 채널이 관리합니다.
-    # (azurerm 5.9 까지는 patch 자동 업그레이드 뒤 alias "1.36" 과 실제 버전 "1.36.6" 이 달라 매 plan 마다 diff 가 생깁니다. 5.10 에서 개선 예정)
-    # minor 업그레이드 절차와 Terraform 으로 버전을 직접 관리하는 방법은 Lab 09 를 참고하세요.
+    # Terraform sets the version only at creation time; after that, the AKS auto-upgrade channel manages it.
+    # (Through azurerm 5.9, after an automatic patch upgrade the alias "1.36" no longer matches the actual version
+    # "1.36.6", so every plan shows a diff. An improvement is planned for 5.10.)
+    # For the minor upgrade procedure and how to manage the version directly with Terraform, see Lab 09.
     ignore_changes = [
       kubernetes_version,
       default_node_pool[0].orchestrator_version,
@@ -184,7 +188,7 @@ resource "azurerm_kubernetes_cluster" "this" {
 }
 
 # ---------------------------------------------------------------------------
-# User 노드 풀: 애플리케이션 워크로드용 (EKS managed node group 에 해당)
+# User node pool: for application workloads (equivalent to an EKS managed node group)
 # ---------------------------------------------------------------------------
 resource "azurerm_kubernetes_cluster_node_pool" "user" {
   name                  = "user"
@@ -217,13 +221,13 @@ resource "azurerm_kubernetes_cluster_node_pool" "user" {
   tags = local.tags
 
   lifecycle {
-    ignore_changes = [orchestrator_version] # 클러스터와 동일한 이유 (자동 업그레이드가 버전을 관리)
+    ignore_changes = [orchestrator_version] # same reason as the cluster (auto-upgrade manages the version)
   }
 }
 
 # ---------------------------------------------------------------------------
-# (선택) Spot 노드 풀: 중단 가능한 배치/CI 워크로드용 (EC2 Spot 에 해당)
-# 0 노드까지 축소되며, 파드는 toleration 이 있어야 스케줄됩니다.
+# (Optional) Spot node pool: for interruptible batch/CI workloads (equivalent to EC2 Spot)
+# Scales down to 0 nodes, and pods are scheduled only if they have a toleration.
 # ---------------------------------------------------------------------------
 resource "azurerm_kubernetes_cluster_node_pool" "spot" {
   count = var.enable_spot_pool ? 1 : 0
@@ -234,7 +238,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "spot" {
 
   priority        = "Spot"
   eviction_policy = "Delete"
-  spot_max_price  = -1 # 온디맨드 가격 상한
+  spot_max_price  = -1 # capped at the on-demand price
 
   vm_size              = var.user_node_vm_size
   zones                = var.zones

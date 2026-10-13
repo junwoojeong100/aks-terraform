@@ -1,4 +1,4 @@
-// highlight.js 용 HCL(Terraform) 문법 정의: highlight.js 기본 번들에는 HCL 이 없어 직접 등록합니다.
+// HCL (Terraform) grammar definition for highlight.js: the default highlight.js bundle has no HCL, so it is registered by hand.
 export default function hcl(hljs) {
   const KEYWORDS = {
     keyword:

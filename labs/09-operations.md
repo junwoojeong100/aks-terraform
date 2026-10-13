@@ -1,174 +1,178 @@
-# Lab 09. Day-2 운영: 업그레이드 · 스케일링 · 노드 교체 · 테스트
+<!-- lang-switch -->
+**English** | [한국어](ko/09-operations.md)
+<!-- /lang-switch -->
 
-| 소요 시간 | 예상 비용 | Terraform 스택 | 선행 실습 |
+# Lab 09. Day-2 operations: upgrades · scaling · node replacement · testing
+
+| Duration | Estimated cost | Terraform stack | Prerequisite |
 |---|---|---|---|
-| 40분 (읽기 + 선택 실험) | 실험 시 노드 추가분 | 새 스택 없음 (`terraform/05-aks` 변수 변경) | [05. AKS 클러스터](05-aks.md) |
+| 40 min (reading + optional experiments) | Extra nodes during experiments | No new stack (variable changes in `terraform/05-aks`) | [05. AKS cluster](05-aks.md) |
 
-클러스터를 만드는 것보다 **계속 안전하게 운영**하는 일이 더 어렵습니다. 이 실습은 Day-2 작업을 *Terraform 변수 변경*으로 수행하는 방법과 주의점을 정리합니다.
+**Operating a cluster safely over time** is harder than creating one. This lab explains how to carry out Day-2 tasks as *Terraform variable changes*, along with the points to watch out for.
 
-## AWS 경험자를 위한 비교
+## Comparison for AWS engineers
 
-| AWS (EKS) | Azure (AKS) | 차이 / 주의 |
+| AWS (EKS) | Azure (AKS) | Differences / notes |
 |---|---|---|
-| 컨트롤 플레인 minor 업그레이드 → 노드 그룹 업그레이드 | **자동 업그레이드 채널** 또는 `az aks upgrade`(컨트롤 플레인 → 노드 풀 순서) | 노드는 `max_surge` 만큼 **임시 노드를 추가**해 롤링 교체. 이 실습은 생성 이후의 버전을 AKS 가 관리하도록 Terraform 에서 무시(`ignore_changes`)하고, 버전도 코드로 관리하는 방법(C)은 아래에서 따로 소개합니다. |
-| Extended Support(14개월 → +12개월, 유료) | 12개월 지원 + **LTS(Premium 티어, 선택)** | 지원 종료 버전은 2027-06 부터 플랫폼이 자동 업그레이드합니다(유지보수 창 무시, PDB 를 무시할 수도 있음 → 미리 올리세요). |
-| 노드 AMI 업데이트 | `node_os_upgrade_channel` (`NodeImage`) + `maintenance_window_node_os` | 주간 창에서 노드 이미지를 자동 교체. |
-| Karpenter drift / consolidation | **NAP** (`node_provisioning_profile.mode = "Auto"`) | Standard 에서 선택, Automatic 에서 기본. 이 실습의 기본은 Cluster Autoscaler(`Manual`). |
-| `eksctl`/콘솔 기반 변경 | **변수 변경 → plan → apply** | 수동 변경(`az aks update`)은 Terraform 과 드리프트를 만듭니다. 변경은 코드로. (예외: Kubernetes 버전은 AKS 가 관리하도록 `ignore_changes` 처리) |
+| Control plane minor upgrade → node group upgrade | **Auto-upgrade channel** or `az aks upgrade` (control plane first, then node pools) | Nodes are replaced in a rolling fashion by **adding temporary nodes** (up to `max_surge`). In this lab, Terraform ignores the version after creation (`ignore_changes`) so that AKS manages it; managing the version in code as well (option C) is covered separately below. |
+| Extended Support (14 months → +12 months, paid) | 12 months of support + **LTS (Premium tier, optional)** | From 2027-06, the platform automatically upgrades versions that are out of support (ignoring the maintenance window, and possibly PDBs too → upgrade ahead of time). |
+| Node AMI updates | `node_os_upgrade_channel` (`NodeImage`) + `maintenance_window_node_os` | Automatically replaces the node image in a weekly window. |
+| Karpenter drift / consolidation | **NAP** (`node_provisioning_profile.mode = "Auto"`) | Optional on Standard, default on Automatic. This lab defaults to Cluster Autoscaler (`Manual`). |
+| Changes through `eksctl` or the console | **Change a variable → plan → apply** | Manual changes (`az aks update`) cause drift from Terraform, so make changes in code. (Exception: the Kubernetes version is handled with `ignore_changes` so that AKS manages it.) |
 
-## 1. 업그레이드 전략
+## 1. Upgrade strategy
 
-![업그레이드 흐름: patch · 노드 이미지 · minor](diagrams/upgrade-flow.svg)
+![Upgrade flow: patch · node image · minor](diagrams/upgrade-flow.svg)
 
-### 자동 업그레이드 채널
+### Auto-upgrade channels
 
-| 채널 | 동작 | 이 실습 |
+| Channel | Behavior | In this lab |
 |---|---|---|
-| `none` | 수동 | C 방식(아래)에서 사용 |
-| **`patch`** | 같은 minor 의 최신 patch 자동 | ✅ **기본값** (minor 는 사전 점검 후 직접) |
-| `stable` | 최신 GA minor 의 N-1 | AKS Automatic 이 사용 |
-| `rapid` | 최신 GA minor | 개발 환경 |
-| `node-image` | 노드 이미지만 | (대신 `node_os_upgrade_channel` 사용) |
+| `none` | Manual | Used in option C (below) |
+| **`patch`** | Automatically moves to the latest patch of the same minor | ✅ **Default** (you upgrade minor versions yourself after a preflight check) |
+| `stable` | N-1 of the latest GA minor | Used by AKS Automatic |
+| `rapid` | Latest GA minor | Development environments |
+| `node-image` | Node image only | (use `node_os_upgrade_channel` instead) |
 
-업그레이드가 **언제** 일어나는지는 `maintenance_window_auto_upgrade`(Kubernetes 버전)와 `maintenance_window_node_os`(노드 OS 이미지)로 통제합니다(실습 코드: 일요일 02:00 KST / 토요일 02:00 KST, 4시간).
+**When** upgrades happen is controlled with `maintenance_window_auto_upgrade` (Kubernetes version) and `maintenance_window_node_os` (node OS image). The lab code uses Sunday 02:00 KST / Saturday 02:00 KST, 4 hours.
 
 > [!IMPORTANT]
-> 유지보수 창은 **자동 업그레이드**에만 적용됩니다. `az aks upgrade` 나 Terraform 으로 버전을 올리는 *수동* 업그레이드는 즉시 시작됩니다. 업무 시간 외에 실행하세요.
+> The maintenance window applies only to **automatic upgrades**. A *manual* upgrade, where you raise the version with `az aks upgrade` or Terraform, starts immediately. Run it outside business hours.
 
-### minor 업그레이드 (예: 1.36 → 1.37, GA 이후)
+### Minor upgrades (for example, 1.36 → 1.37, after GA)
 
 > [!WARNING]
-> 2026-10 현재 1.37 은 **preview** 이며 GA 예정입니다(자동 업그레이드는 preview 로 가지 않습니다). 운영 클러스터는 GA 이후에, 그리고 **개발 → 스테이징 → 운영** 순서로 올리세요. 아래는 GA 이후의 절차 예시입니다.
+> As of 2026-10, 1.37 is in **preview** and is expected to reach GA (automatic upgrades do not move to a preview version). Upgrade production clusters after GA, and in the order **development → staging → production**. The steps below are an example of the procedure after GA.
 
 > [!IMPORTANT]
-> **왜 Terraform 이 Kubernetes 버전을 "무시"하나요?** `kubernetes_version = "1.36"` 같은 minor alias 로 만든 클러스터는 AKS 가 patch 를 자동 업그레이드하면 실제 버전(예: 1.36.6)이 alias 와 달라져, azurerm **5.9.0 까지는** 매 `plan` 마다 `1.36.6 -> 1.36` 이라는 불필요한 diff 가 생깁니다([#26946](https://github.com/hashicorp/terraform-provider-azurerm/issues/26946)). 이를 억제하는 수정([PR #32625](https://github.com/hashicorp/terraform-provider-azurerm/pull/32625))이 병합되어 **v5.10.0(2026-10-15 예정)** 에 포함됩니다. 어느 provider 버전에서도 안전하도록 이 실습은 **생성 시점에만** 버전을 정하고, 이후에는 `lifecycle { ignore_changes = [kubernetes_version, default_node_pool[0].orchestrator_version] }`(User/Spot 풀은 `[orchestrator_version]`)로 AKS 가 관리하게 합니다. 아래 세 가지 방식 중 팀의 운영 모델에 맞는 것을 고르세요.
+> **Why does Terraform "ignore" the Kubernetes version?** When AKS automatically upgrades the patch version of a cluster created with a minor alias such as `kubernetes_version = "1.36"`, the actual version (for example, 1.36.6) no longer matches the alias, so in azurerm **5.9.0 and earlier** every `plan` shows a needless diff of `1.36.6 -> 1.36` ([#26946](https://github.com/hashicorp/terraform-provider-azurerm/issues/26946)). A fix that suppresses this ([PR #32625](https://github.com/hashicorp/terraform-provider-azurerm/pull/32625)) has been merged and is included in **v5.10.0 (scheduled for 2026-10-15)**. To be safe on any provider version, this lab sets the version **only at creation time** and afterwards lets AKS manage it with `lifecycle { ignore_changes = [kubernetes_version, default_node_pool[0].orchestrator_version] }` (`[orchestrator_version]` for the User/Spot pools). Of the three options below, pick the one that fits your team's operating model.
 
-| 방식 | 누가 버전을 올리나 | 적합한 경우 | 이 실습 |
+| Option | Who upgrades the version | Best for | In this lab |
 |---|---|---|---|
-| **A. 자동 채널** (`stable`/`rapid`) | AKS 가 유지보수 창에서 minor 까지 자동 | 운영 부담 최소화, 개발/소규모 환경 (AKS Automatic 과 같은 모델) | `automatic_upgrade_channel` 값만 바꿔 `apply` |
-| **B. 수동 `az aks upgrade`** | 사람이 사전 점검 후 컨트롤 플레인 → 노드 풀 순서로 | patch 는 자동, minor 는 통제하고 싶은 운영 클러스터 | ✅ **기본 구성** (`patch` 채널 + `ignore_changes`) |
-| **C. Terraform 이 단일 출처** | PR 로 버전 변수를 바꾸고 `apply` | 모든 변경을 코드 리뷰로 남겨야 하는 조직 | 아래 *C-1 / C-2* 참고 |
+| **A. Automatic channel** (`stable`/`rapid`) | AKS, automatically up to the minor version, in the maintenance window | Minimal operational burden; dev and small environments (same model as AKS Automatic) | Change only the `automatic_upgrade_channel` value and `apply` |
+| **B. Manual `az aks upgrade`** | A person: preflight check first, then control plane → node pools | Production clusters where you want patches to be automatic but minor upgrades under your control | ✅ **Default setup** (`patch` channel + `ignore_changes`) |
+| **C. Terraform as the single source of truth** | Change the version variable in a PR and `apply` | Organizations that need every change recorded through code review | See *C-1 / C-2* below |
 
-사전 점검(B, C 공통):
+Preflight check (shared by B and C):
 
 ```bash
 RG="$(terraform output -raw resource_group_name)"; CLUSTER="$(terraform output -raw cluster_name)"
-az aks get-versions -l koreacentral -o table 2>/dev/null      # 지원 버전/업그레이드 경로 (경고 메시지는 stderr)
+az aks get-versions -l koreacentral -o table 2>/dev/null      # supported versions / upgrade paths (warning messages go to stderr)
 az aks get-upgrades -g "$RG" -n "$CLUSTER" -o table
 
-# 제거된 API(deprecated) 사용 여부: 업그레이드가 자동으로 막히기도 하지만 미리 확인
+# Are you using removed (deprecated) APIs? Upgrades can get blocked automatically, but check ahead of time
 kubectl get --raw /metrics | grep apiserver_requested_deprecated_apis | head
 ```
 
-**B. 수동 업그레이드 (기본 구성)**
+**B. Manual upgrade (default setup)**
 
 ```bash
-# 1) 컨트롤 플레인만 먼저 올리고, 앱/애드온이 정상인지 확인한 뒤
-az aks upgrade -g "$RG" -n "$CLUSTER" --kubernetes-version "<get-upgrades 로 확인한 1.37.x>" --control-plane-only
+# 1) Upgrade only the control plane first, then confirm that apps and add-ons are healthy
+az aks upgrade -g "$RG" -n "$CLUSTER" --kubernetes-version "<1.37.x from get-upgrades>" --control-plane-only
 
-# 2) 노드 풀을 하나씩 올립니다 (max_surge 만큼 임시 노드를 추가하며 롤링 교체)
+# 2) Upgrade the node pools one at a time (rolling replacement, adding temporary nodes up to max_surge)
 az aks nodepool upgrade -g "$RG" --cluster-name "$CLUSTER" -n system --kubernetes-version "<1.37.x>"
 az aks nodepool upgrade -g "$RG" --cluster-name "$CLUSTER" -n user   --kubernetes-version "<1.37.x>"
 ```
 
-버전 변경은 `ignore_changes` 로 무시되므로 `terraform plan` 에 diff 가 나오지 않습니다. 다만 나중에 **노드 풀을 새로 추가**할 때(예: `enable_spot_pool = true`)는 새 풀이 `var.kubernetes_version` 으로 만들어지므로, `-var kubernetes_version=<현재 클러스터 minor>` 로 맞춰 주세요.
+Version changes are ignored through `ignore_changes`, so `terraform plan` shows no diff. However, when you **add a new node pool** later (for example, `enable_spot_pool = true`), the new pool is created with `var.kubernetes_version`, so align it by passing `-var kubernetes_version=<current cluster minor>`.
 
-**C. Terraform 으로 버전까지 관리하기 (전환 방법)**
+**C. Managing the version with Terraform as well (how to switch)**
 
-공통: `cluster.tf` 와 노드 풀(`user`, `spot`)의 `lifecycle { ignore_changes }` 에서 `kubernetes_version` / `orchestrator_version` 항목을 제거합니다. 그 다음 둘 중 하나를 고르세요.
+Common to both: remove the `kubernetes_version` / `orchestrator_version` entries from `lifecycle { ignore_changes }` in `cluster.tf` and in the node pools (`user`, `spot`). Then pick one of the two.
 
-- **C-1. 전체 patch 버전을 고정 (모든 provider 버전에서 동작)**: `automatic_upgrade_channel = "none"` (노드 OS 교체 `node_os_upgrade_channel = "NodeImage"` 는 유지), `kubernetes_version` 은 alias 가 아닌 **전체 patch 버전**(예: `1.36.4`). patch 보안 업데이트도 변수 변경 → PR → apply 로 직접 올립니다.
-- **C-2. alias 유지 (azurerm ≥ 5.10 필요)**: `automatic_upgrade_channel = "patch"` 를 유지하고 `kubernetes_version = "1.36"` alias 를 그대로 둡니다. patch 는 AKS 가 올리고(provider 가 alias ≡ 실제 patch 로 취급해 diff 를 억제), alias 를 `"1.37"` 로 올리면 minor 업그레이드가 plan 에 나타납니다. 5.10.0 은 아직 릴리스 전이라 이 가이드는 5.9.0 으로 검증했습니다. 릴리스 후 `terraform init -upgrade` 로 올려 `plan` 에 불필요한 diff 가 없는지 확인한 뒤 사용하세요.
+- **C-1. Pin the full patch version (works with every provider version)**: set `automatic_upgrade_channel = "none"` (keep `node_os_upgrade_channel = "NodeImage"` for node OS replacement), and set `kubernetes_version` to a **full patch version** instead of an alias (for example, `1.36.4`). Patch security updates are also applied by hand through variable change → PR → apply.
+- **C-2. Keep the alias (requires azurerm ≥ 5.10)**: keep `automatic_upgrade_channel = "patch"` and leave the `kubernetes_version = "1.36"` alias as it is. AKS raises the patch version (the provider treats the alias as equivalent to the actual patch version, which suppresses the diff), and when you raise the alias to `"1.37"`, the minor upgrade shows up in the plan. 5.10.0 has not been released yet, so this guide was verified with 5.9.0. After the release, upgrade with `terraform init -upgrade`, confirm that `plan` shows no needless diff, and then use it.
 
 ```bash
-export TF_VAR_kubernetes_version=1.37.1   # C-1: az aks get-upgrades 로 확인한 전체 버전 (예시). C-2 는 1.37
-terraform plan -out tfplan      # ~ kubernetes_version, default_node_pool/orchestrator_version, user 풀 orchestrator_version
-terraform apply tfplan          # 컨트롤 플레인 → system 풀 → user 풀 순서. 노드당 수 분.
+export TF_VAR_kubernetes_version=1.37.1   # C-1: full version confirmed with az aks get-upgrades (example). For C-2, use 1.37
+terraform plan -out tfplan      # ~ kubernetes_version, default_node_pool/orchestrator_version, user pool orchestrator_version
+terraform apply tfplan          # control plane → system pool → user pool. A few minutes per node.
 ```
 
-진행 중 관찰 포인트:
+What to watch during the upgrade:
 
 ```bash
-kubectl get nodes -w                         # 임시(surge) 노드 추가 → cordon/drain → 이전 노드 제거
-kubectl get pdb -A                           # PDB 가 드레인 속도를 제한 (Lab 07 의 앱은 maxUnavailable=1)
+kubectl get nodes -w                         # temporary (surge) node added → cordon/drain → old node removed
+kubectl get pdb -A                           # PDBs limit the drain speed (the app in Lab 07 uses maxUnavailable=1)
 kubectl get events -A --field-selector reason=Evicted
 ```
 
 > [!TIP]
-> 업그레이드가 끝나면 저장소 루트에서 `scripts/verify.sh 05-aks` 를 실행해 노드가 모두 Ready 인지, 애드온 파드가 Running 인지 읽기 전용으로 확인하세요. 업그레이드 채널(방식 A / C-1)을 바꿨다면 바뀐 값이 그대로 표시됩니다.
+> When the upgrade finishes, run `scripts/verify.sh 05-aks` from the repository root to check, read-only, that all nodes are Ready and the add-on pods are Running. If you changed the upgrade channel (option A / C-1), the changed value is shown as-is.
 
-| 체크리스트 | 이유 |
+| Checklist | Why |
 |---|---|
-| PDB, 레플리카 ≥ 2, readiness probe | 드레인 중 가용성 |
-| 서브넷 IP 여유 (`max_surge` 33% 만큼) | 임시 노드가 IP 를 소모 |
-| 제거되는 API 목록 확인 | 매니페스트/Helm 차트 호환 |
-| 애드온/CRD 호환 (Gateway API 번들은 **클러스터 버전에 맞게 자동 업그레이드**) | Managed Gateway API CRD v1.5.1(1.36) → v1.6.1(1.37+) |
+| PDBs, replicas ≥ 2, readiness probes | Availability during drains |
+| Spare subnet IPs (enough for a `max_surge` of 33%) | Temporary nodes consume IPs |
+| Check the list of APIs being removed | Manifest/Helm chart compatibility |
+| Add-on/CRD compatibility (the Gateway API bundle is **upgraded automatically to match the cluster version**) | Managed Gateway API CRD v1.5.1 (1.36) → v1.6.1 (1.37+) |
 
-## 2. 스케일링
+## 2. Scaling
 
-| 계층 | 도구 | 이 실습의 구성 |
+| Layer | Tool | Setup in this lab |
 |---|---|---|
-| 파드 수 | **HPA** (CPU/메모리), **KEDA**(이벤트 기반: Service Bus, Kafka …) | HPA: Lab 07 / KEDA: `workload_autoscaler_profile.keda_enabled` |
-| 파드 크기 | **VPA** (요청/제한 권장) | `vertical_pod_autoscaler_enabled` |
-| 노드 수 | **Cluster Autoscaler** (노드 풀별 min/max) | system 3–5, user 3–6 |
-| 노드 종류 | **NAP**(Karpenter) | Lab 10 에서 체험 |
-| 비용 | **Spot 풀** | `-var enable_spot_pool=true` |
+| Pod count | **HPA** (CPU/memory), **KEDA** (event-driven: Service Bus, Kafka …) | HPA: Lab 07 / KEDA: `workload_autoscaler_profile.keda_enabled` |
+| Pod size | **VPA** (recommends requests/limits) | `vertical_pod_autoscaler_enabled` |
+| Node count | **Cluster Autoscaler** (min/max per node pool) | system 3–5, user 3–6 |
+| Node type | **NAP** (Karpenter) | Try it in Lab 10 |
+| Cost | **Spot pool** | `-var enable_spot_pool=true` |
 
 ```bash
-# 노드 오토스케일러 이벤트와 현재 상태
+# Node autoscaler events and current status
 kubectl -n kube-system get configmap cluster-autoscaler-status -o yaml | head -40
 kubectl get events -A | grep -i -E "TriggeredScaleUp|ScaleDown"
 
-# Terraform 이 오토스케일러와 싸우지 않는 이유: node_count 를 코드에 쓰지 않고 min/max 만 선언했기 때문입니다.
+# Why Terraform doesn't fight the autoscaler: the code doesn't set node_count and declares only min/max.
 ```
 
 > [!TIP]
-> **노드 수를 코드에 고정하지 마세요.** `auto_scaling_enabled = true` 일 때는 `min_count`/`max_count` 만 선언합니다. `node_count` 를 쓰면 오토스케일러가 바꾼 값과 계속 충돌합니다(꼭 써야 한다면 `lifecycle.ignore_changes`).
+> **Don't hard-code the node count.** When `auto_scaling_enabled = true`, declare only `min_count`/`max_count`. If you set `node_count`, it keeps conflicting with the values the autoscaler changes (if you must set it, use `lifecycle.ignore_changes`).
 
-## 3. 노드 풀 변경과 교체
+## 3. Changing and replacing node pools
 
-`vm_size`, `os_disk_*`, `zones`, `vnet_subnet_id` 등을 바꾸면 노드 풀이 **교체**됩니다. 이 실습은 `temporary_name_for_rotation`(`systemtmp`, `usertmp`)을 설정해 임시 풀을 만든 뒤 교체합니다. 그래서 plan 에는 `replace` 가 아니라 **`will be updated in-place`** 로 보이고, 실제 교체(임시 풀 생성 → 이전 풀 제거)는 apply 중에 provider 가 수행합니다.
+Changing `vm_size`, `os_disk_*`, `zones`, `vnet_subnet_id`, and similar attributes **replaces** the node pool. This lab sets `temporary_name_for_rotation` (`systemtmp`, `usertmp`) so that a temporary pool is created first and the replacement happens afterwards. That is why the plan shows **`will be updated in-place`** instead of `replace`; the provider performs the actual replacement (create the temporary pool → remove the old pool) during apply.
 
 ```bash
-terraform plan -var user_node_vm_size=Standard_D8ds_v5   # vm_size: D4ds_v5 -> D8ds_v5 (user 풀 updated in-place)
+terraform plan -var user_node_vm_size=Standard_D8ds_v5   # vm_size: D4ds_v5 -> D8ds_v5 (user pool updated in-place)
 ```
 
 > [!CAUTION]
-> 순환 교체(rotation)는 **cordon/drain 없이** 이전 풀을 제거하므로 파드가 중단될 수 있습니다. 운영에서는 *새 풀을 추가 → 기존 풀 cordon/drain → 파드 이동 확인 → 기존 풀 제거*(blue-green)가 더 안전합니다. PDB 가 있는 워크로드라도 반드시 점검 시간에 실행하세요.
+> Rotation removes the old pool **without cordon/drain**, so pods can be interrupted. In production, a blue-green approach (*add a new pool → cordon/drain the existing pool → confirm the pods have moved → remove the existing pool*) is safer. Even for workloads that have a PDB, always run this during planned maintenance time.
 
-## 4. 비용을 아끼는 운영 습관
+## 4. Operating habits that save money
 
 ```bash
-# 실습 중 쉬는 시간: 컨트롤 플레인과 노드 중지 (노드 VM 과금 중지. Spot 풀 등 일부 구성은 제약이 있을 수 있으니 문서 확인)
+# Taking a break during the lab: stop the control plane and nodes (node VM billing stops; some setups such as Spot pools may have limitations, so check the docs)
 az aks stop  -g <rg> -n <cluster>
 az aks start -g <rg> -n <cluster>
 
-# 네임스페이스/워크로드별 비용 (cost_analysis_enabled) → 포털: AKS → Cost Management → Cost analysis
+# Cost per namespace/workload (cost_analysis_enabled) → portal: AKS → Cost Management → Cost analysis
 ```
 
-## 5. 백업 · 재해 복구 (개념)
+## 5. Backup and disaster recovery (concepts)
 
-| 필요 | Azure 서비스 | 메모 |
+| Need | Azure service | Notes |
 |---|---|---|
-| 클러스터 리소스/PV 백업 | **Azure Backup for AKS** (Backup vault + 확장) | Velero 에 해당하는 관리형. PV 스냅샷 포함. |
-| 멀티 리전 | 리전별 클러스터 + **Azure Front Door**/Traffic Manager, 여러 클러스터는 **Fleet Manager** | WAF 가이드의 미션 크리티컬 패턴. IP 대역을 리전 간 겹치지 않게 설계. |
-| GitOps | **Flux 확장**(`azurerm_kubernetes_flux_configuration`) | 클러스터 부트스트랩/앱 배포를 Git 으로. |
+| Cluster resource / PV backup | **Azure Backup for AKS** (Backup vault + extension) | The managed counterpart of Velero. Includes PV snapshots. |
+| Multi-region | A cluster per region + **Azure Front Door**/Traffic Manager; **Fleet Manager** for multiple clusters | The mission-critical pattern from the WAF guide. Design the IP ranges so they don't overlap across regions. |
+| GitOps | **Flux extension** (`azurerm_kubernetes_flux_configuration`) | Bootstrap clusters and deploy apps from Git. |
 
-## 6. Terraform 코드 품질과 CI
+## 6. Terraform code quality and CI
 
-이 저장소는 Azure 구독 없이 실행되는 **3단계 정적 검증**을 제공합니다.
+This repository provides a **three-stage static validation** that runs without an Azure subscription.
 
 ```bash
 tools/validate-all.sh            # 1) fmt -check  2) validate  3) terraform test (mock provider)
 ```
 
-| 단계 | 잡아내는 것 |
+| Stage | What it catches |
 |---|---|
-| `terraform fmt -check` | 포맷 일관성 |
-| `terraform validate` | provider 스키마 위반(예: azurerm 5.x 에서 제거된 인수) — **버전을 올릴 때 가장 먼저 돌려 보세요** |
-| `terraform test` (mock) | 변수 검증, `count`/`for_each`, 조건식, 태그/이름 규칙 같은 **plan 로직** |
+| `terraform fmt -check` | Formatting consistency |
+| `terraform validate` | Provider schema violations (for example, arguments removed in azurerm 5.x) — **run this first when you upgrade versions** |
+| `terraform test` (mock) | **Plan logic** such as variable validation, `count`/`for_each`, conditional expressions, and tag and naming-convention rules |
 
-실제 PR 파이프라인은 여기에 plan 검토와 보안 스캔(예: `trivy config`, `checkov`)을 더합니다. 비밀번호 없이 로그인하는 GitHub Actions(OIDC) 예시입니다(액션 버전은 최신으로 바꿔 쓰세요).
+A real PR pipeline adds plan review and security scanning (for example, `trivy config`, `checkov`) on top of this. Here is a GitHub Actions (OIDC) example that signs in without passwords (replace the action versions with the latest ones).
 
 ```yaml
 name: terraform-plan
@@ -178,7 +182,7 @@ jobs:
   plan:
     runs-on: ubuntu-latest
     env:
-      ARM_USE_OIDC: "true"                 # Workload identity federation (비밀번호/키 없음)
+      ARM_USE_OIDC: "true"                 # Workload identity federation (no passwords/keys)
       ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
       ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
       ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
@@ -195,6 +199,6 @@ jobs:
 ```
 
 > [!NOTE]
-> **드리프트 감지**: `terraform plan -detailed-exitcode` 를 스케줄러로 주기 실행하면 누군가 포털/CLI 로 바꾼 설정(종료 코드 2)을 찾아낼 수 있습니다.
+> **Drift detection**: running `terraform plan -detailed-exitcode` periodically from a scheduler lets you find settings that someone changed through the portal or CLI (exit code 2).
 
-다음 → [Lab 10. AKS Automatic](10-aks-automatic.md)
+Next → [Lab 10. AKS Automatic](10-aks-automatic.md)

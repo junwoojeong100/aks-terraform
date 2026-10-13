@@ -26,7 +26,7 @@ locals {
   )
 }
 
-# 앞선 스택이 만든 리소스를 이름 규칙으로 조회
+# Look up the resources created by earlier stacks by naming convention
 data "azurerm_kubernetes_cluster" "this" {
   name                = module.naming.names.aks
   resource_group_name = module.naming.names.rg_aks

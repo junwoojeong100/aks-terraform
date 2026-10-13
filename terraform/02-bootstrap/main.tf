@@ -27,8 +27,8 @@ resource "azurerm_resource_group" "tfstate" {
   tags     = local.tags
 }
 
-# S3 버킷 + (DynamoDB 락 테이블) 에 해당합니다.
-# Azure Blob 백엔드는 blob lease 로 state 잠금을 제공하므로 별도의 락 테이블이 필요 없습니다.
+# Equivalent to an S3 bucket + (DynamoDB lock table).
+# The Azure Blob backend provides state locking through blob leases, so no separate lock table is needed.
 resource "azurerm_storage_account" "tfstate" {
   name                = module.naming.names.st_tfstate
   resource_group_name = azurerm_resource_group.tfstate.name
@@ -36,16 +36,16 @@ resource "azurerm_storage_account" "tfstate" {
 
   account_kind             = "StorageV2"
   account_tier             = "Standard"
-  account_replication_type = "ZRS" # 가용 영역 3곳에 동기 복제 (S3 의 기본 다중 AZ 내구성과 유사)
+  account_replication_type = "ZRS" # Synchronous replication across 3 availability zones (like S3's default multi-AZ durability)
 
   min_tls_version                 = "TLS1_2"
   https_traffic_only_enabled      = true
   allow_nested_items_to_be_public = false # S3 Block Public Access
-  shared_access_key_enabled       = false # 계정 키 사용 금지 → Entra ID(RBAC) 인증만 허용
+  shared_access_key_enabled       = false # Disable account keys → allow Entra ID (RBAC) authentication only
   default_to_oauth_authentication = true
 
   blob_properties {
-    versioning_enabled = true # S3 Versioning: 잘못된 state 로 되돌릴 수 있습니다.
+    versioning_enabled = true # S3 Versioning: lets you restore a previous version after a bad state overwrite.
 
     delete_retention_policy {
       days = 30
@@ -65,8 +65,8 @@ resource "azurerm_storage_container" "tfstate" {
   container_access_type = "private"
 }
 
-# 현재 로그인한 사용자(또는 CI 의 서비스 주체)에게 state 읽기/쓰기 권한 부여.
-# IAM 정책(s3:GetObject/PutObject) 대신 Azure RBAC 역할 할당을 사용합니다.
+# Grant the signed-in user (or the CI service principal) read/write access to state.
+# Uses an Azure RBAC role assignment instead of an IAM policy (s3:GetObject/PutObject).
 resource "azurerm_role_assignment" "state_contributor" {
   scope                = azurerm_storage_container.tfstate.id
   role_definition_name = "Storage Blob Data Contributor"

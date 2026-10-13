@@ -103,6 +103,11 @@ code, pre, kbd, samp {
   background: var(--bg-soft); color: var(--fg); cursor: pointer; font-size: 14px;
 }
 .icon-btn:hover { border-color: var(--accent); }
+.lang-btn {
+  display: inline-flex; align-items: center; height: 38px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--border);
+  background: var(--bg-soft); color: var(--fg); font-size: 14px; text-decoration: none; white-space: nowrap;
+}
+.lang-btn:hover { border-color: var(--accent); }
 #menu-btn { display: none; }
 .progress { position: fixed; top: 60px; left: 0; height: 3px; width: 0; z-index: 60; background: linear-gradient(90deg, var(--aws), var(--azure)); }
 
@@ -281,7 +286,7 @@ figure.code.shell figcaption .file::before { content: '$ '; color: var(--hl-var)
 }
 
 /* ---------- diagrams (tools/diagrams → inline SVG) ---------- */
-/* SVG 안의 --dg-* 변수를 페이지 테마 변수로 매핑합니다. (SVG 자체 <style> 의 prefers-color-scheme 보다 우선) */
+/* Maps the --dg-* variables inside the SVG to the page theme variables (takes precedence over the prefers-color-scheme rule in the SVG's own <style>). */
 .diagram-fig { margin: 22px 0; border: 1px solid var(--border); border-radius: 14px; background: var(--bg); box-shadow: var(--shadow); overflow: hidden; }
 .diagram-scroll { overflow-x: auto; }
 .diagram-fig svg.dg { display: block; width: 100%; min-width: 760px; height: auto; }

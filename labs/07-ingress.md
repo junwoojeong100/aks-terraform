@@ -1,49 +1,53 @@
-# Lab 07. 인그레스: ALB Controller → Gateway API (approuting-istio)
+<!-- lang-switch -->
+**English** | [한국어](ko/07-ingress.md)
+<!-- /lang-switch -->
 
-| 소요 시간 | 예상 비용 | Terraform 스택 | 선행 실습 |
+# Lab 07. Ingress: ALB Controller → Gateway API (approuting-istio)
+
+| Duration | Estimated cost | Terraform stack | Prerequisite |
 |---|---|---|---|
-| 30분 | 공인 IP + 로드밸런서 + 파드 3개 (소액) | `terraform/07-ingress` | [05. AKS 클러스터](05-aks.md) |
+| 30 min | Public IP + load balancer + 3 pods (a small charge) | `terraform/07-ingress` | [05. AKS cluster](05-aks.md) |
 
-## 이번 실습에서 만드는 것
+## What you build in this lab
 
-![Gateway API 트래픽 흐름](diagrams/ingress-flow.svg)
+![Gateway API traffic flow](diagrams/ingress-flow.svg)
 
-## AWS 경험자를 위한 비교
+## Comparison for AWS engineers
 
-| AWS | Azure | 차이 / 주의 |
+| AWS | Azure | Differences / notes |
 |---|---|---|
-| ALB + AWS Load Balancer Controller (`Ingress`) | **Gateway API** `Gateway` + `HTTPRoute` (GatewayClass `approuting-istio`) | Ingress 의 annotation 대신 표준 API 필드로 라우팅/TLS/가중치를 선언합니다. |
-| ALB 리스너 / 규칙 / 대상 그룹 | `Gateway.listeners` / `HTTPRoute.rules` / `backendRefs` | 역할 분리: Gateway(인프라) ↔ HTTPRoute(앱). |
-| `internal` vs `internet-facing` 스킴 | Gateway 의 `infrastructure.annotations` (`azure-load-balancer-internal`) | 내부 LB 는 `snet-ingress` 서브넷의 사설 IP 를 사용. |
-| NLB (`Service type=LoadBalancer`) | **Azure Load Balancer Standard** (`Service type=LoadBalancer`) | L4. 별도 컨트롤러 설치 없이 AKS 가 관리. |
-| AWS WAF | **Application Gateway(WAF v2)** / **Front Door WAF** | 앞단에 두는 것이 Microsoft 베이스라인의 기본 구조. |
-| ACM 인증서 | **Key Vault** 인증서 → Secrets Store CSI 로 동기화 | HTTPS 리스너 구성 시 사용 (아래 *TLS* 참고). |
+| ALB + AWS Load Balancer Controller (`Ingress`) | **Gateway API** `Gateway` + `HTTPRoute` (GatewayClass `approuting-istio`) | You declare routing, TLS and weights with standard API fields instead of Ingress annotations. |
+| ALB listeners / rules / target groups | `Gateway.listeners` / `HTTPRoute.rules` / `backendRefs` | Separation of roles: Gateway (infrastructure) ↔ HTTPRoute (app). |
+| `internal` vs. `internet-facing` scheme | The Gateway's `infrastructure.annotations` (`azure-load-balancer-internal`) | An internal LB uses a private IP from the `snet-ingress` subnet. |
+| NLB (`Service type=LoadBalancer`) | **Azure Load Balancer Standard** (`Service type=LoadBalancer`) | L4. AKS manages it, with no separate controller to install. |
+| AWS WAF | **Application Gateway (WAF v2)** / **Front Door WAF** | Putting it in front is the default architecture in the Microsoft baseline. |
+| ACM certificates | **Key Vault** certificates → synced with the Secrets Store CSI driver | Used when you configure an HTTPS listener (see *TLS* below). |
 
 > [!WARNING]
-> **ingress-nginx 는 종료되었습니다.** 커뮤니티 ingress-nginx 는 2026-03 에 유지보수가 끝났고, AKS 의 *애플리케이션 라우팅 애드온(NGINX)* 에 대한 Microsoft 보안 패치 지원도 **2026-11** 에 종료됩니다. 신규 구축은 Gateway API 를 쓰세요. 새 AKS Automatic 클러스터(1.36+)는 기본으로 Gateway API 입니다.
+> **ingress-nginx has been retired.** Maintenance of the community ingress-nginx ended in 2026-03, and Microsoft security patch support for the AKS *application routing add-on (NGINX)* also ends in **2026-11**. Use Gateway API for new deployments. New AKS Automatic clusters (1.36+) use Gateway API by default.
 
-### 인그레스 선택지 한눈에 보기
+### Ingress options at a glance
 
-| 선택지 | 특징 | 언제 |
+| Option | Characteristics | When to use |
 |---|---|---|
-| **App Routing Gateway API** (이 실습) | 사이드카 없는 관리형 Istio 컨트롤 플레인 + Envoy. 업그레이드는 AKS 와 함께. | 대부분의 HTTP/HTTPS 인그레스 (헤더/바디 크기 제한, Lua, rate limit 은 미지원) |
-| **Application Gateway for Containers** | 클러스터 밖의 완전 관리형 L7(ALB 에 가장 가까움), WAF 연동 | 고성능/WAF 필요, 클러스터 밖 L7 선호 |
-| Istio 서비스 메시 애드온 + Gateway API | 메시 기능 + 인그레스 | mTLS/트래픽 정책이 필요할 때 (App Routing Gateway API 와 동시 사용 불가) |
-| 자체 관리 (Envoy Gateway, NGINX Gateway Fabric 등) | 완전한 통제 | 관리형이 지원하지 않는 기능이 필요할 때 |
+| **App Routing Gateway API** (this lab) | Managed Istio control plane without sidecars, plus Envoy. It is upgraded together with AKS. | Most HTTP/HTTPS ingress (header/body size limits, Lua, and rate limiting are not supported) |
+| **Application Gateway for Containers** | Fully managed L7 outside the cluster (closest to ALB), WAF integration | You need high performance or WAF, or prefer L7 outside the cluster |
+| Istio service mesh add-on + Gateway API | Mesh features + ingress | You need mTLS/traffic policies (cannot be used together with App Routing Gateway API) |
+| Self-managed (Envoy Gateway, NGINX Gateway Fabric, etc.) | Full control | You need features the managed options do not support |
 
-## 설계 결정 (Best practice)
+## Design decisions (best practices)
 
-| 결정 | 이유 |
+| Decision | Why |
 |---|---|
-| 앱 컨테이너를 **ACR 에서** pull (`az acr import`) | 공용 레지스트리 장애/레이트 리밋 의존 제거, 이미지 스캔·감사. kubelet 의 `AcrPull` + Private Endpoint 경로를 그대로 검증합니다. |
-| Deployment: **requests/limits, probes, 비루트, capabilities drop, seccomp, 영역 분산(best-effort)** | Azure Policy 베이스라인(Lab 08)과 AKS Automatic 의 *Deployment Safeguards* 를 통과하는 구성. 영역 분산은 `ScheduleAnyway` 라 자원이 부족하면 한 영역에 몰릴 수 있지만, `DoNotSchedule` 은 업그레이드/장애 때 파드가 Pending 에 머물 수 있어 의도적으로 택하지 않았습니다. |
-| `PodDisruptionBudget` + `HPA(3~10)` | 노드 업그레이드/드레인 중에도 가용성 유지, 부하에 따른 자동 확장. |
-| NetworkPolicy: **앱 파드는 같은 네임스페이스(`web`)의 파드에서 오는 8080 만 허용** | Cilium 이 강제하는 네임스페이스 단위 격리. Envoy 프록시가 같은 네임스페이스에 만들어지므로 통과합니다. ⚠️ `pod_selector {}` 는 `web` 안의 *모든* 파드를 허용합니다. 더 좁히려면 `kubectl -n web get pods --show-labels` 로 Envoy 파드의 실제 라벨을 확인한 뒤 그 라벨로 제한하세요. (NetworkPolicy 는 앱 파드에만 적용해야 Envoy 의 외부 수신이 막히지 않습니다.) |
-| 네임스페이스 PSS: `baseline` 강제 + `restricted` 경고 | Envoy 프록시 파드가 같은 네임스페이스에 만들어지므로 enforce 는 baseline. |
-| `internal_gateway` 변수 | 공용/내부 노출을 코드 한 줄로 전환. 운영에서는 내부 LB + Application Gateway(WAF) 조합이 일반적입니다. |
-| 공용 Gateway 의 인바운드는 **03-network 노드 NSG** 에서 허용 | Standard LB 는 인바운드가 기본적으로 닫혀 있고, AKS 는 서브넷에 연결한 NSG 에 규칙을 추가하지 않습니다. 03-network 의 `AllowGatewayHttpHttps`(80/443, 출발지 `gateway_allowed_source_prefixes`)가 그 역할을 하며, 내부 Gateway 는 VNet 안 트래픽을 기본 규칙(`AllowVnetInBound`)이 허용합니다. |
+| Pull the app container **from ACR** (`az acr import`) | Removes the dependency on public registry outages and rate limits, and allows image scanning and auditing. It also verifies the kubelet's `AcrPull` role and the Private Endpoint path directly. |
+| Deployment: **requests/limits, probes, non-root, capabilities drop, seccomp, zone spread (best-effort)** | A configuration that passes the Azure Policy baseline (Lab 08) and AKS Automatic's *Deployment Safeguards*. Because zone spread uses `ScheduleAnyway`, pods can pile into one zone when resources are short; `DoNotSchedule` can leave pods stuck in Pending during upgrades or failures, so it was deliberately not chosen. |
+| `PodDisruptionBudget` + `HPA(3~10)` | Keeps the app available during node upgrades and drains, and scales automatically with load. |
+| NetworkPolicy: **app pods allow only port 8080 from pods in the same namespace (`web`)** | Namespace-level isolation enforced by Cilium. Traffic from the Envoy proxy gets through because the proxy is created in the same namespace. ⚠️ `pod_selector {}` allows *all* pods in `web`. To narrow it down, check the actual labels of the Envoy pods with `kubectl -n web get pods --show-labels` and restrict to those labels. (Apply the NetworkPolicy only to the app pods; otherwise, Envoy's inbound traffic from outside gets blocked.) |
+| Namespace PSS: enforce `baseline` + warn on `restricted` | The Envoy proxy pods are created in the same namespace, so enforce stays at baseline. |
+| `internal_gateway` variable | Switches between public and internal exposure with a single line of code. In production, the common setup is an internal LB combined with Application Gateway (WAF). |
+| Inbound traffic for a public Gateway is allowed in the **03-network node NSG** | A Standard LB blocks inbound traffic by default, and AKS does not add rules to an NSG you attached to the subnet. `AllowGatewayHttpHttps` in 03-network (80/443, source `gateway_allowed_source_prefixes`) fills that role, and for an internal Gateway the default rule (`AllowVnetInBound`) allows traffic from inside the VNet. |
 
-## 코드
+## Code
 
 <!-- tf:include path="terraform/07-ingress/versions.tf" -->
 ```hcl title="terraform/07-ingress/versions.tf"
@@ -73,13 +77,13 @@ terraform {
 <!-- tf:include path="terraform/07-ingress/providers.tf" -->
 ```hcl title="terraform/07-ingress/providers.tf"
 provider "azurerm" {
-  # subscription_id 는 ARM_SUBSCRIPTION_ID 환경 변수에서 읽습니다.
+  # subscription_id is read from the ARM_SUBSCRIPTION_ID environment variable.
   resource_provider_registrations = "none"
 
   features {}
 }
 
-# 06-workload 와 동일: kubelogin 으로 Entra ID 토큰을 받아 API 서버에 접속합니다.
+# Same as 06-workload: kubelogin gets an Entra ID token to connect to the API server.
 provider "kubernetes" {
   host                   = data.azurerm_kubernetes_cluster.this.kube_config[0].host
   cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.this.kube_config[0].cluster_ca_certificate)
@@ -96,33 +100,33 @@ provider "kubernetes" {
 <!-- tf:include path="terraform/07-ingress/variables.tf" -->
 ```hcl title="terraform/07-ingress/variables.tf"
 variable "workload" {
-  description = "워크로드 이름 (소문자/숫자 3~8자)"
+  description = "Workload name (3–8 lowercase letters or digits)"
   type        = string
   default     = "aksdemo"
 }
 
 variable "environment" {
-  description = "환경 구분 (dev, test, prod)"
+  description = "Environment (dev, test, prod)"
   type        = string
   default     = "dev"
 }
 
 variable "location" {
-  description = "Azure 리전"
+  description = "Azure region"
   type        = string
   default     = "koreacentral"
 }
 
 variable "namespace" {
-  description = "웹 앱과 Gateway 를 배포할 네임스페이스. Gateway 가 만드는 Envoy 프록시도 같은 네임스페이스에 생깁니다."
+  description = "Namespace for the web app and Gateway. The Envoy proxy that the Gateway creates also runs in this namespace."
   type        = string
   default     = "web"
 }
 
 variable "app_image" {
   description = <<-EOT
-    웹 앱 이미지. 비워 두면 <acr>.azurecr.io/demo/aspnetapp:v1 을 사용합니다.
-    사전에 `az acr import` 로 ACR 에 넣어 두어야 합니다 (Lab 07 참고).
+    Web app image. If left empty, <acr>.azurecr.io/demo/aspnetapp:v1 is used.
+    Import it into ACR beforehand with `az acr import` (see Lab 07).
   EOT
   type        = string
   default     = ""
@@ -130,15 +134,15 @@ variable "app_image" {
 
 variable "internal_gateway" {
   description = <<-EOT
-    true 이면 Gateway 를 내부 로드밸런서(snet-ingress 서브넷의 사설 IP)로 노출합니다.
-    false(기본값)이면 공인 IP 로 노출합니다 (ALB internet-facing / internal 스킴 선택과 같은 개념).
+    If true, the Gateway is exposed through an internal load balancer (private IP in the snet-ingress subnet).
+    If false (default), it is exposed through a public IP (like choosing the ALB internet-facing vs. internal scheme).
   EOT
   type        = bool
   default     = false
 }
 
 variable "ingress_subnet_name" {
-  description = "internal_gateway=true 일 때 로드밸런서 프런트엔드 IP 를 할당할 서브넷 이름 (03-network 의 snet-ingress)"
+  description = "Subnet name for the load balancer frontend IP when internal_gateway=true (snet-ingress from 03-network)"
   type        = string
   default     = "snet-ingress"
 }
@@ -177,21 +181,21 @@ data "azurerm_container_registry" "this" {
 ```
 <!-- /tf:include -->
 
-**`app.tf`** — 데모 앱과 운영 필수 리소스(PDB, HPA, NetworkPolicy)
+**`app.tf`** — the demo app and the essential production resources (PDB, HPA, NetworkPolicy)
 
 <!-- tf:include path="terraform/07-ingress/app.tf" -->
 ```hcl title="terraform/07-ingress/app.tf"
 # ---------------------------------------------------------------------------
-# 데모 웹 앱 (ASP.NET 샘플) : Namespace / Deployment / Service / PDB / HPA / NetworkPolicy
-# 프로덕션 권장 사항(리소스 요청·제한, probe, 비루트 실행, 영역 분산, PDB, HPA)을 모두 포함합니다.
+# Demo web app (ASP.NET sample): Namespace / Deployment / Service / PDB / HPA / NetworkPolicy
+# Includes every production recommendation (resource requests/limits, probes, non-root user, zone spread, PDB, HPA).
 # ---------------------------------------------------------------------------
 resource "kubernetes_namespace_v1" "web" {
   metadata {
     name = var.namespace
 
     labels = {
-      # baseline 은 강제, restricted 위반은 경고로 알려 줍니다.
-      # (Gateway 가 만드는 Envoy 프록시 파드가 같은 네임스페이스에 생성되므로 enforce 는 baseline 으로 둡니다.)
+      # baseline is enforced; restricted violations are only reported as warnings.
+      # (The Envoy proxy pods created by the Gateway run in the same namespace, so enforce stays at baseline.)
       "pod-security.kubernetes.io/enforce" = "baseline"
       "pod-security.kubernetes.io/warn"    = "restricted"
       "pod-security.kubernetes.io/audit"   = "restricted"
@@ -207,7 +211,7 @@ resource "kubernetes_deployment_v1" "app" {
   }
 
   lifecycle {
-    # replicas 는 아래 HPA 가 관리합니다. Terraform 이 값을 되돌리지 않도록 무시합니다.
+    # The HPA below manages replicas. Ignore the attribute so Terraform does not revert the value.
     ignore_changes = [spec[0].replicas]
   }
 
@@ -226,15 +230,16 @@ resource "kubernetes_deployment_v1" "app" {
       spec {
         security_context {
           run_as_non_root = true
-          run_as_user     = 1654 # .NET 이미지의 비루트 사용자 'app'
+          run_as_user     = 1654 # non-root user 'app' in the .NET image
 
           seccomp_profile {
             type = "RuntimeDefault"
           }
         }
 
-        # 가용 영역(zone)별 파드 분산(best-effort): AWS 에서 AZ 분산을 위해 쓰던 topologySpreadConstraints 와 동일.
-        # ScheduleAnyway 는 균형이 깨져도 스케줄을 막지 않습니다. DoNotSchedule 은 엄격하지만 업그레이드/장애 때 Pending 을 만들 수 있습니다.
+        # Best-effort pod spread across availability zones: same as the topologySpreadConstraints used for AZ spread on AWS.
+        # ScheduleAnyway does not block scheduling when the spread becomes unbalanced. DoNotSchedule is strict
+        # but can leave pods Pending during upgrades or failures.
         topology_spread_constraint {
           max_skew           = 1
           topology_key       = "topology.kubernetes.io/zone"
@@ -264,7 +269,7 @@ resource "kubernetes_deployment_v1" "app" {
             }
           }
 
-          # kubernetes provider 는 컨테이너 security_context 에서 생략한 값을 false 로 보내므로 run_as_non_root 를 명시합니다.
+          # The kubernetes provider sends false for omitted security_context values, so set run_as_non_root explicitly.
           security_context {
             allow_privilege_escalation = false
             run_as_non_root            = true
@@ -325,7 +330,7 @@ resource "kubernetes_service_v1" "app" {
   }
 }
 
-# 노드 업그레이드/드레인 중에도 항상 최소 2개 파드는 유지
+# Always keep at least 2 pods running, even during node upgrades/drains
 resource "kubernetes_pod_disruption_budget_v1" "app" {
   metadata {
     name      = local.app_name
@@ -372,11 +377,12 @@ resource "kubernetes_horizontal_pod_autoscaler_v2" "app" {
   }
 }
 
-# Cilium 이 강제하는 NetworkPolicy: 앱 파드는 "같은 네임스페이스의 파드"에서 오는 8080 트래픽만 허용합니다.
-# Gateway 의 Envoy 프록시가 같은 네임스페이스에 만들어지므로 이 규칙으로 통과합니다.
-# 주의: pod_selector {} 는 이 네임스페이스의 "모든" 파드를 허용합니다(다른 네임스페이스는 차단).
-#       더 좁히려면 `kubectl get pods -n web --show-labels` 로 Envoy 파드의 실제 라벨을 확인한 뒤 그 라벨로 selector 를 제한하세요.
-# (Security Group 이 파드 단위로 적용되는 것과 비슷하지만, 쿠버네티스 라벨 셀렉터로 선언합니다.)
+# NetworkPolicy enforced by Cilium: app pods accept only port 8080 traffic coming from "pods in the same namespace".
+# The Gateway's Envoy proxy is created in the same namespace, so its traffic passes this rule.
+# Note: pod_selector {} allows "all" pods in this namespace (other namespaces are blocked).
+#       To narrow it, check the actual labels of the Envoy pods with `kubectl get pods -n web --show-labels`
+#       and restrict the selector to those labels.
+# (Similar to Security Groups applied per pod, but declared with Kubernetes label selectors.)
 resource "kubernetes_network_policy_v1" "app" {
   metadata {
     name      = "${local.app_name}-allow-same-namespace"
@@ -405,22 +411,22 @@ resource "kubernetes_network_policy_v1" "app" {
 ```
 <!-- /tf:include -->
 
-**`gateway.tf`** — Gateway 와 HTTPRoute
+**`gateway.tf`** — Gateway and HTTPRoute
 
 <!-- tf:include path="terraform/07-ingress/gateway.tf" -->
 ```hcl title="terraform/07-ingress/gateway.tf"
 # ---------------------------------------------------------------------------
-# Gateway API 로 외부 트래픽 받기  (AWS Load Balancer Controller 의 Ingress/ALB 에 해당)
+# Receiving external traffic with the Gateway API  (equivalent to Ingress/ALB in the AWS Load Balancer Controller)
 #
-#   GatewayClass(approuting-istio) : AKS 가 설치 (05-aks 의 azapi 단계에서 활성화)
-#   Gateway                        : 포트/프로토콜/로드밸런서 노출 방식 → 플랫폼 팀 관점 (ALB + Listener)
-#   HTTPRoute                      : 호스트/경로 → 서비스 매핑          → 앱 팀 관점   (Listener rule + Target group)
+#   GatewayClass(approuting-istio) : installed by AKS (enabled in the azapi step of 05-aks)
+#   Gateway                        : port/protocol/load balancer exposure → platform team view (ALB + Listener)
+#   HTTPRoute                      : host/path → service mapping          → app team view      (Listener rule + Target group)
 #
-# Gateway 를 적용하면 같은 네임스페이스에 Envoy 프록시 Deployment, LoadBalancer Service, HPA, PDB 가 자동 생성됩니다.
+# Applying a Gateway auto-creates an Envoy proxy Deployment, LoadBalancer Service, HPA, and PDB in the same namespace.
 # ---------------------------------------------------------------------------
 locals {
-  # internal_gateway = true 일 때만 Azure 내부 로드밸런서(사설 IP)를 쓰도록 Service annotation 을 전달합니다.
-  # (조건에 따라 키 자체가 없어야 하므로 tomap + merge 패턴을 사용합니다.)
+  # Pass Service annotations for an Azure internal load balancer (private IP) only when internal_gateway = true.
+  # (The key must be absent entirely depending on the condition, so this uses the tomap + merge pattern.)
   gateway_infrastructure = var.internal_gateway ? tomap({
     infrastructure = {
       annotations = {
@@ -512,22 +518,22 @@ resource "kubernetes_manifest" "http_route" {
 <!-- tf:include path="terraform/07-ingress/outputs.tf" -->
 ```hcl title="terraform/07-ingress/outputs.tf"
 output "namespace" {
-  description = "웹 앱 네임스페이스"
+  description = "Web app namespace"
   value       = kubernetes_namespace_v1.web.metadata[0].name
 }
 
 output "app_image" {
-  description = "배포된 이미지 (ACR 에 미리 import 되어 있어야 합니다)"
+  description = "Deployed image (must be imported into ACR beforehand)"
   value       = local.app_image
 }
 
 output "gateway_address_command" {
-  description = "Gateway 에 할당된 로드밸런서 주소 조회 (할당까지 1~3분 소요)"
+  description = "Look up the load balancer address assigned to the Gateway (assignment takes 1–3 min)"
   value       = "kubectl -n ${var.namespace} get gateway web-gateway -o jsonpath='{.status.addresses[0].value}'"
 }
 
 output "curl_command" {
-  description = "Gateway 주소로 요청 보내기 (internal_gateway=false 일 때)"
+  description = "Send a request to the Gateway address (when internal_gateway=false)"
   value       = "curl -i http://$(kubectl -n ${var.namespace} get gateway web-gateway -o jsonpath='{.status.addresses[0].value}')/"
 }
 ```
@@ -535,7 +541,7 @@ output "curl_command" {
 
 <!-- tf:include path="terraform/07-ingress/tests/plan.tftest.hcl" -->
 ```hcl title="terraform/07-ingress/tests/plan.tftest.hcl"
-# Azure 없이 plan 로직만 검증: terraform -chdir=terraform/07-ingress test
+# Verify only the plan logic, without Azure: terraform -chdir=terraform/07-ingress test
 mock_provider "azurerm" {
   source = "../mocks"
 }
@@ -547,7 +553,7 @@ run "plan_public_gateway" {
 
   assert {
     condition     = !contains(keys(local.gateway_spec), "infrastructure")
-    error_message = "공용 Gateway 에는 infrastructure(annotation)가 없어야 합니다."
+    error_message = "A public Gateway must not have infrastructure (annotations)."
   }
 }
 
@@ -560,22 +566,22 @@ run "plan_internal_gateway" {
 
   assert {
     condition     = local.gateway_spec.infrastructure.annotations["service.beta.kubernetes.io/azure-load-balancer-internal"] == "true"
-    error_message = "내부 Gateway 는 internal LB annotation 이 있어야 합니다."
+    error_message = "An internal Gateway must have the internal LB annotation."
   }
 }
 ```
 <!-- /tf:include -->
 
-## 실습 따라하기
+## Walkthrough
 
-### 1단계. 앱 이미지를 ACR 로 가져오기
+### Step 1. Import the app image into ACR
 
 ```bash
 ACR=$(terraform -chdir=terraform/04-platform output -raw acr_name)
 az acr import -n "$ACR" --source mcr.microsoft.com/dotnet/samples:aspnetapp --image demo/aspnetapp:v1
 ```
 
-### 2단계. 적용
+### Step 2. Apply
 
 ```bash
 cd terraform/07-ingress
@@ -584,64 +590,64 @@ terraform plan -out tfplan
 terraform apply tfplan
 ```
 
-### 3단계. 검증
+### Step 3. Verify
 
 ```bash
-# Gateway 가 Programmed 이고 주소가 할당되었는가 (1~3분)
+# Is the Gateway Programmed and has it been assigned an address? (1–3 min)
 kubectl -n web get gateway,httproute
 kubectl -n web get gateway web-gateway -o jsonpath='{.status.conditions[?(@.type=="Programmed")].status}{"\n"}'
 
-# Gateway 가 만들어 낸 리소스: Envoy Deployment/Service/HPA/PDB
+# Resources the Gateway created: Envoy Deployment/Service/HPA/PDB
 kubectl -n web get deploy,svc,hpa,pdb
 
-# 요청
+# Request
 IP=$(kubectl -n web get gateway web-gateway -o jsonpath='{.status.addresses[0].value}')
 curl -i "http://$IP/"
 
-# 파드가 영역별로 분산되었는가
+# Are the pods spread across zones?
 kubectl -n web get pods -l app=aspnetapp -o wide
 kubectl -n web get pods -l app=aspnetapp -o jsonpath='{range .items[*]}{.spec.nodeName}{"\n"}{end}' | sort | uniq -c
 
-# 액세스 로그 (Envoy 기본 활성, JSON 한 줄). Envoy 파드가 2개라 `deploy/...` 로는 한 파드의 로그만(시작 로그일 수도) 보이므로 라벨로 모두 봅니다
+# Access logs (Envoy enables them by default, single-line JSON). There are 2 Envoy pods, so `deploy/...` would show the logs of only one pod (possibly just startup logs); use the label to see them all
 kubectl -n web logs -l gateway.networking.k8s.io/gateway-name=web-gateway --tail=3 --prefix
 ```
 
-### 4단계. 동작 실험
+### Step 4. Run behavior experiments
 
 ```bash
-# (a) 부하를 주고 HPA 가 늘어나는지 관찰
+# (a) Generate load and watch the HPA scale out
 kubectl -n web get hpa -w &
 kubectl -n web run load --rm -i --restart=Never --image=mcr.microsoft.com/cbl-mariner/busybox:2.0 -- \
   sh -c 'for i in $(seq 1 3000); do wget -q -O- http://aspnetapp.web.svc.cluster.local/ >/dev/null; done'
 
-# (b) NetworkPolicy: 다른 네임스페이스에서는 앱에 직접 접근할 수 없다
+# (b) NetworkPolicy: other namespaces cannot reach the app directly
 kubectl run np-test --rm -i --restart=Never --image=mcr.microsoft.com/cbl-mariner/busybox:2.0 -- \
-  wget -T 3 -qO- http://aspnetapp.web.svc.cluster.local/ || echo "차단됨 (기대한 동작)"
+  wget -T 3 -qO- http://aspnetapp.web.svc.cluster.local/ || echo "Blocked (expected behavior)"
 
-# (c) 내부 로드밸런서로 전환 → snet-ingress 의 사설 IP
+# (c) Switch to the internal load balancer → a private IP in snet-ingress
 terraform apply -var internal_gateway=true
 kubectl -n web get gateway web-gateway -o jsonpath='{.status.addresses[0].value}{"\n"}'   # 10.10.2.x
 ```
 
-### TLS (HTTPS) 로 확장하기
+### Extending to TLS (HTTPS)
 
-`Gateway` 에 `443/HTTPS` 리스너를 추가하고 `tls.certificateRefs` 로 쿠버네티스 Secret 을 가리킵니다. 노드 NSG(03-network)는 80 과 443 을 이미 허용하므로 NSG 를 고칠 필요가 없습니다. 인증서는 **Key Vault 에 두고 Secrets Store CSI 의 `secretObjects`** 로 Secret 에 동기화하는 것이 Microsoft 베이스라인 방식입니다(Lab 06 의 SecretProviderClass 패턴과 동일, `Key Vault Certificate User` 역할 필요). 자세한 절차는 [App Routing Gateway API: DNS 와 TLS](https://learn.microsoft.com/azure/aks/app-routing-gateway-api-dns-tls) 를 참고하세요.
+Add a `443/HTTPS` listener to the `Gateway` and point `tls.certificateRefs` at a Kubernetes Secret. The node NSG (03-network) already allows ports 80 and 443, so you don't need to change the NSG. The Microsoft baseline approach is to **keep the certificate in Key Vault and sync it to a Secret with the Secrets Store CSI driver's `secretObjects`** (the same SecretProviderClass pattern as in Lab 06; the `Key Vault Certificate User` role is required). For the detailed procedure, see [App Routing Gateway API: DNS and TLS](https://learn.microsoft.com/azure/aks/app-routing-gateway-api-dns-tls).
 
-### 자동 검증 스크립트
+### Automated verification script
 
-Gateway(Programmed) → HTTPRoute(Accepted) → Deployment/HPA/PDB/NetworkPolicy 를 확인하고, 공용 Gateway 라면 실제로 `curl` 요청을 보내 `200` 을 확인합니다(내부 Gateway 는 건너뜀).
+It checks Gateway (Programmed) → HTTPRoute (Accepted) → Deployment/HPA/PDB/NetworkPolicy and, for a public Gateway, sends a real `curl` request and expects `200` (skipped for an internal Gateway).
 
 ```bash
-cd ../..                          # 저장소 루트에서 실행
+cd ../..                          # run from the repository root
 scripts/verify.sh 07-ingress
 ```
 
 <!-- tf:include path="scripts/verify/07-ingress.sh" -->
 ```bash title="scripts/verify/07-ingress.sh"
 #!/usr/bin/env bash
-# Lab 07 검증: Gateway API 로 노출한 웹 앱이 정상 동작하는지 확인합니다 (읽기 전용).
-#   Gateway(Programmed) → HTTPRoute(Accepted) → Service → Pod, 그리고 PDB · HPA · NetworkPolicy
-# 사용법: scripts/verify.sh 07-ingress
+# Lab 07 verification: checks that the web app exposed through the Gateway API works (read-only).
+#   Gateway (Programmed) → HTTPRoute (Accepted) → Service → Pod, plus PDB · HPA · NetworkPolicy
+# Usage: scripts/verify.sh 07-ingress
 # shellcheck source=../lib/common.sh
 source "$(dirname "${BASH_SOURCE[0]}")/../lib/common.sh"
 
@@ -653,61 +659,61 @@ verify_stack() {
 
   section "07-ingress · Gateway API (${ns:-?})"
   if [ -z "$ns" ]; then
-    fail "terraform output 을 읽을 수 없습니다. 07-ingress 에서 init/apply 를 마쳤나요?"
+    fail "Can't read terraform output. Did you finish init/apply in 07-ingress?"
     return
   fi
   if ! require_cmd kubectl kubelogin; then
-    skip "kubectl/kubelogin 이 없어 건너뜁니다"
+    skip "kubectl/kubelogin not found; skipping"
     return
   fi
   if ! kube_login "$rg" "$aks_name"; then
-    fail "kubeconfig 를 받지 못했습니다 (az login 과 Cluster User Role 확인)"
+    fail "Couldn't get the kubeconfig (check az login and the Cluster User Role)"
     return
   fi
 
-  # istio 등 다른 CRD 와 이름이 겹치지 않도록 API 그룹까지 적습니다.
+  # Spell out the API group so that the name doesn't clash with other CRDs such as istio's.
   gw="$(kj get gateway.gateway.networking.k8s.io web-gateway -n "$ns")"
-  jq_ok "Gateway web-gateway 가 Programmed" "$gw" '.status.conditions[]? | select(.type == "Programmed") | .status == "True"'
+  jq_ok "Gateway web-gateway is Programmed" "$gw" '.status.conditions[]? | select(.type == "Programmed") | .status == "True"'
   addr="$(jv "$gw" '.status.addresses[0].value')"
-  expect_set "Gateway 에 할당된 로드밸런서 주소" "$addr"
+  expect_set "Load balancer address assigned to the Gateway" "$addr"
 
   route="$(kj get httproute.gateway.networking.k8s.io aspnetapp -n "$ns")"
-  jq_ok "HTTPRoute aspnetapp 이 Accepted" "$route" '.status.parents[]?.conditions[]? | select(.type == "Accepted") | .status == "True"'
+  jq_ok "HTTPRoute aspnetapp is Accepted" "$route" '.status.parents[]?.conditions[]? | select(.type == "Accepted") | .status == "True"'
 
   dep="$(kj get deployment aspnetapp -n "$ns")"
-  jq_ok "Deployment aspnetapp: 준비된 레플리카 = 원하는 수" "$dep" '(.status.readyReplicas // 0) == .spec.replicas and .spec.replicas >= 1'
-  jq_ok "HPA aspnetapp 존재" "$(kj get hpa aspnetapp -n "$ns")" '.metadata.name == "aspnetapp"'
-  jq_ok "PodDisruptionBudget aspnetapp 존재" "$(kj get pdb aspnetapp -n "$ns")" '.metadata.name == "aspnetapp"'
-  jq_ok "NetworkPolicy 존재 (같은 네임스페이스에서 오는 트래픽만 허용)" \
+  jq_ok "Deployment aspnetapp: ready replicas = desired replicas" "$dep" '(.status.readyReplicas // 0) == .spec.replicas and .spec.replicas >= 1'
+  jq_ok "HPA aspnetapp exists" "$(kj get hpa aspnetapp -n "$ns")" '.metadata.name == "aspnetapp"'
+  jq_ok "PodDisruptionBudget aspnetapp exists" "$(kj get pdb aspnetapp -n "$ns")" '.metadata.name == "aspnetapp"'
+  jq_ok "NetworkPolicy exists (allows only traffic from the same namespace)" \
     "$(kj get networkpolicy aspnetapp-allow-same-namespace -n "$ns")" '.metadata.name == "aspnetapp-allow-same-namespace"'
 
-  # 실제 요청: 내부(사설 IP) Gateway 는 VNet 밖에서 접근할 수 없으므로 건너뜁니다.
+  # Real request: an internal (private IP) Gateway can't be reached from outside the VNet, so skip it.
   if printf '%s' "$addr" | grep -Eq '^(10\.|172\.(1[6-9]|2[0-9]|3[01])\.|192\.168\.)'; then
-    skip "내부 Gateway($addr)는 VNet 안에서만 접근할 수 있어 curl 을 건너뜁니다"
+    skip "Internal Gateway ($addr) is reachable only from inside the VNet; skipping curl"
   elif [ -n "$addr" ]; then
     code=""
-    for i in 1 2 3 4 5 6; do # 방금 만든 로드밸런서는 응답까지 1분 정도 걸릴 수 있습니다.
+    for i in 1 2 3 4 5 6; do # A load balancer that was just created can take about a minute to respond.
       code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "http://$addr/" 2>/dev/null || true)"
       [ "$code" = "200" ] && break
       [ "$i" -lt 6 ] && sleep 10
     done
-    expect_eq "GET http://$addr/ 응답 코드" "$code" "200"
+    expect_eq "GET http://$addr/ response code" "$code" "200"
   fi
 }
 
-# 직접 실행(scripts/verify/07-ingress.sh)도 가능합니다.
+# You can also run it directly (scripts/verify/07-ingress.sh).
 if [ "${BASH_SOURCE[0]}" = "$0" ]; then verify_stack; summary; fi
 ```
 <!-- /tf:include -->
 
-## 자주 만나는 문제
+## Common issues
 
-| 증상 | 원인 / 해결 |
+| Symptom | Cause / Fix |
 |---|---|
-| `Gateway` 의 `ADDRESS` 가 비어 있음 | LB 프로비저닝 대기(1–3분). `kubectl -n web describe gateway web-gateway` 의 Conditions 와 `kubectl -n web get events` 확인. 공인 IP 쿼터 부족일 수 있습니다. |
-| plan 오류 `no matches for kind "Gateway"` / GatewayClass 없음 | Lab 05 의 `azapi_update_resource.gateway_api` 가 적용되지 않음 (`enable_gateway_api=false` 였는지 확인). `kubectl get gatewayclass`. |
-| `ImagePullBackOff` | `az acr import` 누락(이미지 경로 `demo/aspnetapp:v1`). `kubectl describe pod` 확인. |
-| `curl` 이 타임아웃 | 03-network 노드 서브넷 NSG 의 `AllowGatewayHttpHttps` 규칙(AKS 는 서브넷에 연결한 NSG 를 수정하지 않으므로 Terraform 이 만든 규칙이 필요)과 `gateway_allowed_source_prefixes` 에 내 IP 가 포함되는지 확인, 내부 Gateway(`internal_gateway=true`)인데 VNet 밖에서 접근, 또는 NetworkPolicy. |
-| HTTPRoute 가 `Accepted: False` | `parentRefs` 이름 불일치 또는 `allowedRoutes`(Same namespace) 위반. |
+| The `ADDRESS` of the `Gateway` is empty | The LB is still provisioning (1–3 min). Check the Conditions in `kubectl -n web describe gateway web-gateway` and `kubectl -n web get events`. The public IP quota may be exhausted. |
+| Plan error `no matches for kind "Gateway"` / no GatewayClass | `azapi_update_resource.gateway_api` from Lab 05 was not applied (check whether `enable_gateway_api=false` was set). Run `kubectl get gatewayclass`. |
+| `ImagePullBackOff` | `az acr import` was skipped (image path `demo/aspnetapp:v1`). Check `kubectl describe pod`. |
+| `curl` times out | Check that the `AllowGatewayHttpHttps` rule exists on the 03-network node subnet NSG (AKS does not modify an NSG attached to the subnet, so the rule Terraform creates is required) and that your IP is included in `gateway_allowed_source_prefixes`. Other causes: you are accessing an internal Gateway (`internal_gateway=true`) from outside the VNet, or a NetworkPolicy is blocking the traffic. |
+| HTTPRoute shows `Accepted: False` | The `parentRefs` name does not match, or `allowedRoutes` (Same namespace) is violated. |
 
-다음 → [Lab 08. 거버넌스와 보안: Azure Policy · Defender · 예산](08-governance.md)
+Next → [Lab 08. Governance and security: Azure Policy · Defender · locks · budgets](08-governance.md)

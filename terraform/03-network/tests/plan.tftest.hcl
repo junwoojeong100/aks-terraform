@@ -1,4 +1,4 @@
-# Azure 없이 plan 로직만 검증: terraform -chdir=terraform/03-network test
+# Verify only the plan logic, without Azure: terraform -chdir=terraform/03-network test
 mock_provider "azurerm" {
   source = "../mocks"
 }
@@ -8,12 +8,12 @@ run "plan_defaults" {
 
   assert {
     condition     = length(azurerm_subnet.aks_apiserver.delegation) == 1
-    error_message = "API 서버 서브넷은 Microsoft.ContainerService/managedClusters 로 위임되어야 합니다."
+    error_message = "The API server subnet must be delegated to Microsoft.ContainerService/managedClusters."
   }
 
   assert {
     condition     = azurerm_subnet.aks_nodes.default_outbound_access_enabled == false
-    error_message = "노드 서브넷은 기본 아웃바운드 IP 에 의존하지 않아야 합니다 (NAT Gateway 사용)."
+    error_message = "The node subnet must not rely on the default outbound IP (use a NAT Gateway)."
   }
 }
 
@@ -26,11 +26,11 @@ run "plan_standard_nat" {
 
   assert {
     condition     = azurerm_nat_gateway.this.zones == toset(["1"])
-    error_message = "Standard NAT Gateway 는 단일 가용 영역에 배치해야 합니다."
+    error_message = "A Standard NAT Gateway must be placed in a single availability zone."
   }
 }
 
-# 노드 NSG: AKS 는 서브넷에 연결한 NSG 를 수정하지 않으므로 필요한 인바운드 허용 규칙이 Terraform 에 있어야 합니다.
+# Node NSG: AKS does not modify an NSG attached to the subnet, so the required inbound allow rules must exist in Terraform.
 run "nodes_nsg_allows_overlay_and_gateway_traffic" {
   command = plan
 
@@ -39,7 +39,7 @@ run "nodes_nsg_allows_overlay_and_gateway_traffic" {
       azurerm_network_security_rule.nodes_allow_nodes_to_pods.source_address_prefix == var.subnet_cidrs.aks_nodes &&
       azurerm_network_security_rule.nodes_allow_nodes_to_pods.destination_address_prefix == var.pod_cidr
     )
-    error_message = "노드 서브넷 → Pod CIDR 인바운드를 허용해야 합니다 (Azure CNI Overlay 의 Service 트래픽 라우팅)."
+    error_message = "Inbound from the node subnet → Pod CIDR must be allowed (Service traffic routing in Azure CNI Overlay)."
   }
 
   assert {
@@ -47,7 +47,7 @@ run "nodes_nsg_allows_overlay_and_gateway_traffic" {
       azurerm_network_security_rule.nodes_allow_pods_to_pods.source_address_prefix == var.pod_cidr &&
       azurerm_network_security_rule.nodes_allow_pods_to_pods.destination_address_prefix == var.pod_cidr
     )
-    error_message = "Pod CIDR 간 인바운드를 허용해야 합니다 (나중에 Deny 규칙이 추가되어도 노드 간 Pod 통신이 끊기지 않게)."
+    error_message = "Inbound between Pod CIDRs must be allowed (so cross-node Pod traffic survives a Deny rule added later)."
   }
 
   assert {
@@ -55,7 +55,7 @@ run "nodes_nsg_allows_overlay_and_gateway_traffic" {
       azurerm_network_security_rule.nodes_allow_apiserver.source_address_prefix == var.subnet_cidrs.aks_apiserver &&
       azurerm_network_security_rule.nodes_allow_apiserver.destination_address_prefixes == toset([var.subnet_cidrs.aks_nodes, var.pod_cidr])
     )
-    error_message = "API 서버 서브넷 → 노드/Pod CIDR 인바운드를 허용해야 합니다."
+    error_message = "Inbound from the API server subnet → node/Pod CIDR must be allowed."
   }
 
   assert {
@@ -64,7 +64,7 @@ run "nodes_nsg_allows_overlay_and_gateway_traffic" {
       azurerm_network_security_rule.nodes_allow_gateway[0].source_address_prefix == "Internet" &&
       azurerm_network_security_rule.nodes_allow_gateway[0].destination_port_ranges == toset(["80", "443"])
     )
-    error_message = "기본값(공용 Gateway)에서는 인터넷 → 80/443 인바운드를 허용해야 합니다."
+    error_message = "With the default (public Gateway), inbound internet → 80/443 must be allowed."
   }
 }
 
@@ -80,7 +80,7 @@ run "gateway_rule_with_multiple_cidrs" {
       azurerm_network_security_rule.nodes_allow_gateway[0].source_address_prefixes == toset(["203.0.113.0/24", "198.51.100.10/32"]) &&
       azurerm_network_security_rule.nodes_allow_gateway[0].source_address_prefix == null
     )
-    error_message = "출발지가 여러 개이면 복수 속성(source_address_prefixes)만 써야 합니다."
+    error_message = "With multiple sources, only the plural attribute (source_address_prefixes) must be used."
   }
 }
 
@@ -88,7 +88,7 @@ run "gateway_rule_with_single_cidr" {
   command = plan
 
   variables {
-    # 중복은 하나로 합쳐지므로 값이 1개일 때와 같이 단수 속성을 씁니다.
+    # Duplicates are merged into one, so the singular attribute is used, just as with a single value.
     gateway_allowed_source_prefixes = ["203.0.113.10/32", "203.0.113.10/32"]
   }
 
@@ -97,7 +97,7 @@ run "gateway_rule_with_single_cidr" {
       azurerm_network_security_rule.nodes_allow_gateway[0].source_address_prefix == "203.0.113.10/32" &&
       azurerm_network_security_rule.nodes_allow_gateway[0].source_address_prefixes == null
     )
-    error_message = "출발지가 하나뿐이면 단수 속성(source_address_prefix)만 써야 합니다."
+    error_message = "With only one source, only the singular attribute (source_address_prefix) must be used."
   }
 }
 
@@ -110,7 +110,7 @@ run "no_gateway_rule_for_internal_only" {
 
   assert {
     condition     = length(azurerm_network_security_rule.nodes_allow_gateway) == 0
-    error_message = "gateway_allowed_source_prefixes = [] 이면 공용 Gateway 허용 규칙을 만들지 않아야 합니다."
+    error_message = "If gateway_allowed_source_prefixes = [], the public Gateway allow rule must not be created."
   }
 }
 

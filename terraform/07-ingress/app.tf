@@ -1,14 +1,14 @@
 # ---------------------------------------------------------------------------
-# 데모 웹 앱 (ASP.NET 샘플) : Namespace / Deployment / Service / PDB / HPA / NetworkPolicy
-# 프로덕션 권장 사항(리소스 요청·제한, probe, 비루트 실행, 영역 분산, PDB, HPA)을 모두 포함합니다.
+# Demo web app (ASP.NET sample): Namespace / Deployment / Service / PDB / HPA / NetworkPolicy
+# Includes every production recommendation (resource requests/limits, probes, non-root user, zone spread, PDB, HPA).
 # ---------------------------------------------------------------------------
 resource "kubernetes_namespace_v1" "web" {
   metadata {
     name = var.namespace
 
     labels = {
-      # baseline 은 강제, restricted 위반은 경고로 알려 줍니다.
-      # (Gateway 가 만드는 Envoy 프록시 파드가 같은 네임스페이스에 생성되므로 enforce 는 baseline 으로 둡니다.)
+      # baseline is enforced; restricted violations are only reported as warnings.
+      # (The Envoy proxy pods created by the Gateway run in the same namespace, so enforce stays at baseline.)
       "pod-security.kubernetes.io/enforce" = "baseline"
       "pod-security.kubernetes.io/warn"    = "restricted"
       "pod-security.kubernetes.io/audit"   = "restricted"
@@ -24,7 +24,7 @@ resource "kubernetes_deployment_v1" "app" {
   }
 
   lifecycle {
-    # replicas 는 아래 HPA 가 관리합니다. Terraform 이 값을 되돌리지 않도록 무시합니다.
+    # The HPA below manages replicas. Ignore the attribute so Terraform does not revert the value.
     ignore_changes = [spec[0].replicas]
   }
 
@@ -43,15 +43,16 @@ resource "kubernetes_deployment_v1" "app" {
       spec {
         security_context {
           run_as_non_root = true
-          run_as_user     = 1654 # .NET 이미지의 비루트 사용자 'app'
+          run_as_user     = 1654 # non-root user 'app' in the .NET image
 
           seccomp_profile {
             type = "RuntimeDefault"
           }
         }
 
-        # 가용 영역(zone)별 파드 분산(best-effort): AWS 에서 AZ 분산을 위해 쓰던 topologySpreadConstraints 와 동일.
-        # ScheduleAnyway 는 균형이 깨져도 스케줄을 막지 않습니다. DoNotSchedule 은 엄격하지만 업그레이드/장애 때 Pending 을 만들 수 있습니다.
+        # Best-effort pod spread across availability zones: same as the topologySpreadConstraints used for AZ spread on AWS.
+        # ScheduleAnyway does not block scheduling when the spread becomes unbalanced. DoNotSchedule is strict
+        # but can leave pods Pending during upgrades or failures.
         topology_spread_constraint {
           max_skew           = 1
           topology_key       = "topology.kubernetes.io/zone"
@@ -81,7 +82,7 @@ resource "kubernetes_deployment_v1" "app" {
             }
           }
 
-          # kubernetes provider 는 컨테이너 security_context 에서 생략한 값을 false 로 보내므로 run_as_non_root 를 명시합니다.
+          # The kubernetes provider sends false for omitted security_context values, so set run_as_non_root explicitly.
           security_context {
             allow_privilege_escalation = false
             run_as_non_root            = true
@@ -142,7 +143,7 @@ resource "kubernetes_service_v1" "app" {
   }
 }
 
-# 노드 업그레이드/드레인 중에도 항상 최소 2개 파드는 유지
+# Always keep at least 2 pods running, even during node upgrades/drains
 resource "kubernetes_pod_disruption_budget_v1" "app" {
   metadata {
     name      = local.app_name
@@ -189,11 +190,12 @@ resource "kubernetes_horizontal_pod_autoscaler_v2" "app" {
   }
 }
 
-# Cilium 이 강제하는 NetworkPolicy: 앱 파드는 "같은 네임스페이스의 파드"에서 오는 8080 트래픽만 허용합니다.
-# Gateway 의 Envoy 프록시가 같은 네임스페이스에 만들어지므로 이 규칙으로 통과합니다.
-# 주의: pod_selector {} 는 이 네임스페이스의 "모든" 파드를 허용합니다(다른 네임스페이스는 차단).
-#       더 좁히려면 `kubectl get pods -n web --show-labels` 로 Envoy 파드의 실제 라벨을 확인한 뒤 그 라벨로 selector 를 제한하세요.
-# (Security Group 이 파드 단위로 적용되는 것과 비슷하지만, 쿠버네티스 라벨 셀렉터로 선언합니다.)
+# NetworkPolicy enforced by Cilium: app pods accept only port 8080 traffic coming from "pods in the same namespace".
+# The Gateway's Envoy proxy is created in the same namespace, so its traffic passes this rule.
+# Note: pod_selector {} allows "all" pods in this namespace (other namespaces are blocked).
+#       To narrow it, check the actual labels of the Envoy pods with `kubectl get pods -n web --show-labels`
+#       and restrict the selector to those labels.
+# (Similar to Security Groups applied per pod, but declared with Kubernetes label selectors.)
 resource "kubernetes_network_policy_v1" "app" {
   metadata {
     name      = "${local.app_name}-allow-same-namespace"

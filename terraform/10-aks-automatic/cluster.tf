@@ -1,22 +1,23 @@
 # ---------------------------------------------------------------------------
-# AKS Automatic  (Amazon EKS Auto Mode 에 해당하는 "운영까지 맡기는" 모드)
+# AKS Automatic  (the "we operate it for you" mode, equivalent to Amazon EKS Auto Mode)
 #
-# 05-aks 에서 직접 설정한 항목 대부분이 "미리 구성(preconfigured)" 되어 있어 코드가 훨씬 짧습니다.
-#   - 관리형 시스템 노드 풀, Node Auto Provisioning(Karpenter 기반) 노드 오토스케일
-#   - Azure CNI Overlay + Cilium, 관리형 NAT Gateway 로 egress
-#   - Standard 등급(업타임 SLA) + Pod readiness SLA, 자동 업그레이드(stable 채널, N-1), 노드 이미지 자동 교체
-#   - Entra ID + Azure RBAC(로컬 계정 없음), Workload Identity/OIDC, 배포 안전장치(Deployment Safeguards), 이미지 클리너
-#   - HPA / KEDA / VPA, 노드 자동 복구(auto-repair), 노드 리소스 그룹 잠금(lockdown)
+# Most of the settings you configured by hand in 05-aks are "preconfigured" here, so the code is much shorter.
+#   - Managed system node pool, Node Auto Provisioning (Karpenter-based) node autoscaling
+#   - Azure CNI Overlay + Cilium, egress through a managed NAT Gateway
+#   - Standard tier (uptime SLA) + Pod readiness SLA, auto upgrades (stable channel, N-1), automatic node image replacement
+#   - Entra ID + Azure RBAC (no local accounts), Workload Identity/OIDC, Deployment Safeguards, image cleaner
+#   - HPA / KEDA / VPA, node auto-repair, node resource group lockdown
 #
-# 주의: Managed Prometheus / Container Insights 는 Azure CLI·포털로 만들 때만 기본 활성화됩니다.
-#       Terraform 으로 만든 이 클러스터에는 연결되어 있지 않으므로, 필요하면 05-aks/monitoring.tf 처럼 직접 연결해야 합니다.
+# Note: Managed Prometheus / Container Insights are enabled by default only when you create the cluster with the
+#       Azure CLI or the portal. This cluster, created with Terraform, is not connected to them, so connect them
+#       yourself if you need them (as in 05-aks/monitoring.tf).
 # ---------------------------------------------------------------------------
 resource "azurerm_kubernetes_automatic_cluster" "this" {
   name                = module.naming.names.aks_automatic
   location            = azurerm_resource_group.automatic.location
   resource_group_name = azurerm_resource_group.automatic.name
 
-  # managed VNet: SystemAssigned 로 충분. BYO VNet: 미리 권한을 준 UserAssigned 필요.
+  # managed VNet: SystemAssigned is enough. BYO VNet: needs a UserAssigned identity that was granted permissions beforehand.
   identity {
     type         = local.byo ? "UserAssigned" : "SystemAssigned"
     identity_ids = local.byo ? [azurerm_user_assigned_identity.aks[0].id] : null
@@ -36,7 +37,8 @@ resource "azurerm_kubernetes_automatic_cluster" "this" {
     }
   }
 
-  # Ingress: NGINX 대신 Gateway API 구현(approuting-istio). AKS 1.36+ 의 새 Automatic 클러스터 기본값과 같습니다.
+  # Ingress: Gateway API implementation (approuting-istio) instead of NGINX.
+  # Same as the default for new Automatic clusters on AKS 1.36+.
   web_app_routing_ingress {
     istio_enabled = true
   }
@@ -46,8 +48,9 @@ resource "azurerm_kubernetes_automatic_cluster" "this" {
   depends_on = [azurerm_role_assignment.network_contributor]
 }
 
-# Automatic 은 Azure RBAC 만 사용하므로 사람에게도 역할 할당이 필요합니다.
-# 현재 로그인 주체(grant_current_user_admin) + admin_principal_ids 로 지정한 주체(팀 환경에서는 Entra 그룹 권장)에게 부여합니다.
+# Automatic uses only Azure RBAC, so people need role assignments too.
+# Grant them to the currently signed-in principal (grant_current_user_admin) and to the principals listed in
+# admin_principal_ids (an Entra group is recommended in team environments).
 locals {
   admin_principal_ids = toset(concat(
     var.grant_current_user_admin ? [data.azurerm_client_config.current.object_id] : [],

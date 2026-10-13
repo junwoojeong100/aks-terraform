@@ -1,7 +1,9 @@
 # ---------------------------------------------------------------------------
-# Microsoft Defender for Containers  (GuardDuty EKS Protection + Inspector(ECR 스캔) + Security Hub 에 해당)
-#   - 구독 단위 "플랜" 을 켜면, 05-aks 의 enable_defender = true (microsoft_defender 프로필)와 함께 동작합니다.
-#   - 기능: 런타임 위협 탐지, ACR 이미지 취약점 스캔, 구성 오류(Kubernetes 보안 태세) 평가
+# Microsoft Defender for Containers  (equivalent to GuardDuty EKS Protection + Inspector (ECR scanning) + Security Hub)
+#   - Turning on the subscription-level "plan" works together with enable_defender = true in 05-aks
+#     (microsoft_defender profile).
+#   - Features: runtime threat detection, ACR image vulnerability scanning,
+#     misconfiguration (Kubernetes security posture) assessment
 # ---------------------------------------------------------------------------
 resource "azurerm_security_center_subscription_pricing" "containers" {
   count = var.enable_defender_plan ? 1 : 0
@@ -11,7 +13,7 @@ resource "azurerm_security_center_subscription_pricing" "containers" {
 }
 
 # ---------------------------------------------------------------------------
-# 리소스 잠금 (CloudFormation 스택 정책 / Termination Protection 과 유사)
+# Resource locks (similar to CloudFormation stack policies / Termination Protection)
 # ---------------------------------------------------------------------------
 resource "azurerm_management_lock" "network" {
   count = var.enable_resource_locks ? 1 : 0
@@ -19,7 +21,7 @@ resource "azurerm_management_lock" "network" {
   name       = "lock-do-not-delete"
   scope      = data.azurerm_resource_group.network.id
   lock_level = "CanNotDelete"
-  notes      = "네트워크는 여러 스택이 공유하므로 실수로 삭제하지 못하게 합니다."
+  notes      = "The network is shared by several stacks, so this lock prevents accidental deletion."
 }
 
 resource "azurerm_management_lock" "platform" {
@@ -28,5 +30,5 @@ resource "azurerm_management_lock" "platform" {
   name       = "lock-do-not-delete"
   scope      = data.azurerm_resource_group.platform.id
   lock_level = "CanNotDelete"
-  notes      = "ACR / Key Vault / 모니터링 공용 서비스 보호"
+  notes      = "Protects the shared ACR / Key Vault / monitoring services"
 }

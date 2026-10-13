@@ -10,11 +10,11 @@ override.tf.json
 *_override.tf
 *_override.tf.json
 
-# 환경별 값 (Lab 02 에서 생성 / Lab 01 에서 저장)
+# Environment-specific values (created in Lab 02 / saved in Lab 01)
 backend.hcl
 env.sh
 *.auto.tfvars
 terraform.tfvars
 
-# .terraform.lock.hcl 은 커밋하는 것을 권장합니다 (provider 버전/체크섬 고정).
-# 처음에는 terraform init 이 만든 파일을 확인한 뒤 `terraform providers lock -platform=linux_amd64 -platform=darwin_arm64 -platform=windows_amd64` 로 다른 OS 체크섬도 추가하세요.
+# Committing .terraform.lock.hcl is recommended (it pins provider versions/checksums).
+# At first, check the file that terraform init created, then add the checksums of other OSes with `terraform providers lock -platform=linux_amd64 -platform=darwin_arm64 -platform=windows_amd64`.

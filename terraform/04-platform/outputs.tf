@@ -1,5 +1,5 @@
 output "resource_group_name" {
-  description = "플랫폼 공용 서비스 리소스 그룹"
+  description = "Resource group for the platform shared services"
   value       = azurerm_resource_group.platform.name
 }
 
@@ -14,22 +14,22 @@ output "monitor_workspace_id" {
 }
 
 output "grafana_endpoint" {
-  description = "Managed Grafana URL (enable_grafana=false 이면 null)"
+  description = "Managed Grafana URL (null if enable_grafana=false)"
   value       = var.enable_grafana ? azurerm_dashboard_grafana.this[0].endpoint : null
 }
 
 output "acr_name" {
-  description = "ACR 이름"
+  description = "ACR name"
   value       = azurerm_container_registry.this.name
 }
 
 output "acr_login_server" {
-  description = "ACR 로그인 서버 (예: <name>.azurecr.io)"
+  description = "ACR login server (e.g., <name>.azurecr.io)"
   value       = azurerm_container_registry.this.login_server
 }
 
 output "key_vault_name" {
-  description = "Key Vault 이름"
+  description = "Key Vault name"
   value       = azurerm_key_vault.this.name
 }
 
@@ -39,11 +39,11 @@ output "key_vault_uri" {
 }
 
 output "aks_cluster_identity" {
-  description = "컨트롤 플레인 UAMI 이름 (05-aks 에서 이름 규칙으로 조회)"
+  description = "Control plane UAMI name (looked up by naming convention in 05-aks)"
   value       = azurerm_user_assigned_identity.aks_cluster.name
 }
 
 output "aks_kubelet_identity" {
-  description = "kubelet UAMI 이름 (05-aks 에서 이름 규칙으로 조회)"
+  description = "kubelet UAMI name (looked up by naming convention in 05-aks)"
   value       = azurerm_user_assigned_identity.aks_kubelet.name
 }

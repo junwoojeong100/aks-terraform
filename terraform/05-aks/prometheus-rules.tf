@@ -1,11 +1,12 @@
 # ---------------------------------------------------------------------------
 # Prometheus Recording Rules
 #
-# Azure Managed Grafana 의 기본 쿠버네티스 대시보드("Kubernetes / Compute Resources / ...")는
-# 아래 recording rule 이 미리 계산해 둔 시계열을 사용합니다.
-# 포털/CLI 로 Managed Prometheus 를 켜면 자동으로 만들어지지만, Terraform 으로 구성할 때는 직접 정의해야 합니다.
-# (출처: Azure/prometheus-collector 저장소의 AddonTerraformTemplate – Linux 용 Node / Kubernetes 규칙 그룹)
-# 규칙은 길기 때문에 이 파일은 "그대로 복사해서 사용" 하면 됩니다.
+# Azure Managed Grafana's default Kubernetes dashboards ("Kubernetes / Compute Resources / ...")
+# use the time series that the recording rules below pre-compute.
+# The portal/CLI creates them automatically when you enable Managed Prometheus,
+# but with Terraform you have to define them yourself.
+# (Source: AddonTerraformTemplate in the Azure/prometheus-collector repo – Node / Kubernetes rule groups for Linux)
+# The rules are long, so just "copy and use this file as is".
 # ---------------------------------------------------------------------------
 resource "azurerm_monitor_alert_prometheus_rule_group" "node_recording_rules" {
   name                = "NodeRecordingRulesRuleGroup-${module.naming.names.aks}"

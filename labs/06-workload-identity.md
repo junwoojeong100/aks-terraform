@@ -1,53 +1,57 @@
-# Lab 06. Workload Identity + Key Vault CSI: IRSA 의 Azure 버전
+<!-- lang-switch -->
+**English** | [한국어](ko/06-workload-identity.md)
+<!-- /lang-switch -->
 
-| 소요 시간 | 예상 비용 | Terraform 스택 | 선행 실습 |
+# Lab 06. Workload Identity + Key Vault CSI: the Azure version of IRSA
+
+| Duration | Estimated cost | Terraform stack | Prerequisite |
 |---|---|---|---|
-| 25분 | 거의 없음 (파드 1개) | `terraform/06-workload` | [05. AKS 클러스터](05-aks.md) |
+| 25 min | Almost none (1 pod) | `terraform/06-workload` | [05. AKS cluster](05-aks.md) |
 
-## 이번 실습에서 만드는 것
+## What you build in this lab
 
-파드가 **정적 비밀(키/비밀번호) 없이** Key Vault 시크릿을 읽는 전체 흐름입니다.
+This is the complete flow for a pod to read a Key Vault secret **without any static credentials (keys or passwords)**.
 
-![Workload Identity 흐름 (IRSA 와 비교)](diagrams/workload-identity-flow.svg)
+![Workload Identity flow (compared with IRSA)](diagrams/workload-identity-flow.svg)
 
-Azure 쪽 흐름을 단계별로 풀어 쓰면 다음과 같습니다.
+Here is the Azure side of the flow, step by step:
 
 ```text
  Pod  (ServiceAccount: demo/workload-sa, label azure.workload.identity/use=true)
-  │ ① kubelet 이 SA 토큰을 투영(projected token)해 파드에 마운트
-  │    iss = 클러스터 OIDC issuer,  sub = system:serviceaccount:demo:workload-sa,  aud = api://AzureADTokenExchange
+  │ ① kubelet mounts the SA token into the pod as a projected token
+  │    iss = cluster OIDC issuer,  sub = system:serviceaccount:demo:workload-sa,  aud = api://AzureADTokenExchange
   ▼
- Microsoft Entra ID ── ② Federated credential(issuer + subject)이 일치하는 UAMI 를 찾아 ──► ③ Entra 액세스 토큰 발급
+ Microsoft Entra ID ── ② finds the UAMI whose federated credential (issuer + subject) matches ──► ③ issues an Entra access token
   ▼
- Key Vault  ── RBAC: 해당 UAMI 에 "Key Vault Secrets User" ──► CSI Driver 가 /mnt/secrets-store/demo-secret 로 마운트
+ Key Vault  ── RBAC: "Key Vault Secrets User" granted to that UAMI ──► CSI driver mounts it at /mnt/secrets-store/demo-secret
 ```
 
-## AWS 경험자를 위한 비교
+## Comparison for AWS engineers
 
-| AWS | Azure | 차이 / 주의 |
+| AWS | Azure | Differences / notes |
 |---|---|---|
-| IAM OIDC Provider (클러스터마다 등록) | 클러스터 **OIDC issuer** (`oidc_issuer_enabled`) | 별도 등록 불필요. issuer URL 은 `oidc_issuer_url` 출력으로 얻습니다. |
-| IAM Role + Trust policy(`sub` 조건) | **UAMI + Federated identity credential**(`issuer`, `subject`, `audience`) | 신뢰 정책 JSON 대신 `azurerm_federated_identity_credential` 리소스. |
-| ServiceAccount annotation `eks.amazonaws.com/role-arn` | annotation `azure.workload.identity/client-id` | 파드에는 추가로 label `azure.workload.identity/use: "true"` 가 필요합니다. |
-| IAM Policy (secretsmanager:GetSecretValue) | 역할 할당 **Key Vault Secrets User** (데이터 평면) | `Contributor` 같은 관리 평면 역할로는 시크릿 값을 읽을 수 없습니다. |
-| Secrets Manager + CSI provider | **Key Vault provider for Secrets Store CSI Driver** (AKS 애드온) | `SecretProviderClass` CRD 로 가져올 객체를 선언. 자동 갱신 간격(`secret_rotation_interval`) 지원. |
-| EKS Pod Identity (association API) | (대응 없음) → *Identity bindings for AKS* | 한 UAMI 당 federated credential **20개 제한**이 있어, 여러 클러스터가 한 ID 를 공유할 때 Identity bindings 를 검토합니다. |
+| IAM OIDC Provider (registered per cluster) | Cluster **OIDC issuer** (`oidc_issuer_enabled`) | No separate registration is needed. You get the issuer URL from the `oidc_issuer_url` output. |
+| IAM Role + trust policy (`sub` condition) | **UAMI + federated identity credential** (`issuer`, `subject`, `audience`) | An `azurerm_federated_identity_credential` resource replaces the trust policy JSON. |
+| ServiceAccount annotation `eks.amazonaws.com/role-arn` | Annotation `azure.workload.identity/client-id` | The pod also needs the label `azure.workload.identity/use: "true"`. |
+| IAM Policy (secretsmanager:GetSecretValue) | Role assignment **Key Vault Secrets User** (data plane) | Management plane roles such as `Contributor` cannot read secret values. |
+| Secrets Manager + CSI provider | **Key Vault provider for Secrets Store CSI Driver** (AKS add-on) | You declare the objects to fetch with the `SecretProviderClass` CRD. Supports an automatic refresh interval (`secret_rotation_interval`). |
+| EKS Pod Identity (association API) | (no equivalent) → *Identity bindings for AKS* | A UAMI is limited to **20 federated credentials**, so consider Identity bindings when several clusters share one identity. |
 
 > [!IMPORTANT]
-> 한 UAMI 에 연결할 수 있는 federated credential 은 **최대 20개**입니다. "앱(네임스페이스/SA)마다 UAMI 하나" 를 기본으로 설계하면 제한에 걸릴 일이 적고 권한도 최소화됩니다.
+> You can attach **at most 20** federated credentials to a single UAMI. If you design for "one UAMI per app (namespace/SA)" by default, you rarely hit the limit and permissions stay minimal.
 
-## 설계 결정 (Best practice)
+## Design decisions (best practices)
 
-| 결정 | 이유 |
+| Decision | Why |
 |---|---|
-| **쿠버네티스 리소스는 별도 스택(06)** 에서, 클러스터는 이미 존재하는 상태로 | 클러스터 생성과 같은 스택에서 `kubernetes` provider 를 쓰면 provider 설정이 apply 시점에 결정되어 계획/삭제가 꼬이기 쉽습니다. |
-| `kubernetes` provider 인증 = **kubelogin + Azure CLI 토큰** | 로컬 계정을 껐기 때문에 정적 인증서/토큰이 없습니다. EKS 의 `aws eks get-token` exec 플러그인과 같은 패턴입니다. |
-| 앱 전용 UAMI + **Secrets User(읽기)** 만 부여 | 최소 권한. 쓰기는 사람(Secrets Officer)만. |
-| 시크릿 값은 **ephemeral + write-only(`value_wo`)** | Terraform state 에 값이 남지 않습니다 (Terraform 1.11+ write-only 인수, azurerm 5.x 지원). 값을 바꾸려면 `value_wo_version` 을 올립니다. |
-| 네임스페이스에 **Pod Security `restricted`** 강제 | 비루트, 권한 상승 금지, seccomp 등 베이스라인 보안을 네임스페이스 단위로 강제. |
-| RBAC 전파 대기용 `time_sleep` | 역할 할당 직후 데이터 평면 호출이 403 으로 실패하는 흔한 문제를 방지. 시크릿 생성(운영자 권한)과 파드의 시크릿 마운트(앱 권한 + 연합 자격 증명) 모두 이 대기 이후에 진행되도록 `depends_on` 으로 묶었습니다. |
+| **Kubernetes resources in a separate stack (06)**, applied once the cluster already exists | Using the `kubernetes` provider in the same stack that creates the cluster means the provider configuration is only resolved at apply time, which makes planning and deletion error-prone. |
+| `kubernetes` provider authentication = **kubelogin + Azure CLI token** | Local accounts are disabled, so there are no static certificates or tokens. It is the same pattern as the `aws eks get-token` exec plugin for EKS. |
+| A dedicated UAMI for the app, granted only **Secrets User (read)** | Least privilege. Only humans (Secrets Officer) can write. |
+| The secret value is **ephemeral + write-only (`value_wo`)** | The value is never stored in the Terraform state (write-only arguments need Terraform 1.11+ and are supported in azurerm 5.x). To change the value, bump `value_wo_version`. |
+| **Pod Security `restricted`** enforced on the namespace | Enforces baseline security (non-root, no privilege escalation, seccomp, etc.) at the namespace level. |
+| `time_sleep` to wait for RBAC propagation | Prevents the common failure where a data plane call returns 403 right after a role assignment. `depends_on` makes both secret creation (operator permissions) and the pod's secret mount (app permissions + federated credential) run only after this wait. |
 
-## 코드
+## Code
 
 <!-- tf:include path="terraform/06-workload/versions.tf" -->
 ```hcl title="terraform/06-workload/versions.tf"
@@ -84,12 +88,12 @@ terraform {
 ```
 <!-- /tf:include -->
 
-**`providers.tf`** — `kubernetes` provider 가 kubelogin 으로 접속하는 부분이 핵심입니다.
+**`providers.tf`** — the key part is how the `kubernetes` provider connects through kubelogin.
 
 <!-- tf:include path="terraform/06-workload/providers.tf" -->
 ```hcl title="terraform/06-workload/providers.tf"
 provider "azurerm" {
-  # subscription_id 는 ARM_SUBSCRIPTION_ID 환경 변수에서 읽습니다.
+  # subscription_id is read from the ARM_SUBSCRIPTION_ID environment variable.
   resource_provider_registrations = "none"
 
   features {
@@ -100,11 +104,12 @@ provider "azurerm" {
 }
 
 # ---------------------------------------------------------------------------
-# kubernetes provider → 05-aks 가 만든 클러스터에 접속
-#   - 클러스터가 "이미 존재" 하는 상태에서 별도 스택으로 실행하므로, provider 설정이 apply 시점에 결정되는
-#     리소스에 의존하지 않습니다 (클러스터 생성과 같은 스택에서 kubernetes provider 를 쓰면 흔히 겪는 문제 회피).
-#   - 로컬 계정이 꺼져 있으므로 정적 인증서 대신 kubelogin 이 Azure CLI 로그인으로 토큰을 받아옵니다.
-#     (EKS 의 `aws eks get-token` exec 플러그인과 같은 방식. server-id 는 AKS 의 Entra 서버 앱 ID 로 고정값입니다.)
+# kubernetes provider → connects to the cluster created by 05-aks
+#   - This stack runs separately, after the cluster "already exists", so the provider configuration does not depend
+#     on resources that are only known at apply time (avoids the common problem of using the kubernetes provider
+#     in the same stack that creates the cluster).
+#   - Local accounts are disabled, so instead of a static certificate, kubelogin gets a token from the Azure CLI login.
+#     (Same approach as the `aws eks get-token` exec plugin on EKS. server-id is the fixed Entra server app ID of AKS.)
 # ---------------------------------------------------------------------------
 provider "kubernetes" {
   host                   = data.azurerm_kubernetes_cluster.this.kube_config[0].host
@@ -122,45 +127,45 @@ provider "kubernetes" {
 <!-- tf:include path="terraform/06-workload/variables.tf" -->
 ```hcl title="terraform/06-workload/variables.tf"
 variable "workload" {
-  description = "워크로드 이름 (소문자/숫자 3~8자)"
+  description = "Workload name (3–8 lowercase letters or digits)"
   type        = string
   default     = "aksdemo"
 }
 
 variable "environment" {
-  description = "환경 구분 (dev, test, prod)"
+  description = "Environment (dev, test, prod)"
   type        = string
   default     = "dev"
 }
 
 variable "location" {
-  description = "Azure 리전"
+  description = "Azure region"
   type        = string
   default     = "koreacentral"
 }
 
 variable "tags" {
-  description = "모든 리소스에 추가로 붙일 태그"
+  description = "Additional tags to apply to all resources"
   type        = map(string)
   default     = {}
 }
 
 variable "app_namespace" {
-  description = "데모 앱을 배포할 쿠버네티스 네임스페이스"
+  description = "Kubernetes namespace to deploy the demo app into"
   type        = string
   default     = "demo"
 }
 
 variable "app_service_account" {
-  description = "Workload Identity 에 연결할 쿠버네티스 ServiceAccount 이름"
+  description = "Name of the Kubernetes ServiceAccount to link with Workload Identity"
   type        = string
   default     = "workload-sa"
 }
 
 variable "app_image" {
   description = <<-EOT
-    데모 컨테이너 이미지. 비워 두면 <acr>.azurecr.io/demo/busybox:2.0 을 사용합니다.
-    사전에 `az acr import` 로 ACR 에 넣어 두어야 합니다 (Lab 06 참고).
+    Demo container image. If left empty, <acr>.azurecr.io/demo/busybox:2.0 is used.
+    Import it into ACR beforehand with `az acr import` (see Lab 06).
   EOT
   type        = string
   default     = ""
@@ -198,7 +203,7 @@ locals {
   )
 }
 
-# 앞선 스택이 만든 리소스를 이름 규칙으로 조회
+# Look up the resources created by earlier stacks by naming convention
 data "azurerm_kubernetes_cluster" "this" {
   name                = module.naming.names.aks
   resource_group_name = module.naming.names.rg_aks
@@ -222,17 +227,17 @@ resource "azurerm_resource_group" "workload" {
 ```
 <!-- /tf:include -->
 
-**`identity.tf`** — Azure 쪽: UAMI, Federated credential, 역할 할당, 시크릿
+**`identity.tf`** — Azure side: UAMI, federated credential, role assignments, secret
 
 <!-- tf:include path="terraform/06-workload/identity.tf" -->
 ```hcl title="terraform/06-workload/identity.tf"
 # ---------------------------------------------------------------------------
-# Azure 쪽: 앱 전용 Managed Identity + 연합 자격 증명(Federated Credential) + 최소 권한
+# Azure side: app-specific managed identity + federated credential + least privilege
 #
-# IRSA 와의 대응
-#   AWS  : IAM Role + OIDC Provider(클러스터별) + trust policy(sub 조건) + SA annotation(role-arn)
-#   Azure: UAMI + Federated credential(issuer + subject) + SA annotation(client-id) + 파드 label
-# 두 방식 모두 "쿠버네티스 SA 토큰 → 클라우드 임시 자격 증명" 교환이며 정적 키가 필요 없습니다.
+# Mapping to IRSA
+#   AWS  : IAM Role + OIDC Provider (per cluster) + trust policy (sub condition) + SA annotation (role-arn)
+#   Azure: UAMI + Federated credential (issuer + subject) + SA annotation (client-id) + pod label
+# Both approaches exchange a "Kubernetes SA token → temporary cloud credentials", so no static keys are needed.
 # ---------------------------------------------------------------------------
 resource "azurerm_user_assigned_identity" "app" {
   name                = "id-${local.app_name}-${module.naming.base}"
@@ -249,7 +254,7 @@ resource "azurerm_federated_identity_credential" "app" {
   subject                   = "system:serviceaccount:${var.app_namespace}:${var.app_service_account}"
 }
 
-# 앱이 Key Vault 시크릿을 "읽기만" 할 수 있도록 최소 권한 부여 (Secrets User = 값 읽기)
+# Grant least privilege so the app can only "read" Key Vault secrets (Secrets User = read values)
 resource "azurerm_role_assignment" "app_reads_secrets" {
   scope                = data.azurerm_key_vault.this.id
   role_definition_name = "Key Vault Secrets User"
@@ -257,15 +262,16 @@ resource "azurerm_role_assignment" "app_reads_secrets" {
   principal_type       = "ServicePrincipal"
 }
 
-# Terraform 을 실행하는 사용자가 데모 시크릿을 만들 수 있도록 Secrets Officer 부여
+# Grant Secrets Officer so the user running Terraform can create the demo secret
 resource "azurerm_role_assignment" "operator_writes_secrets" {
   scope                = data.azurerm_key_vault.this.id
   role_definition_name = "Key Vault Secrets Officer"
   principal_id         = data.azurerm_client_config.current.object_id
 }
 
-# RBAC 전파 지연(수십 초~수 분)과 연합 자격 증명 반영 지연으로 인한 403 / AADSTS70025 류 오류를 피하기 위한 대기.
-# 시크릿 생성(operator 권한)과 파드의 시크릿 마운트(앱 권한 + 연합 자격 증명)가 모두 이 대기 이후에 진행됩니다.
+# Wait to avoid 403 / AADSTS70025-style errors caused by RBAC propagation delay (tens of seconds to a few minutes)
+# and federated credential propagation delay. Secret creation (operator permission) and the pod's secret mount
+# (app permission + federated credential) both happen after this wait.
 resource "time_sleep" "rbac_propagation" {
   create_duration = "90s"
 
@@ -277,10 +283,10 @@ resource "time_sleep" "rbac_propagation" {
 }
 
 # ---------------------------------------------------------------------------
-# 데모 시크릿: 값이 state 에 저장되지 않도록 "ephemeral + write-only" 조합을 사용합니다.
-#   - ephemeral "random_password" : plan/apply 중 메모리에만 존재 (Terraform 1.10+)
-#   - value_wo / value_wo_version : write-only 인수. state 에 기록되지 않음 (Terraform 1.11+, azurerm 4.x 이후)
-# 값을 바꾸고 싶으면 value_wo_version 을 올립니다.
+# Demo secret: uses an "ephemeral + write-only" combination so the value is never stored in state.
+#   - ephemeral "random_password" : exists only in memory during plan/apply (Terraform 1.10+)
+#   - value_wo / value_wo_version : write-only arguments, not recorded in state (Terraform 1.11+, azurerm 4.x and later)
+# To change the value, increment value_wo_version.
 # ---------------------------------------------------------------------------
 ephemeral "random_password" "demo_secret" {
   length  = 24
@@ -300,19 +306,19 @@ resource "azurerm_key_vault_secret" "demo" {
 ```
 <!-- /tf:include -->
 
-**`kubernetes.tf`** — 쿠버네티스 쪽: Namespace, ServiceAccount, SecretProviderClass, Deployment
+**`kubernetes.tf`** — Kubernetes side: Namespace, ServiceAccount, SecretProviderClass, Deployment
 
 <!-- tf:include path="terraform/06-workload/kubernetes.tf" -->
 ```hcl title="terraform/06-workload/kubernetes.tf"
 # ---------------------------------------------------------------------------
-# 쿠버네티스 쪽: Namespace / ServiceAccount / SecretProviderClass / Deployment
+# Kubernetes side: Namespace / ServiceAccount / SecretProviderClass / Deployment
 # ---------------------------------------------------------------------------
 resource "kubernetes_namespace_v1" "app" {
   metadata {
     name = var.app_namespace
 
     labels = {
-      # Pod Security Admission: restricted 프로파일을 강제 (root 실행, 권한 상승 등을 거부)
+      # Pod Security Admission: enforce the restricted profile (rejects running as root, privilege escalation, etc.)
       "pod-security.kubernetes.io/enforce"         = "restricted"
       "pod-security.kubernetes.io/enforce-version" = "latest"
     }
@@ -325,7 +331,7 @@ resource "kubernetes_service_account_v1" "app" {
     namespace = kubernetes_namespace_v1.app.metadata[0].name
 
     annotations = {
-      # EKS 의 eks.amazonaws.com/role-arn 에 해당
+      # Equivalent to eks.amazonaws.com/role-arn on EKS
       "azure.workload.identity/client-id" = azurerm_user_assigned_identity.app.client_id
     }
   }
@@ -333,8 +339,8 @@ resource "kubernetes_service_account_v1" "app" {
   depends_on = [azurerm_federated_identity_credential.app]
 }
 
-# Secrets Store CSI Driver 가 Key Vault 에서 가져올 객체를 정의하는 CRD.
-# (kubernetes_manifest 는 plan 시점에 클러스터에 접속해 CRD 스키마를 읽습니다.)
+# CRD that defines which objects the Secrets Store CSI Driver fetches from Key Vault.
+# (kubernetes_manifest connects to the cluster at plan time to read the CRD schema.)
 resource "kubernetes_manifest" "secret_provider_class" {
   manifest = {
     apiVersion = "secrets-store.csi.x-k8s.io/v1"
@@ -383,7 +389,7 @@ resource "kubernetes_deployment_v1" "app" {
       metadata {
         labels = {
           app = local.app_name
-          # 이 label 이 있어야 Workload Identity webhook 이 토큰 볼륨/환경 변수를 주입합니다.
+          # The Workload Identity webhook injects the token volume and env vars only for pods with this label.
           "azure.workload.identity/use" = "true"
         }
       }
@@ -416,8 +422,8 @@ resource "kubernetes_deployment_v1" "app" {
             }
           }
 
-          # kubernetes provider 는 컨테이너 security_context 에서 생략한 값을 false 로 보냅니다.
-          # run_as_non_root 를 명시하지 않으면 파드 수준의 true 를 덮어써 PSS restricted 에 막힙니다.
+          # The kubernetes provider sends false for any value omitted from a container security_context.
+          # Without an explicit run_as_non_root it overrides the pod-level true and PSS restricted rejects the pod.
           security_context {
             allow_privilege_escalation = false
             read_only_root_filesystem  = true
@@ -464,17 +470,17 @@ resource "kubernetes_deployment_v1" "app" {
 <!-- tf:include path="terraform/06-workload/outputs.tf" -->
 ```hcl title="terraform/06-workload/outputs.tf"
 output "app_identity_client_id" {
-  description = "앱 UAMI 의 client ID (ServiceAccount annotation 값)"
+  description = "Client ID of the app UAMI (value for the ServiceAccount annotation)"
   value       = azurerm_user_assigned_identity.app.client_id
 }
 
 output "namespace" {
-  description = "데모 네임스페이스"
+  description = "Demo namespace"
   value       = kubernetes_namespace_v1.app.metadata[0].name
 }
 
 output "verify_command" {
-  description = "Key Vault 시크릿이 파드에 마운트되었는지 확인"
+  description = "Check that the Key Vault secret is mounted in the pod"
   value       = "kubectl -n ${var.app_namespace} exec deploy/${local.app_name} -- cat /mnt/secrets-store/demo-secret"
 }
 ```
@@ -482,8 +488,8 @@ output "verify_command" {
 
 <!-- tf:include path="terraform/06-workload/tests/plan.tftest.hcl" -->
 ```hcl title="terraform/06-workload/tests/plan.tftest.hcl"
-# Azure 없이 plan 로직만 검증: terraform -chdir=terraform/06-workload test
-# (ephemeral 리소스는 mock provider 가 지원하지 않으므로 random 은 실제 provider 를 사용합니다. 자격 증명은 필요 없습니다.)
+# Verify only the plan logic, without Azure: terraform -chdir=terraform/06-workload test
+# (The mock provider does not support ephemeral resources, so random uses the real provider. No credentials are needed.)
 mock_provider "azurerm" {
   source = "../mocks"
 }
@@ -496,68 +502,68 @@ run "plan" {
 
   assert {
     condition     = azurerm_federated_identity_credential.app.subject == "system:serviceaccount:demo:workload-sa"
-    error_message = "federated credential subject 는 system:serviceaccount:<ns>:<sa> 형식이어야 합니다."
+    error_message = "The federated credential subject must have the format system:serviceaccount:<ns>:<sa>."
   }
 
   assert {
     condition     = azurerm_federated_identity_credential.app.audience == tolist(["api://AzureADTokenExchange"])
-    error_message = "audience 는 api://AzureADTokenExchange 여야 합니다."
+    error_message = "The audience must be api://AzureADTokenExchange."
   }
 }
 ```
 <!-- /tf:include -->
 
-## 실습 따라하기
+## Walkthrough
 
-### 1단계. 데모 이미지를 ACR 로 가져오기
+### Step 1. Import the demo image into ACR
 
-ECR 의 *pull through cache* 처럼 외부 이미지를 직접 쓰지 않고 **사설 레지스트리를 경유**하는 것이 Best practice 입니다. (Lab 04 에서 이미 했다면 건너뛰세요.)
+As with ECR's *pull through cache*, the best practice is to **go through a private registry** rather than pull external images directly. (Skip this step if you already did it in Lab 04.)
 
 ```bash
-ACR=$(terraform -chdir=terraform/04-platform output -raw acr_name)     # 저장소 루트에서 실행
+ACR=$(terraform -chdir=terraform/04-platform output -raw acr_name)     # run from the repository root
 az acr import -n "$ACR" --source mcr.microsoft.com/cbl-mariner/busybox:2.0 --image demo/busybox:2.0
 ```
 
-### 2단계. 적용
+### Step 2. Apply
 
 ```bash
 cd terraform/06-workload
 terraform init -backend-config=../backend.hcl
-terraform plan -out tfplan        # kubernetes_manifest 는 plan 시 클러스터에 접속해 CRD 스키마를 읽습니다
-terraform apply tfplan            # 약 3~5분 (RBAC 대기 90초 포함)
+terraform plan -out tfplan        # kubernetes_manifest connects to the cluster during plan to read the CRD schema
+terraform apply tfplan            # about 3–5 min (includes the 90 s RBAC wait)
 ```
 
 > [!NOTE]
-> `kubelogin`/`kubectl` 이 `az login` 세션을 사용합니다. `executable kubelogin not found` 오류가 나면 [Lab 01](01-prerequisites.md)의 도구 설치를 확인하세요.
+> `kubelogin` and `kubectl` use your `az login` session. If you get an `executable kubelogin not found` error, check the tool installation in [Lab 01](01-prerequisites.md).
 
-### 3단계. 검증
+### Step 3. Verify
 
 ```bash
 kubectl -n demo get pods,sa
 kubectl -n demo rollout status deploy/kv-demo
 
-# ① Key Vault 의 값이 파드에 마운트되었는가
+# ① Is the Key Vault value mounted in the pod?
 kubectl -n demo exec deploy/kv-demo -- cat /mnt/secrets-store/demo-secret; echo
 
-# ② 같은 값을 사람(관리자)이 직접 조회
+# ② Read the same value directly as a human administrator
 az keyvault secret show --vault-name "$(terraform -chdir=../04-platform output -raw key_vault_name)" -n demo-secret --query value -o tsv
 ```
 
-두 값이 같다면 성공입니다. 이제 **무엇이 주입되었는지** 들여다봅니다.
+If the two values match, it worked. Now take a look at **what was injected**.
 
 ```bash
-# Workload Identity webhook 이 주입한 환경 변수와 토큰 파일
+# Environment variables and token file injected by the Workload Identity webhook
 kubectl -n demo exec deploy/kv-demo -- env | grep -E "AZURE_"
 #   AZURE_CLIENT_ID / AZURE_TENANT_ID / AZURE_FEDERATED_TOKEN_FILE / AZURE_AUTHORITY_HOST
 
-# 투영된 SA 토큰의 클레임 (iss / sub / aud). JWT 는 base64url 이라 패딩이 없어서 base64 -d 만으로는 잘리는 경우가 있어 python 으로 풉니다.
+# Claims of the projected SA token (iss / sub / aud). A JWT is base64url without padding, so base64 -d alone can truncate it; decode it with python instead.
 kubectl -n demo exec deploy/kv-demo -- cat /var/run/secrets/azure/tokens/azure-identity-token \
   | python3 -c 'import sys,base64,json; t=sys.stdin.read().strip().split(".")[1]; print(json.dumps(json.loads(base64.urlsafe_b64decode(t + "=" * (-len(t) % 4))), indent=2))'
 ```
 
-`iss` 는 `oidc_issuer_url`, `sub` 는 `system:serviceaccount:demo:workload-sa`, `aud` 는 `api://AzureADTokenExchange` 이며, 이 세 값이 Federated credential 과 일치해야 토큰 교환이 성공합니다.
+`iss` is the `oidc_issuer_url`, `sub` is `system:serviceaccount:demo:workload-sa`, and `aud` is `api://AzureADTokenExchange`. The token exchange succeeds only if all three values match the federated credential.
 
-### 4단계. 시크릿 자동 갱신 확인
+### Step 4. Check automatic secret refresh
 
 ```bash
 KV=$(terraform -chdir=../04-platform output -raw key_vault_name)
@@ -568,34 +574,35 @@ kubectl -n demo exec deploy/kv-demo -- cat /mnt/secrets-store/demo-secret; echo
 ```
 
 > [!TIP]
-> 앱이 파일을 다시 읽어야 새 값을 씁니다. 환경 변수로 쓰려면 CSI 의 `secretObjects` 로 Kubernetes Secret 을 동기화하고 Reloader 같은 도구를 함께 쓰는 패턴이 흔합니다.
+> The app only picks up the new value when it re-reads the file. To use the secret as an environment variable, a common pattern is to sync a Kubernetes Secret through the CSI driver's `secretObjects` and pair it with a tool such as Reloader.
 
-### 5단계. (선택) 사설 DNS 확인
+### Step 5. (Optional) Check private DNS
 
-노드/파드가 Key Vault·ACR 을 **사설 IP** 로 해석하는지 확인합니다.
+Check that nodes and pods resolve Key Vault and ACR to **private IPs**.
 
 ```bash
 kubectl -n demo exec deploy/kv-demo -- nslookup "$KV.vault.azure.net" 2>/dev/null || \
 kubectl run -it --rm dnscheck --image=mcr.microsoft.com/cbl-mariner/busybox:2.0 --restart=Never -- nslookup "$KV.vault.azure.net"
-# privatelink.vaultcore.azure.net 의 10.10.3.x 주소가 보이면 Private Endpoint 경로입니다.
+# If you see a 10.10.3.x address from privatelink.vaultcore.azure.net, the traffic takes the Private Endpoint path.
 ```
 
-### 자동 검증 스크립트
+### Automated verification script
 
-Azure 쪽(UAMI · Federated credential issuer/subject · Key Vault 역할)과 쿠버네티스 쪽(ServiceAccount annotation · 파드 label · 주입된 환경 변수 · 마운트된 시크릿)을 끝까지 확인합니다. 시크릿 **값은 출력하지 않습니다**.
+It checks the whole chain end to end: the Azure side (UAMI · federated credential issuer/subject · Key Vault role) and the Kubernetes side (ServiceAccount annotation · pod label · injected environment variables · mounted secret). It **does not print the secret value**.
 
 ```bash
-cd ../..                          # 저장소 루트에서 실행
+cd ../..                          # run from the repository root
 scripts/verify.sh 06-workload
 ```
 
 <!-- tf:include path="scripts/verify/06-workload.sh" -->
 ```bash title="scripts/verify/06-workload.sh"
 #!/usr/bin/env bash
-# Lab 06 검증: Workload Identity(IRSA 에 해당)와 Key Vault CSI 가 끝까지 연결되었는지 확인합니다 (읽기 전용).
-#   Azure 쪽  : 앱 UAMI ← Federated credential(issuer + subject) ← Key Vault Secrets User 역할
-#   쿠버네티스: ServiceAccount annotation → 파드 label → 주입된 환경 변수 → 마운트된 시크릿
-# 사용법: scripts/verify.sh 06-workload
+# Lab 06 verification: checks that Workload Identity (the equivalent of IRSA) and the Key Vault CSI driver
+# are connected end to end (read-only).
+#   Azure side : app UAMI ← Federated credential (issuer + subject) ← Key Vault Secrets User role
+#   Kubernetes : ServiceAccount annotation → pod label → injected environment variable → mounted secret
+# Usage: scripts/verify.sh 06-workload
 # shellcheck source=../lib/common.sh
 source "$(dirname "${BASH_SOURCE[0]}")/../lib/common.sh"
 
@@ -607,73 +614,74 @@ verify_stack() {
   aks_name="$(tf_out 05-aks cluster_name)"
   kv="$(tf_out 04-platform key_vault_name)"
 
-  section "06-workload · Azure 쪽 (UAMI · Federated credential · 역할)"
+  section "06-workload · Azure side (UAMI · Federated credential · role)"
   if [ -z "$client_id" ]; then
-    fail "terraform output 을 읽을 수 없습니다. 06-workload 에서 init/apply 를 마쳤나요?"
+    fail "Can't read terraform output. Did you finish init/apply in 06-workload?"
     return
   fi
 
-  # client ID 로 구독 안의 UAMI 를 찾습니다.
+  # Find the UAMI in the subscription by its client ID.
   uami="$(jv "$(azj identity list)" "[.[] | select(.clientId == \"$client_id\")][0]")"
   uami_name="$(jv "$uami" .name)"
   uami_rg="$(jv "$uami" .resourceGroup)"
   uami_pid="$(jv "$uami" .principalId)"
-  expect_set "앱 UAMI" "$uami_name"
+  expect_set "App UAMI" "$uami_name"
   [ -n "$uami_name" ] || return
 
   fic="$(azj identity federated-credential list --identity-name "$uami_name" -g "$uami_rg")"
   subject="$(jv "$fic" '[.[].subject | select(startswith("system:serviceaccount:"))][0]')"
   sa="${subject##*:}"
-  sa="${sa:-${TF_VAR_app_service_account:-workload-sa}}" # federated credential 이 없으면 기본 이름으로 계속 확인합니다.
-  expect_eq "Federated credential subject 의 네임스페이스" "${subject%:*}" "system:serviceaccount:$ns"
-  expect_eq "Federated credential issuer = 클러스터 OIDC issuer" "$(jv "$fic" '.[0].issuer')" "$(tf_out 05-aks oidc_issuer_url)"
+  sa="${sa:-${TF_VAR_app_service_account:-workload-sa}}" # If there is no federated credential, keep checking with the default name.
+  expect_eq "Namespace in the Federated credential subject" "${subject%:*}" "system:serviceaccount:$ns"
+  expect_eq "Federated credential issuer = cluster OIDC issuer" "$(jv "$fic" '.[0].issuer')" "$(tf_out 05-aks oidc_issuer_url)"
 
   kv_id="$(az keyvault show -n "$kv" --query id -o tsv 2>/dev/null)"
-  has_role "앱 UAMI → Key Vault Secrets User (읽기 전용 최소 권한)" "$uami_pid" "Key Vault Secrets User" "$kv_id"
+  has_role "App UAMI → Key Vault Secrets User (least privilege, read-only)" "$uami_pid" "Key Vault Secrets User" "$kv_id"
 
-  section "06-workload · 쿠버네티스 쪽 (ServiceAccount · 파드 · 시크릿 마운트)"
+  section "06-workload · Kubernetes side (ServiceAccount · pod · secret mount)"
   if ! require_cmd kubectl kubelogin; then
-    skip "kubectl/kubelogin 이 없어 건너뜁니다"
+    skip "kubectl/kubelogin not found; skipping"
     return
   fi
   if ! kube_login "$rg" "$aks_name"; then
-    fail "kubeconfig 를 받지 못했습니다 (az login 과 Cluster User Role 확인)"
+    fail "Couldn't get the kubeconfig (check az login and the Cluster User Role)"
     return
   fi
 
   sa_json="$(kj get serviceaccount "$sa" -n "$ns")"
-  expect_eq "ServiceAccount 의 client-id annotation (IRSA 의 role-arn 에 해당)" \
+  expect_eq "ServiceAccount client-id annotation (the equivalent of IRSA's role-arn)" \
     "$(jv "$sa_json" '.metadata.annotations["azure.workload.identity/client-id"]')" "$client_id"
 
   dep="$(kj get deployment kv-demo -n "$ns")"
-  jq_ok "Deployment kv-demo 준비됨" "$dep" '(.status.readyReplicas // 0) >= 1'
-  expect_eq "파드 label azure.workload.identity/use (webhook 주입 조건)" \
+  jq_ok "Deployment kv-demo is ready" "$dep" '(.status.readyReplicas // 0) >= 1'
+  expect_eq "Pod label azure.workload.identity/use (condition for webhook injection)" \
     "$(jv "$dep" '.spec.template.metadata.labels["azure.workload.identity/use"]')" "true"
 
-  # 파드 안에서 확인: webhook 이 주입한 환경 변수, CSI 로 마운트된 시크릿 파일 (값은 출력하지 않습니다)
-  expect_eq "파드에 주입된 AZURE_CLIENT_ID" \
+  # Check inside the pod: the environment variable injected by the webhook and the secret file mounted
+  # by the CSI driver (values are not printed)
+  expect_eq "AZURE_CLIENT_ID injected into the pod" \
     "$(kubectl --request-timeout=30s -n "$ns" exec deploy/kv-demo -- printenv AZURE_CLIENT_ID 2>/dev/null)" "$client_id"
   if kubectl --request-timeout=30s -n "$ns" exec deploy/kv-demo -- test -s /mnt/secrets-store/demo-secret 2>/dev/null; then
-    pass "Key Vault 시크릿이 파드에 마운트됨 (/mnt/secrets-store/demo-secret)"
+    pass "Key Vault secret mounted in the pod (/mnt/secrets-store/demo-secret)"
   else
-    fail "시크릿 파일이 없거나 비어 있습니다 (kubectl -n $ns describe pod 의 이벤트에서 마운트 오류 확인)"
+    fail "Secret file is missing or empty (look for mount errors in the events of kubectl -n $ns describe pod)"
   fi
 }
 
-# 직접 실행(scripts/verify/06-workload.sh)도 가능합니다.
+# You can also run it directly (scripts/verify/06-workload.sh).
 if [ "${BASH_SOURCE[0]}" = "$0" ]; then verify_stack; summary; fi
 ```
 <!-- /tf:include -->
 
-## 자주 만나는 문제
+## Common issues
 
-| 증상 | 원인 / 해결 |
+| Symptom | Cause / Fix |
 |---|---|
-| `AADSTS70021: No matching federated identity record found` | Federated credential 의 `issuer`/`subject` 불일치. 네임스페이스·SA 이름, `oidc_issuer_url` 을 확인하세요(대소문자/후행 `/` 포함). |
-| `AADSTS700211`/`AADSTS700213` | audience 가 `api://AzureADTokenExchange` 가 아님. |
-| 파드가 `ContainerCreating` 에서 멈춤 (`failed to mount secrets store objects`) | KV 권한(Secrets User) 전파 지연, KV 방화벽, 또는 SecretProviderClass 의 `clientID`/`tenantId`/`objects` 오타. `kubectl describe pod` 이벤트 확인. |
-| `ImagePullBackOff` | `az acr import` 누락 또는 kubelet 의 AcrPull 권한 전파 지연. |
-| plan 에서 `kubernetes_manifest ... no matches for kind "SecretProviderClass"` | Key Vault CSI 애드온 미활성 → Lab 05 의 `key_vault_secrets_provider` 확인. |
-| `Forbidden` (secret 생성) | 현재 IP 가 Key Vault 방화벽 허용 목록에 없음 → Lab 01/04 의 `allowed_ip_ranges`. |
+| `AADSTS70021: No matching federated identity record found` | The federated credential's `issuer`/`subject` does not match. Check the namespace, the SA name, and `oidc_issuer_url` (including case and any trailing `/`). |
+| `AADSTS700211`/`AADSTS700213` | The audience is not `api://AzureADTokenExchange`. |
+| Pod stuck in `ContainerCreating` (`failed to mount secrets store objects`) | The KV permission (Secrets User) has not propagated yet, the KV firewall is blocking access, or there is a typo in the SecretProviderClass `clientID`/`tenantId`/`objects`. Check the events in `kubectl describe pod`. |
+| `ImagePullBackOff` | `az acr import` was skipped, or the kubelet's AcrPull permission has not propagated yet. |
+| `kubernetes_manifest ... no matches for kind "SecretProviderClass"` during plan | The Key Vault CSI add-on is not enabled → check `key_vault_secrets_provider` in Lab 05. |
+| `Forbidden` (creating the secret) | Your current IP is not on the Key Vault firewall allow list → see `allowed_ip_ranges` in Lab 01/04. |
 
-다음 → [Lab 07. 인그레스: Gateway API](07-ingress.md)
+Next → [Lab 07. Ingress: Gateway API](07-ingress.md)

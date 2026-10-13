@@ -1,4 +1,4 @@
-# Azure 없이 plan 로직만 검증: terraform -chdir=terraform/05-aks test
+# Test the plan logic only, without Azure: terraform -chdir=terraform/05-aks test
 mock_provider "azurerm" {
   source = "../mocks"
 }
@@ -14,22 +14,22 @@ run "plan_defaults" {
 
   assert {
     condition     = azurerm_kubernetes_cluster.this.network_profile[0].outbound_type == "userAssignedNATGateway"
-    error_message = "아웃바운드는 BYO NAT Gateway 여야 합니다."
+    error_message = "Outbound must use the BYO NAT Gateway."
   }
 
   assert {
     condition     = azurerm_kubernetes_cluster.this.local_account_disabled
-    error_message = "로컬 계정(정적 kubeconfig)은 비활성화해야 합니다."
+    error_message = "Local accounts (static kubeconfig) must be disabled."
   }
 
   assert {
     condition     = length(azurerm_kubernetes_cluster_node_pool.spot) == 0
-    error_message = "기본값에서는 Spot 풀이 없어야 합니다."
+    error_message = "With the defaults, there must be no Spot pool."
   }
 
   assert {
     condition     = length(azapi_update_resource.gateway_api) == 1
-    error_message = "기본값에서는 Gateway API 를 활성화해야 합니다."
+    error_message = "With the defaults, Gateway API must be enabled."
   }
 }
 
@@ -47,17 +47,17 @@ run "plan_private_cluster_with_options" {
 
   assert {
     condition     = length(azurerm_kubernetes_cluster_node_pool.spot) == 1
-    error_message = "Spot 풀이 생성되어야 합니다."
+    error_message = "A Spot pool must be created."
   }
 
   assert {
     condition     = length(azapi_update_resource.gateway_api) == 0
-    error_message = "enable_gateway_api=false 이면 azapi 업데이트가 없어야 합니다."
+    error_message = "With enable_gateway_api=false, there must be no azapi update."
   }
 
   assert {
     condition     = length(azurerm_role_assignment.cluster_admin) == 2
-    error_message = "추가 관리자 1명 + 현재 사용자 = 2개의 역할 할당이어야 합니다."
+    error_message = "There must be 2 role assignments: 1 additional admin + the current user."
   }
 }
 
@@ -71,7 +71,7 @@ run "plan_group_admin_only" {
 
   assert {
     condition     = length(azurerm_role_assignment.cluster_admin) == 1
-    error_message = "현재 사용자 자동 부여를 끄면 지정한 그룹 1개만 관리자여야 합니다."
+    error_message = "With the automatic grant to the current user turned off, only the 1 specified group must be an admin."
   }
 }
 

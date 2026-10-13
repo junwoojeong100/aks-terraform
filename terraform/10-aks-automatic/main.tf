@@ -30,11 +30,11 @@ resource "azurerm_resource_group" "automatic" {
 }
 
 # ---------------------------------------------------------------------------
-# (선택) BYO VNet : use_byo_network = true 일 때만 생성
-# Microsoft 공식 샘플(101-aks-automatic-custom-network)과 같은 구성입니다.
-#   - API 서버 서브넷  : Microsoft.ContainerService/managedClusters 로 위임 (/28 이상)
-#   - User 노드 서브넷 : NAP 가 만드는 노드가 위치
-#   - System 노드 서브넷: AKS 가 관리하는 시스템 노드 풀(managed system node pool)용
+# (Optional) BYO VNet : created only when use_byo_network = true
+# Same layout as the official Microsoft sample (101-aks-automatic-custom-network).
+#   - API server subnet : delegated to Microsoft.ContainerService/managedClusters (/28 or larger)
+#   - User node subnet  : where the nodes created by NAP are placed
+#   - System node subnet: for the system node pool managed by AKS
 # ---------------------------------------------------------------------------
 resource "azurerm_virtual_network" "byo" {
   count = local.byo ? 1 : 0
@@ -82,7 +82,7 @@ resource "azurerm_subnet" "system_nodes" {
   address_prefixes     = [cidrsubnet(var.vnet_cidr, 8, 2)] # /24
 
   lifecycle {
-    # 클러스터 생성 후 AKS 가 이 서브넷에 위임(delegation)을 추가합니다.
+    # After the cluster is created, AKS adds a delegation to this subnet.
     ignore_changes = [delegation]
   }
 }
@@ -96,7 +96,7 @@ resource "azurerm_user_assigned_identity" "aks" {
   tags                = local.tags
 }
 
-# 클러스터 ID 가 VNet 안에서 서브넷 join / NAP 노드 생성을 할 수 있도록 Network Contributor
+# Network Contributor so the cluster identity can join subnets and create NAP nodes inside the VNet
 resource "azurerm_role_assignment" "network_contributor" {
   count = local.byo ? 1 : 0
 

@@ -1,67 +1,71 @@
-# Lab 10. AKS Automatic: EKS Auto Mode 에 해당하는 "운영까지 맡기는" 모드
+<!-- lang-switch -->
+**English** | [한국어](ko/10-aks-automatic.md)
+<!-- /lang-switch -->
 
-| 소요 시간 | 예상 비용 | Terraform 스택 | 선행 실습 |
+# Lab 10. AKS Automatic: the "we operate it for you" mode, equivalent to EKS Auto Mode
+
+| Duration | Estimated cost | Terraform stack | Prerequisite |
 |---|---|---|---|
-| 30분 (apply 10–15분) | AKS Standard 티어 + 자동 프로비저닝 노드 (실습 후 바로 삭제) | `terraform/10-aks-automatic` | [02. 원격 State](02-bootstrap.md) (Lab 03–05 와 독립) |
+| 30 min (apply 10–15 min) | AKS Standard tier + automatically provisioned nodes (delete right after the lab) | `terraform/10-aks-automatic` | [02. Remote state](02-bootstrap.md) (independent of Labs 03–05) |
 
 > [!NOTE]
-> 2026 년 현재 Microsoft 의 Well-Architected 가이드는 *"대부분의 신규 프로덕션 워크로드에는 AKS Automatic 을 선택하고, Windows 노드·LTS·특수한 네트워크/플랫폼 커스터마이징이 필요할 때만 Standard 를 선택하라"* 고 권장합니다. Lab 05 에서 직접 설계한 것을 이 모드는 **기본값으로 제공**합니다.
+> As of 2026, Microsoft's Well-Architected guidance recommends the following: *"Choose AKS Automatic for most new production workloads, and choose Standard only when you need Windows nodes, LTS, or special network/platform customization."* This mode gives you **by default** what you designed yourself in Lab 05.
 
-## 이번 실습에서 만드는 것
+## What you build in this lab
 
-Lab 05 에서 약 250 줄의 `cluster.tf` 와 모니터링/네트워크 설정으로 만든 것을, **약 20 줄**의 리소스로 만듭니다.
+What took about 250 lines of `cluster.tf` plus monitoring and network settings in Lab 05 takes about **20 lines** of resources here.
 
 ```text
  azurerm_kubernetes_automatic_cluster
-  ├─ 관리형 시스템 노드 풀 (AKS 구독에서 호스팅/운영)      ← Standard 에서는 직접 생성
-  ├─ Node Auto Provisioning (Karpenter 기반) 사용자 노드    ← 파드 요구사항에 맞는 VM 을 자동 선택
-  ├─ Azure CNI Overlay + Cilium, 관리형 NAT Gateway
-  ├─ Entra ID + Azure RBAC (로컬 계정 없음), Workload Identity/OIDC
-  ├─ Deployment Safeguards + Pod Security Standards(baseline) enforce
-  └─ approuting-istio(Gateway API 구현; CRD 는 1.36+ 에서 기본 포함), Standard 티어 + Pod readiness SLA(99.9% / 5분), 자동 업그레이드(stable, N-1)
+  ├─ Managed system node pool (hosted and operated in AKS's own subscription)    ← You create it yourself in Standard
+  ├─ Node Auto Provisioning (Karpenter-based) user nodes                         ← Automatically picks VMs that fit the pod requirements
+  ├─ Azure CNI Overlay + Cilium, managed NAT Gateway
+  ├─ Entra ID + Azure RBAC (no local accounts), Workload Identity/OIDC
+  ├─ Deployment Safeguards + Pod Security Standards (baseline) enforce
+  └─ approuting-istio (Gateway API implementation; CRDs included by default in 1.36+), Standard tier + Pod readiness SLA (99.9% / 5 min), automatic upgrades (stable, N-1)
 ```
 
-## AWS 경험자를 위한 비교
+## Comparison for AWS engineers
 
-| AWS | Azure | 차이 / 주의 |
+| AWS | Azure | Differences / notes |
 |---|---|---|
-| EKS Auto Mode | **AKS Automatic** | 둘 다 노드·스케일·업그레이드·주요 애드온을 운영 주체가 관리합니다. |
-| Auto Mode 가 만드는 EC2 (내 계정에 보임) | **관리형 시스템 노드 풀**은 AKS 구독에서 호스팅 | 시스템 노드는 내 구독의 VM 목록에 보이지 않습니다. |
-| Karpenter NodePool/EC2NodeClass | NAP 의 `NodePool` / `AKSNodeClass` CRD | 같은 Karpenter 계열 API. |
-| Pod Security/Kyverno 직접 구성 | **Deployment Safeguards** (Azure Policy, enforce) | 리소스 요청/제한, probe, `latest` 태그 금지 등 위반 시 배포 거부. |
-| 노드 관리 계정의 EC2 직접 수정 가능 | **노드 리소스 그룹 잠금** (`MC_` 수정 불가) | 실수로 노드를 건드리는 일을 방지. |
+| EKS Auto Mode | **AKS Automatic** | In both, the cloud provider manages the nodes, scaling, upgrades, and main add-ons. |
+| EC2 instances that Auto Mode creates (visible in your account) | **Managed system node pool** hosted in AKS's own subscription | The system nodes don't appear in your subscription's VM list. |
+| Karpenter NodePool/EC2NodeClass | NAP's `NodePool` / `AKSNodeClass` CRDs | Same Karpenter-family API. |
+| Configure Pod Security/Kyverno yourself | **Deployment Safeguards** (Azure Policy, enforce) | Deployments that violate rules such as resource requests/limits, probes, or the ban on `latest` tags are rejected. |
+| You can modify EC2 instances directly in the account that manages the nodes | **Node resource group lock** (`MC_` can't be modified) | Prevents accidentally touching the nodes. |
 
-## Standard vs Automatic: 무엇을 고를까
+## Standard vs. Automatic: which one to choose
 
-![AKS Standard 와 AKS Automatic: 누가 운영하나](diagrams/standard-vs-automatic.svg)
+![AKS Standard vs. AKS Automatic: who operates what](diagrams/standard-vs-automatic.svg)
 
-| 영역 | AKS Automatic | AKS Standard (Lab 05) |
+| Area | AKS Automatic | AKS Standard (Lab 05) |
 |---|---|---|
-| 시스템 노드 풀 | 관리형(AKS 가 운영) | 직접 생성/운영 |
-| 노드 스케일링 | **NAP 고정**, HPA/KEDA/VPA 활성 | Cluster Autoscaler 또는 NAP 선택 |
-| 티어 / SLA | Standard + **Pod readiness SLA** + 업타임 SLA | Free(기본) / Standard / Premium(LTS) |
-| 업그레이드 | `stable` 채널(N-1) + 노드 이미지 자동 | 수동 또는 채널 선택 |
-| 인증 | Azure RBAC 고정 (로컬 계정 없음) | 로컬 계정 기본 → 끄기 권장 |
-| 정책 | Deployment Safeguards + PSS baseline **enforce** | 선택 (Lab 08) |
-| 네트워크 | Overlay + Cilium, 관리형 NAT, API 서버 VNet Integration | 선택 (Lab 03/05 에서 직접 구성) |
-| 관측성 | 포털/CLI 로 만들면 Prometheus/Container Insights 기본 → **Terraform 으로 만들 때는 직접 연결** | 직접 구성 (Lab 05 의 DCR 패턴) |
-| 제약 | Windows 노드 없음, 일부 확장 미지원(Dapr 등), **Standard → Automatic 전환 불가** | 거의 없음 |
+| System node pool | Managed (operated by AKS) | You create and operate it |
+| Node scaling | **NAP only**, HPA/KEDA/VPA enabled | Choose Cluster Autoscaler or NAP |
+| Tier / SLA | Standard + **Pod readiness SLA** + uptime SLA | Free (default) / Standard / Premium (LTS) |
+| Upgrades | `stable` channel (N-1) + automatic node image updates | Manual or choose a channel |
+| Authentication | Azure RBAC only (no local accounts) | Local accounts on by default → turning them off is recommended |
+| Policy | Deployment Safeguards + PSS baseline **enforce** | Optional (Lab 08) |
+| Networking | Overlay + Cilium, managed NAT, API server VNet Integration | Optional (you configure it yourself in Lab 03/05) |
+| Observability | Prometheus/Container Insights on by default when created from the portal/CLI → **when you create it with Terraform, you connect them yourself** | You configure it yourself (the DCR pattern from Lab 05) |
+| Constraints | No Windows nodes, some extensions unsupported (Dapr, etc.), **no conversion from Standard to Automatic** | Almost none |
 
 > [!IMPORTANT]
-> **Standard 에서 Automatic 으로 이전(in-place 변환)은 지원되지 않습니다.** 처음부터 어느 쪽을 쓸지 정하세요. 판단이 어렵다면 Automatic 으로 시작해 부족한 점을 확인하는 것이 권장 순서입니다.
+> **Migrating from Standard to Automatic (in-place conversion) is not supported.** Decide up front which one you will use. If it's hard to decide, the recommended order is to start with Automatic and see what falls short.
 
-## 설계 결정 (Best practice)
+## Design decisions (best practices)
 
-| 결정 | 이유 |
+| Decision | Why |
 |---|---|
-| 기본은 **managed VNet** (`use_byo_network = false`) | 가장 단순. 기존 네트워크/온프레미스 연동이 필요하면 BYO VNet 으로 시작해야 합니다(이후 변경 불가). |
-| BYO 시: 서브넷 3개(API 서버 위임 /28, user 노드, system 노드) + **UAMI + VNet 에 Network Contributor** | Microsoft 공식 샘플과 동일한 요구 사항. NAP 가 VNet 안에서 노드를 만들기 때문에 VNet 범위 권한이 필요. |
-| system 노드 서브넷의 `ignore_changes = [delegation]` | AKS 가 클러스터 생성 후 서브넷에 위임을 추가해 Terraform 이 되돌리려는 것을 막습니다. |
-| Ingress: `web_app_routing_ingress { istio_enabled = true }` | NGINX 대신 approuting-istio 구현. Gateway API CRD 까지 기본 포함되는 것은 1.36+ 신규 Automatic 입니다(`stable` 채널은 N-1 이라 지금은 1.35 로 만들어져 CRD 가 없을 수 있습니다). |
-| `api_server_access.authorized_ip_ranges` | 공용 엔드포인트는 내 IP 만. |
-| 관리자 권한: `grant_current_user_admin` / `admin_principal_ids` | Automatic 은 로컬 계정이 없어 Azure RBAC 역할이 유일한 접근 수단입니다. 실습은 현재 로그인 사용자에게 부여(기본), 팀/CI 는 `false` 로 끄고 Entra 그룹 Object ID 를 `admin_principal_ids` 로 지정하세요(둘 다 비우면 `validation` 이 막습니다). |
+| Default to a **managed VNet** (`use_byo_network = false`) | Simplest option. If you need to integrate with an existing network or on-premises, you must start with a BYO VNet (it can't be changed afterward). |
+| With BYO: 3 subnets (API server delegated /28, user nodes, system nodes) + **UAMI + Network Contributor on the VNet** | Same requirements as the official Microsoft sample. NAP creates nodes inside the VNet, so it needs permissions at the VNet scope. |
+| `ignore_changes = [delegation]` on the system node subnet | After the cluster is created, AKS adds a delegation to the subnet; this prevents Terraform from trying to revert it. |
+| Ingress: `web_app_routing_ingress { istio_enabled = true }` | Uses the approuting-istio implementation instead of NGINX. Only new Automatic clusters on 1.36+ include the Gateway API CRDs by default (the `stable` channel is N-1, so clusters are currently created on 1.35 and may not have the CRDs). |
+| `api_server_access.authorized_ip_ranges` | Allow only your own IP on the public endpoint. |
+| Admin permissions: `grant_current_user_admin` / `admin_principal_ids` | Automatic has no local accounts, so an Azure RBAC role is the only way to get access. In the lab, the role is granted to the signed-in user (default); for teams/CI, turn that off with `false` and set the Entra group Object ID in `admin_principal_ids` (if you leave both empty, `validation` blocks it). |
 
-## 코드
+## Code
 
 <!-- tf:include path="terraform/10-aks-automatic/versions.tf" -->
 ```hcl title="terraform/10-aks-automatic/versions.tf"
@@ -86,7 +90,7 @@ terraform {
 <!-- tf:include path="terraform/10-aks-automatic/providers.tf" -->
 ```hcl title="terraform/10-aks-automatic/providers.tf"
 provider "azurerm" {
-  # subscription_id 는 ARM_SUBSCRIPTION_ID 환경 변수에서 읽습니다.
+  # subscription_id is read from the ARM_SUBSCRIPTION_ID environment variable.
   resource_provider_registrations = "none"
 
   features {
@@ -101,80 +105,81 @@ provider "azurerm" {
 <!-- tf:include path="terraform/10-aks-automatic/variables.tf" -->
 ```hcl title="terraform/10-aks-automatic/variables.tf"
 variable "workload" {
-  description = "워크로드 이름 (소문자/숫자 3~8자)"
+  description = "Workload name (3–8 lowercase letters or digits)"
   type        = string
   default     = "aksdemo"
 }
 
 variable "environment" {
-  description = "환경 구분 (dev, test, prod)"
+  description = "Environment (dev, test, prod)"
   type        = string
   default     = "dev"
 }
 
 variable "location" {
-  description = "Azure 리전 (AKS Automatic 지원 리전이어야 합니다. koreacentral 지원)"
+  description = "Azure region (must be a region that supports AKS Automatic; koreacentral is supported)"
   type        = string
   default     = "koreacentral"
 }
 
 variable "tags" {
-  description = "모든 리소스에 추가로 붙일 태그"
+  description = "Additional tags to apply to all resources"
   type        = map(string)
   default     = {}
 }
 
 variable "allowed_ip_ranges" {
   description = <<-EOT
-    Kubernetes API 서버에 접근을 허용할 관리자 공인 IP (CIDR 목록).
-    예: export TF_VAR_allowed_ip_ranges='["203.0.113.10/32"]'
+    Public IPs of administrators allowed to access the Kubernetes API server (list of CIDRs).
+    Example: export TF_VAR_allowed_ip_ranges='["203.0.113.10/32"]'
   EOT
   type        = list(string)
 
   validation {
     condition     = length(var.allowed_ip_ranges) > 0 && alltrue([for cidr in var.allowed_ip_ranges : can(cidrhost(cidr, 0))])
-    error_message = "allowed_ip_ranges 에 CIDR 을 1개 이상 지정하세요. 예: export TF_VAR_allowed_ip_ranges='[\"203.0.113.10/32\"]'"
+    error_message = "Specify at least one CIDR in allowed_ip_ranges. Example: export TF_VAR_allowed_ip_ranges='[\"203.0.113.10/32\"]'"
   }
 }
 
 variable "grant_current_user_admin" {
   description = <<-EOT
-    true 이면 terraform 을 실행하는 "현재 로그인 주체"에게 클러스터 관리자(Azure RBAC Cluster Admin) 권한을 줍니다. 실습용 기본값입니다.
-    팀/CI 환경에서는 false 로 두고 admin_principal_ids 에 Entra 그룹을 지정하세요.
+    If true, grants cluster admin permissions (Azure RBAC Cluster Admin) to the "currently signed-in principal"
+    that runs terraform. This is the lab default.
+    In team/CI environments, set it to false and specify an Entra group in admin_principal_ids.
   EOT
   type        = bool
   default     = true
 
   validation {
     condition     = var.grant_current_user_admin || length(var.admin_principal_ids) > 0
-    error_message = "grant_current_user_admin = false 이면 admin_principal_ids 에 관리자 그룹/사용자를 1개 이상 지정하세요. (AKS Automatic 은 로컬 계정이 없어 관리자가 없으면 아무도 클러스터에 접근할 수 없습니다.)"
+    error_message = "When grant_current_user_admin = false, specify at least one admin group/user in admin_principal_ids. (AKS Automatic has no local accounts, so with no admin, nobody can access the cluster.)"
   }
 }
 
 variable "admin_principal_ids" {
-  description = "클러스터 관리자 권한(Azure RBAC Cluster Admin)을 추가로 줄 Entra 사용자/그룹 Object ID. 팀 환경에서는 개인 대신 그룹을 권장합니다."
+  description = "Object IDs of additional Entra users/groups to grant cluster admin permissions (Azure RBAC Cluster Admin). In team environments, prefer groups over individuals."
   type        = set(string)
   default     = []
 }
 
 variable "use_byo_network" {
   description = <<-EOT
-    false(기본값) : AKS 가 VNet 까지 관리하는 "managed VNet" 모드 - 가장 간단합니다.
-    true          : 직접 만든 VNet/서브넷 사용 (BYO VNet) - 기존 네트워크/온프레미스 연동이 필요할 때.
+    false (default): "managed VNet" mode where AKS manages the VNet too - the simplest option.
+    true           : use your own VNet/subnets (BYO VNet) - when you need to integrate with an existing network/on-premises.
   EOT
   type        = bool
   default     = false
 }
 
 variable "vnet_cidr" {
-  description = "use_byo_network = true 일 때 만들 VNet 주소 공간"
+  description = "Address space of the VNet to create when use_byo_network = true"
   type        = string
   default     = "10.20.0.0/16"
 }
 ```
 <!-- /tf:include -->
 
-**`main.tf`** — 리소스 그룹과 (선택) BYO VNet
+**`main.tf`** — Resource group and (optional) BYO VNet
 
 <!-- tf:include path="terraform/10-aks-automatic/main.tf" -->
 ```hcl title="terraform/10-aks-automatic/main.tf"
@@ -210,11 +215,11 @@ resource "azurerm_resource_group" "automatic" {
 }
 
 # ---------------------------------------------------------------------------
-# (선택) BYO VNet : use_byo_network = true 일 때만 생성
-# Microsoft 공식 샘플(101-aks-automatic-custom-network)과 같은 구성입니다.
-#   - API 서버 서브넷  : Microsoft.ContainerService/managedClusters 로 위임 (/28 이상)
-#   - User 노드 서브넷 : NAP 가 만드는 노드가 위치
-#   - System 노드 서브넷: AKS 가 관리하는 시스템 노드 풀(managed system node pool)용
+# (Optional) BYO VNet : created only when use_byo_network = true
+# Same layout as the official Microsoft sample (101-aks-automatic-custom-network).
+#   - API server subnet : delegated to Microsoft.ContainerService/managedClusters (/28 or larger)
+#   - User node subnet  : where the nodes created by NAP are placed
+#   - System node subnet: for the system node pool managed by AKS
 # ---------------------------------------------------------------------------
 resource "azurerm_virtual_network" "byo" {
   count = local.byo ? 1 : 0
@@ -262,7 +267,7 @@ resource "azurerm_subnet" "system_nodes" {
   address_prefixes     = [cidrsubnet(var.vnet_cidr, 8, 2)] # /24
 
   lifecycle {
-    # 클러스터 생성 후 AKS 가 이 서브넷에 위임(delegation)을 추가합니다.
+    # After the cluster is created, AKS adds a delegation to this subnet.
     ignore_changes = [delegation]
   }
 }
@@ -276,7 +281,7 @@ resource "azurerm_user_assigned_identity" "aks" {
   tags                = local.tags
 }
 
-# 클러스터 ID 가 VNet 안에서 서브넷 join / NAP 노드 생성을 할 수 있도록 Network Contributor
+# Network Contributor so the cluster identity can join subnets and create NAP nodes inside the VNet
 resource "azurerm_role_assignment" "network_contributor" {
   count = local.byo ? 1 : 0
 
@@ -288,29 +293,30 @@ resource "azurerm_role_assignment" "network_contributor" {
 ```
 <!-- /tf:include -->
 
-**`cluster.tf`** — Automatic 클러스터: Lab 05 의 `cluster.tf` 와 비교해 보세요.
+**`cluster.tf`** — The Automatic cluster: compare it with `cluster.tf` from Lab 05.
 
 <!-- tf:include path="terraform/10-aks-automatic/cluster.tf" -->
 ```hcl title="terraform/10-aks-automatic/cluster.tf"
 # ---------------------------------------------------------------------------
-# AKS Automatic  (Amazon EKS Auto Mode 에 해당하는 "운영까지 맡기는" 모드)
+# AKS Automatic  (the "we operate it for you" mode, equivalent to Amazon EKS Auto Mode)
 #
-# 05-aks 에서 직접 설정한 항목 대부분이 "미리 구성(preconfigured)" 되어 있어 코드가 훨씬 짧습니다.
-#   - 관리형 시스템 노드 풀, Node Auto Provisioning(Karpenter 기반) 노드 오토스케일
-#   - Azure CNI Overlay + Cilium, 관리형 NAT Gateway 로 egress
-#   - Standard 등급(업타임 SLA) + Pod readiness SLA, 자동 업그레이드(stable 채널, N-1), 노드 이미지 자동 교체
-#   - Entra ID + Azure RBAC(로컬 계정 없음), Workload Identity/OIDC, 배포 안전장치(Deployment Safeguards), 이미지 클리너
-#   - HPA / KEDA / VPA, 노드 자동 복구(auto-repair), 노드 리소스 그룹 잠금(lockdown)
+# Most of the settings you configured by hand in 05-aks are "preconfigured" here, so the code is much shorter.
+#   - Managed system node pool, Node Auto Provisioning (Karpenter-based) node autoscaling
+#   - Azure CNI Overlay + Cilium, egress through a managed NAT Gateway
+#   - Standard tier (uptime SLA) + Pod readiness SLA, auto upgrades (stable channel, N-1), automatic node image replacement
+#   - Entra ID + Azure RBAC (no local accounts), Workload Identity/OIDC, Deployment Safeguards, image cleaner
+#   - HPA / KEDA / VPA, node auto-repair, node resource group lockdown
 #
-# 주의: Managed Prometheus / Container Insights 는 Azure CLI·포털로 만들 때만 기본 활성화됩니다.
-#       Terraform 으로 만든 이 클러스터에는 연결되어 있지 않으므로, 필요하면 05-aks/monitoring.tf 처럼 직접 연결해야 합니다.
+# Note: Managed Prometheus / Container Insights are enabled by default only when you create the cluster with the
+#       Azure CLI or the portal. This cluster, created with Terraform, is not connected to them, so connect them
+#       yourself if you need them (as in 05-aks/monitoring.tf).
 # ---------------------------------------------------------------------------
 resource "azurerm_kubernetes_automatic_cluster" "this" {
   name                = module.naming.names.aks_automatic
   location            = azurerm_resource_group.automatic.location
   resource_group_name = azurerm_resource_group.automatic.name
 
-  # managed VNet: SystemAssigned 로 충분. BYO VNet: 미리 권한을 준 UserAssigned 필요.
+  # managed VNet: SystemAssigned is enough. BYO VNet: needs a UserAssigned identity that was granted permissions beforehand.
   identity {
     type         = local.byo ? "UserAssigned" : "SystemAssigned"
     identity_ids = local.byo ? [azurerm_user_assigned_identity.aks[0].id] : null
@@ -330,7 +336,8 @@ resource "azurerm_kubernetes_automatic_cluster" "this" {
     }
   }
 
-  # Ingress: NGINX 대신 Gateway API 구현(approuting-istio). AKS 1.36+ 의 새 Automatic 클러스터 기본값과 같습니다.
+  # Ingress: Gateway API implementation (approuting-istio) instead of NGINX.
+  # Same as the default for new Automatic clusters on AKS 1.36+.
   web_app_routing_ingress {
     istio_enabled = true
   }
@@ -340,8 +347,9 @@ resource "azurerm_kubernetes_automatic_cluster" "this" {
   depends_on = [azurerm_role_assignment.network_contributor]
 }
 
-# Automatic 은 Azure RBAC 만 사용하므로 사람에게도 역할 할당이 필요합니다.
-# 현재 로그인 주체(grant_current_user_admin) + admin_principal_ids 로 지정한 주체(팀 환경에서는 Entra 그룹 권장)에게 부여합니다.
+# Automatic uses only Azure RBAC, so people need role assignments too.
+# Grant them to the currently signed-in principal (grant_current_user_admin) and to the principals listed in
+# admin_principal_ids (an Entra group is recommended in team environments).
 locals {
   admin_principal_ids = toset(concat(
     var.grant_current_user_admin ? [data.azurerm_client_config.current.object_id] : [],
@@ -370,22 +378,22 @@ resource "azurerm_role_assignment" "cluster_admin" {
 <!-- tf:include path="terraform/10-aks-automatic/outputs.tf" -->
 ```hcl title="terraform/10-aks-automatic/outputs.tf"
 output "cluster_name" {
-  description = "AKS Automatic 클러스터 이름"
+  description = "AKS Automatic cluster name"
   value       = azurerm_kubernetes_automatic_cluster.this.name
 }
 
 output "resource_group_name" {
-  description = "클러스터 리소스 그룹"
+  description = "Cluster resource group"
   value       = azurerm_resource_group.automatic.name
 }
 
 output "kubernetes_version" {
-  description = "현재 Kubernetes 버전 (AKS 가 stable 채널로 자동 관리)"
+  description = "Current Kubernetes version (managed automatically by AKS through the stable channel)"
   value       = azurerm_kubernetes_automatic_cluster.this.current_kubernetes_version
 }
 
 output "get_credentials_command" {
-  description = "kubeconfig 받기 + kubelogin 변환"
+  description = "Get the kubeconfig and convert it for kubelogin"
   value       = "az aks get-credentials --resource-group ${azurerm_resource_group.automatic.name} --name ${azurerm_kubernetes_automatic_cluster.this.name} --overwrite-existing && kubelogin convert-kubeconfig -l azurecli"
 }
 ```
@@ -393,7 +401,7 @@ output "get_credentials_command" {
 
 <!-- tf:include path="terraform/10-aks-automatic/tests/plan.tftest.hcl" -->
 ```hcl title="terraform/10-aks-automatic/tests/plan.tftest.hcl"
-# Azure 없이 plan 로직만 검증: terraform -chdir=terraform/10-aks-automatic test
+# Verify only the plan logic, without Azure: terraform -chdir=terraform/10-aks-automatic test
 mock_provider "azurerm" {
   source = "../mocks"
 }
@@ -407,7 +415,7 @@ run "plan_managed_vnet" {
 
   assert {
     condition     = length(azurerm_virtual_network.byo) == 0
-    error_message = "기본값(managed VNet)에서는 VNet 을 만들지 않습니다."
+    error_message = "The default (managed VNet) does not create a VNet."
   }
 }
 
@@ -421,7 +429,7 @@ run "plan_group_admin_only" {
 
   assert {
     condition     = length(azurerm_role_assignment.cluster_admin) == 1 && length(azurerm_role_assignment.cluster_user) == 1
-    error_message = "현재 사용자 자동 부여를 끄면 지정한 그룹 1개만 관리자여야 합니다."
+    error_message = "With the automatic grant to the current user turned off, only the one specified group must be an admin."
   }
 }
 
@@ -444,49 +452,49 @@ run "plan_byo_vnet" {
 
   assert {
     condition     = length(azurerm_subnet.api_server) == 1 && azurerm_subnet.api_server[0].address_prefixes[0] == "10.20.0.0/28"
-    error_message = "API 서버 서브넷은 /28 이어야 합니다."
+    error_message = "The API server subnet must be a /28."
   }
 }
 ```
 <!-- /tf:include -->
 
-## 실습 따라하기
+## Walkthrough
 
-### 1단계. 적용
+### Step 1. Apply
 
 ```bash
 cd terraform/10-aks-automatic
 terraform init -backend-config=../backend.hcl
 terraform plan -out tfplan
-terraform apply tfplan            # 10~15분
+terraform apply tfplan            # 10–15 min
 $(terraform output -raw get_credentials_command)
 ```
 
 > [!NOTE]
-> AKS Automatic 은 Azure Policy 를 자동으로 켭니다. 구독에 `Microsoft.PolicyInsights` RP 가 등록되어 있어야 합니다([Lab 01](01-prerequisites.md)).
-> Azure CLI 의 `aks-preview` 확장이 설치되어 있다면 충돌할 수 있으니 `az extension remove -n aks-preview` 를 권장합니다.
+> AKS Automatic turns on Azure Policy automatically. The `Microsoft.PolicyInsights` resource provider must be registered in the subscription ([Lab 01](01-prerequisites.md)).
+> If the Azure CLI `aks-preview` extension is installed, it can conflict, so we recommend running `az extension remove -n aks-preview`.
 
-### 2단계. 노드가 "없는" 클러스터를 확인
+### Step 2. Inspect the cluster that has "no" nodes
 
 ```bash
-kubectl get nodes              # 처음에는 사용자 노드가 없거나 적습니다 (관리형 hostedpool 노드 3개 + system-surge 노드 1개가 보입니다)
-kubectl get nodepools.karpenter.sh 2>/dev/null     # NAP 의 NodePool (default, system-surge)
-kubectl get gatewayclass       # approuting-istio (Gateway API CRD 가 있는 1.36+ 클러스터에서만)
+kubectl get nodes              # At first there are few or no user nodes (you see 3 managed hostedpool nodes + 1 system-surge node)
+kubectl get nodepools.karpenter.sh 2>/dev/null     # NAP NodePools (default, system-surge)
+kubectl get gatewayclass       # approuting-istio (only on 1.36+ clusters that have the Gateway API CRDs)
 ```
 
 > [!NOTE]
-> 새 Automatic 클러스터는 `stable` 채널(N-1)이라 **GA 최신 minor 보다 한 단계 낮은 버전**(2026-10 기준 1.35.8)으로 만들어지고, `azurerm_kubernetes_automatic_cluster` 에서는 버전을 고를 수 없습니다. 이 경우 `istio_enabled = true` 로 approuting-istio 구현은 켜지지만 Gateway API CRD 는 설치되지 않아 `kubectl get gatewayclass` 가 `the server doesn't have a resource type "gatewayclass"` 로 실패합니다(정상). Gateway/HTTPRoute 를 쓰려면 1.36+ 로 올라간 뒤에 확인하세요.
+> A new Automatic cluster is on the `stable` channel (N-1), so it is created with a version **one minor below the latest GA minor** (1.35.8 as of 2026-10), and `azurerm_kubernetes_automatic_cluster` doesn't let you pick the version. In this case `istio_enabled = true` turns on the approuting-istio implementation, but the Gateway API CRDs aren't installed, so `kubectl get gatewayclass` fails with `the server doesn't have a resource type "gatewayclass"` (this is expected). To use Gateway/HTTPRoute, check again after the cluster moves up to 1.36+.
 
-### 3단계. Deployment Safeguards 체험
+### Step 3. Try Deployment Safeguards
 
-보호 장치 없이 만든 배포는 거부(또는 경고)됩니다.
+A deployment that doesn't follow the safeguards is rejected (or triggers a warning).
 
 ```bash
 kubectl create deployment naive --image=mcr.microsoft.com/dotnet/samples:aspnetapp --replicas=2
-# → 리소스 요청/제한, probe 등 Deployment Safeguards 위반 메시지가 표시됩니다
+# → Deployment Safeguards violation messages appear (resource requests/limits, probes, etc.)
 ```
 
-Best practice 를 지킨 배포는 통과하고, 대기 중 파드가 **NAP 가 새 노드를 만들도록** 유도합니다.
+A deployment that follows best practices passes, and its pending pods prompt **NAP to create new nodes**.
 
 ```bash
 kubectl apply -f - <<'EOF'
@@ -516,42 +524,42 @@ spec:
           seccompProfile: { type: RuntimeDefault }
 EOF
 
-kubectl get pods -w                       # Pending → NAP 가 노드 프로비저닝 → Running (보통 1~3분)
-kubectl get nodeclaims 2>/dev/null        # NAP 가 요청한 VM (Karpenter NodeClaim)
+kubectl get pods -w                       # Pending → NAP provisions nodes → Running (usually 1–3 min)
+kubectl get nodeclaims 2>/dev/null        # VMs requested by NAP (Karpenter NodeClaims)
 kubectl get nodes -L node.kubernetes.io/instance-type,topology.kubernetes.io/zone
 ```
 
-파드 요구사항(CPU/메모리)에 맞는 VM 크기가 **자동 선택**됩니다. Lab 05 에서는 노드 풀의 `vm_size`, `min/max` 를 직접 정했던 부분입니다.
+A VM size that fits the pod requirements (CPU/memory) is **selected automatically**. In Lab 05, this is the part where you chose the node pool's `vm_size` and `min/max` yourself.
 
-### 4단계. (선택) BYO VNet 으로 새로 만들어 보기
+### Step 4. (Optional) Try rebuilding with a BYO VNet
 
 ```bash
-terraform destroy                                  # 기존 클러스터 정리 (VNet 모드는 도중 전환 불가)
-terraform apply -var use_byo_network=true          # VNet + 서브넷 3개 + UAMI + 역할 할당 + 클러스터
+terraform destroy                                  # clean up the existing cluster (the VNet mode can't be switched after creation)
+terraform apply -var use_byo_network=true          # VNet + 3 subnets + UAMI + role assignments + cluster
 ```
 
-### 5단계. 정리
+### Step 5. Clean up
 
 ```bash
 kubectl delete deployment hello naive --ignore-not-found
 terraform destroy
 ```
 
-### 자동 검증 스크립트
+### Automated verification script
 
-AKS Automatic 설정(SKU, NAP, 로컬 계정, 업그레이드 채널)과 노드/Karpenter NodePool 을 확인합니다 (읽기 전용).
+It checks the AKS Automatic settings (SKU, NAP, local accounts, upgrade channel) and the nodes/Karpenter NodePool (read-only).
 
 ```bash
-cd ../..                          # 저장소 루트에서 실행
+cd ../..                          # run from the repository root
 scripts/verify.sh 10-aks-automatic
 ```
 
 <!-- tf:include path="scripts/verify/10-aks-automatic.sh" -->
 ```bash title="scripts/verify/10-aks-automatic.sh"
 #!/usr/bin/env bash
-# Lab 10 검증: AKS Automatic 클러스터가 "운영까지 맡기는" 모드로 만들어졌는지 확인합니다 (읽기 전용).
-#   AWS 비교: EKS Auto Mode (노드 · 스케일링 · 업그레이드 · 보안 기본값을 클라우드가 관리)
-# 사용법: scripts/verify.sh 10-aks-automatic
+# Lab 10 verification: checks that the AKS Automatic cluster was created in the "we operate it for you" mode (read-only).
+#   AWS comparison: EKS Auto Mode (the cloud manages nodes · scaling · upgrades · security defaults)
+# Usage: scripts/verify.sh 10-aks-automatic
 # shellcheck source=../lib/common.sh
 source "$(dirname "${BASH_SOURCE[0]}")/../lib/common.sh"
 
@@ -560,61 +568,61 @@ verify_stack() {
   rg="$(tf_out 10-aks-automatic resource_group_name)"
   name="$(tf_out 10-aks-automatic cluster_name)"
 
-  section "10-aks-automatic · 클러스터 설정 (${name:-?})"
+  section "10-aks-automatic · cluster settings (${name:-?})"
   if [ -z "$name" ]; then
-    fail "terraform output 을 읽을 수 없습니다. 10-aks-automatic 에서 init/apply 를 마쳤나요?"
+    fail "Can't read terraform output. Did you finish init/apply in 10-aks-automatic?"
     return
   fi
   aks="$(azj aks show -g "$rg" -n "$name")"
   if [ -z "$aks" ]; then
-    fail "클러스터를 찾을 수 없습니다: $name"
+    fail "Cluster not found: $name"
     return
   fi
 
-  expect_eq "프로비저닝 상태" "$(jv "$aks" .provisioningState)" "Succeeded"
-  expect_eq "SKU (이름 / 등급)" "$(jv "$aks" '[.sku.name, .sku.tier] | join("/")')" "Automatic/Standard"
-  expect_eq "노드 프로비저닝 (NAP = Karpenter 기반)" "$(jv "$aks" .nodeProvisioningProfile.mode)" "Auto"
-  expect_eq "로컬 계정 비활성화 (Azure RBAC 만 사용)" "$(jv "$aks" .disableLocalAccounts)" "true"
+  expect_eq "Provisioning state" "$(jv "$aks" .provisioningState)" "Succeeded"
+  expect_eq "SKU (name / tier)" "$(jv "$aks" '[.sku.name, .sku.tier] | join("/")')" "Automatic/Standard"
+  expect_eq "Node provisioning (NAP = Karpenter-based)" "$(jv "$aks" .nodeProvisioningProfile.mode)" "Auto"
+  expect_eq "Local accounts disabled (Azure RBAC only)" "$(jv "$aks" .disableLocalAccounts)" "true"
   expect_eq "Azure RBAC" "$(jv "$aks" .aadProfile.enableAzureRbac)" "true"
-  expect_eq "CNI / 데이터 플레인" "$(jv "$aks" '[.networkProfile.networkPluginMode, .networkProfile.networkDataplane] | join("/")')" "overlay/cilium"
-  expect_eq "자동 업그레이드 채널" "$(jv "$aks" .autoUpgradeProfile.upgradeChannel)" "stable"
+  expect_eq "CNI / data plane" "$(jv "$aks" '[.networkProfile.networkPluginMode, .networkProfile.networkDataplane] | join("/")')" "overlay/cilium"
+  expect_eq "Auto-upgrade channel" "$(jv "$aks" .autoUpgradeProfile.upgradeChannel)" "stable"
   expect_eq "OIDC issuer / Workload Identity" "$(jv "$aks" '[.oidcIssuerProfile.enabled, .securityProfile.workloadIdentity.enabled] | join("/")')" "true/true"
 
-  section "10-aks-automatic · kubectl 확인"
+  section "10-aks-automatic · kubectl checks"
   if ! require_cmd kubectl kubelogin; then
-    skip "kubectl/kubelogin 이 없어 건너뜁니다"
+    skip "kubectl/kubelogin not found; skipping"
     return
   fi
   if ! kube_login "$rg" "$name"; then
-    fail "kubeconfig 를 받지 못했습니다 (az login 과 Cluster User Role 확인)"
+    fail "Couldn't get the kubeconfig (check az login and the Cluster User Role)"
     return
   fi
   nodes="$(kj get nodes)"
   if [ -z "$nodes" ]; then
-    fail "API 서버에 접속하지 못했습니다. 공인 IP 가 바뀌었다면 TF_VAR_allowed_ip_ranges 를 갱신하고 apply 하세요."
+    fail "Couldn't reach the API server. If your public IP changed, update TF_VAR_allowed_ip_ranges and apply."
     return
   fi
   ready="$(jv "$nodes" '[.items[] | select(any(.status.conditions[]; .type == "Ready" and .status == "True"))] | length')"
-  expect_ge "Ready 노드 수 (관리형 system 풀)" "$ready" 1
+  expect_ge "Ready nodes (managed system pool)" "$ready" 1
 
-  # NAP 는 Karpenter 의 NodePool 로 노드를 만듭니다 (EKS Auto Mode 의 NodePool 과 같은 개념).
+  # NAP creates nodes through Karpenter NodePools (the same concept as NodePools in EKS Auto Mode).
   pools="$(kj get nodepools.karpenter.sh)"
-  jq_warn "Karpenter NodePool 이 있음 (NAP)" "$pools" '(.items | length) >= 1'
+  jq_warn "Karpenter NodePool exists (NAP)" "$pools" '(.items | length) >= 1'
 }
 
-# 직접 실행(scripts/verify/10-aks-automatic.sh)도 가능합니다.
+# You can also run it directly (scripts/verify/10-aks-automatic.sh).
 if [ "${BASH_SOURCE[0]}" = "$0" ]; then verify_stack; summary; fi
 ```
 <!-- /tf:include -->
 
-## 자주 만나는 문제
+## Common issues
 
-| 증상 | 원인 / 해결 |
+| Symptom | Cause / Fix |
 |---|---|
-| `Location is not supported` | Automatic 지원 리전인지 확인 (`koreacentral`, `koreasouth` 등 지원). |
+| `Location is not supported` | Check that the region supports Automatic (`koreacentral`, `koreasouth`, and others are supported). |
 | `MissingSubscriptionRegistration ... PolicyInsights` | `az provider register -n Microsoft.PolicyInsights`. |
-| 파드가 계속 `Pending` | vCPU 쿼터 부족(NAP 가 VM 패밀리를 자동 선택). 쿼터 확인 후 증설, `kubectl describe pod` 와 `kubectl get nodeclaims` 확인. |
-| `Forbidden` (kubectl) | Azure RBAC 역할 전파 대기(최대 5분). Automatic 은 로컬 계정이 없습니다. `grant_current_user_admin = false` 라면 본인/소속 그룹이 `admin_principal_ids` 에 있는지 확인. |
-| BYO 에서 `LinkedAuthorizationFailed` | UAMI 의 Network Contributor 전파 지연 → 재시도. |
+| Pods stay `Pending` | Not enough vCPU quota (NAP picks the VM family automatically). Check the quota and request an increase; also check `kubectl describe pod` and `kubectl get nodeclaims`. |
+| `Forbidden` (kubectl) | Wait for the Azure RBAC role to propagate (up to 5 min). Automatic has no local accounts. If `grant_current_user_admin = false`, check that you (or a group you belong to) are listed in `admin_principal_ids`. |
+| `LinkedAuthorizationFailed` with BYO | The UAMI's Network Contributor role is still propagating → retry. |
 
-다음 → [Lab 11. 정리](11-cleanup.md)
+Next → [Lab 11. Cleanup](11-cleanup.md)

@@ -1,4 +1,4 @@
-# Azure 없이 plan 로직만 검증: terraform -chdir=terraform/08-governance test
+# Verify only the plan logic, without Azure: terraform -chdir=terraform/08-governance test
 mock_provider "azurerm" {
   source = "../mocks"
 }
@@ -10,12 +10,12 @@ run "plan_defaults" {
 
   assert {
     condition     = length(azurerm_security_center_subscription_pricing.containers) == 0
-    error_message = "기본값에서는 구독 단위 Defender 플랜을 켜지 않습니다."
+    error_message = "The subscription-level Defender plan is not enabled by default."
   }
 
   assert {
     condition     = length(azurerm_resource_group_policy_assignment.pod_security) == 2
-    error_message = "baseline / restricted 이니셔티브 2개가 할당되어야 합니다."
+    error_message = "Two initiatives, baseline and restricted, must be assigned."
   }
 }
 
@@ -32,7 +32,7 @@ run "plan_everything_enabled" {
 
   assert {
     condition     = length(azurerm_management_lock.network) == 1 && length(azurerm_consumption_budget_subscription.workload) == 1
-    error_message = "잠금과 예산이 생성되어야 합니다."
+    error_message = "The lock and the budget must be created."
   }
 }
 

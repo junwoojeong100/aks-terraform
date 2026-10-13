@@ -1,4 +1,4 @@
-# Azure 없이 plan 로직만 검증: terraform -chdir=terraform/04-platform test
+# Verify only the plan logic, without Azure: terraform -chdir=terraform/04-platform test
 mock_provider "azurerm" {
   source = "../mocks"
 }
@@ -12,12 +12,12 @@ run "plan_defaults" {
 
   assert {
     condition     = azurerm_key_vault.this.network_acls[0].ip_rules == toset(["203.0.113.10", "198.51.100.0/24"])
-    error_message = "Key Vault IP 규칙에서 /32 는 단일 IP 로 변환되어야 합니다."
+    error_message = "/32 in the Key Vault IP rules must be converted to a single IP."
   }
 
   assert {
     condition     = azurerm_container_registry.this.sku == "Premium"
-    error_message = "Private Endpoint 를 쓰려면 ACR 은 Premium 이어야 합니다."
+    error_message = "ACR must be Premium to use a Private Endpoint."
   }
 }
 
@@ -30,7 +30,7 @@ run "plan_without_grafana" {
 
   assert {
     condition     = length(azurerm_dashboard_grafana.this) == 0
-    error_message = "enable_grafana=false 이면 Grafana 를 만들지 않아야 합니다."
+    error_message = "If enable_grafana=false, Grafana must not be created."
   }
 }
 
@@ -43,7 +43,7 @@ run "plan_without_operator_roles" {
 
   assert {
     condition     = length(azurerm_role_assignment.operator_acr_push) == 0 && length(azurerm_role_assignment.operator_grafana_admin) == 0
-    error_message = "grant_current_user_roles=false 이면 실행 주체에게 ACR/Grafana 역할을 부여하지 않아야 합니다."
+    error_message = "If grant_current_user_roles=false, the ACR/Grafana roles must not be granted to the principal running Terraform."
   }
 }
 

@@ -1,5 +1,5 @@
 provider "azurerm" {
-  # subscription_id 는 ARM_SUBSCRIPTION_ID 환경 변수에서 읽습니다.
+  # subscription_id is read from the ARM_SUBSCRIPTION_ID environment variable.
   resource_provider_registrations = "none"
 
   features {
@@ -9,5 +9,5 @@ provider "azurerm" {
   }
 }
 
-# AzAPI 도 ARM_SUBSCRIPTION_ID 와 Azure CLI 로그인 정보를 그대로 사용합니다.
+# AzAPI likewise uses ARM_SUBSCRIPTION_ID and the Azure CLI sign-in as is.
 provider "azapi" {}

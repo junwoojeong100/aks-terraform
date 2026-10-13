@@ -1,12 +1,12 @@
 # ---------------------------------------------------------------------------
-# 예산 알림 (AWS Budgets 에 해당)
-# 구독 전체에서 workload 태그가 일치하는 비용만 추적합니다. AKS 노드 리소스 그룹의 리소스도
-# 클러스터 태그를 상속하므로 함께 집계됩니다.
+# Budget alerts (equivalent to AWS Budgets)
+# Tracks only the cost of resources whose workload tag matches, across the whole subscription. Resources in the
+# AKS node resource group inherit the cluster tags, so they are counted too.
 # ---------------------------------------------------------------------------
 resource "time_static" "budget_start" {}
 
 locals {
-  # 예산 시작일은 "이번 달 1일 00:00Z" 여야 합니다. 최초 생성 시점의 달로 고정합니다.
+  # The budget start date must be "00:00Z on the 1st of the current month". It is pinned to the month of the first creation.
   budget_start_date = formatdate("YYYY-MM-01'T'00:00:00'Z'", time_static.budget_start.rfc3339)
 }
 
@@ -48,7 +48,7 @@ resource "azurerm_consumption_budget_subscription" "workload" {
   lifecycle {
     precondition {
       condition     = length(var.budget_alert_emails) > 0
-      error_message = "enable_budget = true 이면 budget_alert_emails 에 이메일을 1개 이상 지정하세요."
+      error_message = "If enable_budget = true, specify at least one email address in budget_alert_emails."
     }
   }
 }

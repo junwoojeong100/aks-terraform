@@ -1,65 +1,69 @@
-# Lab 04. 플랫폼 서비스: ACR · Key Vault · 모니터링 · AKS 용 ID
+<!-- lang-switch -->
+**English** | [한국어](ko/04-platform.md)
+<!-- /lang-switch -->
 
-| 소요 시간 | 예상 비용 | Terraform 스택 | 선행 실습 |
+# Lab 04. Platform services: ACR · Key Vault · monitoring · identities for AKS
+
+| Duration | Estimated cost | Terraform stack | Prerequisite |
 |---|---|---|---|
-| 30분 | ACR Premium + Managed Grafana + Private Endpoint (시간당 약 $0.2–0.3) | `terraform/04-platform` | [03. 네트워크](03-network.md) |
+| 30 min | ACR Premium + Managed Grafana + Private Endpoint (about $0.2–0.3 per hour) | `terraform/04-platform` | [03. Networking](03-network.md) |
 
-## 이번 실습에서 만드는 것
+## What you build in this lab
 
-클러스터가 "의존하는" 공용 서비스와 **AKS 가 사용할 Managed Identity 2개**를 클러스터보다 먼저 만듭니다.
+Before the cluster itself, you create the shared services it "depends on" and **the two managed identities that AKS will use**.
 
 ```text
  rg-aksdemo-dev-krc-platform
- ├── id-aks-…-cluster   (UAMI)  컨트롤 플레인 ID  ── Network Contributor(네트워크 RG), Managed Identity Operator(kubelet ID)
- ├── id-aks-…-kubelet   (UAMI)  노드 ID           ── AcrPull(ACR)
- ├── acr…               (ACR Premium, 영역 중복)  ── Private Endpoint(snet-private-endpoints) + 공용은 내 IP 만
- ├── kv-…               (Key Vault, RBAC)         ── Private Endpoint + 공용은 내 IP 만
- ├── log-…              (Log Analytics)           ← 로그/컨트롤 플레인 진단 로그
- ├── amw-…              (Azure Monitor workspace) ← Managed Prometheus 메트릭
- └── amg-…              (Managed Grafana)         ── Prometheus 데이터 소스 자동 연결
+ ├── id-aks-…-cluster   (UAMI)  control plane ID      ── Network Contributor (network RG), Managed Identity Operator (kubelet ID)
+ ├── id-aks-…-kubelet   (UAMI)  node ID               ── AcrPull (ACR)
+ ├── acr…               (ACR Premium, zone-redundant) ── Private Endpoint (snet-private-endpoints) + public endpoint for my IP only
+ ├── kv-…               (Key Vault, RBAC)             ── Private Endpoint + public endpoint for my IP only
+ ├── log-…              (Log Analytics)               ← logs / control plane diagnostic logs
+ ├── amw-…              (Azure Monitor workspace)     ← Managed Prometheus metrics
+ └── amg-…              (Managed Grafana)             ── Prometheus data source connected automatically
 ```
 
-## AWS 경험자를 위한 비교
+## Comparison for AWS engineers
 
-| AWS | Azure | 차이 / 주의 |
+| AWS | Azure | Differences / notes |
 |---|---|---|
-| ECR | `azurerm_container_registry` (ACR) | Private Endpoint·IP 방화벽·영역 중복은 **Premium**. 노드 pull 은 `AcrPull` 역할. `admin_enabled = false`. |
-| ECR 라이프사이클 정책 | `retention_policy_in_days` (untagged 매니페스트) | Premium 기능. |
-| EKS cluster role / node role | **UAMI 2개** + 역할 할당 | AWS 는 role 에 신뢰 정책 + 권한 정책을 붙이지만, Azure 는 "ID 리소스 → 대상 리소스에 역할 할당" 입니다. |
-| KMS + Secrets Manager + ACM | `azurerm_key_vault` | `rbac_authorization_enabled = true` → IAM 과 동일한 RBAC 모델. 5.x 에서 **필수 인수**. |
-| VPC Endpoint (Interface) | `azurerm_private_endpoint` + `private_dns_zone_group` | Lab 03 의 Private DNS Zone 에 A 레코드가 자동 등록됩니다. |
-| CloudWatch Logs | Log Analytics workspace | KQL 로 질의. 일일 수집 상한(`daily_quota_gb`)으로 비용 폭주 방지. |
-| Amazon Managed Prometheus (AMP) | `azurerm_monitor_workspace` | Prometheus 원격 쓰기/쿼리 호환. 수집 설정은 Lab 05 의 DCR/DCRA. |
-| Amazon Managed Grafana (AMG) | `azurerm_dashboard_grafana` | Grafana 로그인은 Entra ID. **Grafana Admin** 역할을 할당해야 대시보드를 볼 수 있습니다. |
+| ECR | `azurerm_container_registry` (ACR) | Private Endpoint, IP firewall, and zone redundancy are **Premium** features. Nodes pull images with the `AcrPull` role. `admin_enabled = false`. |
+| ECR lifecycle policy | `retention_policy_in_days` (untagged manifests) | Premium feature. |
+| EKS cluster role / node role | **Two UAMIs** + role assignments | AWS attaches a trust policy and a permissions policy to a role, whereas Azure works as "identity resource → role assignment on the target resource". |
+| KMS + Secrets Manager + ACM | `azurerm_key_vault` | `rbac_authorization_enabled = true` → the same RBAC model as IAM. A **required argument** in 5.x. |
+| VPC Endpoint (Interface) | `azurerm_private_endpoint` + `private_dns_zone_group` | An A record is registered automatically in the Private DNS Zone from Lab 03. |
+| CloudWatch Logs | Log Analytics workspace | Query with KQL. A daily ingestion cap (`daily_quota_gb`) prevents runaway costs. |
+| Amazon Managed Prometheus (AMP) | `azurerm_monitor_workspace` | Compatible with Prometheus remote write/query. Collection is configured through the DCR/DCRA in Lab 05. |
+| Amazon Managed Grafana (AMG) | `azurerm_dashboard_grafana` | Grafana sign-in uses Entra ID. You must be assigned the **Grafana Admin** role to see dashboards. |
 
 > [!TIP]
-> **왜 UAMI 를 직접 만들까?** AKS 는 System-assigned ID 도 지원하지만, UAMI 를 미리 만들어 **역할 할당을 먼저 끝내 두면** 클러스터 생성 중 권한 전파 지연으로 실패하는 일을 줄이고, 클러스터를 재생성해도 ID/권한이 유지됩니다. kubelet ID 를 분리하면 ACR 권한도 클러스터 생성 전에 끝낼 수 있습니다.
+> **Why create the UAMIs yourself?** AKS also supports a system-assigned identity, but if you create the UAMIs in advance and **finish the role assignments first**, cluster creation is less likely to fail because of permission propagation delays, and the identities and permissions survive even if you recreate the cluster. Separating the kubelet identity also lets you finish the ACR permissions before the cluster is created.
 
-### 역할 할당 한눈에 보기
+### Role assignments at a glance
 
-![누가 무엇을 할 수 있는가: 주체 → 역할 → 범위](diagrams/platform-identities.svg)
+![Who can do what: principal → role → scope](diagrams/platform-identities.svg)
 
-| 주체 | 역할 | 범위(scope) | 이유 |
+| Principal | Role | Scope | Why |
 |---|---|---|---|
-| cluster UAMI | Network Contributor | 네트워크 RG | 서브넷 join, NAT Gateway 사용, 내부 LB IP 할당 |
-| cluster UAMI | Managed Identity Operator | kubelet UAMI | 노드에 kubelet ID 부착 |
-| kubelet UAMI | AcrPull | ACR | 이미지 pull |
-| 실습자(현재 사용자) | AcrPush | ACR | 이미지 push / import (`grant_current_user_roles`, 팀/CI 에서는 `false` 로 끄고 그룹/CI 주체에 별도 부여) |
-| Grafana MI | Monitoring Data Reader | Azure Monitor workspace | Prometheus 쿼리 |
-| 실습자 | Grafana Admin | Grafana | 대시보드 로그인 (`grant_current_user_roles`) |
+| cluster UAMI | Network Contributor | Network RG | Join subnets, use the NAT Gateway, allocate internal LB IPs |
+| cluster UAMI | Managed Identity Operator | kubelet UAMI | Attach the kubelet identity to the nodes |
+| kubelet UAMI | AcrPull | ACR | Pull images |
+| Lab user (current user) | AcrPush | ACR | Push / import images (`grant_current_user_roles`; for teams/CI, set it to `false` and grant the role separately to a group or CI principal) |
+| Grafana MI | Monitoring Data Reader | Azure Monitor workspace | Query Prometheus |
+| Lab user | Grafana Admin | Grafana | Sign in to dashboards (`grant_current_user_roles`) |
 
-## 설계 결정 (Best practice)
+## Design decisions (best practices)
 
-| 결정 | 이유 |
+| Decision | Why |
 |---|---|
-| ACR/Key Vault 를 **Private Endpoint + 공용 엔드포인트는 내 IP(와 신뢰된 Azure 서비스)만 허용(기본 Deny)** | 노드·파드는 사설 경로로만 접근. 관리자 PC/CI 는 IP 허용으로 `az acr import`, 시크릿 생성 가능. 방화벽의 "신뢰된 Azure 서비스 허용"(Key Vault `bypass = "AzureServices"`, ACR `network_rule_bypass_option` 기본값 `AzureServices`)은 켜져 있으므로, 완전히 막으려면 `"None"` 으로 바꾸세요. 운영에서는 CI 러너를 VNet 안에 두고 공용 접근을 완전히 끕니다. |
-| Key Vault **purge protection + soft delete 7일** | 실수 삭제 방지. 단, `destroy` 후 이름이 7일 점유(같은 이름으로 재생성하면 provider 가 복구) → Lab 11. |
-| Key Vault IP 규칙에서 `/32` 제거 | Key Vault 는 `/31`, `/32` 를 받지 않고 단일 IP 로 써야 합니다 (`replace(cidr, "/32", "")`). |
-| ACR `admin_enabled = false`, `anonymous_pull_enabled = false` | 정적 자격 증명/익명 접근 제거. |
-| Log Analytics `local_authentication_enabled = false` | 공유 키 대신 Entra(관리 ID) 인증만 허용. |
-| 진단 설정(Diagnostic settings) 으로 ACR/Key Vault 감사 로그 수집 | CloudTrail 데이터 이벤트와 같은 역할. |
+| Put ACR/Key Vault behind a **Private Endpoint, and allow only your IP (plus trusted Azure services) on the public endpoint (default Deny)** | Nodes and pods reach them only over the private path. Admin PCs and CI can run `az acr import` and create secrets through the IP allow rule. The firewall's "Allow trusted Azure services" option (Key Vault `bypass = "AzureServices"`, ACR `network_rule_bypass_option` defaulting to `AzureServices`) is turned on, so to lock it down completely, change it to `"None"`. In production, put CI runners inside the VNet and turn public access off entirely. |
+| Key Vault **purge protection + 7-day soft delete** | Prevents accidental deletion. But after `destroy`, the name stays reserved for 7 days (if you recreate it with the same name, the provider recovers it) → Lab 11. |
+| Strip `/32` from Key Vault IP rules | Key Vault doesn't accept `/31` or `/32`; you must write a single IP instead (`replace(cidr, "/32", "")`). |
+| ACR `admin_enabled = false`, `anonymous_pull_enabled = false` | Removes static credentials and anonymous access. |
+| Log Analytics `local_authentication_enabled = false` | Allows only Entra (managed identity) authentication instead of shared keys. |
+| Collect ACR/Key Vault audit logs with diagnostic settings | Plays the same role as CloudTrail data events. |
 
-## 코드
+## Code
 
 <!-- tf:include path="terraform/04-platform/versions.tf" -->
 ```hcl title="terraform/04-platform/versions.tf"
@@ -84,7 +88,7 @@ terraform {
 <!-- tf:include path="terraform/04-platform/providers.tf" -->
 ```hcl title="terraform/04-platform/providers.tf"
 provider "azurerm" {
-  # subscription_id 는 ARM_SUBSCRIPTION_ID 환경 변수에서 읽습니다.
+  # subscription_id is read from the ARM_SUBSCRIPTION_ID environment variable.
   resource_provider_registrations = "none"
 
   features {
@@ -93,13 +97,13 @@ provider "azurerm" {
     }
 
     key_vault {
-      # 이름이 같은 soft-deleted Key Vault 가 있으면 새로 만들지 않고 복구합니다.
+      # If a soft-deleted Key Vault with the same name exists, recover it instead of creating a new one.
       recover_soft_deleted_key_vaults = true
       purge_soft_delete_on_destroy    = false
     }
 
     log_analytics_workspace {
-      # 실습 후 같은 이름으로 다시 만들 수 있도록 destroy 시 영구 삭제합니다.
+      # Permanently delete on destroy so the same name can be reused after the lab.
       permanently_delete_on_destroy = true
     }
   }
@@ -110,72 +114,73 @@ provider "azurerm" {
 <!-- tf:include path="terraform/04-platform/variables.tf" -->
 ```hcl title="terraform/04-platform/variables.tf"
 variable "workload" {
-  description = "워크로드 이름 (소문자/숫자 3~8자)"
+  description = "Workload name (3–8 lowercase letters or digits)"
   type        = string
   default     = "aksdemo"
 }
 
 variable "environment" {
-  description = "환경 구분 (dev, test, prod)"
+  description = "Environment (dev, test, prod)"
   type        = string
   default     = "dev"
 }
 
 variable "location" {
-  description = "Azure 리전"
+  description = "Azure region"
   type        = string
   default     = "koreacentral"
 }
 
 variable "tags" {
-  description = "모든 리소스에 추가로 붙일 태그"
+  description = "Additional tags to apply to all resources"
   type        = map(string)
   default     = {}
 }
 
 variable "allowed_ip_ranges" {
   description = <<-EOT
-    ACR / Key Vault 방화벽에서 허용할 관리자 공인 IP (CIDR 목록).
-    예: export TF_VAR_allowed_ip_ranges='["203.0.113.10/32"]'
-    노드/파드는 Private Endpoint 로 접근하므로 이 목록은 "사람/CI" 용입니다.
+    Administrator public IPs (list of CIDRs) to allow through the ACR / Key Vault firewalls.
+    Example: export TF_VAR_allowed_ip_ranges='["203.0.113.10/32"]'
+    Nodes/pods connect through Private Endpoints, so this list is for "people/CI".
   EOT
   type        = list(string)
 
   validation {
     condition     = length(var.allowed_ip_ranges) > 0 && alltrue([for cidr in var.allowed_ip_ranges : can(cidrhost(cidr, 0))])
-    error_message = "allowed_ip_ranges 에 CIDR 을 1개 이상 지정하세요. 예: export TF_VAR_allowed_ip_ranges='[\"203.0.113.10/32\"]'"
+    error_message = "Specify at least one CIDR in allowed_ip_ranges. Example: export TF_VAR_allowed_ip_ranges='[\"203.0.113.10/32\"]'"
   }
 }
 
 variable "enable_grafana" {
-  description = "Azure Managed Grafana 생성 여부 (Standard SKU 는 시간당 요금이 발생합니다)."
+  description = "Whether to create Azure Managed Grafana (the Standard SKU is billed hourly)."
   type        = bool
   default     = true
 }
 
 variable "grant_current_user_roles" {
   description = <<-EOT
-    true 이면 terraform 을 실행하는 "현재 로그인 주체"에게 실습용 역할(ACR 에 AcrPush, Grafana 에 Grafana Admin)을 부여합니다.
-    팀/CI 환경에서는 false 로 두고, 사람은 Entra 그룹 / CI 는 별도 서비스 주체에 역할을 부여하세요.
+    If true, grants lab roles (AcrPush on ACR, Grafana Admin on Grafana) to the "currently signed-in principal"
+    that runs terraform. In team/CI environments, set it to false and assign roles to an Entra group (for people)
+    or a separate service principal (for CI) instead.
   EOT
   type        = bool
   default     = true
 }
 
 variable "log_retention_days" {
-  description = "Log Analytics 보존 기간(일)"
+  description = "Log Analytics retention period (days)"
   type        = number
   default     = 30
 }
 
 variable "log_daily_quota_gb" {
-  description = "Log Analytics 일일 수집 상한(GB). 실습 비용 폭주를 막는 안전장치입니다. -1 이면 무제한."
+  description = "Log Analytics daily ingestion cap (GB). A safeguard against runaway lab costs. -1 means unlimited."
   type        = number
   default     = 5
 }
 
 variable "key_vault_purge_protection_enabled" {
-  description = "Key Vault 제거 방지(purge protection). 운영에서는 true 를 권장하며, 한 번 켜면 끌 수 없습니다."
+  description = "Key Vault purge protection. true is recommended in production; once enabled, it cannot be disabled."
   type        = bool
   default     = true
 }
@@ -206,13 +211,13 @@ locals {
     var.tags,
   )
 
-  # Key Vault IP 규칙은 /31, /32 접두사를 받지 않으므로 단일 IP 로 변환합니다.
+  # Key Vault IP rules do not accept /31 or /32 prefixes, so they are converted to single IPs.
   key_vault_ip_rules = [for cidr in var.allowed_ip_ranges : replace(cidr, "/32", "")]
 }
 
 # ---------------------------------------------------------------------------
-# 03-network 스택이 만든 리소스를 "이름 규칙"으로 조회합니다.
-# AWS 의 `data "aws_vpc"` + 태그 조회와 같은 방식이며, remote state 의존성이 없습니다.
+# Look up the resources created by the 03-network stack by "naming convention".
+# Works like AWS `data "aws_vpc"` + tag lookups, and has no remote state dependency.
 # ---------------------------------------------------------------------------
 data "azurerm_resource_group" "network" {
   name = module.naming.names.rg_network
@@ -240,7 +245,7 @@ data "azurerm_private_dns_zone" "key_vault" {
 }
 
 # ---------------------------------------------------------------------------
-# 플랫폼(공용 서비스) 리소스 그룹
+# Platform (shared services) resource group
 # ---------------------------------------------------------------------------
 resource "azurerm_resource_group" "platform" {
   name     = module.naming.names.rg_platform
@@ -250,18 +255,18 @@ resource "azurerm_resource_group" "platform" {
 ```
 <!-- /tf:include -->
 
-**`identity.tf`** — AKS 가 쓸 UAMI 와 역할 할당
+**`identity.tf`** — the UAMIs that AKS uses, and their role assignments
 
 <!-- tf:include path="terraform/04-platform/identity.tf" -->
 ```hcl title="terraform/04-platform/identity.tf"
 # ---------------------------------------------------------------------------
-# AKS 가 사용할 Managed Identity 두 개 (cluster / kubelet)
+# Two managed identities used by AKS (cluster / kubelet)
 #
-# AWS 와의 대응
-#   - cluster identity  ≈ EKS cluster IAM role   (컨트롤 플레인이 LB, 디스크, 서브넷 등을 관리)
-#   - kubelet identity  ≈ EKS node IAM role      (노드가 ACR 이미지를 pull)
-# Azure 에서는 "Role 에 신뢰 정책을 붙이는" 대신, 리소스(UAMI)를 만들고
-# 대상 리소스 scope 에 역할 할당(role assignment)을 추가합니다. 장기 자격 증명(키)은 없습니다.
+# Mapping to AWS
+#   - cluster identity  ≈ EKS cluster IAM role   (the control plane manages LBs, disks, subnets, etc.)
+#   - kubelet identity  ≈ EKS node IAM role      (nodes pull images from ACR)
+# Instead of "attaching a trust policy to a Role", Azure has you create a resource (UAMI) and
+# add a role assignment at the scope of the target resource. There are no long-lived credentials (keys).
 # ---------------------------------------------------------------------------
 resource "azurerm_user_assigned_identity" "aks_cluster" {
   name                = module.naming.names.id_aks_cluster
@@ -277,8 +282,8 @@ resource "azurerm_user_assigned_identity" "aks_kubelet" {
   tags                = local.tags
 }
 
-# 컨트롤 플레인이 BYO VNet 의 서브넷/NAT Gateway 를 사용할 수 있도록 네트워크 리소스 그룹에 Network Contributor.
-# (더 엄격하게 하려면 VNet / 서브넷 scope 로 좁힐 수 있습니다.)
+# Network Contributor on the network resource group so the control plane can use the subnets/NAT Gateway of the BYO VNet.
+# (For stricter access, you can narrow the scope to the VNet / subnet.)
 resource "azurerm_role_assignment" "cluster_network" {
   scope                = data.azurerm_resource_group.network.id
   role_definition_name = "Network Contributor"
@@ -286,7 +291,7 @@ resource "azurerm_role_assignment" "cluster_network" {
   principal_type       = "ServicePrincipal"
 }
 
-# BYO kubelet identity 를 쓰려면 컨트롤 플레인 identity 가 kubelet identity 를 노드에 붙일 수 있어야 합니다.
+# To use a BYO kubelet identity, the control plane identity must be able to attach the kubelet identity to the nodes.
 resource "azurerm_role_assignment" "cluster_manages_kubelet" {
   scope                = azurerm_user_assigned_identity.aks_kubelet.id
   role_definition_name = "Managed Identity Operator"
@@ -294,7 +299,7 @@ resource "azurerm_role_assignment" "cluster_manages_kubelet" {
   principal_type       = "ServicePrincipal"
 }
 
-# 노드(kubelet)가 ACR 에서 이미지를 pull: ECR 의 ecr:GetAuthorizationToken / BatchGetImage 권한에 해당.
+# Lets the nodes (kubelet) pull images from ACR: equivalent to the ECR permissions ecr:GetAuthorizationToken / BatchGetImage.
 resource "azurerm_role_assignment" "kubelet_acr_pull" {
   scope                = azurerm_container_registry.this.id
   role_definition_name = "AcrPull"
@@ -302,8 +307,9 @@ resource "azurerm_role_assignment" "kubelet_acr_pull" {
   principal_type       = "ServicePrincipal"
 }
 
-# 실습자(현재 로그인 사용자)가 이미지를 push 할 수 있도록 AcrPush 부여.
-# 팀/CI 환경에서는 grant_current_user_roles = false 로 끄고, 그룹/CI 주체에 별도로 역할을 부여하세요.
+# Grant AcrPush so the lab user (the currently signed-in user) can push images.
+# In team/CI environments, turn this off with grant_current_user_roles = false and assign roles to
+# a group/CI principal separately.
 resource "azurerm_role_assignment" "operator_acr_push" {
   count = var.grant_current_user_roles ? 1 : 0
 
@@ -314,14 +320,14 @@ resource "azurerm_role_assignment" "operator_acr_push" {
 ```
 <!-- /tf:include -->
 
-**`registry.tf`** — ACR + Private Endpoint + 진단 설정
+**`registry.tf`** — ACR + Private Endpoint + diagnostic settings
 
 <!-- tf:include path="terraform/04-platform/registry.tf" -->
 ```hcl title="terraform/04-platform/registry.tf"
 # ---------------------------------------------------------------------------
-# Azure Container Registry  (Amazon ECR 에 해당)
-#   - ECR 은 리전/계정 단위 레지스트리 + 리포지토리, ACR 은 "레지스트리 1개 = 로그인 서버 1개" 입니다.
-#   - Private Endpoint / 방화벽 규칙 / 영역 중복은 Premium SKU 에서 제공합니다.
+# Azure Container Registry  (equivalent to Amazon ECR)
+#   - ECR is a per-region/per-account registry plus repositories, while ACR is "one registry = one login server".
+#   - Private Endpoint / firewall rules / zone redundancy are available in the Premium SKU.
 # ---------------------------------------------------------------------------
 resource "azurerm_container_registry" "this" {
   name                = module.naming.names.acr
@@ -329,14 +335,14 @@ resource "azurerm_container_registry" "this" {
   resource_group_name = azurerm_resource_group.platform.name
   sku                 = "Premium"
 
-  admin_enabled            = false # 정적 admin 계정 대신 Entra ID + RBAC 사용
+  admin_enabled            = false # Use Entra ID + RBAC instead of a static admin account
   anonymous_pull_enabled   = false
   zone_redundancy_enabled  = true
-  retention_policy_in_days = 7 # 태그 없는(untagged) 매니페스트 자동 정리 (ECR 라이프사이클 정책과 유사)
+  retention_policy_in_days = 7 # Automatically clean up untagged manifests (similar to ECR lifecycle policies)
 
-  # 공용 엔드포인트는 "관리자 IP + 신뢰된 Azure 서비스(network_rule_bypass_option 기본값 AzureServices)" 만 허용하고 나머지는 Deny.
-  # 노드/파드는 Private Endpoint 로 pull 합니다.
-  # (azurerm 5.x 에서는 network_rule_set 이 중첩 속성이라 `= [{ ... }]` 형태로 작성합니다.)
+  # The public endpoint allows only "admin IPs + trusted Azure services (network_rule_bypass_option defaults to
+  # AzureServices)" and denies everything else. Nodes/pods pull through the Private Endpoint.
+  # (In azurerm 5.x, network_rule_set is a nested attribute, so it is written as `= [{ ... }]`.)
   public_network_access_enabled = true
 
   network_rule_set = [{
@@ -371,7 +377,7 @@ resource "azurerm_private_endpoint" "acr" {
   tags = local.tags
 }
 
-# 레지스트리 로그인/이미지 push·pull 이벤트를 Log Analytics 로 전송 (CloudTrail data events 와 유사)
+# Send registry login and image push/pull events to Log Analytics (similar to CloudTrail data events)
 resource "azurerm_monitor_diagnostic_setting" "acr" {
   name                       = "diag-to-log-analytics"
   target_resource_id         = azurerm_container_registry.this.id
@@ -393,9 +399,9 @@ resource "azurerm_monitor_diagnostic_setting" "acr" {
 <!-- tf:include path="terraform/04-platform/keyvault.tf" -->
 ```hcl title="terraform/04-platform/keyvault.tf"
 # ---------------------------------------------------------------------------
-# Azure Key Vault  (AWS KMS + Secrets Manager + ACM 을 한 서비스로 합친 것에 가깝습니다)
-#   - 키(Key) / 시크릿(Secret) / 인증서(Certificate) 를 모두 보관
-#   - Access policy 대신 Azure RBAC(rbac_authorization_enabled) 사용 → IAM 정책 모델과 동일한 방식
+# Azure Key Vault  (close to AWS KMS + Secrets Manager + ACM combined into one service)
+#   - Stores keys, secrets, and certificates
+#   - Uses Azure RBAC (rbac_authorization_enabled) instead of access policies → the same approach as the IAM policy model
 # ---------------------------------------------------------------------------
 resource "azurerm_key_vault" "this" {
   name                = module.naming.names.key_vault
@@ -408,8 +414,8 @@ resource "azurerm_key_vault" "this" {
   purge_protection_enabled   = var.key_vault_purge_protection_enabled
   soft_delete_retention_days = 7
 
-  # 공용 엔드포인트는 "관리자 IP + 신뢰된 Azure 서비스(bypass)" 만 허용하고 나머지는 차단합니다.
-  # 파드(CSI Driver)는 Private Endpoint 로 접근합니다. 신뢰된 Azure 서비스까지 막으려면 bypass = "None" 으로 바꾸세요.
+  # The public endpoint allows only "admin IPs + trusted Azure services (bypass)" and blocks everything else.
+  # Pods (CSI Driver) connect through the Private Endpoint. To block trusted Azure services too, change bypass to "None".
   public_network_access_enabled = true
 
   network_acls {
@@ -442,7 +448,7 @@ resource "azurerm_private_endpoint" "key_vault" {
   tags = local.tags
 }
 
-# 시크릿/키 접근 감사 로그 (AuditEvent) → Log Analytics. CloudTrail 의 KMS/SecretsManager 이벤트에 해당.
+# Secret/key access audit logs (AuditEvent) → Log Analytics. Equivalent to the KMS/SecretsManager events in CloudTrail.
 resource "azurerm_monitor_diagnostic_setting" "key_vault" {
   name                       = "diag-to-log-analytics"
   target_resource_id         = azurerm_key_vault.this.id
@@ -464,10 +470,10 @@ resource "azurerm_monitor_diagnostic_setting" "key_vault" {
 <!-- tf:include path="terraform/04-platform/observability.tf" -->
 ```hcl title="terraform/04-platform/observability.tf"
 # ---------------------------------------------------------------------------
-# 관측성 (CloudWatch Logs / Amazon Managed Prometheus / Amazon Managed Grafana 에 해당)
-#   - Log Analytics workspace : 로그 저장·KQL 쿼리 (CloudWatch Logs + Logs Insights)
-#   - Azure Monitor workspace : Managed Prometheus 메트릭 저장소 (AMP workspace)
-#   - Azure Managed Grafana   : 대시보드 (AMG)
+# Observability (equivalent to CloudWatch Logs / Amazon Managed Prometheus / Amazon Managed Grafana)
+#   - Log Analytics workspace : log storage and KQL queries (CloudWatch Logs + Logs Insights)
+#   - Azure Monitor workspace : Managed Prometheus metric store (AMP workspace)
+#   - Azure Managed Grafana   : dashboards (AMG)
 # ---------------------------------------------------------------------------
 resource "azurerm_log_analytics_workspace" "this" {
   name                = module.naming.names.log_analytics
@@ -477,7 +483,7 @@ resource "azurerm_log_analytics_workspace" "this" {
   sku                          = "PerGB2018"
   retention_in_days            = var.log_retention_days
   daily_quota_gb               = var.log_daily_quota_gb
-  local_authentication_enabled = false # 공유 키 대신 Entra ID(관리 ID) 인증만 허용
+  local_authentication_enabled = false # Allow only Entra ID (managed identity) authentication instead of shared keys
 
   tags = local.tags
 }
@@ -504,7 +510,7 @@ resource "azurerm_dashboard_grafana" "this" {
     type = "SystemAssigned"
   }
 
-  # Managed Prometheus 를 Grafana 데이터 소스로 자동 연결합니다.
+  # Automatically connects Managed Prometheus as a Grafana data source.
   azure_monitor_workspace_integrations {
     resource_id = azurerm_monitor_workspace.this.id
   }
@@ -512,7 +518,7 @@ resource "azurerm_dashboard_grafana" "this" {
   tags = local.tags
 }
 
-# Grafana 가 Prometheus 메트릭을 읽을 수 있도록 Monitoring Data Reader 부여
+# Grant Monitoring Data Reader so Grafana can read Prometheus metrics
 resource "azurerm_role_assignment" "grafana_reads_prometheus" {
   count = var.enable_grafana ? 1 : 0
 
@@ -522,7 +528,7 @@ resource "azurerm_role_assignment" "grafana_reads_prometheus" {
   principal_type       = "ServicePrincipal"
 }
 
-# 실습자가 Grafana 에 로그인해서 대시보드를 볼 수 있도록 Grafana Admin 부여 (grant_current_user_roles = false 이면 생략)
+# Grant Grafana Admin so the lab user can sign in to Grafana and view dashboards (skipped if grant_current_user_roles = false)
 resource "azurerm_role_assignment" "operator_grafana_admin" {
   count = var.enable_grafana && var.grant_current_user_roles ? 1 : 0
 
@@ -536,7 +542,7 @@ resource "azurerm_role_assignment" "operator_grafana_admin" {
 <!-- tf:include path="terraform/04-platform/outputs.tf" -->
 ```hcl title="terraform/04-platform/outputs.tf"
 output "resource_group_name" {
-  description = "플랫폼 공용 서비스 리소스 그룹"
+  description = "Resource group for the platform shared services"
   value       = azurerm_resource_group.platform.name
 }
 
@@ -551,22 +557,22 @@ output "monitor_workspace_id" {
 }
 
 output "grafana_endpoint" {
-  description = "Managed Grafana URL (enable_grafana=false 이면 null)"
+  description = "Managed Grafana URL (null if enable_grafana=false)"
   value       = var.enable_grafana ? azurerm_dashboard_grafana.this[0].endpoint : null
 }
 
 output "acr_name" {
-  description = "ACR 이름"
+  description = "ACR name"
   value       = azurerm_container_registry.this.name
 }
 
 output "acr_login_server" {
-  description = "ACR 로그인 서버 (예: <name>.azurecr.io)"
+  description = "ACR login server (e.g., <name>.azurecr.io)"
   value       = azurerm_container_registry.this.login_server
 }
 
 output "key_vault_name" {
-  description = "Key Vault 이름"
+  description = "Key Vault name"
   value       = azurerm_key_vault.this.name
 }
 
@@ -576,12 +582,12 @@ output "key_vault_uri" {
 }
 
 output "aks_cluster_identity" {
-  description = "컨트롤 플레인 UAMI 이름 (05-aks 에서 이름 규칙으로 조회)"
+  description = "Control plane UAMI name (looked up by naming convention in 05-aks)"
   value       = azurerm_user_assigned_identity.aks_cluster.name
 }
 
 output "aks_kubelet_identity" {
-  description = "kubelet UAMI 이름 (05-aks 에서 이름 규칙으로 조회)"
+  description = "kubelet UAMI name (looked up by naming convention in 05-aks)"
   value       = azurerm_user_assigned_identity.aks_kubelet.name
 }
 ```
@@ -589,7 +595,7 @@ output "aks_kubelet_identity" {
 
 <!-- tf:include path="terraform/04-platform/tests/plan.tftest.hcl" -->
 ```hcl title="terraform/04-platform/tests/plan.tftest.hcl"
-# Azure 없이 plan 로직만 검증: terraform -chdir=terraform/04-platform test
+# Verify only the plan logic, without Azure: terraform -chdir=terraform/04-platform test
 mock_provider "azurerm" {
   source = "../mocks"
 }
@@ -603,12 +609,12 @@ run "plan_defaults" {
 
   assert {
     condition     = azurerm_key_vault.this.network_acls[0].ip_rules == toset(["203.0.113.10", "198.51.100.0/24"])
-    error_message = "Key Vault IP 규칙에서 /32 는 단일 IP 로 변환되어야 합니다."
+    error_message = "/32 in the Key Vault IP rules must be converted to a single IP."
   }
 
   assert {
     condition     = azurerm_container_registry.this.sku == "Premium"
-    error_message = "Private Endpoint 를 쓰려면 ACR 은 Premium 이어야 합니다."
+    error_message = "ACR must be Premium to use a Private Endpoint."
   }
 }
 
@@ -621,7 +627,7 @@ run "plan_without_grafana" {
 
   assert {
     condition     = length(azurerm_dashboard_grafana.this) == 0
-    error_message = "enable_grafana=false 이면 Grafana 를 만들지 않아야 합니다."
+    error_message = "If enable_grafana=false, Grafana must not be created."
   }
 }
 
@@ -634,7 +640,7 @@ run "plan_without_operator_roles" {
 
   assert {
     condition     = length(azurerm_role_assignment.operator_acr_push) == 0 && length(azurerm_role_assignment.operator_grafana_admin) == 0
-    error_message = "grant_current_user_roles=false 이면 실행 주체에게 ACR/Grafana 역할을 부여하지 않아야 합니다."
+    error_message = "If grant_current_user_roles=false, the ACR/Grafana roles must not be granted to the principal running Terraform."
   }
 }
 
@@ -650,19 +656,19 @@ run "rejects_empty_ip_list" {
 ```
 <!-- /tf:include -->
 
-## 실습 따라하기
+## Walkthrough
 
 ```bash
 cd terraform/04-platform
 terraform init -backend-config=../backend.hcl
-terraform plan -out tfplan        # 약 18개 리소스 (Grafana 포함)
-terraform apply tfplan            # 5~10분 (Grafana, ACR 이 오래 걸립니다)
+terraform plan -out tfplan        # about 18 resources (including Grafana)
+terraform apply tfplan            # 5–10 min (Grafana and ACR take the longest)
 ```
 
 > [!NOTE]
-> Grafana 가 부담스럽다면 `export TF_VAR_enable_grafana=false` 후 실행하세요. 클러스터 동작에는 영향이 없고, Lab 05 의 Prometheus 수집은 그대로 됩니다.
+> If you'd rather not deploy Grafana, run `export TF_VAR_enable_grafana=false` first. It doesn't affect how the cluster works, and Prometheus collection in Lab 05 still works.
 
-### 검증
+### Verify
 
 ```bash
 ACR=$(terraform output -raw acr_name); KV=$(terraform output -raw key_vault_name)
@@ -671,38 +677,40 @@ az acr show -n "$ACR" --query "{sku:sku.name, adminUser:adminUserEnabled, public
 
 az keyvault show -n "$KV" --query "{rbac:properties.enableRbacAuthorization, purgeProtection:properties.enablePurgeProtection, defaultAction:properties.networkAcls.defaultAction, ipRules:properties.networkAcls.ipRules[].value}" -o json
 
-# Private Endpoint 와 DNS 레코드 (Private DNS Zone 에 A 레코드가 생겼는지)
+# Private Endpoints and DNS records (check that A records were created in the Private DNS Zone)
 az network private-endpoint list -g "$(terraform output -raw resource_group_name)" -o table
 az network private-dns record-set a list -g "$(az group list --query "[?ends_with(name,'-network')].name | [0]" -o tsv)" \
    -z privatelink.azurecr.io -o table
 
-# 이미지 import 테스트: ECR 에서 이미지를 가져오듯 외부 레지스트리 → ACR 서버 측 복사
+# Image import test: server-side copy from an external registry → ACR (like fetching an image from ECR)
 az acr import -n "$ACR" --source mcr.microsoft.com/cbl-mariner/busybox:2.0 --image demo/busybox:2.0
 az acr repository list -n "$ACR" -o table
 ```
 
 > [!TIP]
-> Grafana 접속: `terraform output grafana_endpoint` 의 URL → Entra ID 로그인. 데이터 소스에 *Managed Prometheus* 가 이미 연결되어 있습니다(메트릭은 Lab 05 이후부터 쌓입니다).
+> To access Grafana, open the URL from `terraform output grafana_endpoint` and sign in with Entra ID. *Managed Prometheus* is already connected as a data source (metrics start to accumulate from Lab 05 onward).
 
-### 자동 검증 스크립트
+### Automated verification script
 
-ACR · Key Vault 의 방화벽/Private Endpoint, Log Analytics, Prometheus workspace, AKS 용 UAMI 와 **역할 할당**(kubelet → AcrPull 등)을 확인합니다 (읽기 전용).
+Checks the firewalls and Private Endpoints of ACR and Key Vault, Log Analytics, the Prometheus workspace, and the UAMIs for AKS together with their **role assignments**, such as kubelet → AcrPull (read-only).
 
 ```bash
-cd ../..                          # 저장소 루트에서 실행
+cd ../..                          # run from the repository root
 scripts/verify.sh 04-platform
 ```
 
 <!-- tf:include path="scripts/verify/04-platform.sh" -->
 ```bash title="scripts/verify/04-platform.sh"
 #!/usr/bin/env bash
-# Lab 04 검증: ACR · Key Vault · Log Analytics · Prometheus/Grafana · AKS 용 ID 와 역할 할당을 확인합니다 (읽기 전용).
-#   AWS 비교: ECR · KMS/Secrets Manager · CloudWatch Logs · Managed Prometheus/Grafana · IAM Role + 정책
-# 사용법: scripts/verify.sh 04-platform
+# Lab 04 verification: checks ACR · Key Vault · Log Analytics · Prometheus/Grafana · the identities for AKS
+# and their role assignments (read-only).
+#   AWS comparison: ECR · KMS/Secrets Manager · CloudWatch Logs · Managed Prometheus/Grafana · IAM Role + policies
+# Usage: scripts/verify.sh 04-platform
 # shellcheck source=../lib/common.sh
 source "$(dirname "${BASH_SOURCE[0]}")/../lib/common.sh"
 
-# Private Endpoint 연결이 1개 이상이고 모두 Approved 인가 (az 버전에 따라 JSON 중첩이 달라 둘 다 허용)
+# Is there at least one Private Endpoint connection, and are all of them Approved?
+# (the JSON nesting differs by az version, so both shapes are accepted)
 PE_APPROVED='[.[]? | (.privateLinkServiceConnectionState // .properties.privateLinkServiceConnectionState).status] | length >= 1 and all(.[]; . == "Approved")'
 
 verify_stack() {
@@ -718,65 +726,65 @@ verify_stack() {
   id_cluster="$(tf_out 04-platform aks_cluster_identity)"
   id_kubelet="$(tf_out 04-platform aks_kubelet_identity)"
 
-  section "04-platform · 플랫폼 서비스 (${rg:-?})"
+  section "04-platform · platform services (${rg:-?})"
   if [ -z "$rg" ]; then
-    fail "terraform output 을 읽을 수 없습니다. 04-platform 에서 init/apply 를 마쳤나요?"
+    fail "Can't read terraform output. Did you finish init/apply in 04-platform?"
     return
   fi
 
   # --- ACR (ECR) ---
   acr_json="$(azj acr show -g "$rg" -n "$acr")"
-  expect_eq "ACR SKU (Private Endpoint 는 Premium 필요)" "$(jv "$acr_json" .sku.name)" "Premium"
-  expect_eq "ACR 관리자 계정(admin user) 사용" "$(jv "$acr_json" .adminUserEnabled)" "false"
-  expect_eq "ACR 익명 pull 허용" "$(jv "$acr_json" .anonymousPullEnabled)" "false"
-  expect_eq "ACR 공용 접근 기본 동작 (방화벽)" "$(jv "$acr_json" .networkRuleSet.defaultAction)" "Deny"
-  jq_ok "ACR Private Endpoint 승인됨" "$acr_json" ".privateEndpointConnections | $PE_APPROVED"
+  expect_eq "ACR SKU (Private Endpoint requires Premium)" "$(jv "$acr_json" .sku.name)" "Premium"
+  expect_eq "ACR admin user enabled" "$(jv "$acr_json" .adminUserEnabled)" "false"
+  expect_eq "ACR anonymous pull allowed" "$(jv "$acr_json" .anonymousPullEnabled)" "false"
+  expect_eq "ACR default action for public access (firewall)" "$(jv "$acr_json" .networkRuleSet.defaultAction)" "Deny"
+  jq_ok "ACR Private Endpoint approved" "$acr_json" ".privateEndpointConnections | $PE_APPROVED"
 
   # --- Key Vault (KMS + Secrets Manager) ---
   kv_json="$(azj keyvault show -n "$kv")"
-  expect_eq "Key Vault 권한 모델 = Azure RBAC" "$(jv "$kv_json" .properties.enableRbacAuthorization)" "true"
-  expect_eq "Key Vault 공용 접근 기본 동작 (방화벽)" "$(jv "$kv_json" .properties.networkAcls.defaultAction)" "Deny"
-  jq_warn "Key Vault purge protection 켜짐 (운영 권장)" "$kv_json" '.properties.enablePurgeProtection == true'
-  jq_ok "Key Vault Private Endpoint 승인됨" "$kv_json" ".properties.privateEndpointConnections | $PE_APPROVED"
+  expect_eq "Key Vault permission model = Azure RBAC" "$(jv "$kv_json" .properties.enableRbacAuthorization)" "true"
+  expect_eq "Key Vault default action for public access (firewall)" "$(jv "$kv_json" .properties.networkAcls.defaultAction)" "Deny"
+  jq_warn "Key Vault purge protection on (recommended for production)" "$kv_json" '.properties.enablePurgeProtection == true'
+  jq_ok "Key Vault Private Endpoint approved" "$kv_json" ".properties.privateEndpointConnections | $PE_APPROVED"
 
-  # --- 관측성 ---
+  # --- Observability ---
   law_name="${law_id##*/}"
   law="$(azj monitor log-analytics workspace show -g "$rg" -n "$law_name")"
-  expect_eq "Log Analytics 로컬(공유 키) 인증 차단" "$(jv "$law" .features.disableLocalAuth)" "true"
-  expect_set "Log Analytics 보존 기간(일)" "$(jv "$law" .retentionInDays)"
+  expect_eq "Log Analytics local (shared key) auth disabled" "$(jv "$law" .features.disableLocalAuth)" "true"
+  expect_set "Log Analytics retention (days)" "$(jv "$law" .retentionInDays)"
   amw="$(azj resource show --ids "$amw_id")"
-  expect_eq "Azure Monitor workspace(Managed Prometheus) 상태" "$(jv "$amw" .properties.provisioningState)" "Succeeded"
+  expect_eq "Azure Monitor workspace (Managed Prometheus) state" "$(jv "$amw" .properties.provisioningState)" "Succeeded"
   if [ -n "$grafana" ]; then
     pass "Managed Grafana: $grafana"
   else
-    skip "Managed Grafana 없음 (enable_grafana = false)"
+    skip "No Managed Grafana (enable_grafana = false)"
   fi
 
-  # --- AKS 용 Managed Identity 와 역할 할당 (IAM Role + 정책 연결에 해당) ---
+  # --- Managed Identities for AKS and their role assignments (equivalent to an IAM Role + attached policies) ---
   cluster_pid="$(jv "$(azj identity show -g "$rg" -n "$id_cluster")" .principalId)"
   kubelet_pid="$(jv "$(azj identity show -g "$rg" -n "$id_kubelet")" .principalId)"
-  expect_set "컨트롤 플레인 UAMI ($id_cluster)" "$cluster_pid"
+  expect_set "Control plane UAMI ($id_cluster)" "$cluster_pid"
   expect_set "kubelet UAMI ($id_kubelet)" "$kubelet_pid"
   net_rg_id="$(az group show -n "$net_rg" --query id -o tsv 2>/dev/null)"
   if [ -n "$kubelet_pid" ] && [ -n "$cluster_pid" ]; then
     has_role "kubelet → AcrPull (ACR)" "$kubelet_pid" "AcrPull" "$(jv "$acr_json" .id)"
-    has_role "컨트롤 플레인 → Network Contributor (네트워크 RG)" "$cluster_pid" "Network Contributor" "$net_rg_id"
+    has_role "Control plane → Network Contributor (network RG)" "$cluster_pid" "Network Contributor" "$net_rg_id"
   fi
 }
 
-# 직접 실행(scripts/verify/04-platform.sh)도 가능합니다.
+# You can also run it directly (scripts/verify/04-platform.sh).
 if [ "${BASH_SOURCE[0]}" = "$0" ]; then verify_stack; summary; fi
 ```
 <!-- /tf:include -->
 
-## 자주 만나는 문제
+## Common issues
 
-| 증상 | 원인 / 해결 |
+| Symptom | Cause / fix |
 |---|---|
-| `MissingSubscriptionRegistration` | 해당 RP 미등록 → [Lab 01 의 3단계](01-prerequisites.md). `Microsoft.Dashboard`, `Microsoft.Monitor` 를 특히 확인. |
-| `az acr import` 가 `403`/`denied` | 공용 접근은 `allowed_ip_ranges` 의 IP 만 허용됩니다. 현재 IP 가 바뀌었는지 확인하고 `terraform apply`. |
-| `az keyvault secret set` 이 `Forbidden` | Key Vault 방화벽(IP) 또는 데이터 평면 역할(Key Vault Secrets Officer) 부족. 역할 전파에 수 분 걸릴 수 있습니다. |
-| Grafana `ZoneRedundancy`/버전 오류 | `grafana_major_version` 은 azurerm 5.9 기준 12 또는 13. 리전 제약이 있으면 `enable_grafana=false`. |
-| Key Vault 이름이 이미 존재(soft-deleted) | provider 의 `recover_soft_deleted_key_vaults = true` 가 복구합니다. 이전에 purge protection 으로 삭제했다면 7일간 복구만 가능합니다. |
+| `MissingSubscriptionRegistration` | The resource provider isn't registered → [step 3 of Lab 01](01-prerequisites.md). Check `Microsoft.Dashboard` and `Microsoft.Monitor` in particular. |
+| `az acr import` fails with `403`/`denied` | Public access is allowed only from the IPs in `allowed_ip_ranges`. Check whether your current IP has changed, then run `terraform apply`. |
+| `az keyvault secret set` fails with `Forbidden` | The Key Vault firewall (IP) or a data plane role (Key Vault Secrets Officer) is missing. Role propagation can take a few minutes. |
+| Grafana `ZoneRedundancy`/version error | As of azurerm 5.9, `grafana_major_version` can be 12 or 13. If the region has constraints, use `enable_grafana=false`. |
+| Key Vault name already exists (soft-deleted) | The provider's `recover_soft_deleted_key_vaults = true` recovers it. If it was deleted earlier with purge protection on, the only option for 7 days is to recover it. |
 
-다음 → [Lab 05. AKS 클러스터](05-aks.md)
+Next → [Lab 05. AKS cluster](05-aks.md)

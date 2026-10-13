@@ -1,4 +1,4 @@
-# Azure 없이 plan 로직만 검증: terraform -chdir=terraform/10-aks-automatic test
+# Verify only the plan logic, without Azure: terraform -chdir=terraform/10-aks-automatic test
 mock_provider "azurerm" {
   source = "../mocks"
 }
@@ -12,7 +12,7 @@ run "plan_managed_vnet" {
 
   assert {
     condition     = length(azurerm_virtual_network.byo) == 0
-    error_message = "기본값(managed VNet)에서는 VNet 을 만들지 않습니다."
+    error_message = "The default (managed VNet) does not create a VNet."
   }
 }
 
@@ -26,7 +26,7 @@ run "plan_group_admin_only" {
 
   assert {
     condition     = length(azurerm_role_assignment.cluster_admin) == 1 && length(azurerm_role_assignment.cluster_user) == 1
-    error_message = "현재 사용자 자동 부여를 끄면 지정한 그룹 1개만 관리자여야 합니다."
+    error_message = "With the automatic grant to the current user turned off, only the one specified group must be an admin."
   }
 }
 
@@ -49,6 +49,6 @@ run "plan_byo_vnet" {
 
   assert {
     condition     = length(azurerm_subnet.api_server) == 1 && azurerm_subnet.api_server[0].address_prefixes[0] == "10.20.0.0/28"
-    error_message = "API 서버 서브넷은 /28 이어야 합니다."
+    error_message = "The API server subnet must be a /28."
   }
 }

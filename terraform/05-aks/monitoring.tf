@@ -1,9 +1,9 @@
 # ---------------------------------------------------------------------------
-# 관측성 연결: AKS ↔ Managed Prometheus / Container Insights
+# Observability wiring: AKS ↔ Managed Prometheus / Container Insights
 #
-# AWS(CloudWatch Container Insights, AMP) 에서는 "에이전트 + 워크스페이스 + IAM" 을 직접 연결하지만,
-# Azure 는 Data Collection Rule(DCR) 이 "무엇을 어디로 보낼지" 를 정의하고,
-# Data Collection Rule Association(DCRA) 이 DCR 을 AKS 클러스터에 연결합니다.
+# On AWS (CloudWatch Container Insights, AMP) you wire up "agent + workspace + IAM" yourself,
+# whereas on Azure a Data Collection Rule (DCR) defines "what to send where",
+# and a Data Collection Rule Association (DCRA) attaches the DCR to the AKS cluster.
 # ---------------------------------------------------------------------------
 
 # --- Managed Prometheus ----------------------------------------------------------
@@ -21,7 +21,7 @@ resource "azurerm_monitor_data_collection_rule" "prometheus" {
   resource_group_name         = azurerm_resource_group.aks.name
   data_collection_endpoint_id = azurerm_monitor_data_collection_endpoint.prometheus.id
   kind                        = "Linux"
-  description                 = "Managed Prometheus: AKS 메트릭을 Azure Monitor workspace 로 전송"
+  description                 = "Managed Prometheus: sends AKS metrics to the Azure Monitor workspace"
 
   destinations {
     monitor_account {
@@ -49,11 +49,11 @@ resource "azurerm_monitor_data_collection_rule_association" "prometheus" {
   name                    = "dcra-${module.naming.names.aks}-prometheus"
   target_resource_id      = azurerm_kubernetes_cluster.this.id
   data_collection_rule_id = azurerm_monitor_data_collection_rule.prometheus.id
-  description             = "삭제하면 이 AKS 클러스터의 Prometheus 메트릭 수집이 중단됩니다."
+  description             = "Deleting this stops Prometheus metric collection for this AKS cluster."
 }
 
-# azurerm 의 monitor_metrics 블록은 컨트롤 플레인 메트릭(apiserver, etcd 등)을 노출하지 않으므로 AzAPI 로 켭니다.
-# DCRA 가 먼저 만들어진 뒤에 켜야 수집 파드가 CrashLoop 하지 않습니다.
+# The azurerm monitor_metrics block doesn't expose control plane metrics (apiserver, etcd, etc.), so enable them via AzAPI.
+# Enable them only after the DCRA has been created, so the collector pods don't go into CrashLoop.
 resource "azapi_update_resource" "control_plane_metrics" {
   type        = "Microsoft.ContainerService/managedClusters@2026-05-01"
   resource_id = azurerm_kubernetes_cluster.this.id
@@ -62,7 +62,7 @@ resource "azapi_update_resource" "control_plane_metrics" {
     properties = {
       azureMonitorProfile = {
         metrics = {
-          enabled = true # monitor_metrics 블록으로 이미 켜져 있는 값. API 스키마상 필수라 함께 보냅니다.
+          enabled = true # already on via the monitor_metrics block; the API schema requires it, so it is sent too
           controlPlane = {
             enabled = true
           }
@@ -71,7 +71,8 @@ resource "azapi_update_resource" "control_plane_metrics" {
     }
   }
 
-  # 같은 클러스터에 대한 PUT 이 노드 풀 생성/변경과 겹치면 409 AnotherOperationInProgress 로 실패하므로 노드 풀 뒤에 실행합니다.
+  # A PUT on the same cluster that overlaps with node pool creation/changes fails with 409 AnotherOperationInProgress,
+  # so this runs after the node pools.
   depends_on = [
     azurerm_monitor_data_collection_rule_association.prometheus,
     azurerm_kubernetes_cluster_node_pool.user,
@@ -79,9 +80,10 @@ resource "azapi_update_resource" "control_plane_metrics" {
   ]
 }
 
-# --- Container Insights (로그) -----------------------------------------------------
+# --- Container Insights (logs) ---------------------------------------------------
 locals {
-  # 비용 최적화 구성: 성능 지표(Perf, InsightsMetrics)는 Prometheus 가 담당하므로 로그/인벤토리 스트림만 수집합니다.
+  # Cost-optimized setup: Prometheus handles the performance metrics (Perf, InsightsMetrics),
+  # so only the log and inventory streams are collected.
   container_insights_streams = [
     "Microsoft-ContainerLogV2",
     "Microsoft-KubeEvents",
@@ -97,7 +99,7 @@ resource "azurerm_monitor_data_collection_rule" "container_insights" {
   location            = azurerm_resource_group.aks.location
   resource_group_name = azurerm_resource_group.aks.name
   kind                = "Linux"
-  description         = "Container Insights: 컨테이너 로그/쿠버네티스 인벤토리를 Log Analytics 로 전송"
+  description         = "Container Insights: sends container logs and Kubernetes inventory to Log Analytics"
 
   destinations {
     log_analytics {
@@ -131,29 +133,29 @@ resource "azurerm_monitor_data_collection_rule" "container_insights" {
   tags = local.tags
 }
 
-# Container Insights 는 연결 이름이 반드시 "ContainerInsightsExtension" 이어야 합니다.
+# Container Insights requires the association name to be exactly "ContainerInsightsExtension".
 resource "azurerm_monitor_data_collection_rule_association" "container_insights" {
   name                    = "ContainerInsightsExtension"
   target_resource_id      = azurerm_kubernetes_cluster.this.id
   data_collection_rule_id = azurerm_monitor_data_collection_rule.container_insights.id
-  description             = "삭제하면 이 AKS 클러스터의 Container Insights 로그 수집이 중단됩니다."
+  description             = "Deleting this stops Container Insights log collection for this AKS cluster."
 }
 
-# --- 컨트롤 플레인 로그 (EKS 의 control plane logging → CloudWatch Logs 에 해당) ---------------
+# --- Control plane logs (equivalent to EKS control plane logging → CloudWatch Logs) ----
 resource "azurerm_monitor_diagnostic_setting" "aks" {
   name                           = "diag-to-log-analytics"
   target_resource_id             = azurerm_kubernetes_cluster.this.id
   log_analytics_workspace_id     = data.azurerm_log_analytics_workspace.this.id
-  log_analytics_destination_type = "Dedicated" # AKSAudit/AKSControlPlane 등 리소스 전용 테이블 사용
+  log_analytics_destination_type = "Dedicated" # use resource-specific tables such as AKSAudit/AKSControlPlane
 
   dynamic "enabled_log" {
     for_each = toset([
-      "kube-audit-admin", # 변경(쓰기) 작업 감사 로그만 수집: kube-audit 보다 훨씬 저렴
+      "kube-audit-admin", # collects audit logs for change (write) operations only: much cheaper than kube-audit
       "kube-apiserver",
       "kube-controller-manager",
       "kube-scheduler",
       "cluster-autoscaler",
-      "guard", # Entra ID 인증/인가 로그
+      "guard", # Entra ID authentication/authorization logs
     ])
 
     content {

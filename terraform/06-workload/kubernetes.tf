@@ -1,12 +1,12 @@
 # ---------------------------------------------------------------------------
-# 쿠버네티스 쪽: Namespace / ServiceAccount / SecretProviderClass / Deployment
+# Kubernetes side: Namespace / ServiceAccount / SecretProviderClass / Deployment
 # ---------------------------------------------------------------------------
 resource "kubernetes_namespace_v1" "app" {
   metadata {
     name = var.app_namespace
 
     labels = {
-      # Pod Security Admission: restricted 프로파일을 강제 (root 실행, 권한 상승 등을 거부)
+      # Pod Security Admission: enforce the restricted profile (rejects running as root, privilege escalation, etc.)
       "pod-security.kubernetes.io/enforce"         = "restricted"
       "pod-security.kubernetes.io/enforce-version" = "latest"
     }
@@ -19,7 +19,7 @@ resource "kubernetes_service_account_v1" "app" {
     namespace = kubernetes_namespace_v1.app.metadata[0].name
 
     annotations = {
-      # EKS 의 eks.amazonaws.com/role-arn 에 해당
+      # Equivalent to eks.amazonaws.com/role-arn on EKS
       "azure.workload.identity/client-id" = azurerm_user_assigned_identity.app.client_id
     }
   }
@@ -27,8 +27,8 @@ resource "kubernetes_service_account_v1" "app" {
   depends_on = [azurerm_federated_identity_credential.app]
 }
 
-# Secrets Store CSI Driver 가 Key Vault 에서 가져올 객체를 정의하는 CRD.
-# (kubernetes_manifest 는 plan 시점에 클러스터에 접속해 CRD 스키마를 읽습니다.)
+# CRD that defines which objects the Secrets Store CSI Driver fetches from Key Vault.
+# (kubernetes_manifest connects to the cluster at plan time to read the CRD schema.)
 resource "kubernetes_manifest" "secret_provider_class" {
   manifest = {
     apiVersion = "secrets-store.csi.x-k8s.io/v1"
@@ -77,7 +77,7 @@ resource "kubernetes_deployment_v1" "app" {
       metadata {
         labels = {
           app = local.app_name
-          # 이 label 이 있어야 Workload Identity webhook 이 토큰 볼륨/환경 변수를 주입합니다.
+          # The Workload Identity webhook injects the token volume and env vars only for pods with this label.
           "azure.workload.identity/use" = "true"
         }
       }
@@ -110,8 +110,8 @@ resource "kubernetes_deployment_v1" "app" {
             }
           }
 
-          # kubernetes provider 는 컨테이너 security_context 에서 생략한 값을 false 로 보냅니다.
-          # run_as_non_root 를 명시하지 않으면 파드 수준의 true 를 덮어써 PSS restricted 에 막힙니다.
+          # The kubernetes provider sends false for any value omitted from a container security_context.
+          # Without an explicit run_as_non_root it overrides the pod-level true and PSS restricted rejects the pod.
           security_context {
             allow_privilege_escalation = false
             read_only_root_filesystem  = true

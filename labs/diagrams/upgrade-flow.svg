@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 960 608" width="960" height="608" role="img" aria-labelledby="upgrade-flow-t upgrade-flow-d"><title id="upgrade-flow-t">업그레이드 흐름: patch · 노드 이미지 · minor</title><desc id="upgrade-flow-d">patch 와 노드 OS 이미지는 자동 업그레이드 채널이 유지보수 창에 적용하고, minor 업그레이드는 사전 점검 후 컨트롤 플레인, 확인, 노드 풀 순서로 수동 진행한다.</desc><style>svg.dg{--dg-bg:#ffffff;--dg-fg:#1f2328;--dg-muted:#59636e;--dg-line:#6e7781;--dg-card:#f6f8fa;--dg-border:#d1d9e0;--dg-aws:#c2590a;--dg-aws-soft:#fff1e5;--dg-azure:#0b6ed0;--dg-azure-soft:#e5f1ff;--dg-ok:#1a7f37;--dg-ok-soft:#e6f6ea;--dg-id:#8250df;--dg-id-soft:#f3ecff;--dg-net:#0e7490;--dg-net-soft:#e0f4f8;--dg-warn:#9a6700;--dg-warn-soft:#fff6d6;--dg-danger:#cf222e;--dg-danger-soft:#ffebe9;font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", "Segoe UI", Roboto, sans-serif}
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 960 608" width="960" height="608" role="img" aria-labelledby="upgrade-flow-t upgrade-flow-d"><title id="upgrade-flow-t">Upgrade flow: patch · node image · minor</title><desc id="upgrade-flow-d">Patch and node OS image upgrades are applied by the automatic upgrade channels during the maintenance window. A minor upgrade is manual: preflight checks first, then the control plane, a verification step, and finally the node pools.</desc><style>svg.dg{--dg-bg:#ffffff;--dg-fg:#1f2328;--dg-muted:#59636e;--dg-line:#6e7781;--dg-card:#f6f8fa;--dg-border:#d1d9e0;--dg-aws:#c2590a;--dg-aws-soft:#fff1e5;--dg-azure:#0b6ed0;--dg-azure-soft:#e5f1ff;--dg-ok:#1a7f37;--dg-ok-soft:#e6f6ea;--dg-id:#8250df;--dg-id-soft:#f3ecff;--dg-net:#0e7490;--dg-net-soft:#e0f4f8;--dg-warn:#9a6700;--dg-warn-soft:#fff6d6;--dg-danger:#cf222e;--dg-danger-soft:#ffebe9;font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", "Segoe UI", Roboto, sans-serif}
 @media (prefers-color-scheme:dark){svg.dg{--dg-bg:#0d1117;--dg-fg:#e6edf3;--dg-muted:#9198a1;--dg-line:#8b949e;--dg-card:#151b23;--dg-border:#30363d;--dg-aws:#f0883e;--dg-aws-soft:#2b1c10;--dg-azure:#58a6ff;--dg-azure-soft:#0f2238;--dg-ok:#3fb950;--dg-ok-soft:#0f2417;--dg-id:#b392f0;--dg-id-soft:#221a36;--dg-net:#39c5cf;--dg-net-soft:#0d2a2f;--dg-warn:#d29922;--dg-warn-soft:#2d2208;--dg-danger:#ff7b72;--dg-danger-soft:#3a1517}}
 .dg-bg{fill:var(--dg-bg)}
 .dg-t{fill:var(--dg-fg)}
@@ -54,69 +54,73 @@
 .dg-line.dg-danger{stroke:var(--dg-danger)}
 .dg-ah.dg-danger{fill:var(--dg-danger)}
 .dg-on{fill:#fff}</style><defs><marker id="upgrade-flow-ah-line" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah"/></marker><marker id="upgrade-flow-ah-ok" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-ok"/></marker><marker id="upgrade-flow-ah-net" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-net"/></marker><marker id="upgrade-flow-ah-azure" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-azure"/></marker></defs><rect width="960" height="608" class="dg-bg" rx="12"/>
-<text x="24" y="32" font-size="18" class="dg-t dg-b">업그레이드 흐름: patch · 노드 이미지 · minor</text>
-<text x="24" y="54" font-size="12.5" class="dg-m">자동은 &quot;유지보수 창&quot;에서만 일어나고, 수동(az aks upgrade 나 Terraform)은 즉시 시작됩니다.</text>
+<text x="24" y="32" font-size="18" class="dg-t dg-b">Upgrade flow: patch · node image · minor</text>
+<text x="24" y="54" font-size="12.5" class="dg-m">Automatic upgrades happen only inside the &quot;maintenance window&quot;; manual ones (az aks upgrade or Terraform) start immediately.</text>
 <rect x="24" y="92" width="912" height="128" rx="14" class="dg-grp dg-ok"/>
-<text x="38" y="112" font-size="12.5" class="dg-tx-ok dg-b" data-w="884">① patch 업그레이드 (자동)</text>
+<text x="38" y="112" font-size="12.5" class="dg-tx-ok dg-b" data-w="884">① Patch upgrade (automatic)</text>
 <rect x="36" y="128" width="276" height="80" rx="10" class="dg-box dg-ok"/>
-<text x="46" y="149" font-size="13" class="dg-t dg-b" data-w="256">채널 patch</text>
-<text x="46" y="166" font-size="11" class="dg-m" data-w="256">같은 minor 의 최신 patch 를 자동 적용</text>
+<text x="46" y="149" font-size="13" class="dg-t dg-b" data-w="256">Patch channel</text>
+<text x="46" y="166" font-size="11" class="dg-m" data-w="256">Applies the latest patch of the</text>
+<text x="46" y="182" font-size="11" class="dg-m" data-w="256">same minor automatically</text>
 <rect x="336" y="128" width="276" height="80" rx="10" class="dg-box dg-ok"/>
-<text x="346" y="149" font-size="13" class="dg-t dg-b" data-w="256">유지보수 창</text>
-<text x="346" y="166" font-size="11" class="dg-m" data-w="256">일요일 02:00 KST · 4시간</text>
+<text x="346" y="149" font-size="13" class="dg-t dg-b" data-w="256">Maintenance window</text>
+<text x="346" y="166" font-size="11" class="dg-m" data-w="256">Sunday 02:00 KST · 4 hours</text>
 <text x="346" y="182" font-size="11" class="dg-m" data-w="256">(maintenance_window_auto_upgrade)</text>
 <rect x="636" y="128" width="276" height="80" rx="10" class="dg-box dg-ok"/>
-<text x="646" y="149" font-size="13" class="dg-t dg-b" data-w="256">AKS 가 순서대로 적용</text>
-<text x="646" y="166" font-size="11" class="dg-m" data-w="256">컨트롤 플레인 → 노드 풀</text>
-<text x="646" y="182" font-size="11" class="dg-m" data-w="256">(surge 33%, PDB 존중)</text>
+<text x="646" y="149" font-size="13" class="dg-t dg-b" data-w="256">AKS applies them in order</text>
+<text x="646" y="166" font-size="11" class="dg-m" data-w="256">Control plane → node pools</text>
+<text x="646" y="182" font-size="11" class="dg-m" data-w="256">(surge 33%, honors PDBs)</text>
 <path d="M312 168 L336 168" class="dg-line dg-ok" marker-end="url(#upgrade-flow-ah-ok)"/>
 <path d="M612 168 L636 168" class="dg-line dg-ok" marker-end="url(#upgrade-flow-ah-ok)"/>
 <rect x="24" y="232" width="912" height="128" rx="14" class="dg-grp dg-net"/>
-<text x="38" y="252" font-size="12.5" class="dg-tx-net dg-b" data-w="884">② 노드 OS 이미지 (자동)</text>
+<text x="38" y="252" font-size="12.5" class="dg-tx-net dg-b" data-w="884">② Node OS image (automatic)</text>
 <rect x="36" y="268" width="276" height="80" rx="10" class="dg-box dg-net"/>
-<text x="46" y="289" font-size="13" class="dg-t dg-b" data-w="256">채널 NodeImage</text>
-<text x="46" y="306" font-size="11" class="dg-m" data-w="256">주 단위로 새 노드 이미지가 나오면 적용</text>
+<text x="46" y="289" font-size="13" class="dg-t dg-b" data-w="256">NodeImage channel</text>
+<text x="46" y="306" font-size="11" class="dg-m" data-w="256">Applies each new node image</text>
+<text x="46" y="322" font-size="11" class="dg-m" data-w="256">release (weekly)</text>
 <rect x="336" y="268" width="276" height="80" rx="10" class="dg-box dg-net"/>
-<text x="346" y="289" font-size="13" class="dg-t dg-b" data-w="256">유지보수 창</text>
-<text x="346" y="306" font-size="11" class="dg-m" data-w="256">토요일 02:00 KST · 4시간</text>
+<text x="346" y="289" font-size="13" class="dg-t dg-b" data-w="256">Maintenance window</text>
+<text x="346" y="306" font-size="11" class="dg-m" data-w="256">Saturday 02:00 KST · 4 hours</text>
 <text x="346" y="322" font-size="11" class="dg-m" data-w="256">(maintenance_window_node_os)</text>
 <rect x="636" y="268" width="276" height="80" rx="10" class="dg-box dg-net"/>
-<text x="646" y="289" font-size="13" class="dg-t dg-b" data-w="256">노드 이미지 교체</text>
-<text x="646" y="306" font-size="11" class="dg-m" data-w="256">surge 노드 추가 → cordon · drain</text>
-<text x="646" y="322" font-size="11" class="dg-m" data-w="256">→ 이전 노드 제거</text>
+<text x="646" y="289" font-size="13" class="dg-t dg-b" data-w="256">Node image replacement</text>
+<text x="646" y="306" font-size="11" class="dg-m" data-w="256">Add surge node → cordon · drain</text>
+<text x="646" y="322" font-size="11" class="dg-m" data-w="256">→ remove the old node</text>
 <path d="M312 308 L336 308" class="dg-line dg-net" marker-end="url(#upgrade-flow-ah-net)"/>
 <path d="M612 308 L636 308" class="dg-line dg-net" marker-end="url(#upgrade-flow-ah-net)"/>
 <rect x="24" y="372" width="912" height="160" rx="14" class="dg-grp dg-azure"/>
-<text x="38" y="392" font-size="12.5" class="dg-tx-azure dg-b" data-w="884">③ minor 업그레이드 (수동 · 사전 점검 후)</text>
+<text x="38" y="392" font-size="12.5" class="dg-tx-azure dg-b" data-w="884">③ Minor upgrade (manual · after preflight checks)</text>
 <rect x="36" y="408" width="156" height="112" rx="10" class="dg-box dg-azure"/>
-<text x="46" y="429" font-size="13" class="dg-t dg-b" data-w="136">1 사전 점검</text>
+<text x="46" y="429" font-size="13" class="dg-t dg-b" data-w="136">1 Preflight check</text>
 <text x="46" y="446" font-size="10.5" class="dg-m" data-w="136">az aks get-upgrades</text>
-<text x="46" y="461.5" font-size="10.5" class="dg-m" data-w="136">deprecated API 확인</text>
-<text x="46" y="477" font-size="10.5" class="dg-m" data-w="136">PDB · 서브넷 IP 여유</text>
+<text x="46" y="461.5" font-size="10.5" class="dg-m" data-w="136">Check deprecated APIs</text>
+<text x="46" y="477" font-size="10.5" class="dg-m" data-w="136">PDB · spare subnet IPs</text>
 <rect x="214" y="408" width="156" height="112" rx="10" class="dg-box dg-azure"/>
-<text x="224" y="429" font-size="13" class="dg-t dg-b" data-w="136">2 컨트롤 플레인</text>
+<text x="224" y="429" font-size="13" class="dg-t dg-b" data-w="136">2 Control plane</text>
 <text x="224" y="446" font-size="10.5" class="dg-m" data-w="136">az aks upgrade</text>
 <text x="224" y="461.5" font-size="10.5" class="dg-m" data-w="136">--control-plane-only</text>
-<text x="224" y="477" font-size="10.5" class="dg-m" data-w="136">(앱은 그대로 동작)</text>
+<text x="224" y="477" font-size="10.5" class="dg-m" data-w="136">(apps keep running)</text>
 <rect x="392" y="408" width="156" height="112" rx="10" class="dg-box dg-azure"/>
-<text x="402" y="429" font-size="13" class="dg-t dg-b" data-w="136">3 확인</text>
-<text x="402" y="446" font-size="10.5" class="dg-m" data-w="136">앱 · 애드온 정상?</text>
-<text x="402" y="461.5" font-size="10.5" class="dg-m" data-w="136">Gateway API CRD 는</text>
-<text x="402" y="477" font-size="10.5" class="dg-m" data-w="136">버전에 맞춰 자동 갱신</text>
+<text x="402" y="429" font-size="13" class="dg-t dg-b" data-w="136">3 Verify</text>
+<text x="402" y="446" font-size="10.5" class="dg-m" data-w="136">Apps · add-ons OK?</text>
+<text x="402" y="461.5" font-size="10.5" class="dg-m" data-w="136">Gateway API CRDs are</text>
+<text x="402" y="477" font-size="10.5" class="dg-m" data-w="136">updated automatically</text>
+<text x="402" y="492.5" font-size="10.5" class="dg-m" data-w="136">to match the version</text>
 <rect x="570" y="408" width="156" height="112" rx="10" class="dg-box dg-azure"/>
-<text x="580" y="429" font-size="13" class="dg-t dg-b" data-w="136">4 노드 풀</text>
+<text x="580" y="429" font-size="13" class="dg-t dg-b" data-w="136">4 Node pools</text>
 <text x="580" y="446" font-size="10.5" class="dg-m" data-w="136">az aks nodepool upgrade</text>
-<text x="580" y="461.5" font-size="10.5" class="dg-m" data-w="136">system → user 순서</text>
-<text x="580" y="477" font-size="10.5" class="dg-m" data-w="136">surge 33% · PDB 존중</text>
+<text x="580" y="461.5" font-size="10.5" class="dg-m" data-w="136">system → user order</text>
+<text x="580" y="477" font-size="10.5" class="dg-m" data-w="136">surge 33%, honors PDBs</text>
 <rect x="748" y="408" width="156" height="112" rx="10" class="dg-box dg-azure"/>
-<text x="758" y="429" font-size="13" class="dg-t dg-b" data-w="136">5 마무리</text>
-<text x="758" y="446" font-size="10.5" class="dg-m" data-w="136">새 노드 풀을 추가할 땐</text>
-<text x="758" y="461.5" font-size="10.5" class="dg-m" data-w="136">버전 변수를 현재</text>
-<text x="758" y="477" font-size="10.5" class="dg-m" data-w="136">minor 에 맞추세요</text>
+<text x="758" y="429" font-size="13" class="dg-t dg-b" data-w="136">5 Wrap-up</text>
+<text x="758" y="446" font-size="10.5" class="dg-m" data-w="136">Adding a node pool?</text>
+<text x="758" y="461.5" font-size="10.5" class="dg-m" data-w="136">Set the version</text>
+<text x="758" y="477" font-size="10.5" class="dg-m" data-w="136">variable to the</text>
+<text x="758" y="492.5" font-size="10.5" class="dg-m" data-w="136">current minor</text>
 <path d="M192 464 L214 464" class="dg-line dg-azure" marker-end="url(#upgrade-flow-ah-azure)"/>
 <path d="M370 464 L392 464" class="dg-line dg-azure" marker-end="url(#upgrade-flow-ah-azure)"/>
 <path d="M548 464 L570 464" class="dg-line dg-azure" marker-end="url(#upgrade-flow-ah-azure)"/>
 <path d="M726 464 L748 464" class="dg-line dg-azure" marker-end="url(#upgrade-flow-ah-azure)"/>
 <rect x="24" y="546" width="912" height="48" rx="10" class="dg-box"/>
-<text x="36" y="570" font-size="12" class="dg-t" data-w="888">Terraform 은 생성 이후의 버전을 ignore_changes 로 무시합니다. 버전까지 코드로 관리하려면 Lab 09 의 C 방식을 쓰세요.</text>
+<text x="36" y="570" font-size="12" class="dg-t" data-w="888">Terraform ignores versions after creation (ignore_changes). To manage versions in code too, use option C in Lab 09.</text>
 </svg>

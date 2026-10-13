@@ -1,10 +1,10 @@
-# 빌드 도구 의존성
+# Build tool dependencies
 tools/node_modules/
 
-# OS / 에디터
+# OS / editors
 .DS_Store
 .idea/
 .vscode/
 
-# 브라우저 자동화 임시 파일
+# Temporary browser automation files
 .playwright-mcp/

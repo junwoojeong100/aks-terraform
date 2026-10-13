@@ -7,6 +7,8 @@
     get: function (k, d) { try { var v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
     set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* ignore */ } }
   };
+  /* UI strings of the page language (injected by tools/build-html.mjs) */
+  var T = window.AKS_I18N || {};
 
   /* ---------- theme ---------- */
   var root = document.documentElement;
@@ -15,7 +17,7 @@
   function applyTheme(t) {
     root.setAttribute('data-theme', t);
     var b = $('#theme-btn');
-    if (b) b.textContent = t === 'dark' ? '☀ 라이트' : '☾ 다크';
+    if (b) b.textContent = t === 'dark' ? T.light : T.dark;
   }
   applyTheme(saved || (prefersDark ? 'dark' : 'light'));
   $('#theme-btn').addEventListener('click', function () {
@@ -40,7 +42,7 @@
         var done = function () {
           copy.classList.add('ok');
           var old = copy.textContent;
-          copy.textContent = '복사됨 ✓';
+          copy.textContent = T.copied;
           setTimeout(function () { copy.classList.remove('ok'); copy.textContent = old; }, 1400);
         };
         if (navigator.clipboard && window.isSecureContext) {
@@ -56,7 +58,7 @@
         var collapsed = fig.classList.contains('collapsed');
         fig.classList.toggle('collapsed', !collapsed);
         fig.classList.toggle('expanded', collapsed);
-        expand.textContent = collapsed ? '코드 접기 ▲' : expand.getAttribute('data-label');
+        expand.textContent = collapsed ? T.collapse : expand.getAttribute('data-label');
       });
     }
   });
@@ -181,7 +183,7 @@
     Object.keys(seen).forEach(function (k) { hits.push(seen[k]); });
     hits.sort(function (a, b) { return b.score - a.score; });
     hits = hits.slice(0, 12);
-    if (!hits.length) { box.innerHTML = '<div class="empty">검색 결과가 없습니다.</div>'; box.classList.add('open'); return; }
+    if (!hits.length) { box.innerHTML = '<div class="empty">' + esc(T.noResults) + '</div>'; box.classList.add('open'); return; }
     box.innerHTML = hits.map(function (h) {
       return '<a href="#' + h.e.anchor + '"><div class="r-title">' + esc(h.e.heading) + '</div><div class="r-lab">' + esc(h.e.labTitle) + '</div><div>' + snippet(h.e.text, h.e.lower, terms) + '</div></a>';
     }).join('');

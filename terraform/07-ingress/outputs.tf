@@ -1,19 +1,19 @@
 output "namespace" {
-  description = "웹 앱 네임스페이스"
+  description = "Web app namespace"
   value       = kubernetes_namespace_v1.web.metadata[0].name
 }
 
 output "app_image" {
-  description = "배포된 이미지 (ACR 에 미리 import 되어 있어야 합니다)"
+  description = "Deployed image (must be imported into ACR beforehand)"
   value       = local.app_image
 }
 
 output "gateway_address_command" {
-  description = "Gateway 에 할당된 로드밸런서 주소 조회 (할당까지 1~3분 소요)"
+  description = "Look up the load balancer address assigned to the Gateway (assignment takes 1–3 min)"
   value       = "kubectl -n ${var.namespace} get gateway web-gateway -o jsonpath='{.status.addresses[0].value}'"
 }
 
 output "curl_command" {
-  description = "Gateway 주소로 요청 보내기 (internal_gateway=false 일 때)"
+  description = "Send a request to the Gateway address (when internal_gateway=false)"
   value       = "curl -i http://$(kubectl -n ${var.namespace} get gateway web-gateway -o jsonpath='{.status.addresses[0].value}')/"
 }

@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 960 520" width="960" height="520" role="img" aria-labelledby="observability-pipeline-t observability-pipeline-d"><title id="observability-pipeline-t">관측성 파이프라인: 로그 · 메트릭 · 컨트롤 플레인 로그</title><desc id="observability-pipeline-d">ama-logs 는 DCR 을 거쳐 Log Analytics 로, ama-metrics 는 DCE/DCR 을 거쳐 Azure Monitor workspace(Managed Prometheus)로, 컨트롤 플레인 진단 로그는 진단 설정을 거쳐 Log Analytics 로 가며, Managed Grafana 가 Prometheus 를 읽는다.</desc><style>svg.dg{--dg-bg:#ffffff;--dg-fg:#1f2328;--dg-muted:#59636e;--dg-line:#6e7781;--dg-card:#f6f8fa;--dg-border:#d1d9e0;--dg-aws:#c2590a;--dg-aws-soft:#fff1e5;--dg-azure:#0b6ed0;--dg-azure-soft:#e5f1ff;--dg-ok:#1a7f37;--dg-ok-soft:#e6f6ea;--dg-id:#8250df;--dg-id-soft:#f3ecff;--dg-net:#0e7490;--dg-net-soft:#e0f4f8;--dg-warn:#9a6700;--dg-warn-soft:#fff6d6;--dg-danger:#cf222e;--dg-danger-soft:#ffebe9;font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", "Segoe UI", Roboto, sans-serif}
+@media (prefers-color-scheme:dark){svg.dg{--dg-bg:#0d1117;--dg-fg:#e6edf3;--dg-muted:#9198a1;--dg-line:#8b949e;--dg-card:#151b23;--dg-border:#30363d;--dg-aws:#f0883e;--dg-aws-soft:#2b1c10;--dg-azure:#58a6ff;--dg-azure-soft:#0f2238;--dg-ok:#3fb950;--dg-ok-soft:#0f2417;--dg-id:#b392f0;--dg-id-soft:#221a36;--dg-net:#39c5cf;--dg-net-soft:#0d2a2f;--dg-warn:#d29922;--dg-warn-soft:#2d2208;--dg-danger:#ff7b72;--dg-danger-soft:#3a1517}}
+.dg-bg{fill:var(--dg-bg)}
+.dg-t{fill:var(--dg-fg)}
+.dg-m{fill:var(--dg-muted)}
+.dg-b{font-weight:650}
+.dg-box,.dg-grp,.dg-chip{stroke-width:1.4}
+.dg-box{fill:var(--dg-card);stroke:var(--dg-border)}
+.dg-grp{fill:none;stroke:var(--dg-border)}
+.dg-dash{stroke-dasharray:6 4}
+.dg-chip{fill:var(--dg-bg);stroke:none}
+.dg-line{fill:none;stroke:var(--dg-line);stroke-width:1.8}
+.dg-ah{fill:var(--dg-line)}
+.dg-box.dg-aws{fill:var(--dg-aws-soft);stroke:var(--dg-aws)}
+.dg-grp.dg-aws{stroke:var(--dg-aws)}
+.dg-fill-aws{fill:var(--dg-aws)}
+.dg-tx-aws{fill:var(--dg-aws)}
+.dg-line.dg-aws{stroke:var(--dg-aws)}
+.dg-ah.dg-aws{fill:var(--dg-aws)}
+.dg-box.dg-azure{fill:var(--dg-azure-soft);stroke:var(--dg-azure)}
+.dg-grp.dg-azure{stroke:var(--dg-azure)}
+.dg-fill-azure{fill:var(--dg-azure)}
+.dg-tx-azure{fill:var(--dg-azure)}
+.dg-line.dg-azure{stroke:var(--dg-azure)}
+.dg-ah.dg-azure{fill:var(--dg-azure)}
+.dg-box.dg-ok{fill:var(--dg-ok-soft);stroke:var(--dg-ok)}
+.dg-grp.dg-ok{stroke:var(--dg-ok)}
+.dg-fill-ok{fill:var(--dg-ok)}
+.dg-tx-ok{fill:var(--dg-ok)}
+.dg-line.dg-ok{stroke:var(--dg-ok)}
+.dg-ah.dg-ok{fill:var(--dg-ok)}
+.dg-box.dg-id{fill:var(--dg-id-soft);stroke:var(--dg-id)}
+.dg-grp.dg-id{stroke:var(--dg-id)}
+.dg-fill-id{fill:var(--dg-id)}
+.dg-tx-id{fill:var(--dg-id)}
+.dg-line.dg-id{stroke:var(--dg-id)}
+.dg-ah.dg-id{fill:var(--dg-id)}
+.dg-box.dg-net{fill:var(--dg-net-soft);stroke:var(--dg-net)}
+.dg-grp.dg-net{stroke:var(--dg-net)}
+.dg-fill-net{fill:var(--dg-net)}
+.dg-tx-net{fill:var(--dg-net)}
+.dg-line.dg-net{stroke:var(--dg-net)}
+.dg-ah.dg-net{fill:var(--dg-net)}
+.dg-box.dg-warn{fill:var(--dg-warn-soft);stroke:var(--dg-warn)}
+.dg-grp.dg-warn{stroke:var(--dg-warn)}
+.dg-fill-warn{fill:var(--dg-warn)}
+.dg-tx-warn{fill:var(--dg-warn)}
+.dg-line.dg-warn{stroke:var(--dg-warn)}
+.dg-ah.dg-warn{fill:var(--dg-warn)}
+.dg-box.dg-danger{fill:var(--dg-danger-soft);stroke:var(--dg-danger)}
+.dg-grp.dg-danger{stroke:var(--dg-danger)}
+.dg-fill-danger{fill:var(--dg-danger)}
+.dg-tx-danger{fill:var(--dg-danger)}
+.dg-line.dg-danger{stroke:var(--dg-danger)}
+.dg-ah.dg-danger{fill:var(--dg-danger)}
+.dg-on{fill:#fff}</style><defs><marker id="observability-pipeline-ah-line" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah"/></marker><marker id="observability-pipeline-ah-net" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-net"/></marker><marker id="observability-pipeline-ah-id" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-id"/></marker><marker id="observability-pipeline-ah-azure" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-azure"/></marker><marker id="observability-pipeline-ah-ok" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-ok"/></marker></defs><rect width="960" height="520" class="dg-bg" rx="12"/>
+<text x="24" y="32" font-size="18" class="dg-t dg-b">관측성 파이프라인: 로그 · 메트릭 · 컨트롤 플레인 로그</text>
+<text x="24" y="54" font-size="12.5" class="dg-m">Azure Monitor 하나로 통합됩니다. 수집 구성은 DCR(Data Collection Rule)과 DCRA(연결)로 선언합니다 (Lab 05).</text>
+<text x="24" y="96" font-size="12.5" class="dg-m dg-b">수집 대상 (AKS)</text>
+<text x="344" y="96" font-size="12.5" class="dg-m dg-b">수집 구성 (Terraform 으로 선언)</text>
+<text x="676" y="96" font-size="12.5" class="dg-m dg-b">저장 · 시각화</text>
+<rect x="24" y="108" width="280" height="96" rx="10" class="dg-box"/>
+<text x="36" y="131.5" font-size="13.5" class="dg-t dg-b" data-w="256">컨테이너 로그</text>
+<text x="36" y="149" font-size="11.5" class="dg-m" data-w="256">ama-logs (DaemonSet)</text>
+<text x="36" y="165.5" font-size="11.5" class="dg-m" data-w="256">≈ CloudWatch Container Insights</text>
+<rect x="344" y="108" width="290" height="96" rx="10" class="dg-box dg-net"/>
+<text x="356" y="131" font-size="13" class="dg-t dg-b" data-w="266">DCR container-insights</text>
+<text x="356" y="148" font-size="11.5" class="dg-m" data-w="266">ContainerLogV2 · KubeEvents</text>
+<text x="356" y="164.5" font-size="11.5" class="dg-m" data-w="266">Pod/Node/Service 인벤토리</text>
+<path d="M304 156 L344 156" class="dg-line dg-net" marker-end="url(#observability-pipeline-ah-net)"/>
+<rect x="24" y="220" width="280" height="96" rx="10" class="dg-box"/>
+<text x="36" y="243.5" font-size="13.5" class="dg-t dg-b" data-w="256">컨트롤 플레인 로그</text>
+<text x="36" y="261" font-size="11.5" class="dg-m" data-w="256">kube-audit-admin · kube-apiserver</text>
+<text x="36" y="277.5" font-size="11.5" class="dg-m" data-w="256">scheduler · autoscaler · guard</text>
+<rect x="344" y="220" width="290" height="96" rx="10" class="dg-box dg-id"/>
+<text x="356" y="243" font-size="13" class="dg-t dg-b" data-w="266">진단 설정 (Diagnostic setting)</text>
+<text x="356" y="260" font-size="11.5" class="dg-m" data-w="266">≈ EKS control plane logging</text>
+<text x="356" y="276.5" font-size="11.5" class="dg-m" data-w="266">전용 테이블(AKSAudit 등)</text>
+<path d="M304 268 L344 268" class="dg-line dg-id" marker-end="url(#observability-pipeline-ah-id)"/>
+<rect x="24" y="332" width="280" height="96" rx="10" class="dg-box"/>
+<text x="36" y="355.5" font-size="13.5" class="dg-t dg-b" data-w="256">메트릭</text>
+<text x="36" y="373" font-size="11.5" class="dg-m" data-w="256">ama-metrics (Prometheus 수집)</text>
+<text x="36" y="389.5" font-size="11.5" class="dg-m" data-w="256">≈ AMP 로 remote write</text>
+<rect x="344" y="332" width="290" height="96" rx="10" class="dg-box dg-azure"/>
+<text x="356" y="355" font-size="13" class="dg-t dg-b" data-w="266">DCE + DCR prometheus</text>
+<text x="356" y="372" font-size="11.5" class="dg-m" data-w="266">Microsoft-PrometheusMetrics</text>
+<text x="356" y="388.5" font-size="11.5" class="dg-m" data-w="266">DCRA 로 클러스터에 연결</text>
+<path d="M304 380 L344 380" class="dg-line dg-azure" marker-end="url(#observability-pipeline-ah-azure)"/>
+<rect x="676" y="108" width="260" height="208" rx="10" class="dg-box dg-ok"/>
+<text x="688" y="131.5" font-size="13.5" class="dg-t dg-b" data-w="236">Log Analytics workspace</text>
+<text x="688" y="149" font-size="11.5" class="dg-m" data-w="236">컨테이너 로그 (ContainerLogV2 …)</text>
+<text x="688" y="165.5" font-size="11.5" class="dg-m" data-w="236">컨트롤 플레인 로그 (AKSAudit …)</text>
+<text x="688" y="190.3" font-size="11.5" class="dg-m" data-w="236">KQL 로 질의 · 일일 수집 상한으로</text>
+<text x="688" y="206.8" font-size="11.5" class="dg-m" data-w="236">비용 폭주 방지</text>
+<text x="688" y="231.5" font-size="11.5" class="dg-m" data-w="236">≈ CloudWatch Logs + Logs Insights</text>
+<rect x="676" y="332" width="260" height="96" rx="10" class="dg-box dg-ok"/>
+<text x="688" y="355" font-size="13" class="dg-t dg-b" data-w="236">Azure Monitor workspace</text>
+<text x="688" y="372" font-size="11.5" class="dg-m" data-w="236">Managed Prometheus</text>
+<text x="688" y="388.5" font-size="11.5" class="dg-m" data-w="236">+ recording rule (대시보드용)</text>
+<rect x="676" y="444" width="260" height="62" rx="10" class="dg-box dg-ok"/>
+<text x="688" y="467.5" font-size="13.5" class="dg-t dg-b" data-w="236">Managed Grafana</text>
+<text x="688" y="485" font-size="11" class="dg-m" data-w="236">Prometheus 데이터 소스 자동 연결</text>
+<path d="M634 156 L676 156" class="dg-line dg-net" marker-end="url(#observability-pipeline-ah-net)"/>
+<path d="M634 268 L676 268" class="dg-line dg-id" marker-end="url(#observability-pipeline-ah-id)"/>
+<path d="M634 380 L676 380" class="dg-line dg-azure" marker-end="url(#observability-pipeline-ah-azure)"/>
+<path d="M806 428 L806 444" class="dg-line dg-ok" marker-end="url(#observability-pipeline-ah-ok)"/>
+<rect x="817.5" y="426" width="57" height="20" rx="6" class="dg-chip"/>
+<text x="846" y="440" font-size="11.5" text-anchor="middle" class="dg-tx-ok dg-b">PromQL</text>
+<text x="24" y="466" font-size="11.5" class="dg-m" data-w="640">Grafana 는 &quot;Monitoring Data Reader&quot; 역할로 Prometheus 를 읽고,</text>
+<text x="24" y="484" font-size="11.5" class="dg-m" data-w="640">운영자는 &quot;Grafana Admin&quot; 역할로 로그인합니다 (Lab 04 의 역할 할당).</text>
+</svg>

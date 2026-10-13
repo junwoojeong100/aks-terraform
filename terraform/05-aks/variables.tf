@@ -1,165 +1,168 @@
 variable "workload" {
-  description = "워크로드 이름 (소문자/숫자 3~8자)"
+  description = "Workload name (3–8 lowercase letters or digits)"
   type        = string
   default     = "aksdemo"
 }
 
 variable "environment" {
-  description = "환경 구분 (dev, test, prod)"
+  description = "Environment (dev, test, prod)"
   type        = string
   default     = "dev"
 }
 
 variable "location" {
-  description = "Azure 리전"
+  description = "Azure region"
   type        = string
   default     = "koreacentral"
 }
 
 variable "tags" {
-  description = "모든 리소스에 추가로 붙일 태그"
+  description = "Additional tags to apply to all resources"
   type        = map(string)
   default     = {}
 }
 
 variable "allowed_ip_ranges" {
   description = <<-EOT
-    Kubernetes API 서버에 접근을 허용할 관리자 공인 IP (CIDR 목록).
-    예: export TF_VAR_allowed_ip_ranges='["203.0.113.10/32"]'
-    enable_private_cluster = true 이면 사용하지 않습니다.
+    Public IPs of administrators allowed to access the Kubernetes API server (list of CIDRs).
+    Example: export TF_VAR_allowed_ip_ranges='["203.0.113.10/32"]'
+    Not used when enable_private_cluster = true.
   EOT
   type        = list(string)
 
   validation {
     condition     = length(var.allowed_ip_ranges) > 0 && alltrue([for cidr in var.allowed_ip_ranges : can(cidrhost(cidr, 0))])
-    error_message = "allowed_ip_ranges 에 CIDR 을 1개 이상 지정하세요. 예: export TF_VAR_allowed_ip_ranges='[\"203.0.113.10/32\"]'"
+    error_message = "Specify at least one CIDR in allowed_ip_ranges. Example: export TF_VAR_allowed_ip_ranges='[\"203.0.113.10/32\"]'"
   }
 }
 
 variable "kubernetes_version" {
   description = <<-EOT
-    클러스터를 "처음 만들 때" 사용할 Kubernetes 버전 (minor alias). 2026-10 기준 GA 최신은 1.36, AKS 기본값은 1.35 입니다.
-    생성 이후의 버전은 AKS 가 관리하므로(patch 는 automatic_upgrade_channel = "patch", minor 는 Lab 09 절차) Terraform 은 이 값의 변경을 무시합니다.
-    확인: az aks get-versions --location koreacentral -o table
+    Kubernetes version (minor alias) used only when the cluster is first created.
+    As of 2026-10, the latest GA version is 1.36 and the AKS default is 1.35.
+    After creation, AKS manages the version (patches: automatic_upgrade_channel = "patch"; minors: the Lab 09 procedure),
+    so Terraform ignores changes to this value.
+    To check: az aks get-versions --location koreacentral -o table
   EOT
   type        = string
   default     = "1.36"
 
   validation {
     condition     = can(regex("^1\\.[0-9]{2}(\\.[0-9]+)?$", var.kubernetes_version))
-    error_message = "kubernetes_version 은 1.36 또는 1.36.4 형식이어야 합니다."
+    error_message = "kubernetes_version must be in the form 1.36 or 1.36.4."
   }
 }
 
 variable "sku_tier" {
-  description = "AKS 컨트롤 플레인 등급. Standard = 업타임 SLA(99.95%, 가용 영역 사용 시) 포함. Free 는 SLA 없음."
+  description = "AKS control plane tier. Standard includes the uptime SLA (99.95% with availability zones). Free has no SLA."
   type        = string
   default     = "Standard"
 
   validation {
     condition     = contains(["Free", "Standard", "Premium"], var.sku_tier)
-    error_message = "sku_tier 는 Free, Standard, Premium 중 하나여야 합니다."
+    error_message = "sku_tier must be one of Free, Standard, or Premium."
   }
 }
 
 variable "enable_private_cluster" {
   description = <<-EOT
-    true 이면 API 서버를 사설 IP 로만 노출합니다(완전 private).
-    이 경우 kubectl/Terraform kubernetes provider 는 VNet 안(또는 VPN/Bastion)에서만 접근 가능합니다.
-    실습 기본값은 false: API Server VNet Integration + authorized IP ranges.
+    If true, the API server is exposed only on a private IP (fully private).
+    In that case, kubectl and the Terraform kubernetes provider can connect only from inside the VNet (or via VPN/Bastion).
+    The lab default is false: API Server VNet Integration + authorized IP ranges.
   EOT
   type        = bool
   default     = false
 }
 
 variable "zones" {
-  description = "노드 풀을 분산 배치할 가용 영역"
+  description = "Availability zones to spread the node pools across"
   type        = list(string)
   default     = ["1", "2", "3"]
 }
 
 variable "system_node_vm_size" {
-  description = "System 노드 풀 VM 크기 (최소 4 vCPU 권장)"
+  description = "System node pool VM size (at least 4 vCPUs recommended)"
   type        = string
   default     = "Standard_D4ds_v5"
 }
 
 variable "system_node_min_count" {
-  description = "System 노드 풀 최소 노드 수 (가용 영역 3곳에 1대씩 = 3)"
+  description = "Minimum node count for the System node pool (one per availability zone across 3 zones = 3)"
   type        = number
   default     = 3
 }
 
 variable "system_node_max_count" {
-  description = "System 노드 풀 최대 노드 수"
+  description = "Maximum node count for the System node pool"
   type        = number
   default     = 5
 }
 
 variable "user_node_vm_size" {
-  description = "User 노드 풀 VM 크기"
+  description = "User node pool VM size"
   type        = string
   default     = "Standard_D4ds_v5"
 }
 
 variable "user_node_min_count" {
-  description = "User 노드 풀 최소 노드 수 (가용 영역 3곳에 1대씩 = 3)"
+  description = "Minimum node count for the User node pool (one per availability zone across 3 zones = 3)"
   type        = number
   default     = 3
 }
 
 variable "user_node_max_count" {
-  description = "User 노드 풀 최대 노드 수"
+  description = "Maximum node count for the User node pool"
   type        = number
   default     = 6
 }
 
 variable "enable_spot_pool" {
-  description = "Spot VM 노드 풀 추가 여부 (EC2 Spot 에 해당, 배치/내결함성 워크로드용)"
+  description = "Whether to add a Spot VM node pool (equivalent to EC2 Spot; for batch/fault-tolerant workloads)"
   type        = bool
   default     = false
 }
 
 variable "enable_gateway_api" {
-  description = "Managed Gateway API CRD + 애플리케이션 라우팅 Gateway API 구현(approuting-istio) 활성화"
+  description = "Enable the Managed Gateway API CRDs + the application routing Gateway API implementation (approuting-istio)"
   type        = bool
   default     = true
 }
 
 variable "enable_defender" {
-  description = "클러스터에 Microsoft Defender for Containers 프로필 연결 (구독 단위 플랜은 08-governance 에서 켭니다)"
+  description = "Attach the Microsoft Defender for Containers profile to the cluster (the subscription-level plan is enabled in 08-governance)"
   type        = bool
   default     = false
 }
 
 variable "grant_current_user_admin" {
   description = <<-EOT
-    true 이면 terraform 을 실행하는 "현재 로그인 주체"에게 클러스터 관리자(Azure RBAC Cluster Admin) 권한을 줍니다. 실습용 기본값입니다.
-    팀/CI 환경에서는 false 로 두고 admin_principal_ids 에 Entra 그룹을 지정하세요(실행 주체가 바뀌어도 권한이 흔들리지 않습니다).
+    If true, grants cluster admin permissions (Azure RBAC Cluster Admin) to the "currently signed-in principal"
+    that runs terraform. This is the lab default. In team/CI environments, set it to false and specify Entra groups
+    in admin_principal_ids (permissions stay stable even when the executing principal changes).
   EOT
   type        = bool
   default     = true
 
   validation {
     condition     = var.grant_current_user_admin || length(var.admin_principal_ids) > 0
-    error_message = "grant_current_user_admin = false 이면 admin_principal_ids 에 관리자 그룹/사용자를 1개 이상 지정하세요. (로컬 계정이 비활성화되어 있어 관리자가 없으면 아무도 클러스터에 접근할 수 없습니다.)"
+    error_message = "When grant_current_user_admin = false, specify at least one admin group/user in admin_principal_ids. (Local accounts are disabled, so with no admin, nobody can access the cluster.)"
   }
 }
 
 variable "admin_principal_ids" {
-  description = "클러스터 관리자 권한(Azure RBAC Cluster Admin)을 추가로 줄 Entra 사용자/그룹 Object ID. 팀 환경에서는 개인 대신 그룹을 권장합니다."
+  description = "Object IDs of additional Entra users/groups to grant cluster admin permissions (Azure RBAC Cluster Admin). In team environments, prefer groups over individuals."
   type        = set(string)
   default     = []
 }
 
 variable "maintenance_utc_offset" {
-  description = "유지보수 창(planned maintenance) 기준 시간대"
+  description = "UTC offset used for the maintenance windows (planned maintenance)"
   type        = string
   default     = "+09:00"
 }
 
 variable "pod_cidr" {
-  description = "Azure CNI Overlay Pod CIDR. VNet / 온프레미스 대역과 겹치면 안 됩니다. 03-network 의 pod_cidr(노드 NSG 의 허용 규칙)와 같은 값을 쓰세요."
+  description = "Azure CNI Overlay pod CIDR. Must not overlap with the VNet or on-premises ranges. Use the same value as pod_cidr in 03-network (the node NSG allow rule)."
   type        = string
   default     = "10.244.0.0/16"
 }
@@ -171,7 +174,7 @@ variable "service_cidr" {
 }
 
 variable "dns_service_ip" {
-  description = "kube-dns Service IP (service_cidr 안의 주소)"
+  description = "kube-dns Service IP (an address within service_cidr)"
   type        = string
   default     = "10.0.0.10"
 }

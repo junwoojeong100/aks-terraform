@@ -1,15 +1,15 @@
 output "resource_group_name" {
-  description = "네트워크 리소스 그룹"
+  description = "Network resource group"
   value       = azurerm_resource_group.network.name
 }
 
 output "vnet_name" {
-  description = "VNet 이름 (이후 스택에서 data source 로 조회)"
+  description = "VNet name (looked up with a data source in later stacks)"
   value       = azurerm_virtual_network.this.name
 }
 
 output "subnet_ids" {
-  description = "서브넷 ID 맵"
+  description = "Map of subnet IDs"
   value = {
     aks_nodes         = azurerm_subnet.aks_nodes.id
     aks_apiserver     = azurerm_subnet.aks_apiserver.id
@@ -19,11 +19,11 @@ output "subnet_ids" {
 }
 
 output "nat_gateway_public_ip" {
-  description = "클러스터 아웃바운드가 나가는 고정 공인 IP (외부 서비스 방화벽 허용 목록에 등록할 값)"
+  description = "Static public IP for cluster outbound traffic (the value to add to external services' firewall allow lists)"
   value       = azurerm_public_ip.nat.ip_address
 }
 
 output "private_dns_zone_names" {
-  description = "Private Endpoint 용 Private DNS Zone"
+  description = "Private DNS Zones for Private Endpoints"
   value       = [for zone in azurerm_private_dns_zone.this : zone.name]
 }

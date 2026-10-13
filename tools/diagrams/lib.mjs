@@ -1,9 +1,21 @@
-// 다이어그램(SVG) 생성용 작은 도우미 라이브러리.
-//   - 외부 의존성 없이 SVG 문자열을 만듭니다.
-//   - 색은 CSS 변수(--dg-*)로 지정합니다.
-//       · 단독 SVG(GitHub 등)    : SVG 안의 <style> 이 라이트/다크(prefers-color-scheme)를 처리
-//       · HTML 가이드에 인라인    : 페이지 CSS(.diagram-fig svg.dg)가 같은 변수를 덮어써서 라이트/다크 토글을 따름
-//   - 글자가 상자를 넘치지 않도록 대략적인 글자 폭을 계산해 경고하고, 브라우저 검사용 data-w 속성을 남깁니다.
+// Small helper library for generating the diagrams (SVG).
+//   - Builds SVG strings without any external dependency.
+//   - Colors are CSS variables (--dg-*).
+//       · standalone SVG (GitHub etc.) : the <style> inside the SVG handles light/dark (prefers-color-scheme)
+//       · inlined in the HTML guide    : the page CSS (.diagram-fig svg.dg) overrides the same variables and follows the light/dark toggle
+//   - Estimates text widths to warn when text would overflow its box, and leaves a data-w attribute for browser checks.
+//   - Every diagram is generated once per language: write visible text as t('English', '한국어').
+
+let currentLang = 'en';
+
+// Selects the language of the diagrams being built (called by tools/gen-diagrams.mjs before each pass).
+export const setLang = (lang) => {
+  currentLang = lang;
+};
+
+// t('English text', '한국어 텍스트') returns the string for the language being generated.
+// Call it inside build() (not at module load time), so every pass picks up its own language.
+export const t = (en, ko) => (currentLang === 'ko' ? ko : en);
 
 export const FONT =
   '-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", "Segoe UI", Roboto, sans-serif';
@@ -35,7 +47,7 @@ const PALETTE = {
 
 const vars = (p) => Object.entries(p).map(([k, v]) => `--dg-${k}:${v}`).join(';');
 
-// HTML 페이지 CSS 가 매핑해야 하는 변수 이름 목록 (tools/assets/style.css 와 일치해야 합니다)
+// Variable names the HTML page CSS has to map (must match tools/assets/style.css)
 export const CSS_VAR_NAMES = Object.keys(PALETTE.light);
 
 const STYLE = `
@@ -61,7 +73,7 @@ ${TONES.filter((t) => t !== 'neutral').map((t) => `.dg-box.dg-${t}{fill:var(--dg
 .dg-on{fill:#fff}
 `.trim();
 
-// 글자 폭 추정 (em 단위 × 글꼴 크기). 한글은 1em, 영문/숫자는 평균 폭.
+// Text width estimate (em units × font size). Hangul counts as 1em, Latin letters/digits use average widths.
 export function textWidth(str, size = 13, bold = false) {
   let w = 0;
   for (const ch of String(str)) {
@@ -106,11 +118,11 @@ export class Diagram {
     this.parts.push(s);
   }
 
-  // --- 글자 ---------------------------------------------------------------------
-  // text(x, y, 문자열, { size, bold, muted, tone, anchor, maxW })   y 는 글자 기준선(baseline)
+  // --- text ---------------------------------------------------------------------
+  // text(x, y, string, { size, bold, muted, tone, anchor, maxW })   y is the text baseline
   text(x, y, str, { size = 13, bold = false, muted = false, tone = null, anchor = 'start', maxW = null, cls = '' } = {}) {
     const w = textWidth(str, size, bold);
-    if (maxW !== null && w > maxW) this.warn(`글자가 넘칩니다(${Math.round(w)}>${Math.round(maxW)}): "${str}"`);
+    if (maxW !== null && w > maxW) this.warn(`text overflows its box (${Math.round(w)}>${Math.round(maxW)}): "${str}"`);
     const classes = [];
     if (!cls.includes('dg-on')) classes.push(muted ? 'dg-m' : tone ? `dg-tx-${tone}` : 'dg-t');
     if (bold) classes.push('dg-b');
@@ -123,14 +135,14 @@ export class Diagram {
     return w;
   }
 
-  // 큰 제목 (그림 맨 위). 반환: 제목 아래 y 좌표
+  // Large title (top of the figure). Returns the y coordinate below the title.
   heading(title, subtitle = '') {
     this.text(24, 32, title, { size: 18, bold: true });
     if (subtitle) this.text(24, 54, subtitle, { size: 12.5, muted: true });
     return subtitle ? 72 : 52;
   }
 
-  // --- 도형 ---------------------------------------------------------------------
+  // --- shapes -------------------------------------------------------------------
   rect(x, y, w, h, { cls = '', rx = 10 } = {}) {
     this.parts.push(`<rect x="${num(x)}" y="${num(y)}" width="${num(w)}" height="${num(h)}" rx="${rx}" class="${cls}"/>`);
   }
@@ -139,7 +151,7 @@ export class Diagram {
     return { x, y, w, h, l: x, r: x + w, t: y, b: y + h, cx: x + w / 2, cy: y + h / 2 };
   }
 
-  // 제목 + 여러 줄 설명이 들어가는 상자. h 를 null 로 두면 내용에 맞춰 높이를 계산합니다.
+  // Box with a title and several description lines. With h = null the height is computed from the content.
   box(x, y, w, h, { tone = 'neutral', title = '', lines = [], titleSize = 14, size = 12.5, align = 'left', pad = 12, padY = null, dashed = false, muted = true } = {}) {
     const lh = size + 5;
     const py = padY ?? pad;
@@ -166,7 +178,7 @@ export class Diagram {
     return this._geom(x, y, w, height);
   }
 
-  // 점선/실선 테두리의 큰 영역 + 왼쪽 위 라벨
+  // Large area with a dashed/solid border + a label at the top left
   group(x, y, w, h, { tone = 'neutral', label = '', dashed = false, labelSize = 12.5 } = {}) {
     if (tone !== 'neutral') this.tonesUsed.add(tone);
     this.rect(x, y, w, h, { cls: `dg-grp${tone !== 'neutral' ? ` dg-${tone}` : ''}${dashed ? ' dg-dash' : ''}`, rx: 14 });
@@ -174,7 +186,7 @@ export class Diagram {
     return this._geom(x, y, w, h);
   }
 
-  // 작은 알약(태그). 폭은 글자에 맞춰 자동 계산됩니다. 반환: 기하 정보 (w 포함)
+  // Small pill (tag). The width follows the text automatically. Returns the geometry (including w).
   pill(x, y, str, { tone = 'neutral', size = 11.5, h = 22, solid = false, minW = 0 } = {}) {
     const w = Math.max(minW, Math.round(textWidth(str, size, true) + 18));
     if (tone !== 'neutral') this.tonesUsed.add(tone);
@@ -183,7 +195,7 @@ export class Diagram {
     return this._geom(x, y, w, h);
   }
 
-  // 번호 배지 (단계 표시)
+  // Numbered badge (step marker)
   badge(cx, cy, label, { tone = 'azure', r = 11 } = {}) {
     this.tonesUsed.add(tone);
     this.parts.push(`<circle cx="${num(cx)}" cy="${num(cy)}" r="${r}" class="dg-fill-${tone}"/>`);
@@ -196,7 +208,7 @@ export class Diagram {
     this.parts.push(`<path d="M${num(x1)} ${num(y1)} L${num(x2)} ${num(y2)}" class="dg-line${tone ? ` dg-${tone}` : ''}${dashed ? ' dg-dash' : ''}"/>`);
   }
 
-  // 화살표: points = [[x,y], ...] (직선 꺾임). label 은 경로 길이의 at(0~1) 위치에 놓입니다.
+  // Arrow: points = [[x,y], ...] (straight segments). The label sits at position `at` (0–1) along the path length.
   arrow(points, { tone = null, dashed = false, label = '', at = 0.5, dx = 0, dy = 0, both = false, head = true } = {}) {
     if (tone) this.tonesUsed.add(tone);
     const t = tone ?? 'line';
@@ -230,7 +242,7 @@ export class Diagram {
   }
 }
 
-// 꺾은선 위에서 전체 길이의 frac(0~1) 지점 좌표
+// Coordinates of the point at fraction frac (0–1) of the total length along a polyline
 function pointAlong(points, frac) {
   const segs = [];
   let total = 0;

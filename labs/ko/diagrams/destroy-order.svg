@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 960 480" width="960" height="480" role="img" aria-labelledby="destroy-order-t destroy-order-d"><title id="destroy-order-t">삭제(destroy) 순서와 주의점</title><desc id="destroy-order-d">10-aks-automatic, 08-governance, 07-ingress, 06-workload, 05-aks, 04-platform, 03-network, 02-bootstrap 순서로 삭제하며 각 단계의 주의점을 보여 준다.</desc><style>svg.dg{--dg-bg:#ffffff;--dg-fg:#1f2328;--dg-muted:#59636e;--dg-line:#6e7781;--dg-card:#f6f8fa;--dg-border:#d1d9e0;--dg-aws:#c2590a;--dg-aws-soft:#fff1e5;--dg-azure:#0b6ed0;--dg-azure-soft:#e5f1ff;--dg-ok:#1a7f37;--dg-ok-soft:#e6f6ea;--dg-id:#8250df;--dg-id-soft:#f3ecff;--dg-net:#0e7490;--dg-net-soft:#e0f4f8;--dg-warn:#9a6700;--dg-warn-soft:#fff6d6;--dg-danger:#cf222e;--dg-danger-soft:#ffebe9;font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", "Segoe UI", Roboto, sans-serif}
+@media (prefers-color-scheme:dark){svg.dg{--dg-bg:#0d1117;--dg-fg:#e6edf3;--dg-muted:#9198a1;--dg-line:#8b949e;--dg-card:#151b23;--dg-border:#30363d;--dg-aws:#f0883e;--dg-aws-soft:#2b1c10;--dg-azure:#58a6ff;--dg-azure-soft:#0f2238;--dg-ok:#3fb950;--dg-ok-soft:#0f2417;--dg-id:#b392f0;--dg-id-soft:#221a36;--dg-net:#39c5cf;--dg-net-soft:#0d2a2f;--dg-warn:#d29922;--dg-warn-soft:#2d2208;--dg-danger:#ff7b72;--dg-danger-soft:#3a1517}}
+.dg-bg{fill:var(--dg-bg)}
+.dg-t{fill:var(--dg-fg)}
+.dg-m{fill:var(--dg-muted)}
+.dg-b{font-weight:650}
+.dg-box,.dg-grp,.dg-chip{stroke-width:1.4}
+.dg-box{fill:var(--dg-card);stroke:var(--dg-border)}
+.dg-grp{fill:none;stroke:var(--dg-border)}
+.dg-dash{stroke-dasharray:6 4}
+.dg-chip{fill:var(--dg-bg);stroke:none}
+.dg-line{fill:none;stroke:var(--dg-line);stroke-width:1.8}
+.dg-ah{fill:var(--dg-line)}
+.dg-box.dg-aws{fill:var(--dg-aws-soft);stroke:var(--dg-aws)}
+.dg-grp.dg-aws{stroke:var(--dg-aws)}
+.dg-fill-aws{fill:var(--dg-aws)}
+.dg-tx-aws{fill:var(--dg-aws)}
+.dg-line.dg-aws{stroke:var(--dg-aws)}
+.dg-ah.dg-aws{fill:var(--dg-aws)}
+.dg-box.dg-azure{fill:var(--dg-azure-soft);stroke:var(--dg-azure)}
+.dg-grp.dg-azure{stroke:var(--dg-azure)}
+.dg-fill-azure{fill:var(--dg-azure)}
+.dg-tx-azure{fill:var(--dg-azure)}
+.dg-line.dg-azure{stroke:var(--dg-azure)}
+.dg-ah.dg-azure{fill:var(--dg-azure)}
+.dg-box.dg-ok{fill:var(--dg-ok-soft);stroke:var(--dg-ok)}
+.dg-grp.dg-ok{stroke:var(--dg-ok)}
+.dg-fill-ok{fill:var(--dg-ok)}
+.dg-tx-ok{fill:var(--dg-ok)}
+.dg-line.dg-ok{stroke:var(--dg-ok)}
+.dg-ah.dg-ok{fill:var(--dg-ok)}
+.dg-box.dg-id{fill:var(--dg-id-soft);stroke:var(--dg-id)}
+.dg-grp.dg-id{stroke:var(--dg-id)}
+.dg-fill-id{fill:var(--dg-id)}
+.dg-tx-id{fill:var(--dg-id)}
+.dg-line.dg-id{stroke:var(--dg-id)}
+.dg-ah.dg-id{fill:var(--dg-id)}
+.dg-box.dg-net{fill:var(--dg-net-soft);stroke:var(--dg-net)}
+.dg-grp.dg-net{stroke:var(--dg-net)}
+.dg-fill-net{fill:var(--dg-net)}
+.dg-tx-net{fill:var(--dg-net)}
+.dg-line.dg-net{stroke:var(--dg-net)}
+.dg-ah.dg-net{fill:var(--dg-net)}
+.dg-box.dg-warn{fill:var(--dg-warn-soft);stroke:var(--dg-warn)}
+.dg-grp.dg-warn{stroke:var(--dg-warn)}
+.dg-fill-warn{fill:var(--dg-warn)}
+.dg-tx-warn{fill:var(--dg-warn)}
+.dg-line.dg-warn{stroke:var(--dg-warn)}
+.dg-ah.dg-warn{fill:var(--dg-warn)}
+.dg-box.dg-danger{fill:var(--dg-danger-soft);stroke:var(--dg-danger)}
+.dg-grp.dg-danger{stroke:var(--dg-danger)}
+.dg-fill-danger{fill:var(--dg-danger)}
+.dg-tx-danger{fill:var(--dg-danger)}
+.dg-line.dg-danger{stroke:var(--dg-danger)}
+.dg-ah.dg-danger{fill:var(--dg-danger)}
+.dg-on{fill:#fff}</style><defs><marker id="destroy-order-ah-line" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah"/></marker><marker id="destroy-order-ah-danger" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-danger"/></marker><marker id="destroy-order-ah-warn" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-warn"/></marker><marker id="destroy-order-ah-id" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-id"/></marker><marker id="destroy-order-ah-azure" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-azure"/></marker><marker id="destroy-order-ah-ok" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-ok"/></marker><marker id="destroy-order-ah-net" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-net"/></marker></defs><rect width="960" height="480" class="dg-bg" rx="12"/>
+<text x="24" y="32" font-size="18" class="dg-t dg-b">삭제(destroy) 순서와 주의점</text>
+<text x="24" y="54" font-size="12.5" class="dg-m">생성의 역순입니다. scripts/cleanup.sh 가 이 순서와 안전장치를 자동으로 처리합니다.</text>
+<rect x="24" y="100" width="204" height="118" rx="10" class="dg-box dg-dash"/>
+<text x="36" y="124" font-size="14" class="dg-t dg-b" data-w="180">10-aks-automatic</text>
+<text x="36" y="142" font-size="12.5" class="dg-m" data-w="180">AKS Automatic (선택)</text>
+<text x="36" y="159.5" font-size="12.5" class="dg-m" data-w="180">05 와 독립이라 가장 먼저</text>
+<circle cx="206" cy="122" r="11" class="dg-fill-danger"/>
+<text x="206" y="126.2" font-size="12" text-anchor="middle" class="dg-b dg-on">1</text>
+<rect x="260" y="100" width="204" height="118" rx="10" class="dg-box dg-warn"/>
+<text x="272" y="124" font-size="14" class="dg-t dg-b" data-w="180">08-governance</text>
+<text x="272" y="142" font-size="12.5" class="dg-m" data-w="180">리소스 잠금을 먼저 해제</text>
+<text x="272" y="159.5" font-size="12.5" class="dg-m" data-w="180">(잠금이 있으면 ScopeLocked)</text>
+<text x="272" y="177" font-size="12.5" class="dg-m" data-w="180">Defender 플랜도 함께 해제</text>
+<circle cx="442" cy="122" r="11" class="dg-fill-danger"/>
+<text x="442" y="126.2" font-size="12" text-anchor="middle" class="dg-b dg-on">2</text>
+<rect x="496" y="100" width="204" height="118" rx="10" class="dg-box dg-id"/>
+<text x="508" y="124" font-size="14" class="dg-t dg-b" data-w="180">07-ingress</text>
+<text x="508" y="142" font-size="12.5" class="dg-m" data-w="180">클러스터가 살아 있어야</text>
+<text x="508" y="159.5" font-size="12.5" class="dg-m" data-w="180">kubernetes provider 가</text>
+<text x="508" y="177" font-size="12.5" class="dg-m" data-w="180">접속해 삭제할 수 있음</text>
+<circle cx="678" cy="122" r="11" class="dg-fill-danger"/>
+<text x="678" y="126.2" font-size="12" text-anchor="middle" class="dg-b dg-on">3</text>
+<rect x="732" y="100" width="204" height="118" rx="10" class="dg-box dg-id"/>
+<text x="744" y="124" font-size="14" class="dg-t dg-b" data-w="180">06-workload</text>
+<text x="744" y="142" font-size="12.5" class="dg-m" data-w="180">07 과 같은 이유</text>
+<text x="744" y="159.5" font-size="12.5" class="dg-m" data-w="180">UAMI · 연합 자격 증명</text>
+<text x="744" y="177" font-size="12.5" class="dg-m" data-w="180">Key Vault 데모 시크릿</text>
+<circle cx="914" cy="122" r="11" class="dg-fill-danger"/>
+<text x="914" y="126.2" font-size="12" text-anchor="middle" class="dg-b dg-on">4</text>
+<rect x="732" y="258" width="204" height="118" rx="10" class="dg-box dg-azure"/>
+<text x="744" y="282" font-size="14" class="dg-t dg-b" data-w="180">05-aks</text>
+<text x="744" y="300" font-size="12.5" class="dg-m" data-w="180">AKS + 노드 풀</text>
+<text x="744" y="317.5" font-size="12.5" class="dg-m" data-w="180">노드 리소스 그룹도 함께</text>
+<text x="744" y="335" font-size="12.5" class="dg-m" data-w="180">삭제 (10–20분)</text>
+<circle cx="914" cy="280" r="11" class="dg-fill-danger"/>
+<text x="914" y="284.2" font-size="12" text-anchor="middle" class="dg-b dg-on">5</text>
+<rect x="496" y="258" width="204" height="118" rx="10" class="dg-box dg-ok"/>
+<text x="508" y="282" font-size="14" class="dg-t dg-b" data-w="180">04-platform</text>
+<text x="508" y="300" font-size="12.5" class="dg-m" data-w="180">ACR · Key Vault · Grafana</text>
+<text x="508" y="317.5" font-size="12.5" class="dg-m" data-w="180">Key Vault 는 soft-delete:</text>
+<text x="508" y="335" font-size="12.5" class="dg-m" data-w="180">7일간 이름만 점유 (무과금)</text>
+<circle cx="678" cy="280" r="11" class="dg-fill-danger"/>
+<text x="678" y="284.2" font-size="12" text-anchor="middle" class="dg-b dg-on">6</text>
+<rect x="260" y="258" width="204" height="118" rx="10" class="dg-box dg-net"/>
+<text x="272" y="282" font-size="14" class="dg-t dg-b" data-w="180">03-network</text>
+<text x="272" y="300" font-size="12.5" class="dg-m" data-w="180">NAT Gateway · 공인 IP</text>
+<text x="272" y="317.5" font-size="12.5" class="dg-m" data-w="180">삭제되면 과금 중지</text>
+<text x="272" y="335" font-size="12.5" class="dg-m" data-w="180">Private DNS Zone</text>
+<circle cx="442" cy="280" r="11" class="dg-fill-danger"/>
+<text x="442" y="284.2" font-size="12" text-anchor="middle" class="dg-b dg-on">7</text>
+<rect x="24" y="258" width="204" height="118" rx="10" class="dg-box dg-dash"/>
+<text x="36" y="282" font-size="14" class="dg-t dg-b" data-w="180">02-bootstrap (옵션)</text>
+<text x="36" y="300" font-size="12.5" class="dg-m" data-w="180">state 저장소 자신이라</text>
+<text x="36" y="317.5" font-size="12.5" class="dg-m" data-w="180">로컬 state 로 되돌린 뒤</text>
+<text x="36" y="335" font-size="12.5" class="dg-m" data-w="180">마지막에 삭제</text>
+<circle cx="206" cy="280" r="11" class="dg-fill-danger"/>
+<text x="206" y="284.2" font-size="12" text-anchor="middle" class="dg-b dg-on">8</text>
+<path d="M228 159 L260 159" class="dg-line dg-danger" marker-end="url(#destroy-order-ah-danger)"/>
+<path d="M464 159 L496 159" class="dg-line dg-danger" marker-end="url(#destroy-order-ah-danger)"/>
+<path d="M700 159 L732 159" class="dg-line dg-danger" marker-end="url(#destroy-order-ah-danger)"/>
+<path d="M834 218 L834 258" class="dg-line dg-danger" marker-end="url(#destroy-order-ah-danger)"/>
+<path d="M732 317 L700 317" class="dg-line dg-danger" marker-end="url(#destroy-order-ah-danger)"/>
+<path d="M496 317 L464 317" class="dg-line dg-danger" marker-end="url(#destroy-order-ah-danger)"/>
+<path d="M260 317 L228 317" class="dg-line dg-danger" marker-end="url(#destroy-order-ah-danger)"/>
+<rect x="24" y="396" width="912" height="64" rx="10" class="dg-box"/>
+<text x="36" y="419" font-size="13" class="dg-t dg-b" data-w="888">실행</text>
+<text x="36" y="436" font-size="12" class="dg-t" data-w="888">scripts/cleanup.sh --dry-run  →  scripts/cleanup.sh   (확인 입력 · 이미 지운 스택은 건너뜀 · 마지막에 남은 리소스 점검)</text>
+</svg>

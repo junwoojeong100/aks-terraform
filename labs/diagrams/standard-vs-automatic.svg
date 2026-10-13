@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 960 548" width="960" height="548" role="img" aria-labelledby="standard-vs-automatic-t standard-vs-automatic-d"><title id="standard-vs-automatic-t">AKS Standard 와 AKS Automatic: 누가 운영하나</title><desc id="standard-vs-automatic-d">시스템 노드 풀, 노드 스케일링, 업그레이드, 인증, 네트워크, 정책, 관측성, SLA 항목별로 AKS Standard 에서는 사용자가 구성하고 AKS Automatic 에서는 AKS 가 기본값으로 관리하는 정도를 비교한 표.</desc><style>svg.dg{--dg-bg:#ffffff;--dg-fg:#1f2328;--dg-muted:#59636e;--dg-line:#6e7781;--dg-card:#f6f8fa;--dg-border:#d1d9e0;--dg-aws:#c2590a;--dg-aws-soft:#fff1e5;--dg-azure:#0b6ed0;--dg-azure-soft:#e5f1ff;--dg-ok:#1a7f37;--dg-ok-soft:#e6f6ea;--dg-id:#8250df;--dg-id-soft:#f3ecff;--dg-net:#0e7490;--dg-net-soft:#e0f4f8;--dg-warn:#9a6700;--dg-warn-soft:#fff6d6;--dg-danger:#cf222e;--dg-danger-soft:#ffebe9;font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", "Segoe UI", Roboto, sans-serif}
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 960 548" width="960" height="548" role="img" aria-labelledby="standard-vs-automatic-t standard-vs-automatic-d"><title id="standard-vs-automatic-t">AKS Standard vs. AKS Automatic: who operates what</title><desc id="standard-vs-automatic-d">A table that compares, item by item, what you configure yourself in AKS Standard with what AKS manages by default in AKS Automatic: system node pool, node scaling, upgrades, authentication, networking, policy, observability, and SLA.</desc><style>svg.dg{--dg-bg:#ffffff;--dg-fg:#1f2328;--dg-muted:#59636e;--dg-line:#6e7781;--dg-card:#f6f8fa;--dg-border:#d1d9e0;--dg-aws:#c2590a;--dg-aws-soft:#fff1e5;--dg-azure:#0b6ed0;--dg-azure-soft:#e5f1ff;--dg-ok:#1a7f37;--dg-ok-soft:#e6f6ea;--dg-id:#8250df;--dg-id-soft:#f3ecff;--dg-net:#0e7490;--dg-net-soft:#e0f4f8;--dg-warn:#9a6700;--dg-warn-soft:#fff6d6;--dg-danger:#cf222e;--dg-danger-soft:#ffebe9;font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", "Segoe UI", Roboto, sans-serif}
 @media (prefers-color-scheme:dark){svg.dg{--dg-bg:#0d1117;--dg-fg:#e6edf3;--dg-muted:#9198a1;--dg-line:#8b949e;--dg-card:#151b23;--dg-border:#30363d;--dg-aws:#f0883e;--dg-aws-soft:#2b1c10;--dg-azure:#58a6ff;--dg-azure-soft:#0f2238;--dg-ok:#3fb950;--dg-ok-soft:#0f2417;--dg-id:#b392f0;--dg-id-soft:#221a36;--dg-net:#39c5cf;--dg-net-soft:#0d2a2f;--dg-warn:#d29922;--dg-warn-soft:#2d2208;--dg-danger:#ff7b72;--dg-danger-soft:#3a1517}}
 .dg-bg{fill:var(--dg-bg)}
 .dg-t{fill:var(--dg-fg)}
@@ -54,59 +54,59 @@
 .dg-line.dg-danger{stroke:var(--dg-danger)}
 .dg-ah.dg-danger{fill:var(--dg-danger)}
 .dg-on{fill:#fff}</style><defs><marker id="standard-vs-automatic-ah-line" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah"/></marker><marker id="standard-vs-automatic-ah-azure" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-azure"/></marker><marker id="standard-vs-automatic-ah-ok" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-ok"/></marker></defs><rect width="960" height="548" class="dg-bg" rx="12"/>
-<text x="24" y="32" font-size="18" class="dg-t dg-b">AKS Standard 와 AKS Automatic: 누가 운영하나</text>
-<text x="24" y="54" font-size="12.5" class="dg-m">Automatic 은 EKS Auto Mode 에 해당합니다. 파란 칸은 내가 구성하는 것, 초록 칸은 AKS 가 기본으로 맡는 것입니다.</text>
+<text x="24" y="32" font-size="18" class="dg-t dg-b">AKS Standard vs. AKS Automatic: who operates what</text>
+<text x="24" y="54" font-size="12.5" class="dg-m">Automatic is the equivalent of EKS Auto Mode. Blue cells are what you configure; green cells are what AKS handles by default.</text>
 <rect x="196" y="96" width="368" height="36" rx="10" class="dg-box dg-azure"/>
-<text x="380" y="118.5" font-size="13.5" text-anchor="middle" class="dg-t dg-b" data-w="352">AKS Standard (Lab 05) — 직접 설계</text>
+<text x="380" y="118.5" font-size="13.5" text-anchor="middle" class="dg-t dg-b" data-w="352">AKS Standard (Lab 05) — design it yourself</text>
 <rect x="576" y="96" width="360" height="36" rx="10" class="dg-box dg-ok"/>
 <text x="756" y="118.5" font-size="13.5" text-anchor="middle" class="dg-t dg-b" data-w="344">AKS Automatic (Lab 10) ≈ EKS Auto Mode</text>
 <rect x="24" y="140" width="160" height="38" rx="10" class="dg-box"/>
-<text x="34" y="163.5" font-size="12.5" class="dg-t dg-b" data-w="140">시스템 노드 풀</text>
+<text x="34" y="163.5" font-size="12.5" class="dg-t dg-b" data-w="140">System node pool</text>
 <rect x="196" y="140" width="368" height="38" rx="10" class="dg-box dg-azure"/>
-<text x="208" y="163" font-size="12" class="dg-t dg-b" data-w="344">직접 만들고 운영 (System 풀)</text>
+<text x="208" y="163" font-size="12" class="dg-t dg-b" data-w="344">You create and operate it (System pool)</text>
 <rect x="576" y="140" width="360" height="38" rx="10" class="dg-box dg-ok"/>
-<text x="588" y="163" font-size="12" class="dg-t dg-b" data-w="336">관리형 — AKS 가 운영</text>
+<text x="588" y="163" font-size="12" class="dg-t dg-b" data-w="336">Managed — operated by AKS</text>
 <rect x="24" y="186" width="160" height="38" rx="10" class="dg-box"/>
-<text x="34" y="209.5" font-size="12.5" class="dg-t dg-b" data-w="140">노드 스케일링</text>
+<text x="34" y="209.5" font-size="12.5" class="dg-t dg-b" data-w="140">Node scaling</text>
 <rect x="196" y="186" width="368" height="38" rx="10" class="dg-box dg-azure"/>
-<text x="208" y="209" font-size="12" class="dg-t dg-b" data-w="344">Cluster Autoscaler (또는 NAP 선택)</text>
+<text x="208" y="209" font-size="12" class="dg-t dg-b" data-w="344">Cluster Autoscaler (or choose NAP)</text>
 <rect x="576" y="186" width="360" height="38" rx="10" class="dg-box dg-ok"/>
-<text x="588" y="209" font-size="12" class="dg-t dg-b" data-w="336">NAP(Karpenter) 고정 + HPA · KEDA · VPA</text>
+<text x="588" y="209" font-size="12" class="dg-t dg-b" data-w="336">NAP (Karpenter) only + HPA · KEDA · VPA</text>
 <rect x="24" y="232" width="160" height="38" rx="10" class="dg-box"/>
-<text x="34" y="255.5" font-size="12.5" class="dg-t dg-b" data-w="140">업그레이드</text>
+<text x="34" y="255.5" font-size="12.5" class="dg-t dg-b" data-w="140">Upgrades</text>
 <rect x="196" y="232" width="368" height="38" rx="10" class="dg-box dg-azure"/>
-<text x="208" y="255" font-size="12" class="dg-t dg-b" data-w="344">수동 또는 채널 선택 (이 실습은 patch)</text>
+<text x="208" y="255" font-size="12" class="dg-t dg-b" data-w="344">Manual, or choose a channel (this lab: patch)</text>
 <rect x="576" y="232" width="360" height="38" rx="10" class="dg-box dg-ok"/>
-<text x="588" y="255" font-size="12" class="dg-t dg-b" data-w="336">stable 채널(N-1) + 노드 이미지 자동</text>
+<text x="588" y="255" font-size="12" class="dg-t dg-b" data-w="336">stable channel (N-1) + automatic node images</text>
 <rect x="24" y="278" width="160" height="38" rx="10" class="dg-box"/>
-<text x="34" y="301.5" font-size="12.5" class="dg-t dg-b" data-w="140">인증 · 접근</text>
+<text x="34" y="301.5" font-size="12.5" class="dg-t dg-b" data-w="140">Auth · access</text>
 <rect x="196" y="278" width="368" height="38" rx="10" class="dg-box dg-azure"/>
-<text x="208" y="301" font-size="12" class="dg-t dg-b" data-w="344">Entra + Azure RBAC, 로컬 계정은 직접 끔</text>
+<text x="208" y="301" font-size="12" class="dg-t dg-b" data-w="344">Entra + Azure RBAC; you disable local accounts</text>
 <rect x="576" y="278" width="360" height="38" rx="10" class="dg-box dg-ok"/>
-<text x="588" y="301" font-size="12" class="dg-t dg-b" data-w="336">Azure RBAC 고정 · 로컬 계정 없음</text>
+<text x="588" y="301" font-size="12" class="dg-t dg-b" data-w="336">Azure RBAC only · no local accounts</text>
 <rect x="24" y="324" width="160" height="38" rx="10" class="dg-box"/>
-<text x="34" y="347.5" font-size="12.5" class="dg-t dg-b" data-w="140">네트워크</text>
+<text x="34" y="347.5" font-size="12.5" class="dg-t dg-b" data-w="140">Networking</text>
 <rect x="196" y="324" width="368" height="38" rx="10" class="dg-box dg-azure"/>
-<text x="208" y="347" font-size="12" class="dg-t dg-b" data-w="344">Overlay + Cilium · NAT GW 를 직접 구성</text>
+<text x="208" y="347" font-size="12" class="dg-t dg-b" data-w="344">Overlay + Cilium, you set up the NAT GW</text>
 <rect x="576" y="324" width="360" height="38" rx="10" class="dg-box dg-ok"/>
-<text x="588" y="347" font-size="12" class="dg-t dg-b" data-w="336">Overlay + Cilium · 관리형 NAT · VNet 통합</text>
+<text x="588" y="347" font-size="12" class="dg-t dg-b" data-w="336">Overlay + Cilium, managed NAT, VNet integration</text>
 <rect x="24" y="370" width="160" height="38" rx="10" class="dg-box"/>
-<text x="34" y="393.5" font-size="12.5" class="dg-t dg-b" data-w="140">정책 · 안전장치</text>
+<text x="34" y="393.5" font-size="12.5" class="dg-t dg-b" data-w="140">Policy</text>
 <rect x="196" y="370" width="368" height="38" rx="10" class="dg-box dg-azure"/>
-<text x="208" y="393" font-size="12" class="dg-t dg-b" data-w="344">Azure Policy 를 직접 할당 (Lab 08)</text>
+<text x="208" y="393" font-size="12" class="dg-t dg-b" data-w="344">You assign Azure Policy yourself (Lab 08)</text>
 <rect x="576" y="370" width="360" height="38" rx="10" class="dg-box dg-ok"/>
-<text x="588" y="393" font-size="12" class="dg-t dg-b" data-w="336">Deployment Safeguards + PSS baseline 강제</text>
+<text x="588" y="393" font-size="12" class="dg-t dg-b" data-w="336">Deployment Safeguards + PSS baseline enforced</text>
 <rect x="24" y="416" width="160" height="38" rx="10" class="dg-box"/>
-<text x="34" y="439.5" font-size="12.5" class="dg-t dg-b" data-w="140">관측성</text>
+<text x="34" y="439.5" font-size="12.5" class="dg-t dg-b" data-w="140">Observability</text>
 <rect x="196" y="416" width="368" height="38" rx="10" class="dg-box dg-azure"/>
-<text x="208" y="439" font-size="12" class="dg-t dg-b" data-w="344">Prometheus · Container Insights 직접 연결</text>
+<text x="208" y="439" font-size="12" class="dg-t dg-b" data-w="344">You connect Prometheus · Container Insights</text>
 <rect x="576" y="416" width="360" height="38" rx="10" class="dg-box dg-ok"/>
-<text x="588" y="439" font-size="12" class="dg-t dg-b" data-w="336">포털/CLI 는 기본 · Terraform 은 직접 연결</text>
+<text x="588" y="439" font-size="12" class="dg-t dg-b" data-w="336">Portal/CLI: on by default · Terraform: manual</text>
 <rect x="24" y="462" width="160" height="38" rx="10" class="dg-box"/>
-<text x="34" y="485.5" font-size="12.5" class="dg-t dg-b" data-w="140">등급 · SLA</text>
+<text x="34" y="485.5" font-size="12.5" class="dg-t dg-b" data-w="140">Tier · SLA</text>
 <rect x="196" y="462" width="368" height="38" rx="10" class="dg-box dg-azure"/>
-<text x="208" y="485" font-size="12" class="dg-t dg-b" data-w="344">Free / Standard / Premium 중 선택</text>
+<text x="208" y="485" font-size="12" class="dg-t dg-b" data-w="344">Choose Free / Standard / Premium</text>
 <rect x="576" y="462" width="360" height="38" rx="10" class="dg-box dg-ok"/>
-<text x="588" y="485" font-size="12" class="dg-t dg-b" data-w="336">Standard + Pod readiness SLA 고정</text>
-<text x="24" y="534" font-size="11.5" class="dg-m" data-w="912">※ Standard 에서 Automatic 으로 제자리 전환은 지원되지 않습니다. 처음부터 어느 쪽을 쓸지 정하세요.</text>
+<text x="588" y="485" font-size="12" class="dg-t dg-b" data-w="336">Fixed: Standard + Pod readiness SLA</text>
+<text x="24" y="534" font-size="11.5" class="dg-m" data-w="912">※ Converting Standard to Automatic in place is not supported. Decide which one to use from the start.</text>
 </svg>

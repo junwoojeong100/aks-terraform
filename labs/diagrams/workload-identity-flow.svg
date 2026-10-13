@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 960 652" width="960" height="652" role="img" aria-labelledby="workload-identity-flow-t workload-identity-flow-d"><title id="workload-identity-flow-t">Workload Identity 흐름 (IRSA 와 비교)</title><desc id="workload-identity-flow-d">파드가 ServiceAccount 토큰을 클라우드의 토큰 교환 서비스(AWS STS 또는 Microsoft Entra ID)에 제시하고, 신뢰 설정을 검증받아 임시 자격 증명이나 액세스 토큰을 받은 뒤 대상 서비스(Secrets Manager 또는 Key Vault)를 호출하는 3단계 흐름을 AWS 와 Azure 로 나란히 보여 준다.</desc><style>svg.dg{--dg-bg:#ffffff;--dg-fg:#1f2328;--dg-muted:#59636e;--dg-line:#6e7781;--dg-card:#f6f8fa;--dg-border:#d1d9e0;--dg-aws:#c2590a;--dg-aws-soft:#fff1e5;--dg-azure:#0b6ed0;--dg-azure-soft:#e5f1ff;--dg-ok:#1a7f37;--dg-ok-soft:#e6f6ea;--dg-id:#8250df;--dg-id-soft:#f3ecff;--dg-net:#0e7490;--dg-net-soft:#e0f4f8;--dg-warn:#9a6700;--dg-warn-soft:#fff6d6;--dg-danger:#cf222e;--dg-danger-soft:#ffebe9;font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", "Segoe UI", Roboto, sans-serif}
+@media (prefers-color-scheme:dark){svg.dg{--dg-bg:#0d1117;--dg-fg:#e6edf3;--dg-muted:#9198a1;--dg-line:#8b949e;--dg-card:#151b23;--dg-border:#30363d;--dg-aws:#f0883e;--dg-aws-soft:#2b1c10;--dg-azure:#58a6ff;--dg-azure-soft:#0f2238;--dg-ok:#3fb950;--dg-ok-soft:#0f2417;--dg-id:#b392f0;--dg-id-soft:#221a36;--dg-net:#39c5cf;--dg-net-soft:#0d2a2f;--dg-warn:#d29922;--dg-warn-soft:#2d2208;--dg-danger:#ff7b72;--dg-danger-soft:#3a1517}}
+.dg-bg{fill:var(--dg-bg)}
+.dg-t{fill:var(--dg-fg)}
+.dg-m{fill:var(--dg-muted)}
+.dg-b{font-weight:650}
+.dg-box,.dg-grp,.dg-chip{stroke-width:1.4}
+.dg-box{fill:var(--dg-card);stroke:var(--dg-border)}
+.dg-grp{fill:none;stroke:var(--dg-border)}
+.dg-dash{stroke-dasharray:6 4}
+.dg-chip{fill:var(--dg-bg);stroke:none}
+.dg-line{fill:none;stroke:var(--dg-line);stroke-width:1.8}
+.dg-ah{fill:var(--dg-line)}
+.dg-box.dg-aws{fill:var(--dg-aws-soft);stroke:var(--dg-aws)}
+.dg-grp.dg-aws{stroke:var(--dg-aws)}
+.dg-fill-aws{fill:var(--dg-aws)}
+.dg-tx-aws{fill:var(--dg-aws)}
+.dg-line.dg-aws{stroke:var(--dg-aws)}
+.dg-ah.dg-aws{fill:var(--dg-aws)}
+.dg-box.dg-azure{fill:var(--dg-azure-soft);stroke:var(--dg-azure)}
+.dg-grp.dg-azure{stroke:var(--dg-azure)}
+.dg-fill-azure{fill:var(--dg-azure)}
+.dg-tx-azure{fill:var(--dg-azure)}
+.dg-line.dg-azure{stroke:var(--dg-azure)}
+.dg-ah.dg-azure{fill:var(--dg-azure)}
+.dg-box.dg-ok{fill:var(--dg-ok-soft);stroke:var(--dg-ok)}
+.dg-grp.dg-ok{stroke:var(--dg-ok)}
+.dg-fill-ok{fill:var(--dg-ok)}
+.dg-tx-ok{fill:var(--dg-ok)}
+.dg-line.dg-ok{stroke:var(--dg-ok)}
+.dg-ah.dg-ok{fill:var(--dg-ok)}
+.dg-box.dg-id{fill:var(--dg-id-soft);stroke:var(--dg-id)}
+.dg-grp.dg-id{stroke:var(--dg-id)}
+.dg-fill-id{fill:var(--dg-id)}
+.dg-tx-id{fill:var(--dg-id)}
+.dg-line.dg-id{stroke:var(--dg-id)}
+.dg-ah.dg-id{fill:var(--dg-id)}
+.dg-box.dg-net{fill:var(--dg-net-soft);stroke:var(--dg-net)}
+.dg-grp.dg-net{stroke:var(--dg-net)}
+.dg-fill-net{fill:var(--dg-net)}
+.dg-tx-net{fill:var(--dg-net)}
+.dg-line.dg-net{stroke:var(--dg-net)}
+.dg-ah.dg-net{fill:var(--dg-net)}
+.dg-box.dg-warn{fill:var(--dg-warn-soft);stroke:var(--dg-warn)}
+.dg-grp.dg-warn{stroke:var(--dg-warn)}
+.dg-fill-warn{fill:var(--dg-warn)}
+.dg-tx-warn{fill:var(--dg-warn)}
+.dg-line.dg-warn{stroke:var(--dg-warn)}
+.dg-ah.dg-warn{fill:var(--dg-warn)}
+.dg-box.dg-danger{fill:var(--dg-danger-soft);stroke:var(--dg-danger)}
+.dg-grp.dg-danger{stroke:var(--dg-danger)}
+.dg-fill-danger{fill:var(--dg-danger)}
+.dg-tx-danger{fill:var(--dg-danger)}
+.dg-line.dg-danger{stroke:var(--dg-danger)}
+.dg-ah.dg-danger{fill:var(--dg-danger)}
+.dg-on{fill:#fff}</style><defs><marker id="workload-identity-flow-ah-line" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah"/></marker><marker id="workload-identity-flow-ah-aws" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-aws"/></marker><marker id="workload-identity-flow-ah-ok" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-ok"/></marker><marker id="workload-identity-flow-ah-azure" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-azure"/></marker></defs><rect width="960" height="652" class="dg-bg" rx="12"/>
+<text x="24" y="32" font-size="18" class="dg-t dg-b">Workload Identity 흐름 (IRSA 와 비교)</text>
+<text x="24" y="54" font-size="12.5" class="dg-m">두 방식 모두 &quot;ServiceAccount 토큰 → 클라우드 임시 자격 증명&quot; 교환이며 정적 키가 필요 없습니다.</text>
+<rect x="24" y="88" width="912" height="236" rx="14" class="dg-grp dg-aws"/>
+<text x="38" y="108" font-size="12.5" class="dg-tx-aws dg-b" data-w="884">AWS · EKS 의 IRSA</text>
+<rect x="36" y="128" width="242" height="118" rx="10" class="dg-box"/>
+<text x="48" y="151.5" font-size="13.5" class="dg-t dg-b" data-w="218">Pod + ServiceAccount</text>
+<text x="48" y="169" font-size="11" class="dg-m" data-w="218">SA annotation:</text>
+<text x="48" y="185" font-size="11" class="dg-m" data-w="218">eks.amazonaws.com/role-arn</text>
+<text x="48" y="201" font-size="11" class="dg-m" data-w="218">SA 토큰 aud:</text>
+<text x="48" y="217" font-size="11" class="dg-m" data-w="218">sts.amazonaws.com</text>
+<rect x="376" y="128" width="236" height="118" rx="10" class="dg-box dg-aws"/>
+<text x="388" y="151.5" font-size="13.5" class="dg-t dg-b" data-w="212">AWS STS</text>
+<text x="388" y="169" font-size="11" class="dg-m" data-w="212">AssumeRoleWithWebIdentity</text>
+<text x="388" y="185" font-size="11" class="dg-m" data-w="212">issuer 공개키로 서명 검증</text>
+<text x="388" y="201" font-size="11" class="dg-m" data-w="212">신뢰 정책(sub) 확인</text>
+<rect x="710" y="128" width="214" height="118" rx="10" class="dg-box dg-ok"/>
+<text x="722" y="151.5" font-size="13.5" class="dg-t dg-b" data-w="190">Secrets Manager</text>
+<text x="722" y="169" font-size="11" class="dg-m" data-w="190">IAM 정책이 허용해야</text>
+<text x="722" y="185" font-size="11" class="dg-m" data-w="190">GetSecretValue 성공</text>
+<rect x="376" y="260" width="236" height="54" rx="10" class="dg-box dg-aws dg-dash"/>
+<text x="386" y="280" font-size="12" class="dg-t dg-b" data-w="216">IAM Role 신뢰 정책 (OIDC)</text>
+<text x="386" y="296" font-size="10.5" class="dg-m" data-w="216">sub = system:serviceaccount:ns:sa</text>
+<path d="M278 171 L376 171" class="dg-line dg-aws" marker-end="url(#workload-identity-flow-ah-aws)"/>
+<rect x="276.5" y="144" width="101" height="20" rx="6" class="dg-chip"/>
+<text x="327" y="158" font-size="11.5" text-anchor="middle" class="dg-tx-aws dg-b">① SA 토큰 제시</text>
+<path d="M376 205 L278 205" class="dg-line dg-aws" marker-end="url(#workload-identity-flow-ah-aws)"/>
+<rect x="287" y="212" width="80" height="20" rx="6" class="dg-chip"/>
+<text x="327" y="226" font-size="11.5" text-anchor="middle" class="dg-tx-aws dg-b">② 임시 자격</text>
+<path d="M157 128 L157 116 L817 116 L817 128" class="dg-line dg-ok" marker-end="url(#workload-identity-flow-ah-ok)"/>
+<rect x="363.5" y="106" width="247" height="20" rx="6" class="dg-chip"/>
+<text x="487" y="120" font-size="11.5" text-anchor="middle" class="dg-tx-ok dg-b">③ 임시 자격으로 API 호출 (정적 키 없음)</text>
+<path d="M494 260 L494 246" class="dg-line dg-aws dg-dash" marker-end="url(#workload-identity-flow-ah-aws)"/>
+<rect x="24" y="338" width="912" height="236" rx="14" class="dg-grp dg-azure"/>
+<text x="38" y="358" font-size="12.5" class="dg-tx-azure dg-b" data-w="884">Azure · AKS 의 Workload Identity</text>
+<rect x="36" y="378" width="242" height="118" rx="10" class="dg-box"/>
+<text x="48" y="401.5" font-size="13.5" class="dg-t dg-b" data-w="218">Pod + ServiceAccount</text>
+<text x="48" y="419" font-size="11" class="dg-m" data-w="218">label azure.workload.identity/use</text>
+<text x="48" y="435" font-size="11" class="dg-m" data-w="218">annotation …/client-id = UAMI</text>
+<text x="48" y="451" font-size="11" class="dg-m" data-w="218">SA 토큰 aud:</text>
+<text x="48" y="467" font-size="11" class="dg-m" data-w="218">api://AzureADTokenExchange</text>
+<rect x="376" y="378" width="236" height="118" rx="10" class="dg-box dg-azure"/>
+<text x="388" y="401.5" font-size="13.5" class="dg-t dg-b" data-w="212">Microsoft Entra ID</text>
+<text x="388" y="419" font-size="11" class="dg-m" data-w="212">토큰 엔드포인트</text>
+<text x="388" y="435" font-size="11" class="dg-m" data-w="212">issuer 공개키로 서명 검증</text>
+<text x="388" y="451" font-size="11" class="dg-m" data-w="212">federated credential 확인</text>
+<rect x="710" y="378" width="214" height="118" rx="10" class="dg-box dg-ok"/>
+<text x="722" y="401.5" font-size="13.5" class="dg-t dg-b" data-w="190">Key Vault</text>
+<text x="722" y="419" font-size="11" class="dg-m" data-w="190">Azure RBAC 역할</text>
+<text x="722" y="435" font-size="11" class="dg-m" data-w="190">&quot;Key Vault Secrets User&quot;</text>
+<rect x="376" y="510" width="236" height="54" rx="10" class="dg-box dg-azure dg-dash"/>
+<text x="386" y="530" font-size="12" class="dg-t dg-b" data-w="216">UAMI + Federated credential</text>
+<text x="386" y="546" font-size="10.5" class="dg-m" data-w="216">issuer = OIDC URL · subject = SA</text>
+<path d="M278 421 L376 421" class="dg-line dg-azure" marker-end="url(#workload-identity-flow-ah-azure)"/>
+<rect x="276.5" y="394" width="101" height="20" rx="6" class="dg-chip"/>
+<text x="327" y="408" font-size="11.5" text-anchor="middle" class="dg-tx-azure dg-b">① SA 토큰 제시</text>
+<path d="M376 455 L278 455" class="dg-line dg-azure" marker-end="url(#workload-identity-flow-ah-azure)"/>
+<rect x="281" y="462" width="92" height="20" rx="6" class="dg-chip"/>
+<text x="327" y="476" font-size="11.5" text-anchor="middle" class="dg-tx-azure dg-b">② 액세스 토큰</text>
+<path d="M157 378 L157 366 L817 366 L817 378" class="dg-line dg-ok" marker-end="url(#workload-identity-flow-ah-ok)"/>
+<rect x="357.5" y="356" width="259" height="20" rx="6" class="dg-chip"/>
+<text x="487" y="370" font-size="11.5" text-anchor="middle" class="dg-tx-ok dg-b">③ 액세스 토큰으로 API 호출 (정적 키 없음)</text>
+<path d="M494 510 L494 496" class="dg-line dg-azure dg-dash" marker-end="url(#workload-identity-flow-ah-azure)"/>
+<rect x="24" y="584" width="912" height="56" rx="10" class="dg-box"/>
+<text x="36" y="608" font-size="12" class="dg-t" data-w="888">Azure: webhook 이 환경 변수(AZURE_CLIENT_ID 등)와 SA 토큰 볼륨을 파드에 주입하고,</text>
+<text x="36" y="625" font-size="12" class="dg-t" data-w="888">앱은 SDK 의 DefaultAzureCredential 로 자동 인증합니다 (Lab 06).</text>
+</svg>

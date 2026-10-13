@@ -3,12 +3,13 @@
 //   - 코드는 빌드 시점에 하이라이트(highlight.js) → 외부 CDN/JS 의존성 없이 오프라인에서도 동작
 //   - 사이드바/검색/복사 버튼/다크 모드/실습 진행 체크는 인라인 JS 로 구현
 // 사용법: cd tools && npm install && npm run build
-import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
+import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Marked } from 'marked';
 import hljs from 'highlight.js';
 import hcl from './assets/hcl.mjs';
+import { CSS_VAR_NAMES } from './diagrams/lib.mjs';
 
 hljs.registerLanguage('hcl', hcl);
 
@@ -44,6 +45,16 @@ const CALLOUT = {
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const stripTags = (s) => s.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+
+// 같은 SVG 를 문서에서 두 번 이상 인라인하면 id(marker, aria-labelledby)가 중복되므로 두 번째부터 접두사를 바꿉니다.
+const inlineCount = new Map();
+function inlineSvg(file) {
+  const name = basename(file, '.svg');
+  const n = (inlineCount.get(name) ?? 0) + 1;
+  inlineCount.set(name, n);
+  const svg = readFileSync(file, 'utf8').trim();
+  return n === 1 ? svg : svg.replaceAll(`${name}-`, `${name}-${n}-`);
+}
 
 function renderCode(text, info, ctx) {
   const m = /^(\S*)(?:\s+title="([^"]*)")?/.exec(info || '');
@@ -135,6 +146,22 @@ function createMarked(ctx) {
         if ((href || '').startsWith('#')) return `<a href="${esc(href)}">${text}</a>`;
         return `<code class="filelink">${text}</code>`;
       },
+      paragraph(token) {
+        // 이미지 하나뿐인 문단은 <p> 없이 <figure> 로 렌더링합니다.
+        if (token.tokens.length === 1 && token.tokens[0].type === 'image') return `${this.parser.parseInline(token.tokens)}\n`;
+        return Object.getPrototypeOf(this).paragraph.call(this, token);
+      },
+      image({ href, title, text }) {
+        if (/^https?:\/\//.test(href || '')) {
+          return `<img src="${esc(href)}" alt="${esc(text)}"${title ? ` title="${esc(title)}"` : ''} loading="lazy">`;
+        }
+        // 단일 파일 HTML 이므로 SVG 를 그대로 인라인합니다 (라이트/다크 테마 변수를 페이지 CSS 가 매핑).
+        const file = resolve(ctx.dir, href || '');
+        if (!(href || '').endsWith('.svg') || !existsSync(file)) {
+          throw new Error(`${ctx.labId}: 인라인할 SVG 를 찾을 수 없습니다 → ${href}`);
+        }
+        return `<figure class="diagram-fig"><div class="diagram-scroll">${inlineSvg(file)}</div></figure>\n`;
+      },
       checkbox({ checked }) {
         const idx = ctx.taskIndex++;
         return `<input type="checkbox" data-task="${idx}"${checked ? ' checked' : ''}> `;
@@ -180,7 +207,10 @@ function verifyOutput(sections, body, sidebar) {
     throw new Error(`취소선(<del>)이 생성되었습니다: ${struck.join(', ')} — 범위 표기의 ~ 를 – 로 바꾸세요 (node tools/check-docs.mjs 로 위치 확인)`);
   }
 
-  const ids = new Set([...body.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
+  const idList = [...body.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]);
+  const dup = [...new Set(idList.filter((id, i) => idList.indexOf(id) !== i))];
+  if (dup.length) throw new Error(`중복된 id: ${dup.join(', ')}`);
+  const ids = new Set(idList);
   const broken = new Set();
   for (const m of (body + sidebar).matchAll(/href="#([^"]+)"/g)) {
     let id = m[1];
@@ -192,6 +222,10 @@ function verifyOutput(sections, body, sidebar) {
     if (!ids.has(id)) broken.add(id);
   }
   if (broken.size) throw new Error(`깨진 내부 링크(#): ${[...broken].join(', ')}`);
+
+  // 다이어그램 색 변수가 페이지 CSS 에 모두 매핑되어 있어야 라이트/다크 토글이 올바로 동작합니다.
+  const missingVars = CSS_VAR_NAMES.filter((n) => !CSS.includes(`--dg-${n}:`));
+  if (missingVars.length) throw new Error(`tools/assets/style.css 에 다이어그램 색 변수가 없습니다: ${missingVars.map((n) => `--dg-${n}`).join(', ')}`);
 }
 
 function build() {

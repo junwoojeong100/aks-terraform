@@ -41,16 +41,11 @@ EKS·VPC·IAM 에 익숙한 엔지니어가 **Azure Best Practice** 로 프로�
 
 ## 아키텍처 개요
 
-```text
- 02-bootstrap ─► remote state (Blob, Entra 인증)
- 03-network   ─► VNet · 서브넷 · NSG · NAT Gateway · Private DNS
- 04-platform  ─► ACR · Key Vault · Log Analytics · Azure Monitor(Prometheus) · Grafana · AKS 용 UAMI
- 05-aks       ─► AKS Standard (zones 1-3, CNI Overlay+Cilium, Entra RBAC, Workload ID, Gateway API)
- 06-workload  ─► UAMI + Federated credential + Key Vault CSI 데모
- 07-ingress   ─► Gateway/HTTPRoute + 데모 앱(PDB, HPA, NetworkPolicy)
- 08-governance─► Azure Policy · Defender · 잠금 · 예산
- 10-aks-automatic ─► (선택) AKS Automatic
-```
+![이 가이드가 만드는 전체 구조](labs/diagrams/overview-architecture.svg)
+
+스택은 수명주기별로 나뉘어 있고, 앞 스택의 결과를 이름 규칙(`modules/naming`)으로 조회해 뒤 스택이 이어받습니다.
+
+![Terraform 스택 계층과 실행 순서](labs/diagrams/stack-layers.svg)
 
 ## 빠른 시작
 
@@ -68,30 +63,45 @@ cd ../03-network && terraform init -backend-config=../backend.hcl && terraform a
 
 자세한 단계는 [Lab 01](labs/01-prerequisites.md) 부터 따라가세요. **단일 HTML 가이드**는 `aks-terraform-guide.html` 을 브라우저로 여세요(오프라인 동작, 검색/복사 버튼/다크 모드/진행 체크 지원).
 
+## 실습 스크립트
+
+손으로 치던 점검·확인·삭제 명령을 스크립트로 묶었습니다 (macOS · Linux · WSL · Cloud Shell, 필요: `terraform` `az` `jq` + 05 이후 `kubectl` `kubelogin`).
+
+| 스크립트 | 용도 |
+|---|---|
+| `scripts/preflight.sh` | 시작 전 점검: 도구 · 로그인 · Resource Provider · vCPU 쿼터 · VM 크기 · 권한 (읽기 전용) |
+| `scripts/verify.sh [스택…]` | 각 스택을 `apply` 한 뒤 결과 검증 (읽기 전용, `✓ ✗ !` 요약과 종료 코드) |
+| `scripts/cleanup.sh` | 생성의 역순 삭제 · 잠금 해제 · 남은 리소스 점검 (`--dry-run` 으로 먼저 확인) |
+| `tools/validate-all.sh` | Azure 없이 `fmt` · `validate` · `terraform test` + 스크립트 문법 검사 |
+
 ## 저장소 구조
 
 ```text
 .
 ├── README.md
-├── aks-terraform-guide.html     # 모든 문서 + 모든 Terraform 코드를 담은 단일 HTML
-├── labs/                        # 실습별 md (코드 블록은 terraform/ 의 실제 파일에서 자동 동기화)
+├── aks-terraform-guide.html     # 모든 문서 + 모든 Terraform 코드 + 다이어그램 + 스크립트를 담은 단일 HTML
+├── labs/                        # 실습별 md (코드 블록은 terraform/, scripts/ 의 실제 파일에서 자동 동기화)
+│   └── diagrams/                # 다이어그램(SVG). tools/gen-diagrams.mjs 로 생성
 ├── terraform/
 │   ├── modules/naming/          # 이름 규칙 모듈
 │   ├── mocks/                   # terraform test 용 mock 값
 │   └── 02-bootstrap … 10-aks-automatic/
+├── scripts/                     # preflight.sh · verify.sh(+verify/) · cleanup.sh · lib/common.sh
 └── tools/
-    ├── validate-all.sh          # fmt + validate + test (Azure 불필요)
-    ├── sync-code.mjs            # md 의 코드 블록을 terraform/ 파일과 동기화
+    ├── validate-all.sh          # fmt + validate + test (Azure 불필요) + 스크립트 검사
+    ├── sync-code.mjs            # md 의 코드 블록/숫자를 소스와 동기화
+    ├── check-docs.mjs           # 문서 검사 (취소선 오인식, 깨진 링크/파일 경로)
+    ├── gen-diagrams.mjs         # 다이어그램(SVG) 생성
     └── build-html.mjs           # md → 단일 HTML
 ```
 
 ## 검증과 HTML 재생성
 
 ```bash
-tools/validate-all.sh                    # 모든 스택 정적 검증 + mock plan 테스트 (구독 불필요)
+tools/validate-all.sh                    # 모든 스택 정적 검증 + mock plan 테스트 + 스크립트 검사 (구독 불필요)
 
-cd tools && npm install && npm run build  # md 코드 동기화 + aks-terraform-guide.html 재생성
-npm run check                             # md 의 코드가 소스와 일치하는지 확인 (CI 용)
+cd tools && npm install && npm run build  # 코드 동기화 + 문서 검사 + aks-terraform-guide.html 재생성
+npm run check                             # md 의 코드/숫자가 소스와 일치하는지 + 문서 검사 (CI 용)
 ```
 
 ## 참고 자료

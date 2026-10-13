@@ -78,7 +78,7 @@ for (const mdPath of targets) {
 
     let lines = readFileSync(srcPath, 'utf8').replace(/\s+$/, '').split('\n');
     if (from && to) lines = lines.slice(Number(from) - 1, Number(to));
-    const lang = LANG[extname(srcPath)] ?? '';
+    const lang = LANG[extname(srcPath)] ?? 'text';
     const range = from && to ? ` lines="${from}-${to}"` : '';
     included += 1;
 

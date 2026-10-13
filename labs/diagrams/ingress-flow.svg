@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 960 560" width="960" height="560" role="img" aria-labelledby="ingress-flow-t ingress-flow-d"><title id="ingress-flow-t">Gateway API 트래픽 흐름</title><desc id="ingress-flow-d">클라이언트의 요청이 Azure 로드밸런서와 Envoy 게이트웨이 프록시 파드, Service 를 거쳐 앱 파드에 도달하고, 플랫폼 팀의 Gateway 와 앱 팀의 HTTPRoute 가 관리형 Istio 기반 컨트롤 플레인을 통해 Envoy 를 구성하는 구조.</desc><style>svg.dg{--dg-bg:#ffffff;--dg-fg:#1f2328;--dg-muted:#59636e;--dg-line:#6e7781;--dg-card:#f6f8fa;--dg-border:#d1d9e0;--dg-aws:#c2590a;--dg-aws-soft:#fff1e5;--dg-azure:#0b6ed0;--dg-azure-soft:#e5f1ff;--dg-ok:#1a7f37;--dg-ok-soft:#e6f6ea;--dg-id:#8250df;--dg-id-soft:#f3ecff;--dg-net:#0e7490;--dg-net-soft:#e0f4f8;--dg-warn:#9a6700;--dg-warn-soft:#fff6d6;--dg-danger:#cf222e;--dg-danger-soft:#ffebe9;font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", "Segoe UI", Roboto, sans-serif}
+@media (prefers-color-scheme:dark){svg.dg{--dg-bg:#0d1117;--dg-fg:#e6edf3;--dg-muted:#9198a1;--dg-line:#8b949e;--dg-card:#151b23;--dg-border:#30363d;--dg-aws:#f0883e;--dg-aws-soft:#2b1c10;--dg-azure:#58a6ff;--dg-azure-soft:#0f2238;--dg-ok:#3fb950;--dg-ok-soft:#0f2417;--dg-id:#b392f0;--dg-id-soft:#221a36;--dg-net:#39c5cf;--dg-net-soft:#0d2a2f;--dg-warn:#d29922;--dg-warn-soft:#2d2208;--dg-danger:#ff7b72;--dg-danger-soft:#3a1517}}
+.dg-bg{fill:var(--dg-bg)}
+.dg-t{fill:var(--dg-fg)}
+.dg-m{fill:var(--dg-muted)}
+.dg-b{font-weight:650}
+.dg-box,.dg-grp,.dg-chip{stroke-width:1.4}
+.dg-box{fill:var(--dg-card);stroke:var(--dg-border)}
+.dg-grp{fill:none;stroke:var(--dg-border)}
+.dg-dash{stroke-dasharray:6 4}
+.dg-chip{fill:var(--dg-bg);stroke:none}
+.dg-line{fill:none;stroke:var(--dg-line);stroke-width:1.8}
+.dg-ah{fill:var(--dg-line)}
+.dg-box.dg-aws{fill:var(--dg-aws-soft);stroke:var(--dg-aws)}
+.dg-grp.dg-aws{stroke:var(--dg-aws)}
+.dg-fill-aws{fill:var(--dg-aws)}
+.dg-tx-aws{fill:var(--dg-aws)}
+.dg-line.dg-aws{stroke:var(--dg-aws)}
+.dg-ah.dg-aws{fill:var(--dg-aws)}
+.dg-box.dg-azure{fill:var(--dg-azure-soft);stroke:var(--dg-azure)}
+.dg-grp.dg-azure{stroke:var(--dg-azure)}
+.dg-fill-azure{fill:var(--dg-azure)}
+.dg-tx-azure{fill:var(--dg-azure)}
+.dg-line.dg-azure{stroke:var(--dg-azure)}
+.dg-ah.dg-azure{fill:var(--dg-azure)}
+.dg-box.dg-ok{fill:var(--dg-ok-soft);stroke:var(--dg-ok)}
+.dg-grp.dg-ok{stroke:var(--dg-ok)}
+.dg-fill-ok{fill:var(--dg-ok)}
+.dg-tx-ok{fill:var(--dg-ok)}
+.dg-line.dg-ok{stroke:var(--dg-ok)}
+.dg-ah.dg-ok{fill:var(--dg-ok)}
+.dg-box.dg-id{fill:var(--dg-id-soft);stroke:var(--dg-id)}
+.dg-grp.dg-id{stroke:var(--dg-id)}
+.dg-fill-id{fill:var(--dg-id)}
+.dg-tx-id{fill:var(--dg-id)}
+.dg-line.dg-id{stroke:var(--dg-id)}
+.dg-ah.dg-id{fill:var(--dg-id)}
+.dg-box.dg-net{fill:var(--dg-net-soft);stroke:var(--dg-net)}
+.dg-grp.dg-net{stroke:var(--dg-net)}
+.dg-fill-net{fill:var(--dg-net)}
+.dg-tx-net{fill:var(--dg-net)}
+.dg-line.dg-net{stroke:var(--dg-net)}
+.dg-ah.dg-net{fill:var(--dg-net)}
+.dg-box.dg-warn{fill:var(--dg-warn-soft);stroke:var(--dg-warn)}
+.dg-grp.dg-warn{stroke:var(--dg-warn)}
+.dg-fill-warn{fill:var(--dg-warn)}
+.dg-tx-warn{fill:var(--dg-warn)}
+.dg-line.dg-warn{stroke:var(--dg-warn)}
+.dg-ah.dg-warn{fill:var(--dg-warn)}
+.dg-box.dg-danger{fill:var(--dg-danger-soft);stroke:var(--dg-danger)}
+.dg-grp.dg-danger{stroke:var(--dg-danger)}
+.dg-fill-danger{fill:var(--dg-danger)}
+.dg-tx-danger{fill:var(--dg-danger)}
+.dg-line.dg-danger{stroke:var(--dg-danger)}
+.dg-ah.dg-danger{fill:var(--dg-danger)}
+.dg-on{fill:#fff}</style><defs><marker id="ingress-flow-ah-line" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah"/></marker><marker id="ingress-flow-ah-net" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-net"/></marker><marker id="ingress-flow-ah-azure" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-azure"/></marker><marker id="ingress-flow-ah-id" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-id"/></marker><marker id="ingress-flow-ah-ok" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-ok"/></marker><marker id="ingress-flow-ah-warn" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-warn"/></marker><marker id="ingress-flow-ah-aws" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-aws"/></marker></defs><rect width="960" height="560" class="dg-bg" rx="12"/>
+<text x="24" y="32" font-size="18" class="dg-t dg-b">Gateway API 트래픽 흐름</text>
+<text x="24" y="54" font-size="12.5" class="dg-m">위쪽은 요청이 흐르는 길(데이터 경로), 아래쪽은 그 길을 만드는 리소스(제어 경로)입니다.</text>
+<text x="24" y="96" font-size="12.5" class="dg-m dg-b">데이터 경로</text>
+<rect x="24" y="108" width="130" height="100" rx="10" class="dg-box"/>
+<text x="36" y="131.5" font-size="13.5" class="dg-t dg-b" data-w="106">클라이언트</text>
+<text x="36" y="149" font-size="11.5" class="dg-m" data-w="106">브라우저</text>
+<text x="36" y="165.5" font-size="11.5" class="dg-m" data-w="106">curl</text>
+<rect x="214" y="108" width="150" height="100" rx="10" class="dg-box dg-net"/>
+<text x="226" y="131.5" font-size="13.5" class="dg-t dg-b" data-w="126">Azure LB</text>
+<text x="226" y="149" font-size="11.5" class="dg-m" data-w="126">공인 IP</text>
+<text x="226" y="165.5" font-size="11.5" class="dg-m" data-w="126">(Gateway 가</text>
+<text x="226" y="182" font-size="11.5" class="dg-m" data-w="126">자동 생성)</text>
+<rect x="384" y="94" width="552" height="128" rx="14" class="dg-grp dg-azure dg-dash"/>
+<text x="398" y="114" font-size="12" class="dg-tx-azure dg-b" data-w="524">네임스페이스 web</text>
+<rect x="394" y="112" width="150" height="92" rx="10" class="dg-box dg-azure"/>
+<text x="404" y="133" font-size="13" class="dg-t dg-b" data-w="130">Envoy 프록시</text>
+<text x="404" y="150" font-size="10.5" class="dg-m" data-w="130">Gateway 당 자동 생성:</text>
+<text x="404" y="165.5" font-size="10.5" class="dg-m" data-w="130">Deployment·HPA·PDB</text>
+<rect x="624" y="112" width="140" height="92" rx="10" class="dg-box dg-azure"/>
+<text x="634" y="133" font-size="13" class="dg-t dg-b" data-w="120">Service</text>
+<text x="634" y="150" font-size="11" class="dg-m" data-w="120">aspnetapp:80</text>
+<text x="634" y="166" font-size="11" class="dg-m" data-w="120">ClusterIP</text>
+<rect x="788" y="112" width="140" height="92" rx="10" class="dg-box dg-azure"/>
+<text x="798" y="133" font-size="13" class="dg-t dg-b" data-w="120">Pod ×3</text>
+<text x="798" y="150" font-size="11" class="dg-m" data-w="120">영역 분산</text>
+<text x="798" y="166" font-size="11" class="dg-m" data-w="120">(best-effort)</text>
+<text x="798" y="182" font-size="11" class="dg-m" data-w="120">:8080 · 비루트</text>
+<path d="M154 158 L214 158" class="dg-line dg-azure" marker-end="url(#ingress-flow-ah-azure)"/>
+<rect x="162" y="134" width="44" height="20" rx="6" class="dg-chip"/>
+<text x="184" y="148" font-size="11.5" text-anchor="middle" class="dg-tx-azure dg-b">HTTP</text>
+<path d="M364 158 L394 158" class="dg-line dg-azure" marker-end="url(#ingress-flow-ah-azure)"/>
+<path d="M544 158 L624 158" class="dg-line dg-azure" marker-end="url(#ingress-flow-ah-azure)"/>
+<rect x="543.5" y="131" width="81" height="20" rx="6" class="dg-chip"/>
+<text x="584" y="145" font-size="11.5" text-anchor="middle" class="dg-tx-azure dg-b">HTTPRoute</text>
+<path d="M764 158 L788 158" class="dg-line dg-azure" marker-end="url(#ingress-flow-ah-azure)"/>
+<text x="24" y="266" font-size="12.5" class="dg-m dg-b">제어 경로 (리소스)</text>
+<rect x="24" y="280" width="246" height="124" rx="10" class="dg-box dg-id"/>
+<text x="36" y="303" font-size="13" class="dg-t dg-b" data-w="222">플랫폼 팀: Gateway</text>
+<text x="36" y="320" font-size="11.5" class="dg-m" data-w="222">web-gateway</text>
+<text x="36" y="336.5" font-size="11.5" class="dg-m" data-w="222">GatewayClass: approuting-istio</text>
+<text x="36" y="353" font-size="11.5" class="dg-m" data-w="222">리스너 HTTP 80 · LB 공용/내부 선택</text>
+<rect x="360" y="280" width="246" height="124" rx="10" class="dg-box dg-ok"/>
+<text x="372" y="303" font-size="13" class="dg-t dg-b" data-w="222">관리형 컨트롤 플레인</text>
+<text x="372" y="320" font-size="11.5" class="dg-m" data-w="222">Istio 기반 구현 (사이드카 없음)</text>
+<text x="372" y="336.5" font-size="11.5" class="dg-m" data-w="222">Gateway 를 감시하다가</text>
+<text x="372" y="353" font-size="11.5" class="dg-m" data-w="222">Envoy · Service(LB) ·</text>
+<text x="372" y="369.5" font-size="11.5" class="dg-m" data-w="222">HPA · PDB 를 생성</text>
+<rect x="640" y="280" width="296" height="124" rx="10" class="dg-box dg-warn"/>
+<text x="652" y="303" font-size="13" class="dg-t dg-b" data-w="272">앱 팀: HTTPRoute</text>
+<text x="652" y="320" font-size="11.5" class="dg-m" data-w="272">aspnetapp · parentRefs: web-gateway</text>
+<text x="652" y="336.5" font-size="11.5" class="dg-m" data-w="272">PathPrefix &quot;/&quot; → Service aspnetapp:80</text>
+<text x="652" y="353" font-size="11.5" class="dg-m" data-w="272">호스트 · 경로 · 가중치 · TLS 는 여기서</text>
+<path d="M270 342 L360 342" class="dg-line dg-id" marker-end="url(#ingress-flow-ah-id)"/>
+<rect x="266" y="315" width="98" height="20" rx="6" class="dg-chip"/>
+<text x="315" y="329" font-size="11.5" text-anchor="middle" class="dg-tx-id dg-b">GatewayClass</text>
+<path d="M470 280 L470 204" class="dg-line dg-ok" marker-end="url(#ingress-flow-ah-ok)"/>
+<rect x="434" y="235.8" width="72" height="20" rx="6" class="dg-chip"/>
+<text x="470" y="249.8" font-size="11.5" text-anchor="middle" class="dg-tx-ok dg-b">프로비저닝</text>
+<path d="M700 280 L700 204" class="dg-line dg-warn" marker-end="url(#ingress-flow-ah-warn)"/>
+<rect x="662" y="224.4" width="76" height="20" rx="6" class="dg-chip"/>
+<text x="700" y="238.4" font-size="11.5" text-anchor="middle" class="dg-tx-warn dg-b">라우팅 규칙</text>
+<path d="M788 404 L788 424 L147 424 L147 404" class="dg-line dg-warn" marker-end="url(#ingress-flow-ah-warn)"/>
+<rect x="368" y="414" width="199" height="20" rx="6" class="dg-chip"/>
+<text x="467.5" y="428" font-size="11.5" text-anchor="middle" class="dg-tx-warn dg-b">parentRefs 로 Gateway 에 연결</text>
+<rect x="24" y="446" width="440" height="92" rx="10" class="dg-box"/>
+<text x="36" y="469" font-size="13" class="dg-t dg-b" data-w="416">NetworkPolicy (Cilium 이 강제)</text>
+<text x="36" y="486" font-size="11.5" class="dg-m" data-w="416">앱 파드는 같은 네임스페이스의 파드에서 오는 8080 만 허용</text>
+<text x="36" y="502.5" font-size="11.5" class="dg-m" data-w="416">다른 네임스페이스에서는 앱에 직접 접근할 수 없습니다</text>
+<rect x="484" y="446" width="452" height="92" rx="10" class="dg-box dg-aws"/>
+<text x="496" y="469" font-size="13" class="dg-t dg-b" data-w="428">AWS 와 비교</text>
+<text x="496" y="486" font-size="11.5" class="dg-m" data-w="428">ALB + AWS Load Balancer Controller ↔ Azure LB + Envoy(Gateway)</text>
+<text x="496" y="502.5" font-size="11.5" class="dg-m" data-w="428">Ingress(annotation) ↔ Gateway + HTTPRoute (표준 API, 역할 분리)</text>
+</svg>

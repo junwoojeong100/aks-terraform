@@ -4,6 +4,7 @@
 //   1) 취소선 오인식: GFM 은 `~` 두 개를 취소선(~텍스트~)으로 해석합니다.
 //      범위 표기 "$2~2.5" 가 "$22.5"(가운데에 취소선)로 보이는 문제를 막기 위해 `–`(en dash) 또는 `\~` 를 쓰세요.
 //   2) 이미지(![](...))와 링크, 백틱으로 쓴 파일 경로(`scripts/...`, `terraform/...`)가 실제로 존재하는지
+//   3) labs/diagrams/*.svg 가 문서에서 한 번도 참조되지 않은 채 남아 있지 않은지
 //
 // 사용법: node tools/check-docs.mjs
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
@@ -21,6 +22,7 @@ const PLACEHOLDER = /[*<>{}…$]|\.\.\.|NN|0X/;
 
 const errors = [];
 const marked = new Marked({ gfm: true });
+const usedImages = new Set();
 
 function lineOf(source, snippet) {
   const idx = source.indexOf(snippet);
@@ -40,7 +42,9 @@ for (const rel of FILES) {
       );
     }
     if (t.type === 'image' && !/^(https?:|data:)/.test(t.href)) {
+      usedImages.add(resolve(baseDir, t.href));
       if (!existsSync(resolve(baseDir, t.href))) errors.push(`${rel}:${lineOf(source, t.raw)}  이미지 파일이 없습니다: ${t.href}`);
+      if (!t.text.trim()) errors.push(`${rel}:${lineOf(source, t.raw)}  이미지에 대체 텍스트(alt)가 없습니다: ${t.href}`);
     }
     if (t.type === 'link' && t.href && !/^(https?:|mailto:|#)/.test(t.href)) {
       const target = t.href.split('#')[0];
@@ -55,8 +59,16 @@ for (const rel of FILES) {
   });
 }
 
+// 문서에서 한 번도 쓰이지 않은 다이어그램은 잊힌 파일입니다.
+const DIAGRAMS = join(ROOT, 'labs', 'diagrams');
+if (existsSync(DIAGRAMS)) {
+  for (const f of readdirSync(DIAGRAMS).filter((x) => x.endsWith('.svg'))) {
+    if (!usedImages.has(join(DIAGRAMS, f))) errors.push(`labs/diagrams/${f}  어떤 문서에서도 참조하지 않는 다이어그램입니다.`);
+  }
+}
+
 if (errors.length) {
   console.error(`✗ 문서 검사 실패 (${errors.length}건)\n` + errors.map((e) => `  - ${e}`).join('\n'));
   process.exit(1);
 }
-console.log(`✓ 문서 검사 통과 (${FILES.length}개 파일: 취소선 오인식 · 이미지/링크/파일 경로)`);
+console.log(`✓ 문서 검사 통과 (${FILES.length}개 파일: 취소선 오인식 · 이미지/링크/파일 경로 · 다이어그램 참조)`);

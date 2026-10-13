@@ -280,6 +280,25 @@ figure.code.shell figcaption .file::before { content: '$ '; color: var(--hl-var)
   .pager { grid-template-columns: 1fr; }
 }
 
+/* ---------- diagrams (tools/diagrams → inline SVG) ---------- */
+/* SVG 안의 --dg-* 변수를 페이지 테마 변수로 매핑합니다. (SVG 자체 <style> 의 prefers-color-scheme 보다 우선) */
+.diagram-fig { margin: 22px 0; border: 1px solid var(--border); border-radius: 14px; background: var(--bg); box-shadow: var(--shadow); overflow: hidden; }
+.diagram-scroll { overflow-x: auto; }
+.diagram-fig svg.dg { display: block; width: 100%; min-width: 760px; height: auto; }
+.diagram-fig svg.dg {
+  --dg-bg: var(--bg); --dg-fg: var(--fg); --dg-muted: var(--fg-muted); --dg-line: var(--fg-muted);
+  --dg-card: var(--bg-soft); --dg-border: var(--border);
+  --dg-aws: var(--aws); --dg-aws-soft: var(--aws-soft); --dg-azure: var(--azure); --dg-azure-soft: var(--azure-soft);
+  --dg-ok: #1a7f37; --dg-ok-soft: #e6f6ea; --dg-id: #8250df; --dg-id-soft: #f3ecff;
+  --dg-net: #0e7490; --dg-net-soft: #e0f4f8; --dg-warn: #9a6700; --dg-warn-soft: #fff6d6;
+  --dg-danger: #cf222e; --dg-danger-soft: #ffebe9;
+}
+[data-theme='dark'] .diagram-fig svg.dg {
+  --dg-ok: #3fb950; --dg-ok-soft: #0f2417; --dg-id: #b392f0; --dg-id-soft: #221a36;
+  --dg-net: #39c5cf; --dg-net-soft: #0d2a2f; --dg-warn: #d29922; --dg-warn-soft: #2d2208;
+  --dg-danger: #ff7b72; --dg-danger-soft: #3a1517;
+}
+
 /* ---------- print ---------- */
 @media print {
   .topbar, .sidebar, .progress, .pager, .lab-done, .copy, .expand { display: none !important; }
@@ -289,4 +308,5 @@ figure.code.shell figcaption .file::before { content: '$ '; color: var(--hl-var)
   figure.code.collapsed .code-body::after { display: none; }
   section.lab { page-break-before: always; }
   body { font-size: 11.5pt; }
+  .diagram-fig { break-inside: avoid; box-shadow: none; }
 }

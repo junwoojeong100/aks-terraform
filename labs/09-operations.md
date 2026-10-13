@@ -18,6 +18,8 @@
 
 ## 1. 업그레이드 전략
 
+![업그레이드 흐름: patch · 노드 이미지 · minor](diagrams/upgrade-flow.svg)
+
 ### 자동 업그레이드 채널
 
 | 채널 | 동작 | 이 실습 |

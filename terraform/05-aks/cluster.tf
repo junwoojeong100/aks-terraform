@@ -169,13 +169,18 @@ resource "azurerm_kubernetes_cluster" "this" {
     for_each = var.enable_defender ? [1] : []
 
     content {
-      log_analytics_workspace_id = data.azurerm_log_analytics_workspace.this.id
+      log_analytics_workspace_id = var.defender_log_analytics_workspace_id
     }
   }
 
   tags = local.tags
 
   lifecycle {
+    precondition {
+      condition     = !var.enable_defender || var.defender_log_analytics_workspace_id != null
+      error_message = "If enable_defender = true, set defender_log_analytics_workspace_id to a workspace that allows local authentication. The platform workspace does not, and the Defender sensor cannot use it."
+    }
+
     # Terraform sets the version only at creation time; after that, the AKS auto-upgrade channel manages it.
     # (Through azurerm 5.9, after an automatic patch upgrade the alias "1.36" no longer matches the actual version
     # "1.36.6", so every plan shows a diff. An improvement is planned for 5.10.)

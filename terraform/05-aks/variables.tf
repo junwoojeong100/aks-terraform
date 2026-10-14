@@ -129,9 +129,22 @@ variable "enable_gateway_api" {
 }
 
 variable "enable_defender" {
-  description = "Attach the Microsoft Defender for Containers profile to the cluster (the subscription-level plan is enabled in 08-governance)"
+  description = "Declare the Microsoft Defender for Containers profile on the cluster (the subscription-level plan is enabled in 08-governance). Requires defender_log_analytics_workspace_id."
   type        = bool
   default     = false
+}
+
+variable "defender_log_analytics_workspace_id" {
+  description = <<-EOT
+    Resource ID of the Log Analytics workspace that the Defender sensor sends its data to (used when enable_defender = true).
+    The workspace must allow local (shared key) authentication: the Defender sensor does not support workspaces with
+    local_authentication_enabled = false, and its publisher pods crash-loop. The platform workspace from 04-platform
+    disables local authentication on purpose, so do not use it here. If the subscription's Defender auto-provisioning policy
+    already attached the profile, reuse its workspace:
+      az aks show -g <rg> -n <cluster> --query securityProfile.defender.logAnalyticsWorkspaceResourceId -o tsv
+  EOT
+  type        = string
+  default     = null
 }
 
 variable "grant_current_user_admin" {

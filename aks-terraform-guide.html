@@ -5307,7 +5307,7 @@ PE_APPROVED=<span class="hljs-string">&#x27;[.[]? | (.privateLinkServiceConnecti
 
 <span class="hljs-comment"># AzAPI likewise uses ARM_SUBSCRIPTION_ID and the Azure CLI sign-in as is.</span>
 <span class="hljs-keyword">provider</span> <span class="hljs-string">&quot;azapi&quot;</span> {}</code></pre></div></figure>
-<figure class="code collapsed"><figcaption><span class="file">terraform/05-aks/variables.tf</span><span class="meta">hcl · 180 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-keyword">variable</span> <span class="hljs-string">&quot;workload&quot;</span> {
+<figure class="code collapsed"><figcaption><span class="file">terraform/05-aks/variables.tf</span><span class="meta">hcl · 193 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-keyword">variable</span> <span class="hljs-string">&quot;workload&quot;</span> {
 <span class="hljs-attr">  description</span> = <span class="hljs-string">&quot;Workload name (3–8 lowercase letters or digits)&quot;</span>
 <span class="hljs-attr">  type</span>        = string
 <span class="hljs-attr">  default</span>     = <span class="hljs-string">&quot;aksdemo&quot;</span>
@@ -5438,9 +5438,22 @@ PE_APPROVED=<span class="hljs-string">&#x27;[.[]? | (.privateLinkServiceConnecti
 }
 
 <span class="hljs-keyword">variable</span> <span class="hljs-string">&quot;enable_defender&quot;</span> {
-<span class="hljs-attr">  description</span> = <span class="hljs-string">&quot;Attach the Microsoft Defender for Containers profile to the cluster (the subscription-level plan is enabled in 08-governance)&quot;</span>
+<span class="hljs-attr">  description</span> = <span class="hljs-string">&quot;Declare the Microsoft Defender for Containers profile on the cluster (the subscription-level plan is enabled in 08-governance). Requires defender_log_analytics_workspace_id.&quot;</span>
 <span class="hljs-attr">  type</span>        = bool
 <span class="hljs-attr">  default</span>     = <span class="hljs-literal">false</span>
+}
+
+<span class="hljs-keyword">variable</span> <span class="hljs-string">&quot;defender_log_analytics_workspace_id&quot;</span> {
+<span class="hljs-attr">  description</span> = <span class="hljs-string">&lt;&lt;-EOT
+    Resource ID of the Log Analytics workspace that the Defender sensor sends its data to (used when enable_defender = true).
+    The workspace must allow local (shared key) authentication: the Defender sensor does not support workspaces with
+    local_authentication_enabled = false, and its publisher pods crash-loop. The platform workspace from 04-platform
+    disables local authentication on purpose, so do not use it here. If the subscription&#x27;s Defender auto-provisioning policy
+    already attached the profile, reuse its workspace:
+      az aks show -g &lt;rg&gt; -n &lt;cluster&gt; --query securityProfile.defender.logAnalyticsWorkspaceResourceId -o tsv
+  EOT</span>
+<span class="hljs-attr">  type</span>        = string
+<span class="hljs-attr">  default</span>     = <span class="hljs-literal">null</span>
 }
 
 <span class="hljs-keyword">variable</span> <span class="hljs-string">&quot;grant_current_user_admin&quot;</span> {
@@ -5486,7 +5499,7 @@ PE_APPROVED=<span class="hljs-string">&#x27;[.[]? | (.privateLinkServiceConnecti
 <span class="hljs-attr">  description</span> = <span class="hljs-string">&quot;kube-dns Service IP (an address within service_cidr)&quot;</span>
 <span class="hljs-attr">  type</span>        = string
 <span class="hljs-attr">  default</span>     = <span class="hljs-string">&quot;10.0.0.10&quot;</span>
-}</code></pre></div><button class="expand" type="button" data-label="Show all 180 lines ▼">Show all 180 lines ▼</button></figure>
+}</code></pre></div><button class="expand" type="button" data-label="Show all 193 lines ▼">Show all 193 lines ▼</button></figure>
 <p><strong><code>main.tf</code></strong> — lookups of resources from earlier stacks, the version <code>check</code>, and the resource group</p>
 <figure class="code collapsed"><figcaption><span class="file">terraform/05-aks/main.tf</span><span class="meta">hcl · 83 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-keyword">data</span> <span class="hljs-string">&quot;azurerm_client_config&quot;</span> <span class="hljs-string">&quot;current&quot;</span> {}
 
@@ -5572,7 +5585,7 @@ PE_APPROVED=<span class="hljs-string">&#x27;[.[]? | (.privateLinkServiceConnecti
 <span class="hljs-attr">  tags</span>     = <span class="hljs-variable">local.tags</span>
 }</code></pre></div><button class="expand" type="button" data-label="Show all 83 lines ▼">Show all 83 lines ▼</button></figure>
 <p><strong><code>cluster.tf</code></strong> — the cluster and node pools (the core of this lab)</p>
-<figure class="code collapsed"><figcaption><span class="file">terraform/05-aks/cluster.tf</span><span class="meta">hcl · 265 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-comment"># ---------------------------------------------------------------------------</span>
+<figure class="code collapsed"><figcaption><span class="file">terraform/05-aks/cluster.tf</span><span class="meta">hcl · 270 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-comment"># ---------------------------------------------------------------------------</span>
 <span class="hljs-comment"># AKS cluster (Standard mode: you design and operate the platform yourself)</span>
 <span class="hljs-comment">#</span>
 <span class="hljs-comment"># Compared with EKS</span>
@@ -5743,13 +5756,18 @@ PE_APPROVED=<span class="hljs-string">&#x27;[.[]? | (.privateLinkServiceConnecti
 <span class="hljs-attr">    for_each</span> = <span class="hljs-variable">var.enable_defender</span> <span class="hljs-operator">?</span> [<span class="hljs-number">1</span>] <span class="hljs-operator">:</span> []
 
     <span class="hljs-keyword">content</span> {
-<span class="hljs-attr">      log_analytics_workspace_id</span> = <span class="hljs-variable">data.azurerm_log_analytics_workspace.this.id</span>
+<span class="hljs-attr">      log_analytics_workspace_id</span> = <span class="hljs-variable">var.defender_log_analytics_workspace_id</span>
     }
   }
 <span class="hljs-attr">
   tags</span> = <span class="hljs-variable">local.tags</span>
 
   <span class="hljs-keyword">lifecycle</span> {
+    precondition {
+<span class="hljs-attr">      condition</span>     = !<span class="hljs-variable">var.enable_defender</span> <span class="hljs-operator">||</span> <span class="hljs-variable">var.defender_log_analytics_workspace_id</span> <span class="hljs-operator">!=</span> <span class="hljs-literal">null</span>
+<span class="hljs-attr">      error_message</span> = <span class="hljs-string">&quot;If enable_defender = true, set defender_log_analytics_workspace_id to a workspace that allows local authentication. The platform workspace does not, and the Defender sensor cannot use it.&quot;</span>
+    }
+
     <span class="hljs-comment"># Terraform sets the version only at creation time; after that, the AKS auto-upgrade channel manages it.</span>
     <span class="hljs-comment"># (Through azurerm 5.9, after an automatic patch upgrade the alias &quot;1.36&quot; no longer matches the actual version</span>
     <span class="hljs-comment"># &quot;1.36.6&quot;, so every plan shows a diff. An improvement is planned for 5.10.)</span>
@@ -5836,7 +5854,7 @@ PE_APPROVED=<span class="hljs-string">&#x27;[.[]? | (.privateLinkServiceConnecti
   <span class="hljs-keyword">lifecycle</span> {
 <span class="hljs-attr">    ignore_changes</span> = [orchestrator_version]
   }
-}</code></pre></div><button class="expand" type="button" data-label="Show all 265 lines ▼">Show all 265 lines ▼</button></figure>
+}</code></pre></div><button class="expand" type="button" data-label="Show all 270 lines ▼">Show all 270 lines ▼</button></figure>
 <p><strong><code>monitoring.tf</code></strong> — Managed Prometheus / Container Insights / diagnostic settings</p>
 <figure class="code collapsed"><figcaption><span class="file">terraform/05-aks/monitoring.tf</span><span class="meta">hcl · 169 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-comment"># ---------------------------------------------------------------------------</span>
 <span class="hljs-comment"># Observability wiring: AKS ↔ Managed Prometheus / Container Insights</span>
@@ -6405,7 +6423,7 @@ PE_APPROVED=<span class="hljs-string">&#x27;[.[]? | (.privateLinkServiceConnecti
 <span class="hljs-attr">  description</span> = <span class="hljs-string">&quot;Command that fetches the kubeconfig and converts it to Entra ID sign-in (kubelogin) format&quot;</span>
 <span class="hljs-attr">  value</span>       = <span class="hljs-string">&quot;az aks get-credentials --resource-group <span class="hljs-subst">${azurerm_resource_group.aks.name}</span> --name <span class="hljs-subst">${azurerm_kubernetes_cluster.this.name}</span> --overwrite-existing &amp;&amp; kubelogin convert-kubeconfig -l azurecli&quot;</span>
 }</code></pre></div></figure>
-<figure class="code collapsed"><figcaption><span class="file">terraform/05-aks/tests/plan.tftest.hcl</span><span class="meta">hcl · 96 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-comment"># Test the plan logic only, without Azure: terraform -chdir=terraform/05-aks test</span>
+<figure class="code collapsed"><figcaption><span class="file">terraform/05-aks/tests/plan.tftest.hcl</span><span class="meta">hcl · 107 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-comment"># Test the plan logic only, without Azure: terraform -chdir=terraform/05-aks test</span>
 <span class="hljs-keyword">mock_provider</span> <span class="hljs-string">&quot;azurerm&quot;</span> {
 <span class="hljs-attr">  source</span> = <span class="hljs-string">&quot;../mocks&quot;</span>
 }
@@ -6444,12 +6462,13 @@ PE_APPROVED=<span class="hljs-string">&#x27;[.[]? | (.privateLinkServiceConnecti
 <span class="hljs-attr">  command</span> = plan
 
   <span class="hljs-keyword">variables</span> {
-<span class="hljs-attr">    enable_private_cluster</span> = <span class="hljs-literal">true</span>
-<span class="hljs-attr">    enable_spot_pool</span>       = <span class="hljs-literal">true</span>
-<span class="hljs-attr">    enable_defender</span>        = <span class="hljs-literal">true</span>
-<span class="hljs-attr">    enable_gateway_api</span>     = <span class="hljs-literal">false</span>
-<span class="hljs-attr">    sku_tier</span>               = <span class="hljs-string">&quot;Premium&quot;</span>
-<span class="hljs-attr">    admin_principal_ids</span>    = [<span class="hljs-string">&quot;11111111-1111-1111-1111-111111111111&quot;</span>]
+<span class="hljs-attr">    enable_private_cluster</span>              = <span class="hljs-literal">true</span>
+<span class="hljs-attr">    enable_spot_pool</span>                    = <span class="hljs-literal">true</span>
+<span class="hljs-attr">    enable_defender</span>                     = <span class="hljs-literal">true</span>
+<span class="hljs-attr">    defender_log_analytics_workspace_id</span> = <span class="hljs-string">&quot;/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-defender/providers/Microsoft.OperationalInsights/workspaces/law-defender&quot;</span>
+<span class="hljs-attr">    enable_gateway_api</span>                  = <span class="hljs-literal">false</span>
+<span class="hljs-attr">    sku_tier</span>                            = <span class="hljs-string">&quot;Premium&quot;</span>
+<span class="hljs-attr">    admin_principal_ids</span>                 = [<span class="hljs-string">&quot;11111111-1111-1111-1111-111111111111&quot;</span>]
   }
 
   <span class="hljs-keyword">assert</span> {
@@ -6500,7 +6519,17 @@ PE_APPROVED=<span class="hljs-string">&#x27;[.[]? | (.privateLinkServiceConnecti
   }
 <span class="hljs-attr">
   expect_failures</span> = [<span class="hljs-variable">var.kubernetes_version]</span>
-}</code></pre></div><button class="expand" type="button" data-label="Show all 96 lines ▼">Show all 96 lines ▼</button></figure>
+}
+
+<span class="hljs-keyword">run</span> <span class="hljs-string">&quot;rejects_defender_without_workspace&quot;</span> {
+<span class="hljs-attr">  command</span> = plan
+
+  <span class="hljs-keyword">variables</span> {
+<span class="hljs-attr">    enable_defender</span> = <span class="hljs-literal">true</span>
+  }
+<span class="hljs-attr">
+  expect_failures</span> = [azurerm_kubernetes_cluster.this]
+}</code></pre></div><button class="expand" type="button" data-label="Show all 107 lines ▼">Show all 107 lines ▼</button></figure>
 <h2 id="05-aks--walkthrough">Walkthrough<a class="anchor" href="#05-aks--walkthrough" aria-label="Link to this heading">#</a></h2>
 <h3 id="05-aks--step-1-plan-and-apply">Step 1. Plan and apply<a class="anchor" href="#05-aks--step-1-plan-and-apply" aria-label="Link to this heading">#</a></h3>
 <figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 3 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-built_in">cd</span> terraform/05-aks
@@ -9000,8 +9029,8 @@ scripts/verify.sh 07-ingress</code></pre></div></figure>
 <p><strong><code>security.tf</code></strong> — Defender plan, resource locks</p>
 <figure class="code"><figcaption><span class="file">terraform/08-governance/security.tf</span><span class="meta">hcl · 34 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-comment"># ---------------------------------------------------------------------------</span>
 <span class="hljs-comment"># Microsoft Defender for Containers  (equivalent to GuardDuty EKS Protection + Inspector (ECR scanning) + Security Hub)</span>
-<span class="hljs-comment">#   - Turning on the subscription-level &quot;plan&quot; works together with enable_defender = true in 05-aks</span>
-<span class="hljs-comment">#     (microsoft_defender profile).</span>
+<span class="hljs-comment">#   - Turning on the subscription-level &quot;plan&quot; works together with the cluster-level microsoft_defender profile</span>
+<span class="hljs-comment">#     (05-aks: enable_defender + defender_log_analytics_workspace_id).</span>
 <span class="hljs-comment">#   - Features: runtime threat detection, ACR image vulnerability scanning,</span>
 <span class="hljs-comment">#     misconfiguration (Kubernetes security posture) assessment</span>
 <span class="hljs-comment"># ---------------------------------------------------------------------------</span>
@@ -9163,7 +9192,7 @@ $(terraform output -raw compliance_command)
 az policy state list -g <span class="hljs-string">&quot;<span class="hljs-subst">$(terraform -chdir=../05-aks output -raw resource_group_name)</span>&quot;</span> \
   --filter <span class="hljs-string">&quot;complianceState eq &#x27;NonCompliant&#x27;&quot;</span> --query <span class="hljs-string">&quot;[].{policy:policyDefinitionName, resource:resourceId}&quot;</span> -o table</code></pre></div></figure>
 <p>Expected result: in the default configuration, policies such as <code>authorized-ip-ranges</code> (✓) and <code>local-auth-disabled</code> (✓) show as <strong>Compliant</strong>, while the Defender profile policy shows as <strong>NonCompliant</strong> because <code>enable_defender=false</code> → the audit is working as intended.</p>
-<aside class="callout note"><div class="callout-title"><span>ℹ️</span><span>Note</span></div><p>If the subscription already has a <em>Defender for Containers auto-provisioning</em> policy (the default in subscriptions where Defender is on), that policy attaches the Defender profile to the cluster directly. In that case the Defender profile policy is Compliant from the start, and the <code>plan</code> for 05-aks keeps showing a diff that removes <code>microsoft_defender</code>. Apply 05-aks with <code>-var enable_defender=true</code> so that Terraform declares the same state. The evaluation results also include non-compliant items from subscription-level initiatives (e.g., the ASC default initiative).</p>
+<aside class="callout note"><div class="callout-title"><span>ℹ️</span><span>Note</span></div><p>If the subscription already has a <em>Defender for Containers auto-provisioning</em> policy (the default in subscriptions where Defender is on), that policy attaches the Defender profile to the cluster directly, using the subscription&#39;s default Defender workspace. In that case the Defender profile policy is Compliant from the start, and the <code>plan</code> for 05-aks keeps showing a diff that removes <code>microsoft_defender</code>. To make Terraform declare the same profile, follow step 4 and reuse the workspace that the profile already uses. Do <strong>not</strong> point it at the platform workspace from Lab 04: that workspace disables local authentication, which the Defender sensor does not support, and its <code>microsoft-defender-publisher</code> pods crash-loop. The evaluation results also include non-compliant items from subscription-level initiatives (e.g., the ASC default initiative).</p>
 </aside>
 <h3 id="08-governance--step-3-try-the-deny-effect">Step 3. Try the Deny effect<a class="anchor" href="#08-governance--step-3-try-the-deny-effect" aria-label="Link to this heading">#</a></h3>
 <figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 14 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">terraform apply -var policy_effect=Deny      <span class="hljs-comment"># wait about 15 min for the add-on to sync</span>
@@ -9184,10 +9213,20 @@ EOF
 </aside>
 <p>When you&#39;re done, revert with <code>terraform apply</code> (default Audit). While Deny is on, the apps you deployed in Labs 06 and 07 must also satisfy the policy (the apps in this guide are written to do so).</p>
 <h3 id="08-governance--step-4-optional-defender-budget-locks">Step 4. (Optional) Defender / budget / locks<a class="anchor" href="#08-governance--step-4-optional-defender-budget-locks" aria-label="Link to this heading">#</a></h3>
-<figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 11 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-comment"># Defender for Containers: subscription-level plan + cluster profile</span>
+<figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 21 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-comment"># Defender for Containers: subscription-level plan</span>
 terraform apply -var enable_defender_plan=<span class="hljs-literal">true</span>
-terraform -<span class="hljs-built_in">chdir</span>=../05-aks apply -var enable_defender=<span class="hljs-literal">true</span>
 az security pricing show -n Containers --query pricingTier -o tsv     <span class="hljs-comment"># Standard</span>
+
+<span class="hljs-comment"># Defender profile on the cluster. The Defender sensor needs a Log Analytics workspace that allows local</span>
+<span class="hljs-comment"># authentication, so the platform workspace from Lab 04 cannot be used. If the policy already attached the</span>
+<span class="hljs-comment"># profile, reuse its workspace (the second command fixes the letter case that AKS returns, which azurerm rejects).</span>
+<span class="hljs-comment"># The first apply only changes the letter case of the ID; repeat both -var flags on later applies of 05-aks,</span>
+<span class="hljs-comment"># otherwise the plan shows the removal diff again.</span>
+RAW=$(az aks show -g <span class="hljs-string">&quot;<span class="hljs-subst">$(terraform -chdir=../05-aks output -raw resource_group_name)</span>&quot;</span> -n <span class="hljs-string">&quot;<span class="hljs-subst">$(terraform -chdir=../05-aks output -raw cluster_name)</span>&quot;</span> \
+  --query securityProfile.defender.logAnalyticsWorkspaceResourceId -o tsv)
+WS=$(az monitor log-analytics workspace show --ids <span class="hljs-string">&quot;<span class="hljs-variable">$RAW</span>&quot;</span> --query <span class="hljs-built_in">id</span> -o tsv)
+terraform -<span class="hljs-built_in">chdir</span>=../05-aks apply -var enable_defender=<span class="hljs-literal">true</span> -var defender_log_analytics_workspace_id=<span class="hljs-string">&quot;<span class="hljs-variable">$WS</span>&quot;</span>
+kubectl -n kube-system get pods | grep microsoft-defender             <span class="hljs-comment"># all Running, including the publisher pods</span>
 
 <span class="hljs-comment"># Monthly budget alerts (email)</span>
 terraform apply -var enable_budget=<span class="hljs-literal">true</span> -var <span class="hljs-string">&#x27;budget_alert_emails=[&quot;you@example.com&quot;]&#x27;</span> -var budget_amount=150
@@ -11086,7 +11125,7 @@ az role assignment list --all --query <span class="hljs-string">&quot;[?principa
 </tr>
 <tr>
 <td><code>terraform test</code> (mock provider)</td>
-<td>Plan logic + variable validation of all stacks (34 runs in total, including the <code>naming</code> module)</td>
+<td>Plan logic + variable validation of all stacks (35 runs in total, including the <code>naming</code> module)</td>
 <td>Passed</td>
 </tr>
 <tr>
@@ -11396,14 +11435,20 @@ az role assignment list --all --query <span class="hljs-string">&quot;[?principa
 <td>The number of resources stated for the plan did not match reality</td>
 <td>Lab 05: corrected 16 → 15 (including the resource group); Lab 08: corrected to 8 policy assignments + 1 <code>time_static</code> = 9</td>
 </tr>
+<tr>
+<td>14</td>
+<td>Lab 08 steps 2 and 4, <code>05-aks</code> <code>enable_defender</code></td>
+<td>With <code>enable_defender=true</code> the Defender profile pointed at the platform workspace, which has local authentication disabled. The Defender sensor does not support that, and its <code>microsoft-defender-publisher</code> pods crash-looped (<code>Local authentication is disabled for the Log Analytics workspace</code>). The earlier runs did not look at those pods</td>
+<td>Added <code>defender_log_analytics_workspace_id</code> (required with <code>enable_defender</code>) and a test for it, and rewrote the Lab 08 guidance to reuse the workspace that the policy attached</td>
+</tr>
 </tbody></table>
 </div>
 <h3 id="99-appendix--a-4-what-could-not-be-verified-and-what-varies-by-environment">A-4. What could not be verified, and what varies by environment<a class="anchor" href="#99-appendix--a-4-what-could-not-be-verified-and-what-varies-by-environment" aria-label="Link to this heading">#</a></h3>
 <ul>
 <li><strong>Spot scale-up (Lab 05 (a))</strong>: Adding and removing the pool was verified, but when pods were deployed, no nodes were added because of <code>SkuNotAvailable</code> (Capacity Restrictions: <code>Standard_D4ds_v5</code>). Spot capacity varies by region and time.</li>
 <li><strong>Upgrade (Lab 09 §1)</strong>: It could not be run because there was no GA version to upgrade to (1.36.4 is the latest GA, 1.37.0 is in preview, and the node image is also the latest). Rolling replacement (surge · PDB) is unverified.</li>
-<li><strong>Defender subscription plan (Lab 08 step 4)</strong>: It was already enabled in this subscription, so it was not run (if Terraform manages it, <code>destroy</code> reverts it to Free, which can change the subscription&#39;s existing settings). Only the cluster-level <code>enable_defender</code> was used.</li>
-<li><strong>Subscriptions with a Defender auto-provisioning policy</strong>: Right after the cluster is created, it stays in <code>Updating</code> for a while, so the provisioning-state check in <code>verify.sh</code> fails temporarily, and the 05-aks plan keeps showing a diff that removes <code>microsoft_defender</code>. Matching it with <code>-var enable_defender=true</code> makes the diff disappear (<a href="#lab-08-governance">Lab 08</a> step 2).</li>
+<li><strong>Defender subscription plan (Lab 08 step 4)</strong>: It was already enabled in this subscription, so it was not run (if Terraform manages it, <code>destroy</code> reverts it to Free, which can change the subscription&#39;s existing settings).</li>
+<li><strong>Subscriptions with a Defender auto-provisioning policy</strong>: Right after the cluster is created, it stays in <code>Updating</code> for a while, so the provisioning-state check in <code>verify.sh</code> fails temporarily, and the 05-aks plan keeps showing a diff that removes <code>microsoft_defender</code>. Declaring the same profile (<code>enable_defender=true</code> plus <code>defender_log_analytics_workspace_id</code> set to the workspace that the policy used) makes the diff disappear (<a href="#lab-08-governance">Lab 08</a> steps 2 and 4). Do not use the platform workspace for it (fix 14 in A-3).</li>
 <li><strong>Subscriptions where an organization policy turns off public access to Storage</strong>: In a subscription where an Azure Policy (Modify) at the management group changes a storage account&#39;s public network access to <code>Disabled</code>, remote state access in Lab 02 failed with <code>403 AuthorizationFailure</code> (even if Terraform creates the account with <code>Enabled</code>, the policy changes it). This guide assumes a public endpoint + Entra authentication, so you need a policy exemption or a different subscription.</li>
 <li><strong><code>terraform plan -detailed-exitcode</code></strong>: It returns <code>2</code> even when the provider changes only the <code>available_kubernetes_versions</code> output value (no actual infrastructure change). Ignore this value when your CI decides whether there are &quot;no changes&quot;.</li>
 <li><strong>Not run</strong>: Windows (PowerShell) commands, other regions, team environments (Entra group <code>admin_principal_ids</code>), an actual deployment with <code>enable_private_cluster=true</code> (plan only), a TLS (443) listener, Application Gateway for Containers, signing in to the Grafana web UI, interactive sign-in with <code>az login</code>, and the GitHub Actions workflow example in <a href="#lab-09-operations">Lab 09</a> §6.</li>

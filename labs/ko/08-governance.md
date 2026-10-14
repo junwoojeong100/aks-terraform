@@ -287,8 +287,8 @@ resource "azurerm_resource_group_policy_assignment" "cluster_config" {
 ```hcl title="terraform/08-governance/security.tf"
 # ---------------------------------------------------------------------------
 # Microsoft Defender for Containers  (equivalent to GuardDuty EKS Protection + Inspector (ECR scanning) + Security Hub)
-#   - Turning on the subscription-level "plan" works together with enable_defender = true in 05-aks
-#     (microsoft_defender profile).
+#   - Turning on the subscription-level "plan" works together with the cluster-level microsoft_defender profile
+#     (05-aks: enable_defender + defender_log_analytics_workspace_id).
 #   - Features: runtime threat detection, ACR image vulnerability scanning,
 #     misconfiguration (Kubernetes security posture) assessment
 # ---------------------------------------------------------------------------
@@ -481,7 +481,7 @@ az policy state list -g "$(terraform -chdir=../05-aks output -raw resource_group
 기대 결과: 기본 구성에서는 `authorized-ip-ranges`(O), `local-auth-disabled`(O) 등이 **Compliant**, Defender 프로필 정책은 `enable_defender=false` 이므로 **NonCompliant** 로 나옵니다 → 감사가 의도대로 동작하는 것입니다.
 
 > [!NOTE]
-> 구독에 *Defender for Containers 자동 프로비저닝* 정책이 이미 있으면(Defender 가 켜진 구독의 기본값) 그 정책이 클러스터에 Defender 프로필을 직접 붙입니다. 이 경우 Defender 프로필 정책은 처음부터 Compliant 이고, 05-aks 의 `plan` 에 `microsoft_defender` 제거 diff 가 계속 보입니다. 05-aks 를 `-var enable_defender=true` 로 적용해 Terraform 이 같은 상태를 선언하게 맞추세요. 평가 결과에는 구독 단위 이니셔티브(예: ASC 기본 이니셔티브)의 비준수 항목도 함께 나옵니다.
+> 구독에 *Defender for Containers 자동 프로비저닝* 정책이 이미 있으면(Defender 가 켜진 구독의 기본값) 그 정책이 구독의 기본 Defender 작업 영역을 써서 클러스터에 Defender 프로필을 직접 붙입니다. 이 경우 Defender 프로필 정책은 처음부터 Compliant 이고, 05-aks 의 `plan` 에 `microsoft_defender` 제거 diff 가 계속 보입니다. Terraform 이 같은 프로필을 선언하게 하려면 4단계를 따라, 그 프로필이 이미 쓰는 작업 영역을 재사용하세요. Lab 04 의 플랫폼 작업 영역을 가리키면 **안 됩니다**. 그 작업 영역은 로컬 인증을 꺼 두었는데 Defender sensor 가 이를 지원하지 않아 `microsoft-defender-publisher` 파드가 크래시합니다. 평가 결과에는 구독 단위 이니셔티브(예: ASC 기본 이니셔티브)의 비준수 항목도 함께 나옵니다.
 
 ### 3단계. Deny 효과 체험
 
@@ -510,10 +510,20 @@ EOF
 ### 4단계. (선택) Defender / 예산 / 잠금
 
 ```bash
-# Defender for Containers: 구독 단위 플랜 + 클러스터 프로필
+# Defender for Containers: 구독 단위 플랜
 terraform apply -var enable_defender_plan=true
-terraform -chdir=../05-aks apply -var enable_defender=true
 az security pricing show -n Containers --query pricingTier -o tsv     # Standard
+
+# 클러스터의 Defender 프로필. Defender sensor 는 로컬 인증을 허용하는 Log Analytics 작업 영역이 필요하므로
+# Lab 04 의 플랫폼 작업 영역은 쓸 수 없습니다. 정책이 이미 프로필을 붙였다면 그 작업 영역을 재사용하세요
+# (두 번째 명령은 AKS 가 돌려주는 대소문자를 azurerm 이 받아 주는 형태로 고칩니다).
+# 첫 apply 는 ID 의 대소문자만 바꿉니다. 이후 05-aks 를 apply 할 때도 -var 두 개를 계속 붙이세요.
+# 안 붙이면 plan 에 제거 diff 가 다시 나옵니다.
+RAW=$(az aks show -g "$(terraform -chdir=../05-aks output -raw resource_group_name)" -n "$(terraform -chdir=../05-aks output -raw cluster_name)" \
+  --query securityProfile.defender.logAnalyticsWorkspaceResourceId -o tsv)
+WS=$(az monitor log-analytics workspace show --ids "$RAW" --query id -o tsv)
+terraform -chdir=../05-aks apply -var enable_defender=true -var defender_log_analytics_workspace_id="$WS"
+kubectl -n kube-system get pods | grep microsoft-defender             # publisher 파드까지 모두 Running
 
 # 월 예산 알림 (이메일)
 terraform apply -var enable_budget=true -var 'budget_alert_emails=["you@example.com"]' -var budget_amount=150

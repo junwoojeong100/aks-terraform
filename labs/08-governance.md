@@ -287,8 +287,8 @@ resource "azurerm_resource_group_policy_assignment" "cluster_config" {
 ```hcl title="terraform/08-governance/security.tf"
 # ---------------------------------------------------------------------------
 # Microsoft Defender for Containers  (equivalent to GuardDuty EKS Protection + Inspector (ECR scanning) + Security Hub)
-#   - Turning on the subscription-level "plan" works together with enable_defender = true in 05-aks
-#     (microsoft_defender profile).
+#   - Turning on the subscription-level "plan" works together with the cluster-level microsoft_defender profile
+#     (05-aks: enable_defender + defender_log_analytics_workspace_id).
 #   - Features: runtime threat detection, ACR image vulnerability scanning,
 #     misconfiguration (Kubernetes security posture) assessment
 # ---------------------------------------------------------------------------
@@ -481,7 +481,7 @@ az policy state list -g "$(terraform -chdir=../05-aks output -raw resource_group
 Expected result: in the default configuration, policies such as `authorized-ip-ranges` (✓) and `local-auth-disabled` (✓) show as **Compliant**, while the Defender profile policy shows as **NonCompliant** because `enable_defender=false` → the audit is working as intended.
 
 > [!NOTE]
-> If the subscription already has a *Defender for Containers auto-provisioning* policy (the default in subscriptions where Defender is on), that policy attaches the Defender profile to the cluster directly. In that case the Defender profile policy is Compliant from the start, and the `plan` for 05-aks keeps showing a diff that removes `microsoft_defender`. Apply 05-aks with `-var enable_defender=true` so that Terraform declares the same state. The evaluation results also include non-compliant items from subscription-level initiatives (e.g., the ASC default initiative).
+> If the subscription already has a *Defender for Containers auto-provisioning* policy (the default in subscriptions where Defender is on), that policy attaches the Defender profile to the cluster directly, using the subscription's default Defender workspace. In that case the Defender profile policy is Compliant from the start, and the `plan` for 05-aks keeps showing a diff that removes `microsoft_defender`. To make Terraform declare the same profile, follow step 4 and reuse the workspace that the profile already uses. Do **not** point it at the platform workspace from Lab 04: that workspace disables local authentication, which the Defender sensor does not support, and its `microsoft-defender-publisher` pods crash-loop. The evaluation results also include non-compliant items from subscription-level initiatives (e.g., the ASC default initiative).
 
 ### Step 3. Try the Deny effect
 
@@ -510,10 +510,20 @@ When you're done, revert with `terraform apply` (default Audit). While Deny is o
 ### Step 4. (Optional) Defender / budget / locks
 
 ```bash
-# Defender for Containers: subscription-level plan + cluster profile
+# Defender for Containers: subscription-level plan
 terraform apply -var enable_defender_plan=true
-terraform -chdir=../05-aks apply -var enable_defender=true
 az security pricing show -n Containers --query pricingTier -o tsv     # Standard
+
+# Defender profile on the cluster. The Defender sensor needs a Log Analytics workspace that allows local
+# authentication, so the platform workspace from Lab 04 cannot be used. If the policy already attached the
+# profile, reuse its workspace (the second command fixes the letter case that AKS returns, which azurerm rejects).
+# The first apply only changes the letter case of the ID; repeat both -var flags on later applies of 05-aks,
+# otherwise the plan shows the removal diff again.
+RAW=$(az aks show -g "$(terraform -chdir=../05-aks output -raw resource_group_name)" -n "$(terraform -chdir=../05-aks output -raw cluster_name)" \
+  --query securityProfile.defender.logAnalyticsWorkspaceResourceId -o tsv)
+WS=$(az monitor log-analytics workspace show --ids "$RAW" --query id -o tsv)
+terraform -chdir=../05-aks apply -var enable_defender=true -var defender_log_analytics_workspace_id="$WS"
+kubectl -n kube-system get pods | grep microsoft-defender             # all Running, including the publisher pods
 
 # Monthly budget alerts (email)
 terraform apply -var enable_budget=true -var 'budget_alert_emails=["you@example.com"]' -var budget_amount=150

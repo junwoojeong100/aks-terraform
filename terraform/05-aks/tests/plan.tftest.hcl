@@ -37,12 +37,13 @@ run "plan_private_cluster_with_options" {
   command = plan
 
   variables {
-    enable_private_cluster = true
-    enable_spot_pool       = true
-    enable_defender        = true
-    enable_gateway_api     = false
-    sku_tier               = "Premium"
-    admin_principal_ids    = ["11111111-1111-1111-1111-111111111111"]
+    enable_private_cluster              = true
+    enable_spot_pool                    = true
+    enable_defender                     = true
+    defender_log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-defender/providers/Microsoft.OperationalInsights/workspaces/law-defender"
+    enable_gateway_api                  = false
+    sku_tier                            = "Premium"
+    admin_principal_ids                 = ["11111111-1111-1111-1111-111111111111"]
   }
 
   assert {
@@ -93,4 +94,14 @@ run "rejects_malformed_version" {
   }
 
   expect_failures = [var.kubernetes_version]
+}
+
+run "rejects_defender_without_workspace" {
+  command = plan
+
+  variables {
+    enable_defender = true
+  }
+
+  expect_failures = [azurerm_kubernetes_cluster.this]
 }

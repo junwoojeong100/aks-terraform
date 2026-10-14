@@ -231,9 +231,22 @@ variable "enable_gateway_api" {
 }
 
 variable "enable_defender" {
-  description = "Attach the Microsoft Defender for Containers profile to the cluster (the subscription-level plan is enabled in 08-governance)"
+  description = "Declare the Microsoft Defender for Containers profile on the cluster (the subscription-level plan is enabled in 08-governance). Requires defender_log_analytics_workspace_id."
   type        = bool
   default     = false
+}
+
+variable "defender_log_analytics_workspace_id" {
+  description = <<-EOT
+    Resource ID of the Log Analytics workspace that the Defender sensor sends its data to (used when enable_defender = true).
+    The workspace must allow local (shared key) authentication: the Defender sensor does not support workspaces with
+    local_authentication_enabled = false, and its publisher pods crash-loop. The platform workspace from 04-platform
+    disables local authentication on purpose, so do not use it here. If the subscription's Defender auto-provisioning policy
+    already attached the profile, reuse its workspace:
+      az aks show -g <rg> -n <cluster> --query securityProfile.defender.logAnalyticsWorkspaceResourceId -o tsv
+  EOT
+  type        = string
+  default     = null
 }
 
 variable "grant_current_user_admin" {
@@ -548,13 +561,18 @@ resource "azurerm_kubernetes_cluster" "this" {
     for_each = var.enable_defender ? [1] : []
 
     content {
-      log_analytics_workspace_id = data.azurerm_log_analytics_workspace.this.id
+      log_analytics_workspace_id = var.defender_log_analytics_workspace_id
     }
   }
 
   tags = local.tags
 
   lifecycle {
+    precondition {
+      condition     = !var.enable_defender || var.defender_log_analytics_workspace_id != null
+      error_message = "If enable_defender = true, set defender_log_analytics_workspace_id to a workspace that allows local authentication. The platform workspace does not, and the Defender sensor cannot use it."
+    }
+
     # Terraform sets the version only at creation time; after that, the AKS auto-upgrade channel manages it.
     # (Through azurerm 5.9, after an automatic patch upgrade the alias "1.36" no longer matches the actual version
     # "1.36.6", so every plan shows a diff. An improvement is planned for 5.10.)
@@ -1284,12 +1302,13 @@ run "plan_private_cluster_with_options" {
   command = plan
 
   variables {
-    enable_private_cluster = true
-    enable_spot_pool       = true
-    enable_defender        = true
-    enable_gateway_api     = false
-    sku_tier               = "Premium"
-    admin_principal_ids    = ["11111111-1111-1111-1111-111111111111"]
+    enable_private_cluster              = true
+    enable_spot_pool                    = true
+    enable_defender                     = true
+    defender_log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-defender/providers/Microsoft.OperationalInsights/workspaces/law-defender"
+    enable_gateway_api                  = false
+    sku_tier                            = "Premium"
+    admin_principal_ids                 = ["11111111-1111-1111-1111-111111111111"]
   }
 
   assert {
@@ -1340,6 +1359,16 @@ run "rejects_malformed_version" {
   }
 
   expect_failures = [var.kubernetes_version]
+}
+
+run "rejects_defender_without_workspace" {
+  command = plan
+
+  variables {
+    enable_defender = true
+  }
+
+  expect_failures = [azurerm_kubernetes_cluster.this]
 }
 ```
 <!-- /tf:include -->

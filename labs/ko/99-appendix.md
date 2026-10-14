@@ -19,7 +19,7 @@
 |---|---|---|
 | `terraform fmt -check` | 모든 스택/모듈 | 통과 |
 | `terraform validate` | azurerm 5.9.0 · azapi 2.13.0 · kubernetes 3.3.0 · random 3.9.1 · time 0.14.2 실제 스키마 기준 | 통과 |
-| `terraform test` (mock provider) | 모든 스택의 plan 로직 + 변수 검증(`naming` 모듈 포함 총 <!-- count:test-runs -->34<!-- /count -->개 run) | 통과 |
+| `terraform test` (mock provider) | 모든 스택의 plan 로직 + 변수 검증(`naming` 모듈 포함 총 <!-- count:test-runs -->35<!-- /count -->개 run) | 통과 |
 | AzAPI 본문 검증 | `Microsoft.ContainerService/managedClusters@2026-05-01` 의 속성명을 OpenAPI 스펙과 azapi 내장 스키마로 확인 | 통과 |
 | 내장 정책 정의 ID | `az policy definition show` 로 8개 ID 확인 | 확인 |
 | VM 크기/영역 | `Standard_D4ds_v5` 가 koreacentral 영역 1·2·3 에서 사용 가능한지 확인 | 확인 |
@@ -97,13 +97,14 @@
 | 11 | Lab 09 §3 | vm_size 변경 plan 이 `replace` 가 아니라 `updated in-place` 로 표시됨(임시 풀 교체는 apply 중 수행) | 설명 정정 |
 | 12 | Lab 10 2단계 | Automatic 이 1.35 로 만들어져 Gateway API CRD 가 없고 `kubectl get gatewayclass` 가 실패 | 1.36+ 에서만 해당한다는 안내 추가 |
 | 13 | Lab 05 · 08 | plan 리소스 수 표기가 실제와 다름 | Lab 05 는 16 → 15(리소스 그룹 포함), Lab 08 은 정책 할당 8개 + `time_static` 1개 = 9개로 정정 |
+| 14 | Lab 08 2·4단계, `05-aks` 의 `enable_defender` | `enable_defender=true` 로 하면 Defender 프로필이 로컬 인증이 꺼진 플랫폼 작업 영역을 가리켰습니다. Defender sensor 는 이를 지원하지 않아 `microsoft-defender-publisher` 파드가 크래시했습니다(`Local authentication is disabled for the Log Analytics workspace`). 이전 실행에서는 이 파드를 확인하지 않았습니다 | `defender_log_analytics_workspace_id` 변수(`enable_defender` 와 함께 필수)와 테스트를 추가하고, Lab 08 안내를 정책이 붙인 작업 영역을 재사용하도록 고쳤습니다 |
 
 ### A-4. 확인하지 못했거나 환경에 따라 다른 것
 
 - **Spot 스케일 업(Lab 05 (a))**: 풀 추가 · 제거는 확인했지만, 파드를 올리자 `SkuNotAvailable`(Capacity Restrictions: `Standard_D4ds_v5`)로 노드가 늘지 않았습니다. Spot 용량은 리전 · 시간에 따라 다릅니다.
 - **업그레이드(Lab 09 §1)**: 업그레이드할 GA 버전이 없어서(1.36.4 가 최신 GA, 1.37.0 은 preview, 노드 이미지도 최신) 실행하지 못했습니다. 롤링 교체(surge · PDB)는 미확인입니다.
-- **Defender 구독 플랜(Lab 08 4단계)**: 이 구독에는 이미 켜져 있어 실행하지 않았습니다(Terraform 으로 관리하면 `destroy` 때 Free 로 되돌아가 구독의 기존 설정이 바뀔 수 있습니다). 클러스터 단위 `enable_defender` 만 사용했습니다.
-- **Defender 자동 프로비저닝 정책이 있는 구독**: 클러스터를 만든 직후 한동안 `Updating` 이라 `verify.sh` 의 프로비저닝 상태가 일시적으로 실패하고, 05-aks plan 에 `microsoft_defender` 제거 diff 가 계속 보입니다. `-var enable_defender=true` 로 맞추면 사라집니다([Lab 08](08-governance.md) 2단계).
+- **Defender 구독 플랜(Lab 08 4단계)**: 이 구독에는 이미 켜져 있어 실행하지 않았습니다(Terraform 으로 관리하면 `destroy` 때 Free 로 되돌아가 구독의 기존 설정이 바뀔 수 있습니다).
+- **Defender 자동 프로비저닝 정책이 있는 구독**: 클러스터를 만든 직후 한동안 `Updating` 이라 `verify.sh` 의 프로비저닝 상태가 일시적으로 실패하고, 05-aks plan 에 `microsoft_defender` 제거 diff 가 계속 보입니다. 같은 프로필을 선언하면(`enable_defender=true` 와, 정책이 쓴 작업 영역을 가리키는 `defender_log_analytics_workspace_id`) 사라집니다([Lab 08](08-governance.md) 2·4단계). 이때 플랫폼 작업 영역을 쓰면 안 됩니다(A-3 의 14번).
 - **조직 정책이 Storage 공용 접근을 끄는 구독**: 관리 그룹의 Azure Policy(Modify)가 Storage 계정의 공용 네트워크 접근을 `Disabled` 로 바꾸는 구독에서는 Lab 02 의 원격 state 접근이 `403 AuthorizationFailure` 로 실패했습니다(Terraform 이 `Enabled` 로 만들어도 정책이 바꿈). 이 가이드는 공용 엔드포인트 + Entra 인증을 전제로 하므로, 정책 예외를 받거나 다른 구독을 써야 합니다.
 - **`terraform plan -detailed-exitcode`**: provider 가 `available_kubernetes_versions` 출력 값만 바꿔도 `2` 를 돌려줍니다(실제 인프라 변경 없음). CI 의 "변경 없음" 판정에는 이 값을 무시하세요.
 - **실행하지 않은 것**: Windows(PowerShell) 명령, 다른 리전, 팀 환경(Entra 그룹 `admin_principal_ids`), `enable_private_cluster=true` 로 실제 배포(plan 만), TLS(443) 리스너, Application Gateway for Containers, Grafana 웹 UI 로그인, `az login` 의 대화형 로그인, [Lab 09](09-operations.md) §6 의 GitHub Actions 워크플로 예시.

@@ -1,7 +1,7 @@
 # ---------------------------------------------------------------------------
 # Microsoft Defender for Containers  (equivalent to GuardDuty EKS Protection + Inspector (ECR scanning) + Security Hub)
-#   - Turning on the subscription-level "plan" works together with enable_defender = true in 05-aks
-#     (microsoft_defender profile).
+#   - Turning on the subscription-level "plan" works together with the cluster-level microsoft_defender profile
+#     (05-aks: enable_defender + defender_log_analytics_workspace_id).
 #   - Features: runtime threat detection, ACR image vulnerability scanning,
 #     misconfiguration (Kubernetes security posture) assessment
 # ---------------------------------------------------------------------------

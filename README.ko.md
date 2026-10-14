@@ -117,6 +117,8 @@ cd tools && npm install && npm run build  # 코드 동기화 + 문서 검사 + �
 npm run check                             # md 의 코드/숫자가 소스와 일치하는지 + 문서 검사 (CI 용)
 ```
 
+`main` 에 푸시하면 GitHub Actions(`.github/workflows/pages.yml`)가 깨끗한 체크아웃에서 같은 `npm run build` 를 실행하고, 두 HTML 가이드를 [GitHub Pages](https://junwoojeong100.github.io/aks-terraform/)로 배포합니다. 사이트는 푸시한 소스로 항상 새로 빌드되므로, 저장소에 있는 HTML 파일의 오프라인용 사본을 갱신하고 싶을 때만 로컬에서 빌드하면 됩니다.
+
 ## 참고 자료
 
 - [AKS for Amazon EKS professionals](https://learn.microsoft.com/azure/architecture/aws-professional/eks-to-aks/) · [Azure for AWS professionals](https://learn.microsoft.com/azure/architecture/aws-professional/)

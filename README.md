@@ -117,6 +117,8 @@ cd tools && npm install && npm run build  # sync code + check docs + regenerate 
 npm run check                             # verify that code/numbers in md match the sources + doc checks (for CI)
 ```
 
+Pushing to `main` runs the same `npm run build` on a clean checkout in GitHub Actions (`.github/workflows/pages.yml`) and publishes the two HTML guides to [GitHub Pages](https://junwoojeong100.github.io/aks-terraform/). The site is always built from the pushed sources, so run the build locally only if you want to refresh the offline copies of the HTML files in this repository.
+
 ## References
 
 - [AKS for Amazon EKS professionals](https://learn.microsoft.com/azure/architecture/aws-professional/eks-to-aks/) · [Azure for AWS professionals](https://learn.microsoft.com/azure/architecture/aws-professional/)

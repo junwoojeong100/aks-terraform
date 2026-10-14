@@ -849,6 +849,7 @@ scripts/cleanup.sh --dry-run          <span class="hljs-comment"># when you&#x27
 
 <span class="hljs-built_in">cd</span> tools &amp;&amp; npm install &amp;&amp; npm run build  <span class="hljs-comment"># sync code + check docs + regenerate the diagrams and both HTML guides</span>
 npm run check                             <span class="hljs-comment"># verify that code/numbers in md match the sources + doc checks (for CI)</span></code></pre></div></figure>
+<p>Pushing to <code>main</code> runs the same <code>npm run build</code> on a clean checkout in GitHub Actions (<code>.github/workflows/pages.yml</code>) and publishes the two HTML guides to <a href="https://junwoojeong100.github.io/aks-terraform/" target="_blank" rel="noopener noreferrer">GitHub Pages</a>. The site is always built from the pushed sources, so run the build locally only if you want to refresh the offline copies of the HTML files in this repository.</p>
 <h2 id="readme--references">References<a class="anchor" href="#readme--references" aria-label="Link to this heading">#</a></h2>
 <ul>
 <li><a href="https://learn.microsoft.com/azure/architecture/aws-professional/eks-to-aks/" target="_blank" rel="noopener noreferrer">AKS for Amazon EKS professionals</a> · <a href="https://learn.microsoft.com/azure/architecture/aws-professional/" target="_blank" rel="noopener noreferrer">Azure for AWS professionals</a></li>

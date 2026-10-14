@@ -847,6 +847,7 @@ scripts/cleanup.sh --dry-run          <span class="hljs-comment"># 실습을 마
 
 <span class="hljs-built_in">cd</span> tools &amp;&amp; npm install &amp;&amp; npm run build  <span class="hljs-comment"># 코드 동기화 + 문서 검사 + 다이어그램과 두 HTML 가이드 재생성</span>
 npm run check                             <span class="hljs-comment"># md 의 코드/숫자가 소스와 일치하는지 + 문서 검사 (CI 용)</span></code></pre></div></figure>
+<p><code>main</code> 에 푸시하면 GitHub Actions(<code>.github/workflows/pages.yml</code>)가 깨끗한 체크아웃에서 같은 <code>npm run build</code> 를 실행하고, 두 HTML 가이드를 <a href="https://junwoojeong100.github.io/aks-terraform/" target="_blank" rel="noopener noreferrer">GitHub Pages</a>로 배포합니다. 사이트는 푸시한 소스로 항상 새로 빌드되므로, 저장소에 있는 HTML 파일의 오프라인용 사본을 갱신하고 싶을 때만 로컬에서 빌드하면 됩니다.</p>
 <h2 id="readme--참고-자료">참고 자료<a class="anchor" href="#readme--참고-자료" aria-label="이 제목 링크">#</a></h2>
 <ul>
 <li><a href="https://learn.microsoft.com/azure/architecture/aws-professional/eks-to-aks/" target="_blank" rel="noopener noreferrer">AKS for Amazon EKS professionals</a> · <a href="https://learn.microsoft.com/azure/architecture/aws-professional/" target="_blank" rel="noopener noreferrer">Azure for AWS professionals</a></li>

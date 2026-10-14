@@ -7,6 +7,8 @@
 EKS·VPC·IAM 에 익숙한 엔지니어가 **Azure Best Practice** 로 프로덕션급 **AKS(Azure Kubernetes Service)** 를 **Terraform** 으로 구축하는 실습 가이드입니다.
 각 실습은 독립된 Terraform 스택이며, 모든 코드는 `terraform fmt` · `validate` · `test` 를 통과한 실제 파일에서 문서로 가져왔습니다.
 
+**온라인으로 보기:** [한국어 HTML 가이드](https://junwoojeong100.github.io/aks-terraform/aks-terraform-guide.ko.html) · [영어 HTML 가이드](https://junwoojeong100.github.io/aks-terraform/aks-terraform-guide.html)
+
 | 소요 시간 | 예상 비용 | Terraform 스택 | 선행 실습 |
 |---|---|---|---|
 | 전체 약 4–6시간 | 03–05 스택을 켜 둔 동안 시간당 약 $2–2.5 | `terraform/*` | [01. 사전 준비](labs/ko/01-prerequisites.md) |
@@ -69,7 +71,7 @@ cd ../.. && scripts/verify.sh         # apply 한 스택이 설계대로 만들�
 scripts/cleanup.sh --dry-run          # 실습을 마치면: 지울 목록 확인 → scripts/cleanup.sh (Lab 11)
 ```
 
-자세한 단계는 [Lab 01](labs/ko/01-prerequisites.md) 부터 따라가세요. **단일 HTML 가이드**는 `aks-terraform-guide.ko.html` 을 브라우저로 여세요(오프라인 동작, 검색/복사 버튼/다크 모드/진행 체크 지원).
+자세한 단계는 [Lab 01](labs/ko/01-prerequisites.md) 부터 따라가세요. **단일 HTML 가이드**는 [온라인](https://junwoojeong100.github.io/aks-terraform/aks-terraform-guide.ko.html)에서 바로 보거나, 저장소의 `aks-terraform-guide.ko.html` 을 브라우저로 여세요(오프라인 동작, 검색/복사 버튼/다크 모드/진행 체크 지원).
 
 ## 언어
 

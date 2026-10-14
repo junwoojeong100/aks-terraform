@@ -7,6 +7,8 @@
 A hands-on guide for engineers who know EKS, VPC, and IAM to build a production-grade **AKS (Azure Kubernetes Service)** cluster with **Terraform**, following **Azure best practices**.
 Each lab is an independent Terraform stack, and every piece of code in the docs comes from real files that pass `terraform fmt`, `validate`, and `test`.
 
+**Read it online:** [English HTML guide](https://junwoojeong100.github.io/aks-terraform/aks-terraform-guide.html) · [Korean HTML guide](https://junwoojeong100.github.io/aks-terraform/aks-terraform-guide.ko.html)
+
 | Duration | Estimated cost | Terraform stacks | Prerequisite |
 |---|---|---|---|
 | About 4–6 hours in total | About $2–2.5 per hour while stacks 03–05 are running | `terraform/*` | [01. Prerequisites](labs/01-prerequisites.md) |
@@ -69,7 +71,7 @@ cd ../.. && scripts/verify.sh         # check that the stacks you applied were b
 scripts/cleanup.sh --dry-run          # when you're done: review what will be deleted → scripts/cleanup.sh (Lab 11)
 ```
 
-Follow the detailed steps starting from [Lab 01](labs/01-prerequisites.md). To read the **single-file HTML guide**, open `aks-terraform-guide.html` in a browser (works offline; supports search, copy buttons, dark mode, and progress checkboxes).
+Follow the detailed steps starting from [Lab 01](labs/01-prerequisites.md). The **single-file HTML guide** is published [online](https://junwoojeong100.github.io/aks-terraform/aks-terraform-guide.html); you can also open `aks-terraform-guide.html` from this repository in a browser (works offline; supports search, copy buttons, dark mode, and progress checkboxes).
 
 ## Languages
 

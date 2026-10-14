@@ -354,6 +354,7 @@ figure.code.shell figcaption .file::before { content: '$ '; color: var(--hl-var)
       </div>
 <section class="lab" id="lab-readme" data-lab="readme" data-title="Overview · learning path"><div class="lab-kicker">Overview</div><p>A hands-on guide for engineers who know EKS, VPC, and IAM to build a production-grade <strong>AKS (Azure Kubernetes Service)</strong> cluster with <strong>Terraform</strong>, following <strong>Azure best practices</strong>.
 Each lab is an independent Terraform stack, and every piece of code in the docs comes from real files that pass <code>terraform fmt</code>, <code>validate</code>, and <code>test</code>.</p>
+<p><strong>Read it online:</strong> <a href="https://junwoojeong100.github.io/aks-terraform/aks-terraform-guide.html" target="_blank" rel="noopener noreferrer">English HTML guide</a> · <a href="https://junwoojeong100.github.io/aks-terraform/aks-terraform-guide.ko.html" target="_blank" rel="noopener noreferrer">Korean HTML guide</a></p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -796,7 +797,7 @@ terraform output -raw backend_hcl &gt; ../backend.hcl
 
 <span class="hljs-built_in">cd</span> ../.. &amp;&amp; scripts/verify.sh         <span class="hljs-comment"># check that the stacks you applied were built as designed (read-only)</span>
 scripts/cleanup.sh --dry-run          <span class="hljs-comment"># when you&#x27;re done: review what will be deleted → scripts/cleanup.sh (Lab 11)</span></code></pre></div></figure>
-<p>Follow the detailed steps starting from <a href="#lab-01-prerequisites">Lab 01</a>. To read the <strong>single-file HTML guide</strong>, open <code>aks-terraform-guide.html</code> in a browser (works offline; supports search, copy buttons, dark mode, and progress checkboxes).</p>
+<p>Follow the detailed steps starting from <a href="#lab-01-prerequisites">Lab 01</a>. The <strong>single-file HTML guide</strong> is published <a href="https://junwoojeong100.github.io/aks-terraform/aks-terraform-guide.html" target="_blank" rel="noopener noreferrer">online</a>; you can also open <code>aks-terraform-guide.html</code> from this repository in a browser (works offline; supports search, copy buttons, dark mode, and progress checkboxes).</p>
 <h2 id="readme--languages">Languages<a class="anchor" href="#readme--languages" aria-label="Link to this heading">#</a></h2>
 <p>The guide is available in <strong>English (default)</strong> and <strong>Korean</strong>: the Korean edition lives in <code>README.ko.md</code>, <code>labs/ko/</code>, and <code>aks-terraform-guide.ko.html</code>. Terraform code, comments, and script messages are English-only, because both editions embed the same source files verbatim.</p>
 <h2 id="readme--lab-scripts">Lab scripts<a class="anchor" href="#readme--lab-scripts" aria-label="Link to this heading">#</a></h2>

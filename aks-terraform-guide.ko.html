@@ -354,6 +354,7 @@ figure.code.shell figcaption .file::before { content: '$ '; color: var(--hl-var)
       </div>
 <section class="lab" id="lab-readme" data-lab="readme" data-title="개요 · 학습 경로"><div class="lab-kicker">개요</div><p>EKS·VPC·IAM 에 익숙한 엔지니어가 <strong>Azure Best Practice</strong> 로 프로덕션급 <strong>AKS(Azure Kubernetes Service)</strong> 를 <strong>Terraform</strong> 으로 구축하는 실습 가이드입니다.
 각 실습은 독립된 Terraform 스택이며, 모든 코드는 <code>terraform fmt</code> · <code>validate</code> · <code>test</code> 를 통과한 실제 파일에서 문서로 가져왔습니다.</p>
+<p><strong>온라인으로 보기:</strong> <a href="https://junwoojeong100.github.io/aks-terraform/aks-terraform-guide.ko.html" target="_blank" rel="noopener noreferrer">한국어 HTML 가이드</a> · <a href="https://junwoojeong100.github.io/aks-terraform/aks-terraform-guide.html" target="_blank" rel="noopener noreferrer">영어 HTML 가이드</a></p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -794,7 +795,7 @@ terraform output -raw backend_hcl &gt; ../backend.hcl
 
 <span class="hljs-built_in">cd</span> ../.. &amp;&amp; scripts/verify.sh         <span class="hljs-comment"># apply 한 스택이 설계대로 만들어졌는지 확인 (읽기 전용)</span>
 scripts/cleanup.sh --dry-run          <span class="hljs-comment"># 실습을 마치면: 지울 목록 확인 → scripts/cleanup.sh (Lab 11)</span></code></pre></div></figure>
-<p>자세한 단계는 <a href="#lab-01-prerequisites">Lab 01</a> 부터 따라가세요. <strong>단일 HTML 가이드</strong>는 <code>aks-terraform-guide.ko.html</code> 을 브라우저로 여세요(오프라인 동작, 검색/복사 버튼/다크 모드/진행 체크 지원).</p>
+<p>자세한 단계는 <a href="#lab-01-prerequisites">Lab 01</a> 부터 따라가세요. <strong>단일 HTML 가이드</strong>는 <a href="https://junwoojeong100.github.io/aks-terraform/aks-terraform-guide.ko.html" target="_blank" rel="noopener noreferrer">온라인</a>에서 바로 보거나, 저장소의 <code>aks-terraform-guide.ko.html</code> 을 브라우저로 여세요(오프라인 동작, 검색/복사 버튼/다크 모드/진행 체크 지원).</p>
 <h2 id="readme--언어">언어<a class="anchor" href="#readme--언어" aria-label="이 제목 링크">#</a></h2>
 <p>이 가이드는 <strong>영어(기본)</strong> 와 <strong>한국어</strong> 로 제공합니다. 한국어판은 <code>README.ko.md</code>, <code>labs/ko/</code>, <code>aks-terraform-guide.ko.html</code> 에 있습니다. 두 판이 같은 소스 파일을 그대로 가져오므로 Terraform 코드, 코드 주석, 스크립트 메시지는 영어로만 작성합니다.</p>
 <h2 id="readme--실습-스크립트">실습 스크립트<a class="anchor" href="#readme--실습-스크립트" aria-label="이 제목 링크">#</a></h2>

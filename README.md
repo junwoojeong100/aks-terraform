@@ -126,3 +126,7 @@ Pushing to `main` runs the same `npm run build` on a clean checkout in GitHub Ac
 - [AKS for Amazon EKS professionals](https://learn.microsoft.com/azure/architecture/aws-professional/eks-to-aks/) · [Azure for AWS professionals](https://learn.microsoft.com/azure/architecture/aws-professional/)
 - [Baseline architecture for an AKS cluster](https://learn.microsoft.com/azure/architecture/reference-architectures/containers/aks/baseline-aks) · [AKS Well-Architected guide](https://learn.microsoft.com/azure/well-architected/service-guides/azure-kubernetes-service)
 - [azurerm 5.0 upgrade guide](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/5.0-upgrade-guide) · [Official Microsoft AKS Terraform samples](https://github.com/Azure/terraform/tree/master/quickstart)
+
+## License
+
+[MIT License](https://github.com/junwoojeong100/aks-terraform/blob/main/LICENSE) © 2026 Junwoo Jeong

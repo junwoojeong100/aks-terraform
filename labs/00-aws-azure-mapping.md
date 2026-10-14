@@ -149,6 +149,11 @@ The code in every later lab carries comments that map each piece back to AWS (fo
 | `aws sts get-caller-identity` | `az account show` | Check the current subscription, tenant, and user |
 | `aws configure sso` / `aws sso login` | `az login` | Select a subscription with `az account set --subscription <id>` |
 | `aws eks update-kubeconfig --name x` | `az aks get-credentials -g <rg> -n x` + `kubelogin convert-kubeconfig -l azurecli` | kubelogin handles the Entra sign-in |
+| `aws eks list-clusters` / `describe-cluster` | `az aks list -o table` / `az aks show -g <rg> -n <name>` | The SKU column tells the two clusters of this guide apart: `Base` (Standard) and `Automatic` |
+| `kubectl config get-contexts` / `use-context` | The same commands | Each `az aks get-credentials` makes that cluster the current context. With two clusters, check it before `apply` or `delete` ([Appendix D](99-appendix.md)) |
+| (no direct equivalent) | `az aks command invoke -g <rg> -n <name> --command "kubectl …"` | Runs `kubectl` through the Azure API when there is no network path to the API server, for example from Cloud Shell ([Appendix D](99-appendix.md)) |
+| (no direct equivalent; scale node groups to 0) | `az aks stop` / `az aks start` | Stops the nodes and their billing but keeps the cluster ([Lab 09](09-operations.md) section 4) |
+| `kubectl get/describe/logs/exec/scale/rollout` | The same `kubectl` | Pods and Deployments are plain Kubernetes: see [Appendix E](99-appendix.md) |
 | `aws ecr get-login-password \| docker login` | `az acr login -n <acr>` | Use `az acr import` to copy an external image into ACR on the server side |
 | `aws ec2 describe-vpcs` | `az network vnet list -o table` | Use `-o table` and `--query` (JMESPath) |
 | `aws iam list-attached-role-policies` | `az role assignment list --assignee <id> --all -o table` | Look up role assignments |

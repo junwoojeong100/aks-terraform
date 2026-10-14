@@ -45,6 +45,7 @@ winget install Hashicorp.Terraform Microsoft.AzureCLI Kubernetes.kubectl Azure.K
 
 > [!NOTE]
 > `scripts/` 의 셸 스크립트는 **macOS · Linux · WSL · Azure Cloud Shell(bash)** 에서 동작합니다. Windows PowerShell 에서는 WSL 또는 Git Bash 를 쓰세요.
+> Cloud Shell 에는 한 가지 제약이 있습니다. Cloud Shell 의 공인 IP 가 `TF_VAR_allowed_ip_ranges` 에 없어서, Lab 05 이후의 `kubectl` 단계와 `kubernetes` provider 를 쓰는 Lab 06–07 스택은 거기서 API 서버에 닿지 못합니다. 대신 `az aks command invoke` 를 쓰세요([부록 D](99-appendix.md)).
 
 > [!TIP]
 > 어느 OS 에서든 Azure CLI 만 설치했다면 `az aks install-cli` 한 번으로 **kubectl 과 kubelogin** 을 함께 설치할 수 있습니다.
@@ -154,7 +155,7 @@ $env:TF_VAR_allowed_ip_ranges = "[`"$ip/32`"]"
 ```
 
 > [!IMPORTANT]
-> 회사 VPN/프록시를 쓰거나 네트워크가 바뀌면 공인 IP 가 달라집니다. 그러면 Key Vault·ACR·API 서버 접근이 막히므로 `TF_VAR_allowed_ip_ranges` 를 갱신하고 해당 스택을 다시 `apply` 하세요.
+> 회사 VPN/프록시를 쓰거나 네트워크가 바뀌면 공인 IP 가 달라집니다. 그러면 Key Vault·ACR·API 서버 접근이 막히므로 `TF_VAR_allowed_ip_ranges` 를 갱신하고, 이 값을 쓰는 스택 세 개를 다시 `apply` 하세요: `04-platform`(ACR, Key Vault), `05-aks` 와 `10-aks-automatic`(API 서버). 자세한 내용은 [부록 D](99-appendix.md) 입니다. 위 명령을 Cloud Shell 안에서 실행하지 마세요. 내 랩탑이 아니라 Cloud Shell 의 IP 가 등록됩니다.
 
 ## 6. 한 번에 점검하기: preflight 스크립트
 
@@ -325,7 +326,7 @@ summary
 <!-- /tf:include -->
 
 > [!NOTE]
-> 스크립트들이 함께 쓰는 공통 함수(`scripts/lib/common.sh`)는 [부록 G](99-appendix.md) 에 있습니다. 실행 결과의 `✓ 통과 / ✗ 실패 / ! 경고 / - 건너뜀` 은 모든 검증 스크립트가 같은 형식으로 보여 줍니다.
+> 스크립트들이 함께 쓰는 공통 함수(`scripts/lib/common.sh`)는 [부록 I](99-appendix.md) 에 있습니다. 실행 결과의 `✓ 통과 / ✗ 실패 / ! 경고 / - 건너뜀` 은 모든 검증 스크립트가 같은 형식으로 보여 줍니다.
 
 ## 7. 저장소 구조
 

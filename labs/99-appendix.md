@@ -2,11 +2,14 @@
 **English** | [한국어](ko/99-appendix.md)
 <!-- /lang-switch -->
 
-# Appendix. Troubleshooting · production checklist · references · test code
+# Appendix. Troubleshooting · production checklist · cluster access and workloads · references · test code
 
 | Duration | Estimated cost | Terraform stack | Prerequisite |
 |---|---|---|---|
 | Reference only | None | `terraform/mocks`, `scripts/`, `tools/validate-all.sh` | None |
+
+> [!TIP]
+> Looking for how to reach the clusters from Cloud Shell or another PC, or how to run `kubectl` against pods and Deployments? See **D. How to reach the clusters** and **E. Handling Kubernetes workloads with kubectl** below.
 
 ## A. How this guide was validated, and its limits
 
@@ -133,7 +136,8 @@ At the subscription level, the `Microsoft.Quota` Resource Provider registration 
 | `Provider produced inconsistent result after apply` (kubernetes_manifest) | CRD defaults / server-side normalization differences. Retry `terraform apply` or use `computed_fields`. |
 | `StorageAccountAlreadyTaken` / `VaultAlreadyExists` / ACR name conflict | Globally unique name conflict. Change `TF_VAR_workload`, or recover/purge the soft-deleted Key Vault. |
 | `terraform destroy` fails with `ScopeLocked` | Remove the resource lock ([Lab 08](08-governance.md), [Lab 11](11-cleanup.md)). |
-| `kubectl: Unable to connect ... i/o timeout` | Your public IP changed → update `TF_VAR_allowed_ip_ranges`, then `apply` 05-aks (API server authorized IP). |
+| `kubectl: Unable to connect ... i/o timeout` | The API server only accepts the IPs in `allowed_ip_ranges`. Your public IP changed, or you are on another network, Cloud Shell or CI → see section D (D-3 and D-4): update `TF_VAR_allowed_ip_ranges` and `apply` `04-platform`, `05-aks` and `10-aks-automatic`; meanwhile use `az aks command invoke`. |
+| `kubectl` changes the wrong cluster | With two clusters, `az aks get-credentials` switches the current context to the cluster you fetched last. Check `kubectl config current-context`, then `kubectl config use-context <name>` (see D-1). |
 | `kubelogin` error / `Unauthorized` | Rerun `az login`, run `kubelogin convert-kubeconfig -l azurecli`, and wait for the Azure RBAC role to propagate. |
 | `terraform plan` asks for a `node_count` change every time | Conflict with the autoscaler. Don't set `node_count` in the code; use only `min_count`/`max_count` ([Lab 09](09-operations.md)). |
 | `409 ... AnotherOperationInProgress` (`azapi_update_resource`) | It overlapped with another operation on the same cluster (such as node pool creation). The code in this guide fixes the order with `depends_on`; if they still overlapped, rerun `terraform apply` after the other operation finishes. |
@@ -158,7 +162,357 @@ This guide is a **cost-balanced setup for learning and PoCs**. For production, u
 | Modularization | Defined directly, for learning | Standardize on in-house modules or **Azure Verified Modules (AVM)** |
 | Observability | Default dashboards | Prometheus alert rules (`azurerm_monitor_alert_prometheus_rule_group`) + Action Group, SLO dashboards |
 
-## D. References
+## D. How to reach the clusters, and what is exposed to the internet
+
+After Lab 05 and Lab 10 you have **two** clusters in the same subscription. This section shows how to tell them apart, which traffic can enter and leave, and what to do when you are not on the laptop you used for the labs (Azure Cloud Shell, another PC, CI).
+
+### D-1. The two clusters
+
+| | Standard (Lab 05) | Automatic (Lab 10) |
+|---|---|---|
+| Terraform stack | `terraform/05-aks` (builds on the network and platform stacks 03 and 04) | `terraform/10-aks-automatic` (independent of Lab 03–05) |
+| Default name | `aks-aksdemo-dev-krc` in `rg-aksdemo-dev-krc-aks` | `aksa-aksdemo-dev-krc` in `rg-aksdemo-dev-krc-automatic` |
+| SKU in `az aks list` | `Base` (tier `Standard`) | `Automatic` (tier `Standard`) |
+| Nodes | System and user pools that you size (default 3 + 3) | A managed system pool, plus nodes that node auto-provisioning (NAP) adds on demand |
+| `kubectl` context | Same as the cluster name | Same as the cluster name |
+
+The names depend on `TF_VAR_workload`, `TF_VAR_environment` and `TF_VAR_location`; read the exact values from the `cluster_name` and `resource_group_name` outputs of each stack.
+
+```bash
+# Which clusters do I have, and what kind is each?
+az aks list --query "[].{name:name, rg:resourceGroup, sku:sku.name, tier:sku.tier, version:currentKubernetesVersion, power:powerState.code}" -o table
+
+# Which cluster does kubectl talk to right now? (* marks the current context)
+kubectl config get-contexts
+kubectl config current-context
+
+kubectl config use-context aks-aksdemo-dev-krc     # switch the default cluster
+kubectl --context aksa-aksdemo-dev-krc get nodes   # or address the other cluster for a single command
+```
+
+> [!WARNING]
+> `az aks get-credentials` makes the cluster you fetched **last** the current context. After Lab 10 step 1, every plain `kubectl` command goes to the Automatic cluster until you run `kubectl config use-context` again. Check `kubectl config current-context` before any `apply` or `delete`. The `scripts/verify.sh` scripts are not affected because they use a temporary kubeconfig.
+
+### D-2. What can connect to what
+
+| | Standard cluster | Automatic cluster |
+|---|---|---|
+| Outbound (cluster → internet) | Yes, through the NAT Gateway from Lab 03 (static public IP, `nat_gateway_public_ip` output) | Yes, through the NAT Gateway that AKS manages in the node resource group (`MC_…`) |
+| API server | Public endpoint with API Server VNet Integration. **Only the IPs in `allowed_ip_ranges` can use it** | Same |
+| Apps reachable from the internet | The Lab 07 Gateway has a public IP on ports 80 and 443 (node NSG rule `AllowGatewayHttpHttps`); `internal_gateway=true` makes it private | None: the guide deploys no `LoadBalancer` Service here |
+| Images from the Lab 04 ACR | Pulled over the Private Endpoint; only this cluster's kubelet identity has `AcrPull` | **Cannot pull** (`ErrImagePull … 403 Forbidden`). Use public images such as `mcr.microsoft.com`, or give your own registry `AcrPull` and network access |
+
+The platform services from Lab 04 do not belong to one cluster: the ACR and Key Vault public endpoints accept only the IPs in `allowed_ip_ranges`, and Grafana has a public endpoint behind Entra ID sign-in.
+
+**Check the outbound IP from inside a cluster.** The pod below also follows the Automatic cluster's Deployment Safeguards (resource requests are mandatory there), so the same manifest works on both clusters.
+
+```bash
+kubectl apply -f - <<'EOF'
+apiVersion: v1
+kind: Pod
+metadata: { name: egress-test, namespace: default }
+spec:
+  restartPolicy: Never
+  containers:
+  - name: t
+    image: mcr.microsoft.com/cbl-mariner/busybox:2.0
+    command: ["sh", "-c", "wget -qO- -T 15 http://api.ipify.org; echo"]
+    resources:
+      requests: { cpu: 50m, memory: 32Mi }
+      limits: { cpu: 100m, memory: 64Mi }
+    readinessProbe: { exec: { command: ["true"] } }
+    livenessProbe: { exec: { command: ["true"] } }
+    securityContext:
+      allowPrivilegeEscalation: false
+      runAsNonRoot: true
+      runAsUser: 1000
+      capabilities: { drop: ["ALL"] }
+      seccompProfile: { type: RuntimeDefault }
+EOF
+kubectl wait --for=jsonpath='{.status.phase}'=Succeeded pod/egress-test --timeout=180s
+kubectl logs egress-test          # the public IP that the internet sees for this cluster
+kubectl delete pod egress-test
+
+# Compare it with the NAT Gateway's address
+terraform -chdir=terraform/03-network output -raw nat_gateway_public_ip        # Standard cluster
+NODE_RG=$(az aks show -g <automatic-rg> -n <automatic-cluster> --query nodeResourceGroup -o tsv)
+az network public-ip list -g "$NODE_RG" --query "[].ipAddress" -o tsv            # Automatic cluster
+```
+
+### D-3. Where can I run kubectl from?
+
+| From | `kubectl` to the API servers | Why |
+|---|---|---|
+| The laptop whose IP is in `allowed_ip_ranges` | Works | The IP is authorized |
+| Another network (other Wi-Fi, VPN, tethering) or a teammate's PC | Blocked | The IP is not authorized |
+| Azure Cloud Shell | Blocked | Cloud Shell runs on Microsoft-managed Azure addresses that are not in your list, and a fixed address is not guaranteed |
+| CI runners (for example GitHub-hosted runners) | Blocked | Same reason |
+| Anywhere, with `az aks command invoke` or the portal **Run command** | Works | The command runs inside the cluster through the Azure API, not over your network path |
+
+A blocked request gets no answer at all, so `kubectl` ends with `Unable to connect to the server: dial tcp …:443: i/o timeout`. (Measured for this guide: from an unauthorized address the TCP connection opens but the HTTPS request gets no response, while the same request from an authorized address returns HTTP 401, which means it reached the API server.)
+
+**`az aks command invoke`** runs a command in the cluster through the Azure API, so it works from anywhere you are signed in to Azure:
+
+```bash
+az aks command invoke -g <rg> -n <cluster> --command "kubectl get nodes"
+az aks command invoke -g <rg> -n <cluster> --command "kubectl -n web get pods -o wide"
+```
+
+- You need Azure RBAC permission on the cluster for the actions `Microsoft.ContainerService/managedClusters/runcommand/action` and `Microsoft.ContainerService/managedClusters/commandResults/read` (Owner, Contributor and the AKS Contributor role have them).
+- AKS runs the command in a short-lived pod in the `aks-command` namespace and returns the text output. There is no interactive shell, `exec -it` or `port-forward`; keep each call to commands that finish on their own, and attach files such as a manifest with `--file`.
+- The portal offers the same feature as **AKS cluster → Run command**.
+- Tested on both clusters of this guide.
+
+### D-4. When your public IP changes, or a teammate needs access
+
+1. Look up the new address ([Lab 01](01-prerequisites.md), step 5): `curl -s https://api.ipify.org`.
+2. Put every machine that needs access into `TF_VAR_allowed_ip_ranges` (a JSON list with one `/32` per machine) and save it in your `env.sh`, for example `export TF_VAR_allowed_ip_ranges='["203.0.113.10/32","198.51.100.7/32"]'`.
+3. Re-apply the three stacks that use the list:
+
+| Stack | What the IP list opens | Command (from the repository root) |
+|---|---|---|
+| `04-platform` | ACR and Key Vault firewalls (needed for `az acr import` and Key Vault secrets) | `terraform -chdir=terraform/04-platform apply` |
+| `05-aks` | Standard cluster API server | `terraform -chdir=terraform/05-aks apply` |
+| `10-aks-automatic` | Automatic cluster API server | `terraform -chdir=terraform/10-aks-automatic apply` |
+
+These applies talk to Azure Resource Manager only, so they work even while `kubectl` is blocked. A new list takes up to two minutes to propagate. Until then, use `az aks command invoke`.
+
+> [!WARNING]
+> Do not run the Lab 01 one-liner (`curl … api.ipify.org`) inside Cloud Shell to fill `TF_VAR_allowed_ip_ranges`: it would register Cloud Shell's address instead of your laptop's. Run Terraform from your own machine, and use `az aks command invoke` from Cloud Shell. From an unauthorized address, the `kubectl` steps of `scripts/verify.sh` and the stacks that use the `kubernetes` provider (06 and 07) cannot reach the API server either.
+
+## E. Handling Kubernetes workloads with kubectl
+
+Labs 01–10 build the platform. This section is about the Kubernetes objects that run on it: how to look at them, change them and debug them, and how that fits with Terraform and Azure RBAC. Every command here was run against a cluster from this guide in a throwaway namespace; they work on both clusters unless noted.
+
+### E-1. Pick the cluster and namespace
+
+```bash
+kubectl config current-context        # which cluster? (two clusters: see D-1)
+kubectl get ns                        # which namespaces exist?
+kubectl -n practice get pods          # -n selects a namespace
+kubectl get pods -A                   # -A means all namespaces
+kubectl config set-context --current --namespace=practice    # optional: make practice the default namespace
+```
+
+### E-2. Create a practice namespace and a first Deployment
+
+Practice in a namespace of your own so that you never touch the Lab 06 and Lab 07 apps (`demo`, `web`).
+
+```bash
+kubectl create namespace practice
+kubectl apply -f - <<'EOF'
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: hello, namespace: practice }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: hello } }
+  template:
+    metadata: { labels: { app: hello } }
+    spec:
+      containers:
+      - name: hello
+        image: mcr.microsoft.com/dotnet/samples:aspnetapp
+        ports: [{ containerPort: 8080 }]
+        resources:
+          requests: { cpu: 100m, memory: 128Mi }
+          limits: { cpu: 500m, memory: 256Mi }
+        readinessProbe: { httpGet: { path: /, port: 8080 } }
+        livenessProbe: { httpGet: { path: /, port: 8080 } }
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1654
+          capabilities: { drop: ["ALL"] }
+          seccompProfile: { type: RuntimeDefault }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: hello, namespace: practice }
+spec:
+  selector: { app: hello }
+  ports: [{ port: 80, targetPort: 8080 }]
+EOF
+kubectl -n practice rollout status deploy/hello
+```
+
+The manifest follows the same rules as the Lab 07 app, so it passes on both clusters:
+
+- `resources.requests` and `limits`: on the Automatic cluster ([Lab 10](10-aks-automatic.md)), Deployment Safeguards **reject** a bare pod without requests, and add default values (with a warning) to a Deployment that has none. The scheduler needs them everywhere.
+- Probes: the readiness probe decides when a pod receives traffic, and the liveness probe restarts a stuck container. Deployment Safeguards warn when they are missing.
+- `runAsNonRoot`, `allowPrivilegeEscalation: false`, `drop: ["ALL"]` and `seccompProfile`: the Pod Security rules and the Lab 08 policies.
+- The image is a public sample so that it also runs on the Automatic cluster (see the ACR row in D-2).
+
+### E-3. Look at things (read-only)
+
+```bash
+kubectl -n practice get all                          # common kinds only: ConfigMaps, Secrets and Ingresses are not included
+kubectl -n practice get pods -o wide                 # node and pod IP
+kubectl -n practice get pods --show-labels
+kubectl -n practice get pods -l app=hello            # filter by label
+kubectl -n practice get pods -w                      # watch changes (Ctrl+C to stop)
+kubectl get pods -A --field-selector=status.phase!=Running      # what is not running, in all namespaces
+
+# Pick exactly the fields you need
+kubectl -n practice get pods -o jsonpath='{.items[*].metadata.name}'
+kubectl -n practice get pods -o custom-columns=NAME:.metadata.name,NODE:.spec.nodeName,IP:.status.podIP
+kubectl -n practice get deploy hello -o yaml         # the full object as the cluster stores it
+
+kubectl -n practice describe deploy hello            # settings + recent events
+kubectl -n practice get events --sort-by=.lastTimestamp
+
+# Logs
+kubectl -n practice logs deploy/hello --tail=20      # one pod of the Deployment
+kubectl -n practice logs -l app=hello --prefix --tail=5    # every pod, prefixed with its name
+kubectl -n practice logs <pod> -f                    # follow
+kubectl -n practice logs <pod> --previous            # the container before the last restart
+kubectl -n practice logs <pod> -c <container>        # pods with more than one container
+
+# Resource usage (metrics-server is built into AKS)
+kubectl -n practice top pods
+kubectl top nodes
+
+kubectl explain deploy.spec.strategy                 # documentation of any field
+```
+
+### E-4. Get inside a pod
+
+```bash
+kubectl -n practice exec -it deploy/hello -- sh                 # a shell in the container
+kubectl -n practice port-forward svc/hello 8080:80              # then open http://localhost:8080
+kubectl -n practice cp <pod>:/etc/hostname ./hostname           # copy a file out (needs tar in the image)
+
+# An image without a shell? Attach a temporary debug container to the running pod
+kubectl -n practice debug -it pod/<pod> --image=mcr.microsoft.com/cbl-mariner/busybox:2.0 --target=hello -- sh
+
+# Call a Service from inside the cluster with a throw-away pod
+kubectl -n practice run tmp --rm -it --restart=Never --image=mcr.microsoft.com/cbl-mariner/busybox:2.0 -- wget -qO- http://hello
+```
+
+- `exec`, `logs`, `cp` and `port-forward` go through the API server, so they work only from where `kubectl` works (see D-3).
+- A debug container stays in the pod's spec until the pod is replaced.
+- On the Automatic cluster, `kubectl run` cannot set resource requests, so the throw-away pod is rejected. Use a manifest with requests, as in D-2.
+
+### E-5. Change things
+
+```bash
+kubectl apply -f deploy.yaml                         # declarative: the recommended way, keep manifests in Git
+kubectl diff -f deploy.yaml                          # preview (exit code 1 means there are differences)
+kubectl apply --dry-run=server -f deploy.yaml        # validate against the server, including admission and policies
+
+kubectl -n practice scale deploy/hello --replicas=3
+kubectl -n practice set env deploy/hello MODE=demo   # changes the pod template, so it starts a rolling update
+kubectl -n practice set image deploy/hello hello=<new-image>
+
+kubectl -n practice rollout status deploy/hello      # wait for the rollout
+kubectl -n practice rollout history deploy/hello
+kubectl -n practice rollout undo deploy/hello        # back to the previous revision
+kubectl -n practice rollout restart deploy/hello     # recreate the pods without changing the spec
+
+kubectl -n practice patch deploy hello -p '{"spec":{"replicas":2}}'
+kubectl -n practice label pod <pod> tier=frontend
+kubectl -n practice annotate deploy hello kubernetes.io/change-cause="set MODE=demo"    # shown in rollout history
+kubectl -n practice autoscale deploy hello --min=2 --max=4 --cpu-percent=70
+kubectl -n practice edit deploy hello                # opens the object in $EDITOR
+kubectl -n practice delete pod <pod>                 # the Deployment creates a replacement
+```
+
+A rolling update protects you from a bad release. Try `kubectl -n practice set image deploy/hello hello=mcr.microsoft.com/dotnet/samples:does-not-exist`: only the **new** pod goes to `ImagePullBackOff`, the old pods keep serving, `rollout status` eventually fails with `timed out waiting for the condition`, and `kubectl -n practice rollout undo deploy/hello` restores the working revision. With an autoscaler (HPA) the HPA owns the replica count, so a manual `kubectl scale` is overridden.
+
+### E-6. Configuration data and batch jobs
+
+```bash
+kubectl -n practice create configmap app-config --from-literal=MODE=demo
+kubectl -n practice create secret generic db --from-literal=password='<demo-value>'
+kubectl -n practice set env deploy/hello --from=configmap/app-config         # inject as environment variables
+kubectl -n practice exec deploy/hello -- printenv MODE
+
+kubectl -n practice create job hello-job --image=mcr.microsoft.com/cbl-mariner/busybox:2.0 -- sh -c 'echo job-done'
+kubectl -n practice wait --for=condition=complete job/hello-job --timeout=90s
+kubectl -n practice logs job/hello-job
+
+kubectl -n practice create cronjob tick --image=mcr.microsoft.com/cbl-mariner/busybox:2.0 --schedule="*/5 * * * *" -- sh -c 'date'
+kubectl -n practice create job manual-run --from=cronjob/tick                # run a CronJob once, right now
+```
+
+> [!WARNING]
+> A Kubernetes Secret is only **base64-encoded**, not encrypted: `kubectl get secret db -o jsonpath='{.data.password}'` prints a value that anyone with read access can decode. Do not commit Secret manifests, and keep real secrets out of your shell history. For real applications read secrets from Key Vault ([Lab 06](06-workload-identity.md)).
+
+### E-7. When something is wrong: a triage playbook
+
+Start with these three commands, then use the table.
+
+```bash
+kubectl get pods -A --field-selector=status.phase!=Running      # what is not running?
+kubectl -n practice describe pod <pod>                          # read the Events at the bottom first
+kubectl get events -A --sort-by=.lastTimestamp | tail -20       # what happened recently?
+```
+
+| Symptom | Where to look | Usual cause and fix |
+|---|---|---|
+| `Pending` | `describe pod` → Events, for example `0/6 nodes are available: 3 Insufficient cpu, 3 node(s) had untolerated taint(s)` | The requests are larger than any node can offer, or only tainted nodes are left (the system pool accepts critical add-ons only). Lower the requests; if nodes cannot be added, check the vCPU quota ([Lab 01](01-prerequisites.md) step 4) |
+| `ImagePullBackOff` / `ErrImagePull` | The event message of `describe pod` | A typo in the image or tag; the image was not imported into the ACR ([Lab 04](04-platform.md), [Lab 06](06-workload-identity.md)); the cluster has no `AcrPull` or is blocked by the registry firewall (`403 Forbidden`, see D-2) |
+| `CrashLoopBackOff` / `Error` | `kubectl logs <pod>`, `--previous`, `describe` → Last State and Exit Code | The application exits: a wrong command, environment variable or config; a failing liveness probe; a missing ConfigMap or Secret (`CreateContainerConfigError`). `--previous` can be unavailable for a container that restarts very fast, so read the current logs as well |
+| `OOMKilled` (exit code 137) | `describe pod` → Last State | The memory limit is lower than what the process needs. Raise `limits.memory` or fix the leak; compare with `kubectl top pod` |
+| The pod disappeared, or `Evicted` | `get events` | Node pressure, or node consolidation (NAP on the Automatic cluster evicts under-used nodes). A bare pod with no owner is not recreated, so run workloads through a Deployment or Job |
+| `Forbidden` on create or apply | The message names the rule | `denied the request` from Gatekeeper or Deployment Safeguards ([Lab 08](08-governance.md), [Lab 10](10-aks-automatic.md)), `violates PodSecurity`, or an RBAC error (`kubectl auth can-i create deployments -n practice`) |
+| A Service returns nothing | `kubectl -n practice get endpoints hello` | No endpoints: the selector does not match the pod labels (`get pods --show-labels`), or the readiness probe fails |
+| `Unable to connect … i/o timeout` | Your public IP | The IP is not authorized: see D-3 and D-4 |
+| `You must be logged in to the server (Unauthorized)` | Your sign-in | Run `az login` and `kubelogin convert-kubeconfig -l azurecli` again |
+
+Try it: a pod that exits at once (`command: ["sh","-c","echo boom; exit 1"]`) shows `Error` and then `CrashLoopBackOff`, and its output is in `kubectl logs`. A pod that asks for `cpu: "64"` stays `Pending` with the scheduler event above.
+
+### E-8. Terraform-managed or kubectl-managed?
+
+The Lab 06 and Lab 07 workloads (`kv-demo`, `aspnetapp`, the Gateway) belong to **Terraform**. If you change a field that Terraform manages with `kubectl`, the next `terraform plan` shows a difference and the next `apply` reverts your change:
+
+```bash
+kubectl -n web patch svc aspnetapp -p '{"spec":{"sessionAffinity":"ClientIP"}}'
+terraform -chdir=terraform/07-ingress plan        # ~ session_affinity = "ClientIP" -> "None"
+kubectl -n web patch svc aspnetapp -p '{"spec":{"sessionAffinity":"None"}}'      # put it back
+```
+
+Rules of thumb:
+
+1. **Experiments** belong in your own namespace and are done with `kubectl` (this section).
+2. **Permanent changes** to the Lab 06 and Lab 07 workloads are made in the Terraform code or its variables, then applied.
+3. Fields that a controller owns are excluded on purpose: the replica count of the Lab 07 Deployment is `ignore_changes` because the HPA manages it, so scaling it by hand does not show up as a difference.
+4. To find manual changes, run `terraform plan -detailed-exitcode` regularly ([Lab 09](09-operations.md)).
+
+### E-9. Who may do what: Azure RBAC for Kubernetes
+
+Local accounts are disabled, so permissions come from Azure roles ([Lab 05](05-aks.md)):
+
+| Role | Scope | What it allows |
+|---|---|---|
+| Azure Kubernetes Service RBAC Reader | Cluster or namespace | Read most objects |
+| Azure Kubernetes Service RBAC Writer | Cluster or namespace | Read and write most objects |
+| Azure Kubernetes Service RBAC Admin | Cluster or namespace | Read and write most objects, and manage roles and role bindings in the namespace |
+| Azure Kubernetes Service RBAC Cluster Admin | Cluster | Everything in every namespace (the lab gives this to the signed-in user) |
+
+To give an application team access to one namespace only, assign the role at namespace scope. They also need the **Azure Kubernetes Service Cluster User Role** on the cluster (to run `az aks get-credentials`) and their IP in `allowed_ip_ranges` (D-4):
+
+```bash
+CLUSTER_ID=$(az aks show -g <rg> -n <cluster> --query id -o tsv)
+az role assignment create --assignee <user-or-group-object-id> \
+  --role "Azure Kubernetes Service RBAC Writer" --scope "$CLUSTER_ID/namespaces/practice"
+az role assignment list --scope "$CLUSTER_ID/namespaces/practice" -o table
+
+kubectl -n practice auth can-i create deployments       # check your own permission: yes or no
+```
+
+`kubectl auth can-i --list` is incomplete on a cluster that uses Azure RBAC (it warns that the webhook authorizer does not support rule resolution), so check one permission at a time. In a team, prefer Entra groups over individual users.
+
+### E-10. Clean up the practice namespace
+
+```bash
+kubectl config current-context        # make sure it is the cluster you mean
+kubectl delete namespace practice     # removes everything inside: Deployments, Pods, Services, Jobs, ConfigMaps, Secrets
+```
+
+This does not touch the Lab 06 and Lab 07 workloads or any Azure resource.
+
+## F. References
 
 | Topic | Links |
 |---|---|
@@ -171,7 +525,7 @@ This guide is a **cost-balanced setup for learning and PoCs**. For production, u
 | Official Microsoft Terraform samples | [Azure/terraform quickstart](https://github.com/Azure/terraform/tree/master/quickstart): `101-aks-application-routing-gateway-api`, `101-aks-automatic-custom-network`, `101-aks-network-isolated`, `101-aks-use-azure-policy`, `101-aks-defender-containers`, `301-aks-enterprise` |
 | Prometheus template | [Azure/prometheus-collector — AddonTerraformTemplate](https://github.com/Azure/prometheus-collector/tree/main/AddonTerraformTemplate) |
 
-## E. Complete list of Terraform files (which lab has each)
+## G. Complete list of Terraform files (which lab has each)
 
 | Stack / module | Files | Included in |
 |---|---|---|
@@ -189,7 +543,7 @@ This guide is a **cost-balanced setup for learning and PoCs**. For production, u
 > [!NOTE]
 > All stacks follow the same file layout (`versions.tf` → `providers.tf` → `variables.tf` → `main.tf` → topic-specific files → `outputs.tf`). To see the files in one place, type a file name (e.g., `cluster.tf`) into the search box of this HTML page.
 
-## F. Complete test and tooling code
+## H. Complete test and tooling code
 
 Each stack's `tests/plan.tftest.hcl` is in the Code section of its lab. The shared mock values and the script that validates all stacks are below.
 
@@ -515,7 +869,7 @@ terraform.tfvars
 ```
 <!-- /tf:include -->
 
-## G. Verification and cleanup scripts
+## I. Verification and cleanup scripts
 
 The check and delete commands you type by hand during the labs are bundled into scripts. They all live in `scripts/` at the repository root and run on macOS · Linux · WSL · Azure Cloud Shell (bash) (requires `terraform`, `az`, `jq`, and, from 05 onward, `kubectl` and `kubelogin`).
 

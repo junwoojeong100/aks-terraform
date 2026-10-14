@@ -40,10 +40,10 @@ Each lab is an independent Terraform stack, and every piece of code in the docs 
 | [06](labs/06-workload-identity.md) | Workload Identity | IRSA ↔ Entra Workload ID, Key Vault CSI |
 | [07](labs/07-ingress.md) | Ingress | ALB Controller ↔ Gateway API (approuting-istio) |
 | [08](labs/08-governance.md) | Governance and security | Azure Policy, Defender, locks, budgets |
-| [09](labs/09-operations.md) | Day-2 operations | Upgrades, scaling, node replacement, testing/CI |
+| [09](labs/09-operations.md) | Day-2 operations | Upgrades, scaling, node replacement, testing/CI (workload operations with kubectl: Appendix E) |
 | [10](labs/10-aks-automatic.md) | AKS Automatic | The fully managed mode, equivalent to EKS Auto Mode |
 | [11](labs/11-cleanup.md) | Cleanup | `destroy` in reverse order, Key Vault soft-delete, cost check |
-| [99](labs/99-appendix.md) | Appendix | Troubleshooting, production checklist, references, test code |
+| [99](labs/99-appendix.md) | Appendix | Troubleshooting, production checklist, **cluster access and internet exposure (D)**, **handling Kubernetes workloads with kubectl (E)**, references, test code |
 
 ## Architecture overview
 

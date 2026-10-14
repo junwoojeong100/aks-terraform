@@ -129,6 +129,9 @@ kubectl get events -A | grep -i -E "TriggeredScaleUp|ScaleDown"
 > [!TIP]
 > **노드 수를 코드에 고정하지 마세요.** `auto_scaling_enabled = true` 일 때는 `min_count`/`max_count` 만 선언합니다. `node_count` 를 쓰면 오토스케일러가 바꾼 값과 계속 충돌합니다(꼭 써야 한다면 `lifecycle.ignore_changes`).
 
+> [!TIP]
+> 워크로드를 손으로 늘리고 줄이기(`kubectl scale`), 새 이미지 롤아웃, 잘못된 릴리스 되돌리기, 파드 로그 읽기는 [부록 E](99-appendix.md) 에서 다룹니다. Terraform 이 소유한 워크로드(Lab 06·07)는 `kubectl` 대신 코드를 고치세요. 그러지 않으면 다음 `terraform plan` 에 차이가 나타납니다(E-8).
+
 ## 3. 노드 풀 변경과 교체
 
 `vm_size`, `os_disk_*`, `zones`, `vnet_subnet_id` 등을 바꾸면 노드 풀이 **교체**됩니다. 이 실습은 `temporary_name_for_rotation`(`systemtmp`, `usertmp`)을 설정해 임시 풀을 만든 뒤 교체합니다. 그래서 plan 에는 `replace` 가 아니라 **`will be updated in-place`** 로 보이고, 실제 교체(임시 풀 생성 → 이전 풀 제거)는 apply 중에 provider 가 수행합니다.

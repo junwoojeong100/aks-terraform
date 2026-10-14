@@ -45,6 +45,7 @@ winget install Hashicorp.Terraform Microsoft.AzureCLI Kubernetes.kubectl Azure.K
 
 > [!NOTE]
 > The shell scripts in `scripts/` run on **macOS · Linux · WSL · Azure Cloud Shell (bash)**. On Windows PowerShell, use WSL or Git Bash.
+> Cloud Shell has one limit: its public IP is not in `TF_VAR_allowed_ip_ranges`, so the `kubectl` steps from Lab 05 on (and the Lab 06–07 stacks that use the `kubernetes` provider) cannot reach the API servers from there. Use `az aks command invoke` instead ([Appendix D](99-appendix.md)).
 
 > [!TIP]
 > On any OS, if you have installed only the Azure CLI, a single `az aks install-cli` installs **both kubectl and kubelogin**.
@@ -154,7 +155,7 @@ $env:TF_VAR_allowed_ip_ranges = "[`"$ip/32`"]"
 ```
 
 > [!IMPORTANT]
-> Your public IP changes if you use a corporate VPN/proxy or switch networks. Access to Key Vault, ACR, and the API server is then blocked, so update `TF_VAR_allowed_ip_ranges` and `apply` the affected stacks again.
+> Your public IP changes if you use a corporate VPN/proxy or switch networks. Access to Key Vault, ACR, and the API servers is then blocked, so update `TF_VAR_allowed_ip_ranges` and `apply` the three stacks that use it again: `04-platform` (ACR, Key Vault), `05-aks` and `10-aks-automatic` (API servers). See [Appendix D](99-appendix.md). Do not run the command above inside Cloud Shell: it would register Cloud Shell's IP instead of your laptop's.
 
 ## 6. Check everything at once: the preflight script
 
@@ -325,7 +326,7 @@ summary
 <!-- /tf:include -->
 
 > [!NOTE]
-> The common functions shared by the scripts (`scripts/lib/common.sh`) are in [Appendix G](99-appendix.md). All the verification scripts report their results in the same format: `✓ passed / ✗ failed / ! warnings / - skipped`.
+> The common functions shared by the scripts (`scripts/lib/common.sh`) are in [Appendix I](99-appendix.md). All the verification scripts report their results in the same format: `✓ passed / ✗ failed / ! warnings / - skipped`.
 
 ## 7. Repository structure
 

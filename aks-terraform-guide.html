@@ -343,7 +343,7 @@ figure.code.shell figcaption .file::before { content: '$ '; color: var(--hl-var)
 </header>
 <div class="progress"></div>
 <div class="layout">
-  <nav class="sidebar" aria-label="Table of contents"><h4>Getting started</h4><a class="lab-link" data-lab="readme" href="#lab-readme"><span class="num">★</span><span>Overview · learning path</span></a><div class="sub"><a href="#readme--baseline-versions-2026-10-13">Baseline versions (2026-10-13)</a><a href="#readme--learning-path">Learning path</a><a href="#readme--architecture-overview">Architecture overview</a><a href="#readme--quick-start">Quick start</a><a href="#readme--languages">Languages</a><a href="#readme--lab-scripts">Lab scripts</a><a href="#readme--repository-layout">Repository layout</a><a href="#readme--validation-and-regenerating-the-html">Validation and regenerating the HTML</a><a href="#readme--references">References</a></div><a class="lab-link" data-lab="00-aws-azure-mapping" href="#lab-00-aws-azure-mapping"><span class="num">00</span><span>AWS ↔ Azure infrastructure services compared (for EKS engineers)</span></a><div class="sub"><a href="#00-aws-azure-mapping--1-ten-mindset-shifts-to-make-first">1. Ten mindset shifts to make first</a><a href="#00-aws-azure-mapping--2-organization-accounts-and-regions">2. Organization, accounts, and regions</a><a href="#00-aws-azure-mapping--3-networking">3. Networking</a><a href="#00-aws-azure-mapping--4-identity-permissions-and-secrets">4. Identity, permissions, and secrets</a><a href="#00-aws-azure-mapping--5-containers-and-kubernetes-eks-aks">5. Containers and Kubernetes (EKS ↔ AKS)</a><a href="#00-aws-azure-mapping--6-storage-and-state">6. Storage and state</a><a href="#00-aws-azure-mapping--7-cost-management">7. Cost management</a><a href="#00-aws-azure-mapping--8-differences-from-a-terraform-perspective">8. Differences from a Terraform perspective</a><a href="#00-aws-azure-mapping--9-command-cheat-sheet">9. Command cheat sheet</a><a href="#00-aws-azure-mapping--10-best-practices-this-lab-follows-summary">10. Best practices this lab follows (summary)</a></div><a class="lab-link" data-lab="01-prerequisites" href="#lab-01-prerequisites"><span class="num">01</span><span>Lab 01. Prerequisites: tools, sign-in, permissions, environment variables</span></a><div class="sub"><a href="#01-prerequisites--goals-of-this-lab">Goals of this lab</a><a href="#01-prerequisites--1-install-the-tools">1. Install the tools</a><a href="#01-prerequisites--2-sign-in-and-select-a-subscription">2. Sign in and select a subscription</a><a href="#01-prerequisites--3-register-resource-providers">3. Register Resource Providers</a><a href="#01-prerequisites--4-check-your-vcpu-quota">4. Check your vCPU quota</a><a href="#01-prerequisites--5-set-environment-variables">5. Set environment variables</a><a href="#01-prerequisites--6-check-everything-at-once-the-preflight-script">6. Check everything at once: the preflight script</a><a href="#01-prerequisites--7-repository-structure">7. Repository structure</a><a href="#01-prerequisites--8-optional-validate-the-code-without-azure">8. (Optional) Validate the code without Azure</a><a href="#01-prerequisites--9-cost-overview-rough-estimates">9. Cost overview (rough estimates)</a></div><h4>Part 1 · Foundation</h4><a class="lab-link" data-lab="02-bootstrap" href="#lab-02-bootstrap"><span class="num">02</span><span>Lab 02. Terraform remote state: S3 + DynamoDB ↔ Blob Storage</span></a><div class="sub"><a href="#02-bootstrap--what-you-build-in-this-lab">What you build in this lab</a><a href="#02-bootstrap--comparison-for-aws-engineers">Comparison for AWS engineers</a><a href="#02-bootstrap--shared-module-modulesnaming">Shared module: modules/naming</a><a href="#02-bootstrap--bootstrap-stack-code">Bootstrap stack code</a><a href="#02-bootstrap--walkthrough">Walkthrough</a><a href="#02-bootstrap--the-init-pattern-used-by-all-later-stacks">The init pattern used by all later stacks</a><a href="#02-bootstrap--common-issues">Common issues</a></div><a class="lab-link" data-lab="03-network" href="#lab-03-network"><span class="num">03</span><span>Lab 03. Networking: VNet · NSG · NAT Gateway · Private DNS</span></a><div class="sub"><a href="#03-network--what-you-build-in-this-lab">What you build in this lab</a><a href="#03-network--comparison-for-aws-engineers">Comparison for AWS engineers</a><a href="#03-network--design-decisions-best-practices">Design decisions (best practices)</a><a href="#03-network--nsg-inbound-rules">NSG inbound rules</a><a href="#03-network--code">Code</a><a href="#03-network--walkthrough">Walkthrough</a><a href="#03-network--common-issues">Common issues</a></div><a class="lab-link" data-lab="04-platform" href="#lab-04-platform"><span class="num">04</span><span>Lab 04. Platform services: ACR · Key Vault · monitoring · identities for AKS</span></a><div class="sub"><a href="#04-platform--what-you-build-in-this-lab">What you build in this lab</a><a href="#04-platform--comparison-for-aws-engineers">Comparison for AWS engineers</a><a href="#04-platform--design-decisions-best-practices">Design decisions (best practices)</a><a href="#04-platform--code">Code</a><a href="#04-platform--walkthrough">Walkthrough</a><a href="#04-platform--common-issues">Common issues</a></div><h4>Part 2 · AKS cluster</h4><a class="lab-link" data-lab="05-aks" href="#lab-05-aks"><span class="num">05</span><span>Lab 05. AKS cluster (Standard): how it differs from EKS</span></a><div class="sub"><a href="#05-aks--what-you-build-in-this-lab">What you build in this lab</a><a href="#05-aks--comparison-for-eks-engineers">Comparison for EKS engineers</a><a href="#05-aks--design-decisions-best-practices">Design decisions (best practices)</a><a href="#05-aks--code">Code</a><a href="#05-aks--walkthrough">Walkthrough</a><a href="#05-aks--advanced-experiments">Advanced experiments</a><a href="#05-aks--common-issues">Common issues</a></div><a class="lab-link" data-lab="06-workload-identity" href="#lab-06-workload-identity"><span class="num">06</span><span>Lab 06. Workload Identity + Key Vault CSI: the Azure version of IRSA</span></a><div class="sub"><a href="#06-workload-identity--what-you-build-in-this-lab">What you build in this lab</a><a href="#06-workload-identity--comparison-for-aws-engineers">Comparison for AWS engineers</a><a href="#06-workload-identity--design-decisions-best-practices">Design decisions (best practices)</a><a href="#06-workload-identity--code">Code</a><a href="#06-workload-identity--walkthrough">Walkthrough</a><a href="#06-workload-identity--common-issues">Common issues</a></div><a class="lab-link" data-lab="07-ingress" href="#lab-07-ingress"><span class="num">07</span><span>Lab 07. Ingress: ALB Controller → Gateway API (approuting-istio)</span></a><div class="sub"><a href="#07-ingress--what-you-build-in-this-lab">What you build in this lab</a><a href="#07-ingress--comparison-for-aws-engineers">Comparison for AWS engineers</a><a href="#07-ingress--design-decisions-best-practices">Design decisions (best practices)</a><a href="#07-ingress--code">Code</a><a href="#07-ingress--walkthrough">Walkthrough</a><a href="#07-ingress--common-issues">Common issues</a></div><h4>Part 3 · Governance &amp; operations</h4><a class="lab-link" data-lab="08-governance" href="#lab-08-governance"><span class="num">08</span><span>Lab 08. Governance and security: Azure Policy · Defender · locks · budgets</span></a><div class="sub"><a href="#08-governance--what-you-build-in-this-lab">What you build in this lab</a><a href="#08-governance--comparison-for-aws-engineers">Comparison for AWS engineers</a><a href="#08-governance--design-decisions-best-practices">Design decisions (best practices)</a><a href="#08-governance--code">Code</a><a href="#08-governance--walkthrough">Walkthrough</a><a href="#08-governance--common-issues">Common issues</a></div><a class="lab-link" data-lab="09-operations" href="#lab-09-operations"><span class="num">09</span><span>Lab 09. Day-2 operations: upgrades · scaling · node replacement · testing</span></a><div class="sub"><a href="#09-operations--comparison-for-aws-engineers">Comparison for AWS engineers</a><a href="#09-operations--1-upgrade-strategy">1. Upgrade strategy</a><a href="#09-operations--2-scaling">2. Scaling</a><a href="#09-operations--3-changing-and-replacing-node-pools">3. Changing and replacing node pools</a><a href="#09-operations--4-operating-habits-that-save-money">4. Operating habits that save money</a><a href="#09-operations--5-backup-and-disaster-recovery-concepts">5. Backup and disaster recovery (concepts)</a><a href="#09-operations--6-terraform-code-quality-and-ci">6. Terraform code quality and CI</a></div><a class="lab-link" data-lab="10-aks-automatic" href="#lab-10-aks-automatic"><span class="num">10</span><span>Lab 10. AKS Automatic: the &quot;we operate it for you&quot; mode, equivalent to EKS Auto Mode</span></a><div class="sub"><a href="#10-aks-automatic--what-you-build-in-this-lab">What you build in this lab</a><a href="#10-aks-automatic--comparison-for-aws-engineers">Comparison for AWS engineers</a><a href="#10-aks-automatic--standard-vs-automatic-which-one-to-choose">Standard vs. Automatic: which one to choose</a><a href="#10-aks-automatic--design-decisions-best-practices">Design decisions (best practices)</a><a href="#10-aks-automatic--code">Code</a><a href="#10-aks-automatic--walkthrough">Walkthrough</a><a href="#10-aks-automatic--common-issues">Common issues</a></div><a class="lab-link" data-lab="11-cleanup" href="#lab-11-cleanup"><span class="num">11</span><span>Lab 11. Cleanup: delete everything so costs don't leak</span></a><div class="sub"><a href="#11-cleanup--the-easiest-way-the-cleanup-script">The easiest way: the cleanup script</a><a href="#11-cleanup--destroy-order-reverse-of-creation">Destroy order (reverse of creation)</a><a href="#11-cleanup--preflight-checks-locks-and-subscription-level-settings">Preflight checks (locks and subscription-level settings)</a><a href="#11-cleanup--step-1-destroy-each-stack">Step 1. Destroy each stack</a><a href="#11-cleanup--step-2-delete-the-bootstrap-state-storage">Step 2. Delete the bootstrap (state storage)</a><a href="#11-cleanup--step-3-verify-the-cleanup">Step 3. Verify the cleanup</a><a href="#11-cleanup--emergency-cleanup-when-terraform-fails">Emergency cleanup (when Terraform fails)</a><a href="#11-cleanup--check-costs">Check costs</a></div><h4>Appendix</h4><a class="lab-link" data-lab="99-appendix" href="#lab-99-appendix"><span class="num">A</span><span>Appendix. Troubleshooting · production checklist · references · test code</span></a><div class="sub"><a href="#99-appendix--a-how-this-guide-was-validated-and-its-limits">A. How this guide was validated, and its limits</a><a href="#99-appendix--b-troubleshooting-collection">B. Troubleshooting collection</a><a href="#99-appendix--c-checklist-before-going-to-production">C. Checklist before going to production</a><a href="#99-appendix--d-references">D. References</a><a href="#99-appendix--e-complete-list-of-terraform-files-which-lab-has-each">E. Complete list of Terraform files (which lab has each)</a><a href="#99-appendix--f-complete-test-and-tooling-code">F. Complete test and tooling code</a><a href="#99-appendix--g-verification-and-cleanup-scripts">G. Verification and cleanup scripts</a></div></nav>
+  <nav class="sidebar" aria-label="Table of contents"><h4>Getting started</h4><a class="lab-link" data-lab="readme" href="#lab-readme"><span class="num">★</span><span>Overview · learning path</span></a><div class="sub"><a href="#readme--baseline-versions-2026-10-13">Baseline versions (2026-10-13)</a><a href="#readme--learning-path">Learning path</a><a href="#readme--architecture-overview">Architecture overview</a><a href="#readme--quick-start">Quick start</a><a href="#readme--languages">Languages</a><a href="#readme--lab-scripts">Lab scripts</a><a href="#readme--repository-layout">Repository layout</a><a href="#readme--validation-and-regenerating-the-html">Validation and regenerating the HTML</a><a href="#readme--references">References</a></div><a class="lab-link" data-lab="00-aws-azure-mapping" href="#lab-00-aws-azure-mapping"><span class="num">00</span><span>AWS ↔ Azure infrastructure services compared (for EKS engineers)</span></a><div class="sub"><a href="#00-aws-azure-mapping--1-ten-mindset-shifts-to-make-first">1. Ten mindset shifts to make first</a><a href="#00-aws-azure-mapping--2-organization-accounts-and-regions">2. Organization, accounts, and regions</a><a href="#00-aws-azure-mapping--3-networking">3. Networking</a><a href="#00-aws-azure-mapping--4-identity-permissions-and-secrets">4. Identity, permissions, and secrets</a><a href="#00-aws-azure-mapping--5-containers-and-kubernetes-eks-aks">5. Containers and Kubernetes (EKS ↔ AKS)</a><a href="#00-aws-azure-mapping--6-storage-and-state">6. Storage and state</a><a href="#00-aws-azure-mapping--7-cost-management">7. Cost management</a><a href="#00-aws-azure-mapping--8-differences-from-a-terraform-perspective">8. Differences from a Terraform perspective</a><a href="#00-aws-azure-mapping--9-command-cheat-sheet">9. Command cheat sheet</a><a href="#00-aws-azure-mapping--10-best-practices-this-lab-follows-summary">10. Best practices this lab follows (summary)</a></div><a class="lab-link" data-lab="01-prerequisites" href="#lab-01-prerequisites"><span class="num">01</span><span>Lab 01. Prerequisites: tools, sign-in, permissions, environment variables</span></a><div class="sub"><a href="#01-prerequisites--goals-of-this-lab">Goals of this lab</a><a href="#01-prerequisites--1-install-the-tools">1. Install the tools</a><a href="#01-prerequisites--2-sign-in-and-select-a-subscription">2. Sign in and select a subscription</a><a href="#01-prerequisites--3-register-resource-providers">3. Register Resource Providers</a><a href="#01-prerequisites--4-check-your-vcpu-quota">4. Check your vCPU quota</a><a href="#01-prerequisites--5-set-environment-variables">5. Set environment variables</a><a href="#01-prerequisites--6-check-everything-at-once-the-preflight-script">6. Check everything at once: the preflight script</a><a href="#01-prerequisites--7-repository-structure">7. Repository structure</a><a href="#01-prerequisites--8-optional-validate-the-code-without-azure">8. (Optional) Validate the code without Azure</a><a href="#01-prerequisites--9-cost-overview-rough-estimates">9. Cost overview (rough estimates)</a></div><h4>Part 1 · Foundation</h4><a class="lab-link" data-lab="02-bootstrap" href="#lab-02-bootstrap"><span class="num">02</span><span>Lab 02. Terraform remote state: S3 + DynamoDB ↔ Blob Storage</span></a><div class="sub"><a href="#02-bootstrap--what-you-build-in-this-lab">What you build in this lab</a><a href="#02-bootstrap--comparison-for-aws-engineers">Comparison for AWS engineers</a><a href="#02-bootstrap--shared-module-modulesnaming">Shared module: modules/naming</a><a href="#02-bootstrap--bootstrap-stack-code">Bootstrap stack code</a><a href="#02-bootstrap--walkthrough">Walkthrough</a><a href="#02-bootstrap--the-init-pattern-used-by-all-later-stacks">The init pattern used by all later stacks</a><a href="#02-bootstrap--common-issues">Common issues</a></div><a class="lab-link" data-lab="03-network" href="#lab-03-network"><span class="num">03</span><span>Lab 03. Networking: VNet · NSG · NAT Gateway · Private DNS</span></a><div class="sub"><a href="#03-network--what-you-build-in-this-lab">What you build in this lab</a><a href="#03-network--comparison-for-aws-engineers">Comparison for AWS engineers</a><a href="#03-network--design-decisions-best-practices">Design decisions (best practices)</a><a href="#03-network--nsg-inbound-rules">NSG inbound rules</a><a href="#03-network--code">Code</a><a href="#03-network--walkthrough">Walkthrough</a><a href="#03-network--common-issues">Common issues</a></div><a class="lab-link" data-lab="04-platform" href="#lab-04-platform"><span class="num">04</span><span>Lab 04. Platform services: ACR · Key Vault · monitoring · identities for AKS</span></a><div class="sub"><a href="#04-platform--what-you-build-in-this-lab">What you build in this lab</a><a href="#04-platform--comparison-for-aws-engineers">Comparison for AWS engineers</a><a href="#04-platform--design-decisions-best-practices">Design decisions (best practices)</a><a href="#04-platform--code">Code</a><a href="#04-platform--walkthrough">Walkthrough</a><a href="#04-platform--common-issues">Common issues</a></div><h4>Part 2 · AKS cluster</h4><a class="lab-link" data-lab="05-aks" href="#lab-05-aks"><span class="num">05</span><span>Lab 05. AKS cluster (Standard): how it differs from EKS</span></a><div class="sub"><a href="#05-aks--what-you-build-in-this-lab">What you build in this lab</a><a href="#05-aks--comparison-for-eks-engineers">Comparison for EKS engineers</a><a href="#05-aks--design-decisions-best-practices">Design decisions (best practices)</a><a href="#05-aks--code">Code</a><a href="#05-aks--walkthrough">Walkthrough</a><a href="#05-aks--advanced-experiments">Advanced experiments</a><a href="#05-aks--common-issues">Common issues</a></div><a class="lab-link" data-lab="06-workload-identity" href="#lab-06-workload-identity"><span class="num">06</span><span>Lab 06. Workload Identity + Key Vault CSI: the Azure version of IRSA</span></a><div class="sub"><a href="#06-workload-identity--what-you-build-in-this-lab">What you build in this lab</a><a href="#06-workload-identity--comparison-for-aws-engineers">Comparison for AWS engineers</a><a href="#06-workload-identity--design-decisions-best-practices">Design decisions (best practices)</a><a href="#06-workload-identity--code">Code</a><a href="#06-workload-identity--walkthrough">Walkthrough</a><a href="#06-workload-identity--common-issues">Common issues</a></div><a class="lab-link" data-lab="07-ingress" href="#lab-07-ingress"><span class="num">07</span><span>Lab 07. Ingress: ALB Controller → Gateway API (approuting-istio)</span></a><div class="sub"><a href="#07-ingress--what-you-build-in-this-lab">What you build in this lab</a><a href="#07-ingress--comparison-for-aws-engineers">Comparison for AWS engineers</a><a href="#07-ingress--design-decisions-best-practices">Design decisions (best practices)</a><a href="#07-ingress--code">Code</a><a href="#07-ingress--walkthrough">Walkthrough</a><a href="#07-ingress--common-issues">Common issues</a></div><h4>Part 3 · Governance &amp; operations</h4><a class="lab-link" data-lab="08-governance" href="#lab-08-governance"><span class="num">08</span><span>Lab 08. Governance and security: Azure Policy · Defender · locks · budgets</span></a><div class="sub"><a href="#08-governance--what-you-build-in-this-lab">What you build in this lab</a><a href="#08-governance--comparison-for-aws-engineers">Comparison for AWS engineers</a><a href="#08-governance--design-decisions-best-practices">Design decisions (best practices)</a><a href="#08-governance--code">Code</a><a href="#08-governance--walkthrough">Walkthrough</a><a href="#08-governance--common-issues">Common issues</a></div><a class="lab-link" data-lab="09-operations" href="#lab-09-operations"><span class="num">09</span><span>Lab 09. Day-2 operations: upgrades · scaling · node replacement · testing</span></a><div class="sub"><a href="#09-operations--comparison-for-aws-engineers">Comparison for AWS engineers</a><a href="#09-operations--1-upgrade-strategy">1. Upgrade strategy</a><a href="#09-operations--2-scaling">2. Scaling</a><a href="#09-operations--3-changing-and-replacing-node-pools">3. Changing and replacing node pools</a><a href="#09-operations--4-operating-habits-that-save-money">4. Operating habits that save money</a><a href="#09-operations--5-backup-and-disaster-recovery-concepts">5. Backup and disaster recovery (concepts)</a><a href="#09-operations--6-terraform-code-quality-and-ci">6. Terraform code quality and CI</a></div><a class="lab-link" data-lab="10-aks-automatic" href="#lab-10-aks-automatic"><span class="num">10</span><span>Lab 10. AKS Automatic: the &quot;we operate it for you&quot; mode, equivalent to EKS Auto Mode</span></a><div class="sub"><a href="#10-aks-automatic--what-you-build-in-this-lab">What you build in this lab</a><a href="#10-aks-automatic--comparison-for-aws-engineers">Comparison for AWS engineers</a><a href="#10-aks-automatic--standard-vs-automatic-which-one-to-choose">Standard vs. Automatic: which one to choose</a><a href="#10-aks-automatic--design-decisions-best-practices">Design decisions (best practices)</a><a href="#10-aks-automatic--code">Code</a><a href="#10-aks-automatic--walkthrough">Walkthrough</a><a href="#10-aks-automatic--common-issues">Common issues</a></div><a class="lab-link" data-lab="11-cleanup" href="#lab-11-cleanup"><span class="num">11</span><span>Lab 11. Cleanup: delete everything so costs don't leak</span></a><div class="sub"><a href="#11-cleanup--the-easiest-way-the-cleanup-script">The easiest way: the cleanup script</a><a href="#11-cleanup--destroy-order-reverse-of-creation">Destroy order (reverse of creation)</a><a href="#11-cleanup--preflight-checks-locks-and-subscription-level-settings">Preflight checks (locks and subscription-level settings)</a><a href="#11-cleanup--step-1-destroy-each-stack">Step 1. Destroy each stack</a><a href="#11-cleanup--step-2-delete-the-bootstrap-state-storage">Step 2. Delete the bootstrap (state storage)</a><a href="#11-cleanup--step-3-verify-the-cleanup">Step 3. Verify the cleanup</a><a href="#11-cleanup--emergency-cleanup-when-terraform-fails">Emergency cleanup (when Terraform fails)</a><a href="#11-cleanup--check-costs">Check costs</a></div><h4>Appendix</h4><a class="lab-link" data-lab="99-appendix" href="#lab-99-appendix"><span class="num">A</span><span>Appendix. Troubleshooting · production checklist · cluster access and workloads · references · test code</span></a><div class="sub"><a href="#99-appendix--a-how-this-guide-was-validated-and-its-limits">A. How this guide was validated, and its limits</a><a href="#99-appendix--b-troubleshooting-collection">B. Troubleshooting collection</a><a href="#99-appendix--c-checklist-before-going-to-production">C. Checklist before going to production</a><a href="#99-appendix--d-how-to-reach-the-clusters-and-what-is-exposed-to-the-internet">D. How to reach the clusters, and what is exposed to the internet</a><a href="#99-appendix--e-handling-kubernetes-workloads-with-kubectl">E. Handling Kubernetes workloads with kubectl</a><a href="#99-appendix--f-references">F. References</a><a href="#99-appendix--g-complete-list-of-terraform-files-which-lab-has-each">G. Complete list of Terraform files (which lab has each)</a><a href="#99-appendix--h-complete-test-and-tooling-code">H. Complete test and tooling code</a><a href="#99-appendix--i-verification-and-cleanup-scripts">I. Verification and cleanup scripts</a></div></nav>
   <main class="content">
     <div class="content-inner">
       <div class="hero">
@@ -472,7 +472,7 @@ Each lab is an independent Terraform stack, and every piece of code in the docs 
 <tr>
 <td><a href="#lab-09-operations">09</a></td>
 <td>Day-2 operations</td>
-<td>Upgrades, scaling, node replacement, testing/CI</td>
+<td>Upgrades, scaling, node replacement, testing/CI (workload operations with kubectl: Appendix E)</td>
 </tr>
 <tr>
 <td><a href="#lab-10-aks-automatic">10</a></td>
@@ -487,7 +487,7 @@ Each lab is an independent Terraform stack, and every piece of code in the docs 
 <tr>
 <td><a href="#lab-99-appendix">99</a></td>
 <td>Appendix</td>
-<td>Troubleshooting, production checklist, references, test code</td>
+<td>Troubleshooting, production checklist, <strong>cluster access and internet exposure (D)</strong>, <strong>handling Kubernetes workloads with kubectl (E)</strong>, references, test code</td>
 </tr>
 </tbody></table>
 </div>
@@ -1713,6 +1713,31 @@ The tables in this guide are based on those resources and the latest AKS documen
 <td>kubelogin handles the Entra sign-in</td>
 </tr>
 <tr>
+<td><code>aws eks list-clusters</code> / <code>describe-cluster</code></td>
+<td><code>az aks list -o table</code> / <code>az aks show -g &lt;rg&gt; -n &lt;name&gt;</code></td>
+<td>The SKU column tells the two clusters of this guide apart: <code>Base</code> (Standard) and <code>Automatic</code></td>
+</tr>
+<tr>
+<td><code>kubectl config get-contexts</code> / <code>use-context</code></td>
+<td>The same commands</td>
+<td>Each <code>az aks get-credentials</code> makes that cluster the current context. With two clusters, check it before <code>apply</code> or <code>delete</code> (<a href="#lab-99-appendix">Appendix D</a>)</td>
+</tr>
+<tr>
+<td>(no direct equivalent)</td>
+<td><code>az aks command invoke -g &lt;rg&gt; -n &lt;name&gt; --command &quot;kubectl …&quot;</code></td>
+<td>Runs <code>kubectl</code> through the Azure API when there is no network path to the API server, for example from Cloud Shell (<a href="#lab-99-appendix">Appendix D</a>)</td>
+</tr>
+<tr>
+<td>(no direct equivalent; scale node groups to 0)</td>
+<td><code>az aks stop</code> / <code>az aks start</code></td>
+<td>Stops the nodes and their billing but keeps the cluster (<a href="#lab-09-operations">Lab 09</a> section 4)</td>
+</tr>
+<tr>
+<td><code>kubectl get/describe/logs/exec/scale/rollout</code></td>
+<td>The same <code>kubectl</code></td>
+<td>Pods and Deployments are plain Kubernetes: see <a href="#lab-99-appendix">Appendix E</a></td>
+</tr>
+<tr>
 <td><code>aws ecr get-login-password | docker login</code></td>
 <td><code>az acr login -n &lt;acr&gt;</code></td>
 <td>Use <code>az acr import</code> to copy an external image into ACR on the server side</td>
@@ -1837,7 +1862,8 @@ brew tap hashicorp/tap
 brew install hashicorp/tap/terraform azure-cli kubectl Azure/kubelogin/kubelogin jq</code></pre></div></figure>
 <figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">powershell · 2 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-powershell"><span class="hljs-comment"># Windows (winget)</span>
 winget install Hashicorp.Terraform Microsoft.AzureCLI Kubernetes.kubectl Azure.Kubelogin jqlang.jq</code></pre></div></figure>
-<aside class="callout note"><div class="callout-title"><span>ℹ️</span><span>Note</span></div><p>The shell scripts in <code>scripts/</code> run on <strong>macOS · Linux · WSL · Azure Cloud Shell (bash)</strong>. On Windows PowerShell, use WSL or Git Bash.</p>
+<aside class="callout note"><div class="callout-title"><span>ℹ️</span><span>Note</span></div><p>The shell scripts in <code>scripts/</code> run on <strong>macOS · Linux · WSL · Azure Cloud Shell (bash)</strong>. On Windows PowerShell, use WSL or Git Bash.
+Cloud Shell has one limit: its public IP is not in <code>TF_VAR_allowed_ip_ranges</code>, so the <code>kubectl</code> steps from Lab 05 on (and the Lab 06–07 stacks that use the <code>kubernetes</code> provider) cannot reach the API servers from there. Use <code>az aks command invoke</code> instead (<a href="#lab-99-appendix">Appendix D</a>).</p>
 </aside>
 <aside class="callout tip"><div class="callout-title"><span>💡</span><span>Tip</span></div><p>On any OS, if you have installed only the Azure CLI, a single <code>az aks install-cli</code> installs <strong>both kubectl and kubelogin</strong>.</p>
 </aside>
@@ -1945,7 +1971,7 @@ az quota create --resource-name cores               --scope <span class="hljs-st
 <span class="hljs-variable">$env:TF_VAR_location</span> = <span class="hljs-string">&quot;koreacentral&quot;</span>
 <span class="hljs-variable">$ip</span> = (<span class="hljs-built_in">Invoke-RestMethod</span> https://api.ipify.org)
 <span class="hljs-variable">$env:TF_VAR_allowed_ip_ranges</span> = <span class="hljs-string">&quot;[`&quot;<span class="hljs-variable">$ip</span>/32`&quot;]&quot;</span></code></pre></div></figure>
-<aside class="callout important"><div class="callout-title"><span>❗</span><span>Important</span></div><p>Your public IP changes if you use a corporate VPN/proxy or switch networks. Access to Key Vault, ACR, and the API server is then blocked, so update <code>TF_VAR_allowed_ip_ranges</code> and <code>apply</code> the affected stacks again.</p>
+<aside class="callout important"><div class="callout-title"><span>❗</span><span>Important</span></div><p>Your public IP changes if you use a corporate VPN/proxy or switch networks. Access to Key Vault, ACR, and the API servers is then blocked, so update <code>TF_VAR_allowed_ip_ranges</code> and <code>apply</code> the three stacks that use it again: <code>04-platform</code> (ACR, Key Vault), <code>05-aks</code> and <code>10-aks-automatic</code> (API servers). See <a href="#lab-99-appendix">Appendix D</a>. Do not run the command above inside Cloud Shell: it would register Cloud Shell&#39;s IP instead of your laptop&#39;s.</p>
 </aside>
 <h2 id="01-prerequisites--6-check-everything-at-once-the-preflight-script">6. Check everything at once: the preflight script<a class="anchor" href="#01-prerequisites--6-check-everything-at-once-the-preflight-script" aria-label="Link to this heading">#</a></h2>
 <p>Instead of checking steps 3–5 above by hand one at a time, run the <strong>read-only</strong> preflight script. It doesn&#39;t create or change anything.</p>
@@ -2132,7 +2158,7 @@ roles=<span class="hljs-string">&quot;<span class="hljs-subst">$(az role assignm
 <span class="hljs-keyword">fi</span>
 
 summary</code></pre></div><button class="expand" type="button" data-label="Show all 144 lines ▼">Show all 144 lines ▼</button></figure>
-<aside class="callout note"><div class="callout-title"><span>ℹ️</span><span>Note</span></div><p>The common functions shared by the scripts (<code>scripts/lib/common.sh</code>) are in <a href="#lab-99-appendix">Appendix G</a>. All the verification scripts report their results in the same format: <code>✓ passed / ✗ failed / ! warnings / - skipped</code>.</p>
+<aside class="callout note"><div class="callout-title"><span>ℹ️</span><span>Note</span></div><p>The common functions shared by the scripts (<code>scripts/lib/common.sh</code>) are in <a href="#lab-99-appendix">Appendix I</a>. All the verification scripts report their results in the same format: <code>✓ passed / ✗ failed / ! warnings / - skipped</code>.</p>
 </aside>
 <h2 id="01-prerequisites--7-repository-structure">7. Repository structure<a class="anchor" href="#01-prerequisites--7-repository-structure" aria-label="Link to this heading">#</a></h2>
 <figure class="code diagram"><figcaption><span class="file">Diagram</span><span class="meta">text · 25 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-text">aks-terraform/
@@ -6490,14 +6516,17 @@ terraform plan -out tfplan</code></pre></div></figure>
 <aside class="callout note"><div class="callout-title"><span>ℹ️</span><span>Note</span></div><p>During apply, <code>azapi_update_resource</code> updates the cluster one more time, so the total time gets longer. Use the wait to re-read <em>Design decisions</em>.</p>
 </aside>
 <h3 id="05-aks--step-2-get-the-kubeconfig-entra-id-sign-in">Step 2. Get the kubeconfig (Entra ID sign-in)<a class="anchor" href="#05-aks--step-2-get-the-kubeconfig-entra-id-sign-in" aria-label="Link to this heading">#</a></h3>
-<figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 4 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">$(terraform output -raw get_credentials_command)
+<figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 4 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-built_in">eval</span> <span class="hljs-string">&quot;<span class="hljs-subst">$(terraform output -raw get_credentials_command)</span>&quot;</span>
 <span class="hljs-comment"># = az aks get-credentials ... &amp;&amp; kubelogin convert-kubeconfig -l azurecli</span>
 
 kubectl get nodes -o wide</code></pre></div></figure>
-<aside class="callout tip"><div class="callout-title"><span>💡</span><span>Tip</span></div><p>Local accounts are disabled, so the <code>--admin</code> option doesn&#39;t work. <code>kubectl</code> gets a token from your <code>az login</code> session, and your permissions come from the <em>Azure Kubernetes Service RBAC Cluster Admin</em> role granted in <code>access.tf</code> of Lab 05. Role propagation can take 1–5 minutes (if you get <code>Forbidden</code>, retry after a moment).</p>
+<aside class="callout note"><div class="callout-title"><span>ℹ️</span><span>Note</span></div><p>Use <code>eval &quot;$(…)&quot;</code>, not a bare <code>$(…)</code>. The output is a command line that contains <code>&amp;&amp;</code>, and a bare <code>$(…)</code> hands the <code>&amp;&amp;</code> to <code>az</code> as an argument, so it fails with <code>unrecognized arguments</code>.</p>
+</aside>
+<aside class="callout tip"><div class="callout-title"><span>💡</span><span>Tip</span></div><p>Local accounts are disabled, so the <code>--admin</code> option doesn&#39;t work. <code>kubectl</code> gets a token from your <code>az login</code> session, and your permissions come from the <em>Azure Kubernetes Service RBAC Cluster Admin</em> role granted in <code>access.tf</code> of Lab 05. Role propagation can take 1–5 minutes (if you get <code>Forbidden</code>, retry after a moment).
+Every <code>az aks get-credentials</code> makes that cluster the current <code>kubectl</code> context. Once you also have the Lab 10 cluster, check <code>kubectl config current-context</code> (<a href="#lab-99-appendix">Appendix D</a>).</p>
 </aside>
 <h3 id="05-aks--step-3-verify">Step 3. Verify<a class="anchor" href="#05-aks--step-3-verify" aria-label="Link to this heading">#</a></h3>
-<figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 17 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-comment"># Are the nodes spread across zones 1, 2, and 3, and split into System/User pools?</span>
+<figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 21 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-comment"># Are the nodes spread across zones 1, 2, and 3, and split into System/User pools?</span>
 kubectl get nodes -L topology.kubernetes.io/zone,kubernetes.azure.com/mode,agentpool
 
 <span class="hljs-comment"># System pods (Cilium, CoreDNS, ama-logs (container logs), ama-metrics (Prometheus), Azure Policy, etc.)</span>
@@ -6510,11 +6539,15 @@ az aks show -g <span class="hljs-string">&quot;<span class="hljs-subst">$(terraf
 <span class="hljs-comment"># Permissions: do you have cluster-admin-equivalent permissions through Azure RBAC?</span>
 kubectl auth can-i <span class="hljs-string">&#x27;*&#x27;</span> <span class="hljs-string">&#x27;*&#x27;</span>
 
+<span class="hljs-comment"># Outbound: is the public IP that the internet sees for a pod the NAT Gateway from Lab 03?</span>
+kubectl run egress-test --<span class="hljs-built_in">rm</span> -i --restart=Never --image=mcr.microsoft.com/cbl-mariner/busybox:2.0 -- wget -qO- http://api.ipify.org
+terraform -<span class="hljs-built_in">chdir</span>=../03-network output -raw nat_gateway_public_ip
+
 <span class="hljs-comment"># Gateway API: are the CRDs and the GatewayClass (approuting-istio) ready?</span>
 kubectl get crd | grep gateway.networking.k8s.io
 kubectl get gatewayclass
 kubectl get pods -n aks-istio-system</code></pre></div></figure>
-<p>Expected result: 6 or more nodes (<code>system</code> 3 + <code>user</code> 3), <code>kubectl auth can-i</code> → <code>yes</code>, and <code>GatewayClass approuting-istio</code> shows <code>ACCEPTED True</code>.</p>
+<p>Expected result: 6 or more nodes (<code>system</code> 3 + <code>user</code> 3), <code>kubectl auth can-i</code> → <code>yes</code>, <code>GatewayClass approuting-istio</code> shows <code>ACCEPTED True</code>, and the two outbound IPs are the same (egress goes through your NAT Gateway).</p>
 <h3 id="05-aks--step-4-check-observability">Step 4. Check observability<a class="anchor" href="#05-aks--step-4-check-observability" aria-label="Link to this heading">#</a></h3>
 <figure class="diagram-fig"><div class="diagram-scroll"><svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 960 520" width="960" height="520" role="img" aria-labelledby="observability-pipeline-t observability-pipeline-d"><title id="observability-pipeline-t">Observability pipeline: logs · metrics · control plane logs</title><desc id="observability-pipeline-d">ama-logs sends container logs through a DCR to Log Analytics; ama-metrics sends metrics through a DCE and DCR to the Azure Monitor workspace (Managed Prometheus); control plane diagnostic logs reach Log Analytics through a diagnostic setting; and Managed Grafana reads from Prometheus.</desc><style>svg.dg{--dg-bg:#ffffff;--dg-fg:#1f2328;--dg-muted:#59636e;--dg-line:#6e7781;--dg-card:#f6f8fa;--dg-border:#d1d9e0;--dg-aws:#c2590a;--dg-aws-soft:#fff1e5;--dg-azure:#0b6ed0;--dg-azure-soft:#e5f1ff;--dg-ok:#1a7f37;--dg-ok-soft:#e6f6ea;--dg-id:#8250df;--dg-id-soft:#f3ecff;--dg-net:#0e7490;--dg-net-soft:#e0f4f8;--dg-warn:#9a6700;--dg-warn-soft:#fff6d6;--dg-danger:#cf222e;--dg-danger-soft:#ffebe9;font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", "Segoe UI", Roboto, sans-serif}
 @media (prefers-color-scheme:dark){svg.dg{--dg-bg:#0d1117;--dg-fg:#e6edf3;--dg-muted:#9198a1;--dg-line:#8b949e;--dg-card:#151b23;--dg-border:#30363d;--dg-aws:#f0883e;--dg-aws-soft:#2b1c10;--dg-azure:#58a6ff;--dg-azure-soft:#0f2238;--dg-ok:#3fb950;--dg-ok-soft:#0f2417;--dg-id:#b392f0;--dg-id-soft:#221a36;--dg-net:#39c5cf;--dg-net-soft:#0d2a2f;--dg-warn:#d29922;--dg-warn-soft:#2d2208;--dg-danger:#ff7b72;--dg-danger-soft:#3a1517}}
@@ -6645,6 +6678,7 @@ kubectl get nodes -L kubernetes.azure.com/scalesetpriority    <span class="hljs-
 <h3 id="05-aks--b-switch-to-a-fully-private-cluster">(b) Switch to a fully private cluster<a class="anchor" href="#05-aks--b-switch-to-a-fully-private-cluster" aria-label="Link to this heading">#</a></h3>
 <p>Run <code>terraform plan -var enable_private_cluster=true</code>. Changing <code>private_cluster_enabled</code> <strong>recreates the cluster (forces replacement)</strong>. In production, decide this from the start. With a private cluster, <code>kubectl</code> and the Terraform kubernetes provider can connect only from inside the VNet (VPN, Bastion, or a jump host). For an ad-hoc check, use <code>az aks command invoke</code>.</p>
 <figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 1 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">az aks <span class="hljs-built_in">command</span> invoke -g &lt;rg&gt; -n &lt;cluster&gt; --<span class="hljs-built_in">command</span> <span class="hljs-string">&quot;kubectl get pods -A&quot;</span></code></pre></div></figure>
+<p><code>command invoke</code> also works on the public cluster of this lab when you are on an address that is not in <code>allowed_ip_ranges</code>, such as Cloud Shell or another network (<a href="#lab-99-appendix">Appendix D</a>).</p>
 <h3 id="05-aks--automated-verification-script">Automated verification script<a class="anchor" href="#05-aks--automated-verification-script" aria-label="Link to this heading">#</a></h3>
 <p>A single <code>az aks show</code> call checks the cluster settings (security · networking · upgrades · add-ons · node pools), and <code>kubectl</code> checks the nodes, permissions, GatewayClass, and add-on pods.
 It uses a temporary kubeconfig, so <code>~/.kube/config</code> isn&#39;t changed.</p>
@@ -6786,7 +6820,7 @@ scripts/verify.sh 05-aks</code></pre></div></figure>
 
 <span class="hljs-comment"># You can also run it directly (scripts/verify/05-aks.sh).</span>
 <span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">${BASH_SOURCE[0]}</span>&quot;</span> = <span class="hljs-string">&quot;<span class="hljs-variable">$0</span>&quot;</span> ]; <span class="hljs-keyword">then</span> verify_stack; summary; <span class="hljs-keyword">fi</span></code></pre></div><button class="expand" type="button" data-label="Show all 136 lines ▼">Show all 136 lines ▼</button></figure>
-<aside class="callout tip"><div class="callout-title"><span>💡</span><span>Tip</span></div><p>If the kubectl step fails with &quot;Couldn&#39;t reach the API server&quot;, it&#39;s almost always because your public IP changed. Update <code>TF_VAR_allowed_ip_ranges</code> and <code>apply</code> 05-aks again.
+<aside class="callout tip"><div class="callout-title"><span>💡</span><span>Tip</span></div><p>If the kubectl step fails with &quot;Couldn&#39;t reach the API server&quot;, it&#39;s almost always because your public IP changed (or you are on another network or in Cloud Shell). Update <code>TF_VAR_allowed_ip_ranges</code> and <code>apply</code> 05-aks again; the IP list is also used by <code>04-platform</code> and <code>10-aks-automatic</code> (<a href="#lab-99-appendix">Appendix D</a>).
 Settings you changed from the default setup (<code>sku_tier</code>, <code>enable_gateway_api</code>, node counts, the Lab 09 upgrade channel) are shown as values, warnings, or skips instead of ✗. For a private cluster (<code>enable_private_cluster</code>), the script skips the kubectl step when you run it from outside the VNet.</p>
 </aside>
 <h2 id="05-aks--common-issues">Common issues<a class="anchor" href="#05-aks--common-issues" aria-label="Link to this heading">#</a></h2>
@@ -6811,7 +6845,7 @@ Settings you changed from the default setup (<code>sku_tier</code>, <code>enable
 </tr>
 <tr>
 <td><code>Unable to connect to the server: ... i/o timeout</code></td>
-<td>Your public IP changed → update <code>TF_VAR_allowed_ip_ranges</code>, then run <code>terraform apply</code>.</td>
+<td>Your public IP changed, or you are on another network or in Cloud Shell → update <code>TF_VAR_allowed_ip_ranges</code>, then run <code>terraform apply</code> (and see <a href="#lab-99-appendix">Appendix D</a>; <code>az aks command invoke</code> works meanwhile).</td>
 </tr>
 <tr>
 <td><code>error: You must be logged in to the server (Unauthorized)</code></td>
@@ -8422,6 +8456,8 @@ kubectl run np-test --<span class="hljs-built_in">rm</span> -i --restart=Never -
 <span class="hljs-comment"># (c) Switch to the internal load balancer → a private IP in snet-ingress</span>
 terraform apply -var internal_gateway=<span class="hljs-literal">true</span>
 kubectl -n web get gateway web-gateway -o jsonpath=<span class="hljs-string">&#x27;{.status.addresses[0].value}{&quot;\n&quot;}&#x27;</span>   <span class="hljs-comment"># 10.10.2.x</span></code></pre></div></figure>
+<aside class="callout tip"><div class="callout-title"><span>💡</span><span>Tip</span></div><p>More <code>kubectl</code> practice with pods and Deployments (logs, <code>exec</code>, <code>port-forward</code>, rollouts, troubleshooting) is in <a href="#lab-99-appendix">Appendix E</a>. This app is managed by Terraform, so do your experiments in a practice namespace: a change made with <code>kubectl</code> shows up as a difference in the next <code>terraform plan</code> (E-8).</p>
+</aside>
 <h3 id="07-ingress--extending-to-tls-https">Extending to TLS (HTTPS)<a class="anchor" href="#07-ingress--extending-to-tls-https" aria-label="Link to this heading">#</a></h3>
 <p>Add a <code>443/HTTPS</code> listener to the <code>Gateway</code> and point <code>tls.certificateRefs</code> at a Kubernetes Secret. The node NSG (03-network) already allows ports 80 and 443, so you don&#39;t need to change the NSG. The Microsoft baseline approach is to <strong>keep the certificate in Key Vault and sync it to a Secret with the Secrets Store CSI driver&#39;s <code>secretObjects</code></strong> (the same SecretProviderClass pattern as in Lab 06; the <code>Key Vault Certificate User</code> role is required). For the detailed procedure, see <a href="https://learn.microsoft.com/azure/aks/app-routing-gateway-api-dns-tls" target="_blank" rel="noopener noreferrer">App Routing Gateway API: DNS and TLS</a>.</p>
 <h3 id="07-ingress--automated-verification-script">Automated verification script<a class="anchor" href="#07-ingress--automated-verification-script" aria-label="Link to this heading">#</a></h3>
@@ -9599,6 +9635,8 @@ kubectl get events -A | grep -i -E <span class="hljs-string">&quot;TriggeredScal
 <span class="hljs-comment"># Why Terraform doesn&#x27;t fight the autoscaler: the code doesn&#x27;t set node_count and declares only min/max.</span></code></pre></div></figure>
 <aside class="callout tip"><div class="callout-title"><span>💡</span><span>Tip</span></div><p><strong>Don&#39;t hard-code the node count.</strong> When <code>auto_scaling_enabled = true</code>, declare only <code>min_count</code>/<code>max_count</code>. If you set <code>node_count</code>, it keeps conflicting with the values the autoscaler changes (if you must set it, use <code>lifecycle.ignore_changes</code>).</p>
 </aside>
+<aside class="callout tip"><div class="callout-title"><span>💡</span><span>Tip</span></div><p>Scaling a workload by hand (<code>kubectl scale</code>), rolling out a new image, undoing a bad release and reading pod logs are covered in <a href="#lab-99-appendix">Appendix E</a>. If Terraform owns the workload (Lab 06 and Lab 07), change the code instead of using <code>kubectl</code>, or the next <code>terraform plan</code> shows a difference (E-8).</p>
+</aside>
 <h2 id="09-operations--3-changing-and-replacing-node-pools">3. Changing and replacing node pools<a class="anchor" href="#09-operations--3-changing-and-replacing-node-pools" aria-label="Link to this heading">#</a></h2>
 <p>Changing <code>vm_size</code>, <code>os_disk_*</code>, <code>zones</code>, <code>vnet_subnet_id</code>, and similar attributes <strong>replaces</strong> the node pool. This lab sets <code>temporary_name_for_rotation</code> (<code>systemtmp</code>, <code>usertmp</code>) so that a temporary pool is created first and the replacement happens afterwards. That is why the plan shows <strong><code>will be updated in-place</code></strong> instead of <code>replace</code>; the provider performs the actual replacement (create the temporary pool → remove the old pool) during apply.</p>
 <figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 1 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">terraform plan -var user_node_vm_size=Standard_D8ds_v5   <span class="hljs-comment"># vm_size: D4ds_v5 -&gt; D8ds_v5 (user pool updated in-place)</span></code></pre></div></figure>
@@ -10317,14 +10355,22 @@ az aks start -g &lt;rg&gt; -n &lt;cluster&gt;
 terraform init -backend-config=../backend.hcl
 terraform plan -out tfplan
 terraform apply tfplan            <span class="hljs-comment"># 10–15 min</span>
-$(terraform output -raw get_credentials_command)</code></pre></div></figure>
+<span class="hljs-built_in">eval</span> <span class="hljs-string">&quot;<span class="hljs-subst">$(terraform output -raw get_credentials_command)</span>&quot;</span></code></pre></div></figure>
 <aside class="callout note"><div class="callout-title"><span>ℹ️</span><span>Note</span></div><p>AKS Automatic turns on Azure Policy automatically. The <code>Microsoft.PolicyInsights</code> resource provider must be registered in the subscription (<a href="#lab-01-prerequisites">Lab 01</a>).
 If the Azure CLI <code>aks-preview</code> extension is installed, it can conflict, so we recommend running <code>az extension remove -n aks-preview</code>.</p>
 </aside>
+<aside class="callout important"><div class="callout-title"><span>❗</span><span>Important</span></div><p><strong>You now have two clusters.</strong> <code>az aks get-credentials</code> made this Automatic cluster the current <code>kubectl</code> context, so the commands in the next steps run against it. To go back to the Lab 05 cluster, use <code>kubectl config use-context &lt;name&gt;</code>; <code>kubectl config get-contexts</code> lists both, and <code>az aks list -o table</code> shows their SKUs (<code>Base</code> for Standard, <code>Automatic</code> for this one). See <a href="#lab-99-appendix">Appendix D</a>. This cluster is not connected to the Lab 04 ACR, so use public images here.</p>
+</aside>
 <h3 id="10-aks-automatic--step-2-inspect-the-cluster-that-has-no-nodes">Step 2. Inspect the cluster that has &quot;no&quot; nodes<a class="anchor" href="#10-aks-automatic--step-2-inspect-the-cluster-that-has-no-nodes" aria-label="Link to this heading">#</a></h3>
-<figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 3 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">kubectl get nodes              <span class="hljs-comment"># At first there are few or no user nodes (you see 3 managed hostedpool nodes + 1 system-surge node)</span>
+<figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 7 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">kubectl get nodes              <span class="hljs-comment"># At first there are few or no user nodes (you see 3 managed hostedpool nodes + 1 system-surge node)</span>
 kubectl get nodepools.karpenter.sh 2&gt;/dev/null     <span class="hljs-comment"># NAP NodePools (default, system-surge)</span>
-kubectl get gatewayclass       <span class="hljs-comment"># approuting-istio (only on 1.36+ clusters that have the Gateway API CRDs)</span></code></pre></div></figure>
+kubectl get gatewayclass       <span class="hljs-comment"># approuting-istio (only on 1.36+ clusters that have the Gateway API CRDs)</span>
+
+<span class="hljs-comment"># Outbound: AKS manages a NAT Gateway in the node resource group; its public IP is the cluster&#x27;s egress IP</span>
+NODE_RG=$(az aks show -g <span class="hljs-string">&quot;<span class="hljs-subst">$(terraform output -raw resource_group_name)</span>&quot;</span> -n <span class="hljs-string">&quot;<span class="hljs-subst">$(terraform output -raw cluster_name)</span>&quot;</span> --query nodeResourceGroup -o tsv)
+az network public-ip list -g <span class="hljs-string">&quot;<span class="hljs-variable">$NODE_RG</span>&quot;</span> --query <span class="hljs-string">&quot;[].ipAddress&quot;</span> -o tsv</code></pre></div></figure>
+<aside class="callout tip"><div class="callout-title"><span>💡</span><span>Tip</span></div><p>To see that address from inside the cluster, run the pod from <a href="#lab-99-appendix">Appendix D</a> (D-2). A bare <code>kubectl run</code> pod is rejected here because it has no resource requests.</p>
+</aside>
 <aside class="callout note"><div class="callout-title"><span>ℹ️</span><span>Note</span></div><p>A new Automatic cluster is on the <code>stable</code> channel (N-1), so it is created with a version <strong>one minor below the latest GA minor</strong> (1.35.8 as of 2026-10), and <code>azurerm_kubernetes_automatic_cluster</code> doesn&#39;t let you pick the version. In this case <code>istio_enabled = true</code> turns on the approuting-istio implementation, but the Gateway API CRDs aren&#39;t installed, so <code>kubectl get gatewayclass</code> fails with <code>the server doesn&#39;t have a resource type &quot;gatewayclass&quot;</code> (this is expected). To use Gateway/HTTPRoute, check again after the cluster moves up to 1.36+.</p>
 </aside>
 <h3 id="10-aks-automatic--step-3-try-deployment-safeguards">Step 3. Try Deployment Safeguards<a class="anchor" href="#10-aks-automatic--step-3-try-deployment-safeguards" aria-label="Link to this heading">#</a></h3>
@@ -10997,8 +11043,8 @@ az role assignment list --all --query <span class="hljs-string">&quot;[?principa
 </li>
 </ul>
 <p>Next → <a href="#lab-99-appendix">Appendix</a></p>
-<label class="lab-done"><input type="checkbox" class="lab-done-cb"> I finished this lab (progress is saved in this browser)</label><nav class="pager"><a class="prev" href="#lab-10-aks-automatic"><small>← Previous</small>Lab 10. AKS Automatic: the &quot;we operate it for you&quot; mode, equivalent to EKS Auto Mode</a><a class="next" href="#lab-99-appendix"><small>Next →</small>Appendix. Troubleshooting · production checklist · references · test code</a></nav></section>
-<section class="lab" id="lab-99-appendix" data-lab="99-appendix" data-title="Appendix. Troubleshooting · production checklist · references · test code"><div class="lab-kicker">Appendix</div><h1 id="99-appendix--appendix-troubleshooting-production-checklist-references-test-code">Appendix. Troubleshooting · production checklist · references · test code<a class="anchor" href="#99-appendix--appendix-troubleshooting-production-checklist-references-test-code" aria-label="Link to this heading">#</a></h1>
+<label class="lab-done"><input type="checkbox" class="lab-done-cb"> I finished this lab (progress is saved in this browser)</label><nav class="pager"><a class="prev" href="#lab-10-aks-automatic"><small>← Previous</small>Lab 10. AKS Automatic: the &quot;we operate it for you&quot; mode, equivalent to EKS Auto Mode</a><a class="next" href="#lab-99-appendix"><small>Next →</small>Appendix. Troubleshooting · production checklist · cluster access and workloads · references · test code</a></nav></section>
+<section class="lab" id="lab-99-appendix" data-lab="99-appendix" data-title="Appendix. Troubleshooting · production checklist · cluster access and workloads · references · test code"><div class="lab-kicker">Appendix</div><h1 id="99-appendix--appendix-troubleshooting-production-checklist-cluster-access-and-workloads-references-test-code">Appendix. Troubleshooting · production checklist · cluster access and workloads · references · test code<a class="anchor" href="#99-appendix--appendix-troubleshooting-production-checklist-cluster-access-and-workloads-references-test-code" aria-label="Link to this heading">#</a></h1>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -11016,6 +11062,8 @@ az role assignment list --all --query <span class="hljs-string">&quot;[?principa
 </tr>
 </tbody></table>
 </div>
+<aside class="callout tip"><div class="callout-title"><span>💡</span><span>Tip</span></div><p>Looking for how to reach the clusters from Cloud Shell or another PC, or how to run <code>kubectl</code> against pods and Deployments? See <strong>D. How to reach the clusters</strong> and <strong>E. Handling Kubernetes workloads with kubectl</strong> below.</p>
+</aside>
 <h2 id="99-appendix--a-how-this-guide-was-validated-and-its-limits">A. How this guide was validated, and its limits<a class="anchor" href="#99-appendix--a-how-this-guide-was-validated-and-its-limits" aria-label="Link to this heading">#</a></h2>
 <h3 id="99-appendix--a-1-static-validation-no-azure-needed">A-1. Static validation (no Azure needed)<a class="anchor" href="#99-appendix--a-1-static-validation-no-azure-needed" aria-label="Link to this heading">#</a></h3>
 <div class="table-wrap"><table>
@@ -11446,7 +11494,11 @@ az role assignment list --all --query <span class="hljs-string">&quot;[?principa
 </tr>
 <tr>
 <td><code>kubectl: Unable to connect ... i/o timeout</code></td>
-<td>Your public IP changed → update <code>TF_VAR_allowed_ip_ranges</code>, then <code>apply</code> 05-aks (API server authorized IP).</td>
+<td>The API server only accepts the IPs in <code>allowed_ip_ranges</code>. Your public IP changed, or you are on another network, Cloud Shell or CI → see section D (D-3 and D-4): update <code>TF_VAR_allowed_ip_ranges</code> and <code>apply</code> <code>04-platform</code>, <code>05-aks</code> and <code>10-aks-automatic</code>; meanwhile use <code>az aks command invoke</code>.</td>
+</tr>
+<tr>
+<td><code>kubectl</code> changes the wrong cluster</td>
+<td>With two clusters, <code>az aks get-credentials</code> switches the current context to the cluster you fetched last. Check <code>kubectl config current-context</code>, then <code>kubectl config use-context &lt;name&gt;</code> (see D-1).</td>
 </tr>
 <tr>
 <td><code>kubelogin</code> error / <code>Unauthorized</code></td>
@@ -11537,7 +11589,447 @@ az role assignment list --all --query <span class="hljs-string">&quot;[?principa
 </tr>
 </tbody></table>
 </div>
-<h2 id="99-appendix--d-references">D. References<a class="anchor" href="#99-appendix--d-references" aria-label="Link to this heading">#</a></h2>
+<h2 id="99-appendix--d-how-to-reach-the-clusters-and-what-is-exposed-to-the-internet">D. How to reach the clusters, and what is exposed to the internet<a class="anchor" href="#99-appendix--d-how-to-reach-the-clusters-and-what-is-exposed-to-the-internet" aria-label="Link to this heading">#</a></h2>
+<p>After Lab 05 and Lab 10 you have <strong>two</strong> clusters in the same subscription. This section shows how to tell them apart, which traffic can enter and leave, and what to do when you are not on the laptop you used for the labs (Azure Cloud Shell, another PC, CI).</p>
+<h3 id="99-appendix--d-1-the-two-clusters">D-1. The two clusters<a class="anchor" href="#99-appendix--d-1-the-two-clusters" aria-label="Link to this heading">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>Standard (Lab 05)</th>
+<th>Automatic (Lab 10)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Terraform stack</td>
+<td><code>terraform/05-aks</code> (builds on the network and platform stacks 03 and 04)</td>
+<td><code>terraform/10-aks-automatic</code> (independent of Lab 03–05)</td>
+</tr>
+<tr>
+<td>Default name</td>
+<td><code>aks-aksdemo-dev-krc</code> in <code>rg-aksdemo-dev-krc-aks</code></td>
+<td><code>aksa-aksdemo-dev-krc</code> in <code>rg-aksdemo-dev-krc-automatic</code></td>
+</tr>
+<tr>
+<td>SKU in <code>az aks list</code></td>
+<td><code>Base</code> (tier <code>Standard</code>)</td>
+<td><code>Automatic</code> (tier <code>Standard</code>)</td>
+</tr>
+<tr>
+<td>Nodes</td>
+<td>System and user pools that you size (default 3 + 3)</td>
+<td>A managed system pool, plus nodes that node auto-provisioning (NAP) adds on demand</td>
+</tr>
+<tr>
+<td><code>kubectl</code> context</td>
+<td>Same as the cluster name</td>
+<td>Same as the cluster name</td>
+</tr>
+</tbody></table>
+</div>
+<p>The names depend on <code>TF_VAR_workload</code>, <code>TF_VAR_environment</code> and <code>TF_VAR_location</code>; read the exact values from the <code>cluster_name</code> and <code>resource_group_name</code> outputs of each stack.</p>
+<figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 9 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-comment"># Which clusters do I have, and what kind is each?</span>
+az aks list --query <span class="hljs-string">&quot;[].{name:name, rg:resourceGroup, sku:sku.name, tier:sku.tier, version:currentKubernetesVersion, power:powerState.code}&quot;</span> -o table
+
+<span class="hljs-comment"># Which cluster does kubectl talk to right now? (* marks the current context)</span>
+kubectl config get-contexts
+kubectl config current-context
+
+kubectl config use-context aks-aksdemo-dev-krc     <span class="hljs-comment"># switch the default cluster</span>
+kubectl --context aksa-aksdemo-dev-krc get nodes   <span class="hljs-comment"># or address the other cluster for a single command</span></code></pre></div></figure>
+<aside class="callout warning"><div class="callout-title"><span>⚠️</span><span>Warning</span></div><p><code>az aks get-credentials</code> makes the cluster you fetched <strong>last</strong> the current context. After Lab 10 step 1, every plain <code>kubectl</code> command goes to the Automatic cluster until you run <code>kubectl config use-context</code> again. Check <code>kubectl config current-context</code> before any <code>apply</code> or <code>delete</code>. The <code>scripts/verify.sh</code> scripts are not affected because they use a temporary kubeconfig.</p>
+</aside>
+<h3 id="99-appendix--d-2-what-can-connect-to-what">D-2. What can connect to what<a class="anchor" href="#99-appendix--d-2-what-can-connect-to-what" aria-label="Link to this heading">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>Standard cluster</th>
+<th>Automatic cluster</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Outbound (cluster → internet)</td>
+<td>Yes, through the NAT Gateway from Lab 03 (static public IP, <code>nat_gateway_public_ip</code> output)</td>
+<td>Yes, through the NAT Gateway that AKS manages in the node resource group (<code>MC_…</code>)</td>
+</tr>
+<tr>
+<td>API server</td>
+<td>Public endpoint with API Server VNet Integration. <strong>Only the IPs in <code>allowed_ip_ranges</code> can use it</strong></td>
+<td>Same</td>
+</tr>
+<tr>
+<td>Apps reachable from the internet</td>
+<td>The Lab 07 Gateway has a public IP on ports 80 and 443 (node NSG rule <code>AllowGatewayHttpHttps</code>); <code>internal_gateway=true</code> makes it private</td>
+<td>None: the guide deploys no <code>LoadBalancer</code> Service here</td>
+</tr>
+<tr>
+<td>Images from the Lab 04 ACR</td>
+<td>Pulled over the Private Endpoint; only this cluster&#39;s kubelet identity has <code>AcrPull</code></td>
+<td><strong>Cannot pull</strong> (<code>ErrImagePull … 403 Forbidden</code>). Use public images such as <code>mcr.microsoft.com</code>, or give your own registry <code>AcrPull</code> and network access</td>
+</tr>
+</tbody></table>
+</div>
+<p>The platform services from Lab 04 do not belong to one cluster: the ACR and Key Vault public endpoints accept only the IPs in <code>allowed_ip_ranges</code>, and Grafana has a public endpoint behind Entra ID sign-in.</p>
+<p><strong>Check the outbound IP from inside a cluster.</strong> The pod below also follows the Automatic cluster&#39;s Deployment Safeguards (resource requests are mandatory there), so the same manifest works on both clusters.</p>
+<figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 30 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">kubectl apply -f - &lt;&lt;<span class="hljs-string">&#x27;EOF&#x27;</span>
+apiVersion: v1
+kind: Pod
+metadata: { name: egress-test, namespace: default }
+spec:
+  restartPolicy: Never
+  containers:
+  - name: t
+    image: mcr.microsoft.com/cbl-mariner/busybox:2.0
+    <span class="hljs-built_in">command</span>: [<span class="hljs-string">&quot;sh&quot;</span>, <span class="hljs-string">&quot;-c&quot;</span>, <span class="hljs-string">&quot;wget -qO- -T 15 http://api.ipify.org; echo&quot;</span>]
+    resources:
+      requests: { cpu: 50m, memory: 32Mi }
+      limits: { cpu: 100m, memory: 64Mi }
+    readinessProbe: { <span class="hljs-built_in">exec</span>: { <span class="hljs-built_in">command</span>: [<span class="hljs-string">&quot;true&quot;</span>] } }
+    livenessProbe: { <span class="hljs-built_in">exec</span>: { <span class="hljs-built_in">command</span>: [<span class="hljs-string">&quot;true&quot;</span>] } }
+    securityContext:
+      allowPrivilegeEscalation: <span class="hljs-literal">false</span>
+      runAsNonRoot: <span class="hljs-literal">true</span>
+      runAsUser: 1000
+      capabilities: { drop: [<span class="hljs-string">&quot;ALL&quot;</span>] }
+      seccompProfile: { <span class="hljs-built_in">type</span>: RuntimeDefault }
+EOF
+kubectl <span class="hljs-built_in">wait</span> --<span class="hljs-keyword">for</span>=jsonpath=<span class="hljs-string">&#x27;{.status.phase}&#x27;</span>=Succeeded pod/egress-test --<span class="hljs-built_in">timeout</span>=180s
+kubectl logs egress-test          <span class="hljs-comment"># the public IP that the internet sees for this cluster</span>
+kubectl delete pod egress-test
+
+<span class="hljs-comment"># Compare it with the NAT Gateway&#x27;s address</span>
+terraform -<span class="hljs-built_in">chdir</span>=terraform/03-network output -raw nat_gateway_public_ip        <span class="hljs-comment"># Standard cluster</span>
+NODE_RG=$(az aks show -g &lt;automatic-rg&gt; -n &lt;automatic-cluster&gt; --query nodeResourceGroup -o tsv)
+az network public-ip list -g <span class="hljs-string">&quot;<span class="hljs-variable">$NODE_RG</span>&quot;</span> --query <span class="hljs-string">&quot;[].ipAddress&quot;</span> -o tsv            <span class="hljs-comment"># Automatic cluster</span></code></pre></div></figure>
+<h3 id="99-appendix--d-3-where-can-i-run-kubectl-from">D-3. Where can I run kubectl from?<a class="anchor" href="#99-appendix--d-3-where-can-i-run-kubectl-from" aria-label="Link to this heading">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>From</th>
+<th><code>kubectl</code> to the API servers</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>The laptop whose IP is in <code>allowed_ip_ranges</code></td>
+<td>Works</td>
+<td>The IP is authorized</td>
+</tr>
+<tr>
+<td>Another network (other Wi-Fi, VPN, tethering) or a teammate&#39;s PC</td>
+<td>Blocked</td>
+<td>The IP is not authorized</td>
+</tr>
+<tr>
+<td>Azure Cloud Shell</td>
+<td>Blocked</td>
+<td>Cloud Shell runs on Microsoft-managed Azure addresses that are not in your list, and a fixed address is not guaranteed</td>
+</tr>
+<tr>
+<td>CI runners (for example GitHub-hosted runners)</td>
+<td>Blocked</td>
+<td>Same reason</td>
+</tr>
+<tr>
+<td>Anywhere, with <code>az aks command invoke</code> or the portal <strong>Run command</strong></td>
+<td>Works</td>
+<td>The command runs inside the cluster through the Azure API, not over your network path</td>
+</tr>
+</tbody></table>
+</div>
+<p>A blocked request gets no answer at all, so <code>kubectl</code> ends with <code>Unable to connect to the server: dial tcp …:443: i/o timeout</code>. (Measured for this guide: from an unauthorized address the TCP connection opens but the HTTPS request gets no response, while the same request from an authorized address returns HTTP 401, which means it reached the API server.)</p>
+<p><strong><code>az aks command invoke</code></strong> runs a command in the cluster through the Azure API, so it works from anywhere you are signed in to Azure:</p>
+<figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 2 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">az aks <span class="hljs-built_in">command</span> invoke -g &lt;rg&gt; -n &lt;cluster&gt; --<span class="hljs-built_in">command</span> <span class="hljs-string">&quot;kubectl get nodes&quot;</span>
+az aks <span class="hljs-built_in">command</span> invoke -g &lt;rg&gt; -n &lt;cluster&gt; --<span class="hljs-built_in">command</span> <span class="hljs-string">&quot;kubectl -n web get pods -o wide&quot;</span></code></pre></div></figure>
+<ul>
+<li>You need Azure RBAC permission on the cluster for the actions <code>Microsoft.ContainerService/managedClusters/runcommand/action</code> and <code>Microsoft.ContainerService/managedClusters/commandResults/read</code> (Owner, Contributor and the AKS Contributor role have them).</li>
+<li>AKS runs the command in a short-lived pod in the <code>aks-command</code> namespace and returns the text output. There is no interactive shell, <code>exec -it</code> or <code>port-forward</code>; keep each call to commands that finish on their own, and attach files such as a manifest with <code>--file</code>.</li>
+<li>The portal offers the same feature as <strong>AKS cluster → Run command</strong>.</li>
+<li>Tested on both clusters of this guide.</li>
+</ul>
+<h3 id="99-appendix--d-4-when-your-public-ip-changes-or-a-teammate-needs-access">D-4. When your public IP changes, or a teammate needs access<a class="anchor" href="#99-appendix--d-4-when-your-public-ip-changes-or-a-teammate-needs-access" aria-label="Link to this heading">#</a></h3>
+<ol>
+<li>Look up the new address (<a href="#lab-01-prerequisites">Lab 01</a>, step 5): <code>curl -s https://api.ipify.org</code>.</li>
+<li>Put every machine that needs access into <code>TF_VAR_allowed_ip_ranges</code> (a JSON list with one <code>/32</code> per machine) and save it in your <code>env.sh</code>, for example <code>export TF_VAR_allowed_ip_ranges=&#39;[&quot;203.0.113.10/32&quot;,&quot;198.51.100.7/32&quot;]&#39;</code>.</li>
+<li>Re-apply the three stacks that use the list:</li>
+</ol>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Stack</th>
+<th>What the IP list opens</th>
+<th>Command (from the repository root)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>04-platform</code></td>
+<td>ACR and Key Vault firewalls (needed for <code>az acr import</code> and Key Vault secrets)</td>
+<td><code>terraform -chdir=terraform/04-platform apply</code></td>
+</tr>
+<tr>
+<td><code>05-aks</code></td>
+<td>Standard cluster API server</td>
+<td><code>terraform -chdir=terraform/05-aks apply</code></td>
+</tr>
+<tr>
+<td><code>10-aks-automatic</code></td>
+<td>Automatic cluster API server</td>
+<td><code>terraform -chdir=terraform/10-aks-automatic apply</code></td>
+</tr>
+</tbody></table>
+</div>
+<p>These applies talk to Azure Resource Manager only, so they work even while <code>kubectl</code> is blocked. A new list takes up to two minutes to propagate. Until then, use <code>az aks command invoke</code>.</p>
+<aside class="callout warning"><div class="callout-title"><span>⚠️</span><span>Warning</span></div><p>Do not run the Lab 01 one-liner (<code>curl … api.ipify.org</code>) inside Cloud Shell to fill <code>TF_VAR_allowed_ip_ranges</code>: it would register Cloud Shell&#39;s address instead of your laptop&#39;s. Run Terraform from your own machine, and use <code>az aks command invoke</code> from Cloud Shell. From an unauthorized address, the <code>kubectl</code> steps of <code>scripts/verify.sh</code> and the stacks that use the <code>kubernetes</code> provider (06 and 07) cannot reach the API server either.</p>
+</aside>
+<h2 id="99-appendix--e-handling-kubernetes-workloads-with-kubectl">E. Handling Kubernetes workloads with kubectl<a class="anchor" href="#99-appendix--e-handling-kubernetes-workloads-with-kubectl" aria-label="Link to this heading">#</a></h2>
+<p>Labs 01–10 build the platform. This section is about the Kubernetes objects that run on it: how to look at them, change them and debug them, and how that fits with Terraform and Azure RBAC. Every command here was run against a cluster from this guide in a throwaway namespace; they work on both clusters unless noted.</p>
+<h3 id="99-appendix--e-1-pick-the-cluster-and-namespace">E-1. Pick the cluster and namespace<a class="anchor" href="#99-appendix--e-1-pick-the-cluster-and-namespace" aria-label="Link to this heading">#</a></h3>
+<figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 5 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">kubectl config current-context        <span class="hljs-comment"># which cluster? (two clusters: see D-1)</span>
+kubectl get ns                        <span class="hljs-comment"># which namespaces exist?</span>
+kubectl -n practice get pods          <span class="hljs-comment"># -n selects a namespace</span>
+kubectl get pods -A                   <span class="hljs-comment"># -A means all namespaces</span>
+kubectl config set-context --current --namespace=practice    <span class="hljs-comment"># optional: make practice the default namespace</span></code></pre></div></figure>
+<h3 id="99-appendix--e-2-create-a-practice-namespace-and-a-first-deployment">E-2. Create a practice namespace and a first Deployment<a class="anchor" href="#99-appendix--e-2-create-a-practice-namespace-and-a-first-deployment" aria-label="Link to this heading">#</a></h3>
+<p>Practice in a namespace of your own so that you never touch the Lab 06 and Lab 07 apps (<code>demo</code>, <code>web</code>).</p>
+<figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 35 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">kubectl create namespace practice
+kubectl apply -f - &lt;&lt;<span class="hljs-string">&#x27;EOF&#x27;</span>
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: hello, namespace: practice }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: hello } }
+  template:
+    metadata: { labels: { app: hello } }
+    spec:
+      containers:
+      - name: hello
+        image: mcr.microsoft.com/dotnet/samples:aspnetapp
+        ports: [{ containerPort: 8080 }]
+        resources:
+          requests: { cpu: 100m, memory: 128Mi }
+          limits: { cpu: 500m, memory: 256Mi }
+        readinessProbe: { httpGet: { path: /, port: 8080 } }
+        livenessProbe: { httpGet: { path: /, port: 8080 } }
+        securityContext:
+          allowPrivilegeEscalation: <span class="hljs-literal">false</span>
+          runAsNonRoot: <span class="hljs-literal">true</span>
+          runAsUser: 1654
+          capabilities: { drop: [<span class="hljs-string">&quot;ALL&quot;</span>] }
+          seccompProfile: { <span class="hljs-built_in">type</span>: RuntimeDefault }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: hello, namespace: practice }
+spec:
+  selector: { app: hello }
+  ports: [{ port: 80, targetPort: 8080 }]
+EOF
+kubectl -n practice rollout status deploy/hello</code></pre></div></figure>
+<p>The manifest follows the same rules as the Lab 07 app, so it passes on both clusters:</p>
+<ul>
+<li><code>resources.requests</code> and <code>limits</code>: on the Automatic cluster (<a href="#lab-10-aks-automatic">Lab 10</a>), Deployment Safeguards <strong>reject</strong> a bare pod without requests, and add default values (with a warning) to a Deployment that has none. The scheduler needs them everywhere.</li>
+<li>Probes: the readiness probe decides when a pod receives traffic, and the liveness probe restarts a stuck container. Deployment Safeguards warn when they are missing.</li>
+<li><code>runAsNonRoot</code>, <code>allowPrivilegeEscalation: false</code>, <code>drop: [&quot;ALL&quot;]</code> and <code>seccompProfile</code>: the Pod Security rules and the Lab 08 policies.</li>
+<li>The image is a public sample so that it also runs on the Automatic cluster (see the ACR row in D-2).</li>
+</ul>
+<h3 id="99-appendix--e-3-look-at-things-read-only">E-3. Look at things (read-only)<a class="anchor" href="#99-appendix--e-3-look-at-things-read-only" aria-label="Link to this heading">#</a></h3>
+<figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 27 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">kubectl -n practice get all                          <span class="hljs-comment"># common kinds only: ConfigMaps, Secrets and Ingresses are not included</span>
+kubectl -n practice get pods -o wide                 <span class="hljs-comment"># node and pod IP</span>
+kubectl -n practice get pods --show-labels
+kubectl -n practice get pods -l app=hello            <span class="hljs-comment"># filter by label</span>
+kubectl -n practice get pods -w                      <span class="hljs-comment"># watch changes (Ctrl+C to stop)</span>
+kubectl get pods -A --field-selector=status.phase!=Running      <span class="hljs-comment"># what is not running, in all namespaces</span>
+
+<span class="hljs-comment"># Pick exactly the fields you need</span>
+kubectl -n practice get pods -o jsonpath=<span class="hljs-string">&#x27;{.items[*].metadata.name}&#x27;</span>
+kubectl -n practice get pods -o custom-columns=NAME:.metadata.name,NODE:.spec.nodeName,IP:.status.podIP
+kubectl -n practice get deploy hello -o yaml         <span class="hljs-comment"># the full object as the cluster stores it</span>
+
+kubectl -n practice describe deploy hello            <span class="hljs-comment"># settings + recent events</span>
+kubectl -n practice get events --sort-by=.lastTimestamp
+
+<span class="hljs-comment"># Logs</span>
+kubectl -n practice logs deploy/hello --<span class="hljs-built_in">tail</span>=20      <span class="hljs-comment"># one pod of the Deployment</span>
+kubectl -n practice logs -l app=hello --prefix --<span class="hljs-built_in">tail</span>=5    <span class="hljs-comment"># every pod, prefixed with its name</span>
+kubectl -n practice logs &lt;pod&gt; -f                    <span class="hljs-comment"># follow</span>
+kubectl -n practice logs &lt;pod&gt; --previous            <span class="hljs-comment"># the container before the last restart</span>
+kubectl -n practice logs &lt;pod&gt; -c &lt;container&gt;        <span class="hljs-comment"># pods with more than one container</span>
+
+<span class="hljs-comment"># Resource usage (metrics-server is built into AKS)</span>
+kubectl -n practice top pods
+kubectl top nodes
+
+kubectl explain deploy.spec.strategy                 <span class="hljs-comment"># documentation of any field</span></code></pre></div></figure>
+<h3 id="99-appendix--e-4-get-inside-a-pod">E-4. Get inside a pod<a class="anchor" href="#99-appendix--e-4-get-inside-a-pod" aria-label="Link to this heading">#</a></h3>
+<figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 9 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">kubectl -n practice <span class="hljs-built_in">exec</span> -it deploy/hello -- sh                 <span class="hljs-comment"># a shell in the container</span>
+kubectl -n practice port-forward svc/hello 8080:80              <span class="hljs-comment"># then open http://localhost:8080</span>
+kubectl -n practice <span class="hljs-built_in">cp</span> &lt;pod&gt;:/etc/hostname ./hostname           <span class="hljs-comment"># copy a file out (needs tar in the image)</span>
+
+<span class="hljs-comment"># An image without a shell? Attach a temporary debug container to the running pod</span>
+kubectl -n practice debug -it pod/&lt;pod&gt; --image=mcr.microsoft.com/cbl-mariner/busybox:2.0 --target=hello -- sh
+
+<span class="hljs-comment"># Call a Service from inside the cluster with a throw-away pod</span>
+kubectl -n practice run tmp --<span class="hljs-built_in">rm</span> -it --restart=Never --image=mcr.microsoft.com/cbl-mariner/busybox:2.0 -- wget -qO- http://hello</code></pre></div></figure>
+<ul>
+<li><code>exec</code>, <code>logs</code>, <code>cp</code> and <code>port-forward</code> go through the API server, so they work only from where <code>kubectl</code> works (see D-3).</li>
+<li>A debug container stays in the pod&#39;s spec until the pod is replaced.</li>
+<li>On the Automatic cluster, <code>kubectl run</code> cannot set resource requests, so the throw-away pod is rejected. Use a manifest with requests, as in D-2.</li>
+</ul>
+<h3 id="99-appendix--e-5-change-things">E-5. Change things<a class="anchor" href="#99-appendix--e-5-change-things" aria-label="Link to this heading">#</a></h3>
+<figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 19 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">kubectl apply -f deploy.yaml                         <span class="hljs-comment"># declarative: the recommended way, keep manifests in Git</span>
+kubectl diff -f deploy.yaml                          <span class="hljs-comment"># preview (exit code 1 means there are differences)</span>
+kubectl apply --dry-run=server -f deploy.yaml        <span class="hljs-comment"># validate against the server, including admission and policies</span>
+
+kubectl -n practice scale deploy/hello --replicas=3
+kubectl -n practice <span class="hljs-built_in">set</span> <span class="hljs-built_in">env</span> deploy/hello MODE=demo   <span class="hljs-comment"># changes the pod template, so it starts a rolling update</span>
+kubectl -n practice <span class="hljs-built_in">set</span> image deploy/hello hello=&lt;new-image&gt;
+
+kubectl -n practice rollout status deploy/hello      <span class="hljs-comment"># wait for the rollout</span>
+kubectl -n practice rollout <span class="hljs-built_in">history</span> deploy/hello
+kubectl -n practice rollout undo deploy/hello        <span class="hljs-comment"># back to the previous revision</span>
+kubectl -n practice rollout restart deploy/hello     <span class="hljs-comment"># recreate the pods without changing the spec</span>
+
+kubectl -n practice patch deploy hello -p <span class="hljs-string">&#x27;{&quot;spec&quot;:{&quot;replicas&quot;:2}}&#x27;</span>
+kubectl -n practice label pod &lt;pod&gt; tier=frontend
+kubectl -n practice annotate deploy hello kubernetes.io/change-cause=<span class="hljs-string">&quot;set MODE=demo&quot;</span>    <span class="hljs-comment"># shown in rollout history</span>
+kubectl -n practice autoscale deploy hello --min=2 --max=4 --cpu-percent=70
+kubectl -n practice edit deploy hello                <span class="hljs-comment"># opens the object in $EDITOR</span>
+kubectl -n practice delete pod &lt;pod&gt;                 <span class="hljs-comment"># the Deployment creates a replacement</span></code></pre></div></figure>
+<p>A rolling update protects you from a bad release. Try <code>kubectl -n practice set image deploy/hello hello=mcr.microsoft.com/dotnet/samples:does-not-exist</code>: only the <strong>new</strong> pod goes to <code>ImagePullBackOff</code>, the old pods keep serving, <code>rollout status</code> eventually fails with <code>timed out waiting for the condition</code>, and <code>kubectl -n practice rollout undo deploy/hello</code> restores the working revision. With an autoscaler (HPA) the HPA owns the replica count, so a manual <code>kubectl scale</code> is overridden.</p>
+<h3 id="99-appendix--e-6-configuration-data-and-batch-jobs">E-6. Configuration data and batch jobs<a class="anchor" href="#99-appendix--e-6-configuration-data-and-batch-jobs" aria-label="Link to this heading">#</a></h3>
+<figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 11 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">kubectl -n practice create configmap app-config --from-literal=MODE=demo
+kubectl -n practice create secret generic db --from-literal=password=<span class="hljs-string">&#x27;&lt;demo-value&gt;&#x27;</span>
+kubectl -n practice <span class="hljs-built_in">set</span> <span class="hljs-built_in">env</span> deploy/hello --from=configmap/app-config         <span class="hljs-comment"># inject as environment variables</span>
+kubectl -n practice <span class="hljs-built_in">exec</span> deploy/hello -- <span class="hljs-built_in">printenv</span> MODE
+
+kubectl -n practice create job hello-job --image=mcr.microsoft.com/cbl-mariner/busybox:2.0 -- sh -c <span class="hljs-string">&#x27;echo job-done&#x27;</span>
+kubectl -n practice <span class="hljs-built_in">wait</span> --<span class="hljs-keyword">for</span>=condition=complete job/hello-job --<span class="hljs-built_in">timeout</span>=90s
+kubectl -n practice logs job/hello-job
+
+kubectl -n practice create cronjob tick --image=mcr.microsoft.com/cbl-mariner/busybox:2.0 --schedule=<span class="hljs-string">&quot;*/5 * * * *&quot;</span> -- sh -c <span class="hljs-string">&#x27;date&#x27;</span>
+kubectl -n practice create job manual-run --from=cronjob/tick                <span class="hljs-comment"># run a CronJob once, right now</span></code></pre></div></figure>
+<aside class="callout warning"><div class="callout-title"><span>⚠️</span><span>Warning</span></div><p>A Kubernetes Secret is only <strong>base64-encoded</strong>, not encrypted: <code>kubectl get secret db -o jsonpath=&#39;{.data.password}&#39;</code> prints a value that anyone with read access can decode. Do not commit Secret manifests, and keep real secrets out of your shell history. For real applications read secrets from Key Vault (<a href="#lab-06-workload-identity">Lab 06</a>).</p>
+</aside>
+<h3 id="99-appendix--e-7-when-something-is-wrong-a-triage-playbook">E-7. When something is wrong: a triage playbook<a class="anchor" href="#99-appendix--e-7-when-something-is-wrong-a-triage-playbook" aria-label="Link to this heading">#</a></h3>
+<p>Start with these three commands, then use the table.</p>
+<figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 3 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">kubectl get pods -A --field-selector=status.phase!=Running      <span class="hljs-comment"># what is not running?</span>
+kubectl -n practice describe pod &lt;pod&gt;                          <span class="hljs-comment"># read the Events at the bottom first</span>
+kubectl get events -A --sort-by=.lastTimestamp | <span class="hljs-built_in">tail</span> -20       <span class="hljs-comment"># what happened recently?</span></code></pre></div></figure>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Where to look</th>
+<th>Usual cause and fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Pending</code></td>
+<td><code>describe pod</code> → Events, for example <code>0/6 nodes are available: 3 Insufficient cpu, 3 node(s) had untolerated taint(s)</code></td>
+<td>The requests are larger than any node can offer, or only tainted nodes are left (the system pool accepts critical add-ons only). Lower the requests; if nodes cannot be added, check the vCPU quota (<a href="#lab-01-prerequisites">Lab 01</a> step 4)</td>
+</tr>
+<tr>
+<td><code>ImagePullBackOff</code> / <code>ErrImagePull</code></td>
+<td>The event message of <code>describe pod</code></td>
+<td>A typo in the image or tag; the image was not imported into the ACR (<a href="#lab-04-platform">Lab 04</a>, <a href="#lab-06-workload-identity">Lab 06</a>); the cluster has no <code>AcrPull</code> or is blocked by the registry firewall (<code>403 Forbidden</code>, see D-2)</td>
+</tr>
+<tr>
+<td><code>CrashLoopBackOff</code> / <code>Error</code></td>
+<td><code>kubectl logs &lt;pod&gt;</code>, <code>--previous</code>, <code>describe</code> → Last State and Exit Code</td>
+<td>The application exits: a wrong command, environment variable or config; a failing liveness probe; a missing ConfigMap or Secret (<code>CreateContainerConfigError</code>). <code>--previous</code> can be unavailable for a container that restarts very fast, so read the current logs as well</td>
+</tr>
+<tr>
+<td><code>OOMKilled</code> (exit code 137)</td>
+<td><code>describe pod</code> → Last State</td>
+<td>The memory limit is lower than what the process needs. Raise <code>limits.memory</code> or fix the leak; compare with <code>kubectl top pod</code></td>
+</tr>
+<tr>
+<td>The pod disappeared, or <code>Evicted</code></td>
+<td><code>get events</code></td>
+<td>Node pressure, or node consolidation (NAP on the Automatic cluster evicts under-used nodes). A bare pod with no owner is not recreated, so run workloads through a Deployment or Job</td>
+</tr>
+<tr>
+<td><code>Forbidden</code> on create or apply</td>
+<td>The message names the rule</td>
+<td><code>denied the request</code> from Gatekeeper or Deployment Safeguards (<a href="#lab-08-governance">Lab 08</a>, <a href="#lab-10-aks-automatic">Lab 10</a>), <code>violates PodSecurity</code>, or an RBAC error (<code>kubectl auth can-i create deployments -n practice</code>)</td>
+</tr>
+<tr>
+<td>A Service returns nothing</td>
+<td><code>kubectl -n practice get endpoints hello</code></td>
+<td>No endpoints: the selector does not match the pod labels (<code>get pods --show-labels</code>), or the readiness probe fails</td>
+</tr>
+<tr>
+<td><code>Unable to connect … i/o timeout</code></td>
+<td>Your public IP</td>
+<td>The IP is not authorized: see D-3 and D-4</td>
+</tr>
+<tr>
+<td><code>You must be logged in to the server (Unauthorized)</code></td>
+<td>Your sign-in</td>
+<td>Run <code>az login</code> and <code>kubelogin convert-kubeconfig -l azurecli</code> again</td>
+</tr>
+</tbody></table>
+</div>
+<p>Try it: a pod that exits at once (<code>command: [&quot;sh&quot;,&quot;-c&quot;,&quot;echo boom; exit 1&quot;]</code>) shows <code>Error</code> and then <code>CrashLoopBackOff</code>, and its output is in <code>kubectl logs</code>. A pod that asks for <code>cpu: &quot;64&quot;</code> stays <code>Pending</code> with the scheduler event above.</p>
+<h3 id="99-appendix--e-8-terraform-managed-or-kubectl-managed">E-8. Terraform-managed or kubectl-managed?<a class="anchor" href="#99-appendix--e-8-terraform-managed-or-kubectl-managed" aria-label="Link to this heading">#</a></h3>
+<p>The Lab 06 and Lab 07 workloads (<code>kv-demo</code>, <code>aspnetapp</code>, the Gateway) belong to <strong>Terraform</strong>. If you change a field that Terraform manages with <code>kubectl</code>, the next <code>terraform plan</code> shows a difference and the next <code>apply</code> reverts your change:</p>
+<figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 3 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">kubectl -n web patch svc aspnetapp -p <span class="hljs-string">&#x27;{&quot;spec&quot;:{&quot;sessionAffinity&quot;:&quot;ClientIP&quot;}}&#x27;</span>
+terraform -<span class="hljs-built_in">chdir</span>=terraform/07-ingress plan        <span class="hljs-comment"># ~ session_affinity = &quot;ClientIP&quot; -&gt; &quot;None&quot;</span>
+kubectl -n web patch svc aspnetapp -p <span class="hljs-string">&#x27;{&quot;spec&quot;:{&quot;sessionAffinity&quot;:&quot;None&quot;}}&#x27;</span>      <span class="hljs-comment"># put it back</span></code></pre></div></figure>
+<p>Rules of thumb:</p>
+<ol>
+<li><strong>Experiments</strong> belong in your own namespace and are done with <code>kubectl</code> (this section).</li>
+<li><strong>Permanent changes</strong> to the Lab 06 and Lab 07 workloads are made in the Terraform code or its variables, then applied.</li>
+<li>Fields that a controller owns are excluded on purpose: the replica count of the Lab 07 Deployment is <code>ignore_changes</code> because the HPA manages it, so scaling it by hand does not show up as a difference.</li>
+<li>To find manual changes, run <code>terraform plan -detailed-exitcode</code> regularly (<a href="#lab-09-operations">Lab 09</a>).</li>
+</ol>
+<h3 id="99-appendix--e-9-who-may-do-what-azure-rbac-for-kubernetes">E-9. Who may do what: Azure RBAC for Kubernetes<a class="anchor" href="#99-appendix--e-9-who-may-do-what-azure-rbac-for-kubernetes" aria-label="Link to this heading">#</a></h3>
+<p>Local accounts are disabled, so permissions come from Azure roles (<a href="#lab-05-aks">Lab 05</a>):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Scope</th>
+<th>What it allows</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Azure Kubernetes Service RBAC Reader</td>
+<td>Cluster or namespace</td>
+<td>Read most objects</td>
+</tr>
+<tr>
+<td>Azure Kubernetes Service RBAC Writer</td>
+<td>Cluster or namespace</td>
+<td>Read and write most objects</td>
+</tr>
+<tr>
+<td>Azure Kubernetes Service RBAC Admin</td>
+<td>Cluster or namespace</td>
+<td>Read and write most objects, and manage roles and role bindings in the namespace</td>
+</tr>
+<tr>
+<td>Azure Kubernetes Service RBAC Cluster Admin</td>
+<td>Cluster</td>
+<td>Everything in every namespace (the lab gives this to the signed-in user)</td>
+</tr>
+</tbody></table>
+</div>
+<p>To give an application team access to one namespace only, assign the role at namespace scope. They also need the <strong>Azure Kubernetes Service Cluster User Role</strong> on the cluster (to run <code>az aks get-credentials</code>) and their IP in <code>allowed_ip_ranges</code> (D-4):</p>
+<figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 6 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">CLUSTER_ID=$(az aks show -g &lt;rg&gt; -n &lt;cluster&gt; --query <span class="hljs-built_in">id</span> -o tsv)
+az role assignment create --assignee &lt;user-or-group-object-id&gt; \
+  --role <span class="hljs-string">&quot;Azure Kubernetes Service RBAC Writer&quot;</span> --scope <span class="hljs-string">&quot;<span class="hljs-variable">$CLUSTER_ID</span>/namespaces/practice&quot;</span>
+az role assignment list --scope <span class="hljs-string">&quot;<span class="hljs-variable">$CLUSTER_ID</span>/namespaces/practice&quot;</span> -o table
+
+kubectl -n practice auth can-i create deployments       <span class="hljs-comment"># check your own permission: yes or no</span></code></pre></div></figure>
+<p><code>kubectl auth can-i --list</code> is incomplete on a cluster that uses Azure RBAC (it warns that the webhook authorizer does not support rule resolution), so check one permission at a time. In a team, prefer Entra groups over individual users.</p>
+<h3 id="99-appendix--e-10-clean-up-the-practice-namespace">E-10. Clean up the practice namespace<a class="anchor" href="#99-appendix--e-10-clean-up-the-practice-namespace" aria-label="Link to this heading">#</a></h3>
+<figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 2 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">kubectl config current-context        <span class="hljs-comment"># make sure it is the cluster you mean</span>
+kubectl delete namespace practice     <span class="hljs-comment"># removes everything inside: Deployments, Pods, Services, Jobs, ConfigMaps, Secrets</span></code></pre></div></figure>
+<p>This does not touch the Lab 06 and Lab 07 workloads or any Azure resource.</p>
+<h2 id="99-appendix--f-references">F. References<a class="anchor" href="#99-appendix--f-references" aria-label="Link to this heading">#</a></h2>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -11579,7 +12071,7 @@ az role assignment list --all --query <span class="hljs-string">&quot;[?principa
 </tr>
 </tbody></table>
 </div>
-<h2 id="99-appendix--e-complete-list-of-terraform-files-which-lab-has-each">E. Complete list of Terraform files (which lab has each)<a class="anchor" href="#99-appendix--e-complete-list-of-terraform-files-which-lab-has-each" aria-label="Link to this heading">#</a></h2>
+<h2 id="99-appendix--g-complete-list-of-terraform-files-which-lab-has-each">G. Complete list of Terraform files (which lab has each)<a class="anchor" href="#99-appendix--g-complete-list-of-terraform-files-which-lab-has-each" aria-label="Link to this heading">#</a></h2>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -11642,7 +12134,7 @@ az role assignment list --all --query <span class="hljs-string">&quot;[?principa
 </div>
 <aside class="callout note"><div class="callout-title"><span>ℹ️</span><span>Note</span></div><p>All stacks follow the same file layout (<code>versions.tf</code> → <code>providers.tf</code> → <code>variables.tf</code> → <code>main.tf</code> → topic-specific files → <code>outputs.tf</code>). To see the files in one place, type a file name (e.g., <code>cluster.tf</code>) into the search box of this HTML page.</p>
 </aside>
-<h2 id="99-appendix--f-complete-test-and-tooling-code">F. Complete test and tooling code<a class="anchor" href="#99-appendix--f-complete-test-and-tooling-code" aria-label="Link to this heading">#</a></h2>
+<h2 id="99-appendix--h-complete-test-and-tooling-code">H. Complete test and tooling code<a class="anchor" href="#99-appendix--h-complete-test-and-tooling-code" aria-label="Link to this heading">#</a></h2>
 <p>Each stack&#39;s <code>tests/plan.tftest.hcl</code> is in the Code section of its lab. The shared mock values and the script that validates all stacks are below.</p>
 <p><strong><code>terraform/mocks/azurerm.tfmock.hcl</code></strong> — azurerm mock values shared by the mock tests of all stacks</p>
 <figure class="code collapsed"><figcaption><span class="file">terraform/mocks/azurerm.tfmock.hcl</span><span class="meta">hcl · 221 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-comment"># Mock values for the azurerm provider, for use with terraform test.</span>
@@ -11948,7 +12440,7 @@ terraform.tfvars
 
 # Committing .terraform.lock.hcl is recommended (it pins provider versions/checksums).
 # At first, check the file that terraform init created, then add the checksums of other OSes with `terraform providers lock -platform=linux_amd64 -platform=darwin_arm64 -platform=windows_amd64`.</code></pre></div></figure>
-<h2 id="99-appendix--g-verification-and-cleanup-scripts">G. Verification and cleanup scripts<a class="anchor" href="#99-appendix--g-verification-and-cleanup-scripts" aria-label="Link to this heading">#</a></h2>
+<h2 id="99-appendix--i-verification-and-cleanup-scripts">I. Verification and cleanup scripts<a class="anchor" href="#99-appendix--i-verification-and-cleanup-scripts" aria-label="Link to this heading">#</a></h2>
 <p>The check and delete commands you type by hand during the labs are bundled into scripts. They all live in <code>scripts/</code> at the repository root and run on macOS · Linux · WSL · Azure Cloud Shell (bash) (requires <code>terraform</code>, <code>az</code>, <code>jq</code>, and, from 05 onward, <code>kubectl</code> and <code>kubelogin</code>).</p>
 <div class="table-wrap"><table>
 <thead>

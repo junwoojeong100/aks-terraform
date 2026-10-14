@@ -40,10 +40,10 @@ EKS·VPC·IAM 에 익숙한 엔지니어가 **Azure Best Practice** 로 프로�
 | [06](labs/ko/06-workload-identity.md) | Workload Identity | IRSA ↔ Entra Workload ID, Key Vault CSI |
 | [07](labs/ko/07-ingress.md) | 인그레스 | ALB Controller ↔ Gateway API(approuting-istio) |
 | [08](labs/ko/08-governance.md) | 거버넌스·보안 | Azure Policy, Defender, 잠금, 예산 |
-| [09](labs/ko/09-operations.md) | Day-2 운영 | 업그레이드, 스케일링, 노드 교체, 테스트/CI |
+| [09](labs/ko/09-operations.md) | Day-2 운영 | 업그레이드, 스케일링, 노드 교체, 테스트/CI (kubectl 워크로드 운영: 부록 E) |
 | [10](labs/ko/10-aks-automatic.md) | AKS Automatic | EKS Auto Mode 에 해당하는 완전 관리형 모드 |
 | [11](labs/ko/11-cleanup.md) | 정리 | 역순 `destroy`, Key Vault soft-delete, 비용 확인 |
-| [99](labs/ko/99-appendix.md) | 부록 | 트러블슈팅, 프로덕션 체크리스트, 참고 자료, 테스트 코드 |
+| [99](labs/ko/99-appendix.md) | 부록 | 트러블슈팅, 프로덕션 체크리스트, **접속 경로·인터넷 노출 요약(D)**, **kubectl 로 쿠버네티스 워크로드 다루기(E)**, 참고 자료, 테스트 코드 |
 
 ## 아키텍처 개요
 

@@ -1370,14 +1370,18 @@ terraform apply tfplan        # cluster creation 10–20 min + azapi updates 5�
 ### Step 2. Get the kubeconfig (Entra ID sign-in)
 
 ```bash
-$(terraform output -raw get_credentials_command)
+eval "$(terraform output -raw get_credentials_command)"
 # = az aks get-credentials ... && kubelogin convert-kubeconfig -l azurecli
 
 kubectl get nodes -o wide
 ```
 
+> [!NOTE]
+> Use `eval "$(…)"`, not a bare `$(…)`. The output is a command line that contains `&&`, and a bare `$(…)` hands the `&&` to `az` as an argument, so it fails with `unrecognized arguments`.
+
 > [!TIP]
 > Local accounts are disabled, so the `--admin` option doesn't work. `kubectl` gets a token from your `az login` session, and your permissions come from the *Azure Kubernetes Service RBAC Cluster Admin* role granted in `access.tf` of Lab 05. Role propagation can take 1–5 minutes (if you get `Forbidden`, retry after a moment).
+> Every `az aks get-credentials` makes that cluster the current `kubectl` context. Once you also have the Lab 10 cluster, check `kubectl config current-context` ([Appendix D](99-appendix.md)).
 
 ### Step 3. Verify
 
@@ -1395,13 +1399,17 @@ az aks show -g "$(terraform output -raw resource_group_name)" -n "$(terraform ou
 # Permissions: do you have cluster-admin-equivalent permissions through Azure RBAC?
 kubectl auth can-i '*' '*'
 
+# Outbound: is the public IP that the internet sees for a pod the NAT Gateway from Lab 03?
+kubectl run egress-test --rm -i --restart=Never --image=mcr.microsoft.com/cbl-mariner/busybox:2.0 -- wget -qO- http://api.ipify.org
+terraform -chdir=../03-network output -raw nat_gateway_public_ip
+
 # Gateway API: are the CRDs and the GatewayClass (approuting-istio) ready?
 kubectl get crd | grep gateway.networking.k8s.io
 kubectl get gatewayclass
 kubectl get pods -n aks-istio-system
 ```
 
-Expected result: 6 or more nodes (`system` 3 + `user` 3), `kubectl auth can-i` → `yes`, and `GatewayClass approuting-istio` shows `ACCEPTED True`.
+Expected result: 6 or more nodes (`system` 3 + `user` 3), `kubectl auth can-i` → `yes`, `GatewayClass approuting-istio` shows `ACCEPTED True`, and the two outbound IPs are the same (egress goes through your NAT Gateway).
 
 ### Step 4. Check observability
 
@@ -1438,6 +1446,8 @@ Run `terraform plan -var enable_private_cluster=true`. Changing `private_cluster
 ```bash
 az aks command invoke -g <rg> -n <cluster> --command "kubectl get pods -A"
 ```
+
+`command invoke` also works on the public cluster of this lab when you are on an address that is not in `allowed_ip_ranges`, such as Cloud Shell or another network ([Appendix D](99-appendix.md)).
 
 ### Automated verification script
 
@@ -1591,7 +1601,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then verify_stack; summary; fi
 <!-- /tf:include -->
 
 > [!TIP]
-> If the kubectl step fails with "Couldn't reach the API server", it's almost always because your public IP changed. Update `TF_VAR_allowed_ip_ranges` and `apply` 05-aks again.
+> If the kubectl step fails with "Couldn't reach the API server", it's almost always because your public IP changed (or you are on another network or in Cloud Shell). Update `TF_VAR_allowed_ip_ranges` and `apply` 05-aks again; the IP list is also used by `04-platform` and `10-aks-automatic` ([Appendix D](99-appendix.md)).
 > Settings you changed from the default setup (`sku_tier`, `enable_gateway_api`, node counts, the Lab 09 upgrade channel) are shown as values, warnings, or skips instead of ✗. For a private cluster (`enable_private_cluster`), the script skips the kubectl step when you run it from outside the VNet.
 
 ## Common issues
@@ -1601,7 +1611,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then verify_stack; summary; fi
 | `QuotaExceeded` / `Operation could not be completed as it results in exceeding approved ... cores` | Not enough vCPU quota → [step 4 of Lab 01](01-prerequisites.md). Reduce the size/count or request a quota increase. |
 | `SkuNotAvailable`, `ZonalAllocationFailed` | The VM size is out of stock or restricted in that zone. Reduce `var.zones` to `["1","2"]` or change `*_node_vm_size`. |
 | `AuthorizationFailed ... subnets/join/action` | Propagation delay, or a missing Network Contributor role from Lab 04. Retry after 5 minutes. |
-| `Unable to connect to the server: ... i/o timeout` | Your public IP changed → update `TF_VAR_allowed_ip_ranges`, then run `terraform apply`. |
+| `Unable to connect to the server: ... i/o timeout` | Your public IP changed, or you are on another network or in Cloud Shell → update `TF_VAR_allowed_ip_ranges`, then run `terraform apply` (and see [Appendix D](99-appendix.md); `az aks command invoke` works meanwhile). |
 | `error: You must be logged in to the server (Unauthorized)` | Run `az login` again, then `kubelogin convert-kubeconfig -l azurecli`. |
 | `Forbidden: ... cannot list resource` | Wait for Azure RBAC role propagation (up to 5 minutes). Or, if you applied with `grant_current_user_admin = false`, check that your own (or your group's) Object ID is in `admin_principal_ids`. |
 | A `default_node_pool.*` change in `terraform plan` requires replacing the node pool | Because `temporary_name_for_rotation` is set, the pool is replaced by **rotation**. System pods are briefly rescheduled during the replacement. |

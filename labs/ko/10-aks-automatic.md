@@ -467,12 +467,15 @@ cd terraform/10-aks-automatic
 terraform init -backend-config=../backend.hcl
 terraform plan -out tfplan
 terraform apply tfplan            # 10~15분
-$(terraform output -raw get_credentials_command)
+eval "$(terraform output -raw get_credentials_command)"
 ```
 
 > [!NOTE]
 > AKS Automatic 은 Azure Policy 를 자동으로 켭니다. 구독에 `Microsoft.PolicyInsights` RP 가 등록되어 있어야 합니다([Lab 01](01-prerequisites.md)).
 > Azure CLI 의 `aks-preview` 확장이 설치되어 있다면 충돌할 수 있으니 `az extension remove -n aks-preview` 를 권장합니다.
+
+> [!IMPORTANT]
+> **이제 클러스터가 2개입니다.** `az aks get-credentials` 가 이 Automatic 클러스터를 `kubectl` 의 현재 컨텍스트로 바꾸므로, 다음 단계의 명령은 모두 이 클러스터로 갑니다. Lab 05 클러스터로 돌아가려면 `kubectl config use-context <이름>` 을 쓰세요. `kubectl config get-contexts` 가 둘을 보여 주고, `az aks list -o table` 의 SKU 로 구분합니다(Standard 는 `Base`, 이 클러스터는 `Automatic`). [부록 D](99-appendix.md) 를 참고하세요. 이 클러스터는 Lab 04 의 ACR 과 연결되어 있지 않으므로 여기서는 공개 이미지를 쓰세요.
 
 ### 2단계. 노드가 "없는" 클러스터를 확인
 
@@ -480,7 +483,14 @@ $(terraform output -raw get_credentials_command)
 kubectl get nodes              # 처음에는 사용자 노드가 없거나 적습니다 (관리형 hostedpool 노드 3개 + system-surge 노드 1개가 보입니다)
 kubectl get nodepools.karpenter.sh 2>/dev/null     # NAP 의 NodePool (default, system-surge)
 kubectl get gatewayclass       # approuting-istio (Gateway API CRD 가 있는 1.36+ 클러스터에서만)
+
+# 아웃바운드: AKS 가 노드 리소스 그룹에 만든 NAT Gateway 의 공인 IP 가 이 클러스터의 출구 IP 입니다
+NODE_RG=$(az aks show -g "$(terraform output -raw resource_group_name)" -n "$(terraform output -raw cluster_name)" --query nodeResourceGroup -o tsv)
+az network public-ip list -g "$NODE_RG" --query "[].ipAddress" -o tsv
 ```
+
+> [!TIP]
+> 클러스터 안에서 이 주소를 직접 확인하려면 [부록 D](99-appendix.md)(D-2)의 파드를 실행하세요. 리소스 요청이 없는 단독 `kubectl run` 파드는 여기서 거부됩니다.
 
 > [!NOTE]
 > 새 Automatic 클러스터는 `stable` 채널(N-1)이라 **GA 최신 minor 보다 한 단계 낮은 버전**(2026-10 기준 1.35.8)으로 만들어지고, `azurerm_kubernetes_automatic_cluster` 에서는 버전을 고를 수 없습니다. 이 경우 `istio_enabled = true` 로 approuting-istio 구현은 켜지지만 Gateway API CRD 는 설치되지 않아 `kubectl get gatewayclass` 가 `the server doesn't have a resource type "gatewayclass"` 로 실패합니다(정상). Gateway/HTTPRoute 를 쓰려면 1.36+ 로 올라간 뒤에 확인하세요.

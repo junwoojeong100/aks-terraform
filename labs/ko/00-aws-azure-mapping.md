@@ -149,6 +149,11 @@
 | `aws sts get-caller-identity` | `az account show` | 현재 구독/테넌트/사용자 확인 |
 | `aws configure sso` / `aws sso login` | `az login` | `az account set --subscription <id>` 로 구독 선택 |
 | `aws eks update-kubeconfig --name x` | `az aks get-credentials -g <rg> -n x` + `kubelogin convert-kubeconfig -l azurecli` | Entra 로그인은 kubelogin 이 처리 |
+| `aws eks list-clusters` / `describe-cluster` | `az aks list -o table` / `az aks show -g <rg> -n <name>` | SKU 열로 이 가이드의 두 클러스터를 구분합니다: `Base`(Standard) 와 `Automatic` |
+| `kubectl config get-contexts` / `use-context` | 같은 명령 | `az aks get-credentials` 를 실행할 때마다 그 클러스터가 현재 컨텍스트가 됩니다. 클러스터가 2개이면 `apply`/`delete` 전에 확인하세요([부록 D](99-appendix.md)) |
+| (직접 대응 없음) | `az aks command invoke -g <rg> -n <name> --command "kubectl …"` | API 서버까지 네트워크 경로가 없을 때(예: Cloud Shell) Azure API 를 거쳐 `kubectl` 을 실행합니다([부록 D](99-appendix.md)) |
+| (직접 대응 없음, 노드 그룹을 0 으로 줄이기) | `az aks stop` / `az aks start` | 노드와 과금을 멈추고 클러스터는 유지합니다([Lab 09](09-operations.md) §4) |
+| `kubectl get/describe/logs/exec/scale/rollout` | 같은 `kubectl` | 파드와 Deployment 는 순수 쿠버네티스입니다: [부록 E](99-appendix.md) 참고 |
 | `aws ecr get-login-password \| docker login` | `az acr login -n <acr>` | `az acr import` 로 외부 이미지를 ACR 로 서버 측 복사 |
 | `aws ec2 describe-vpcs` | `az network vnet list -o table` | `-o table`, `--query`(JMESPath) 사용 |
 | `aws iam list-attached-role-policies` | `az role assignment list --assignee <id> --all -o table` | 역할 할당 조회 |

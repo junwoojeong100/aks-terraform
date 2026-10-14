@@ -467,12 +467,15 @@ cd terraform/10-aks-automatic
 terraform init -backend-config=../backend.hcl
 terraform plan -out tfplan
 terraform apply tfplan            # 10–15 min
-$(terraform output -raw get_credentials_command)
+eval "$(terraform output -raw get_credentials_command)"
 ```
 
 > [!NOTE]
 > AKS Automatic turns on Azure Policy automatically. The `Microsoft.PolicyInsights` resource provider must be registered in the subscription ([Lab 01](01-prerequisites.md)).
 > If the Azure CLI `aks-preview` extension is installed, it can conflict, so we recommend running `az extension remove -n aks-preview`.
+
+> [!IMPORTANT]
+> **You now have two clusters.** `az aks get-credentials` made this Automatic cluster the current `kubectl` context, so the commands in the next steps run against it. To go back to the Lab 05 cluster, use `kubectl config use-context <name>`; `kubectl config get-contexts` lists both, and `az aks list -o table` shows their SKUs (`Base` for Standard, `Automatic` for this one). See [Appendix D](99-appendix.md). This cluster is not connected to the Lab 04 ACR, so use public images here.
 
 ### Step 2. Inspect the cluster that has "no" nodes
 
@@ -480,7 +483,14 @@ $(terraform output -raw get_credentials_command)
 kubectl get nodes              # At first there are few or no user nodes (you see 3 managed hostedpool nodes + 1 system-surge node)
 kubectl get nodepools.karpenter.sh 2>/dev/null     # NAP NodePools (default, system-surge)
 kubectl get gatewayclass       # approuting-istio (only on 1.36+ clusters that have the Gateway API CRDs)
+
+# Outbound: AKS manages a NAT Gateway in the node resource group; its public IP is the cluster's egress IP
+NODE_RG=$(az aks show -g "$(terraform output -raw resource_group_name)" -n "$(terraform output -raw cluster_name)" --query nodeResourceGroup -o tsv)
+az network public-ip list -g "$NODE_RG" --query "[].ipAddress" -o tsv
 ```
+
+> [!TIP]
+> To see that address from inside the cluster, run the pod from [Appendix D](99-appendix.md) (D-2). A bare `kubectl run` pod is rejected here because it has no resource requests.
 
 > [!NOTE]
 > A new Automatic cluster is on the `stable` channel (N-1), so it is created with a version **one minor below the latest GA minor** (1.35.8 as of 2026-10), and `azurerm_kubernetes_automatic_cluster` doesn't let you pick the version. In this case `istio_enabled = true` turns on the approuting-istio implementation, but the Gateway API CRDs aren't installed, so `kubectl get gatewayclass` fails with `the server doesn't have a resource type "gatewayclass"` (this is expected). To use Gateway/HTTPRoute, check again after the cluster moves up to 1.36+.

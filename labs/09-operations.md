@@ -129,6 +129,9 @@ kubectl get events -A | grep -i -E "TriggeredScaleUp|ScaleDown"
 > [!TIP]
 > **Don't hard-code the node count.** When `auto_scaling_enabled = true`, declare only `min_count`/`max_count`. If you set `node_count`, it keeps conflicting with the values the autoscaler changes (if you must set it, use `lifecycle.ignore_changes`).
 
+> [!TIP]
+> Scaling a workload by hand (`kubectl scale`), rolling out a new image, undoing a bad release and reading pod logs are covered in [Appendix E](99-appendix.md). If Terraform owns the workload (Lab 06 and Lab 07), change the code instead of using `kubectl`, or the next `terraform plan` shows a difference (E-8).
+
 ## 3. Changing and replacing node pools
 
 Changing `vm_size`, `os_disk_*`, `zones`, `vnet_subnet_id`, and similar attributes **replaces** the node pool. This lab sets `temporary_name_for_rotation` (`systemtmp`, `usertmp`) so that a temporary pool is created first and the replacement happens afterwards. That is why the plan shows **`will be updated in-place`** instead of `replace`; the provider performs the actual replacement (create the temporary pool → remove the old pool) during apply.

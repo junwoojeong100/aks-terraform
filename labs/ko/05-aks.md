@@ -1370,14 +1370,18 @@ terraform apply tfplan        # 클러스터 생성 10~20분 + azapi 업데이�
 ### 2단계. kubeconfig 받기 (Entra ID 로그인)
 
 ```bash
-$(terraform output -raw get_credentials_command)
+eval "$(terraform output -raw get_credentials_command)"
 # = az aks get-credentials ... && kubelogin convert-kubeconfig -l azurecli
 
 kubectl get nodes -o wide
 ```
 
+> [!NOTE]
+> 맨 `$(…)` 가 아니라 `eval "$(…)"` 로 실행하세요. 출력이 `&&` 가 들어 있는 명령줄이라서, 맨 `$(…)` 는 `&&` 를 `az` 의 인자로 넘겨 `unrecognized arguments` 로 실패합니다.
+
 > [!TIP]
 > 로컬 계정이 꺼져 있으므로 `--admin` 옵션은 동작하지 않습니다. `kubectl` 은 `az login` 세션으로 토큰을 받고, 권한은 Lab 05 의 `access.tf` 에서 부여한 *Azure Kubernetes Service RBAC Cluster Admin* 역할로 결정됩니다. 역할 전파에 1–5분 걸릴 수 있습니다(`Forbidden` 이면 잠시 후 재시도).
+> `az aks get-credentials` 를 실행할 때마다 그 클러스터가 `kubectl` 의 현재 컨텍스트가 됩니다. Lab 10 클러스터도 만든 뒤에는 `kubectl config current-context` 를 확인하세요([부록 D](99-appendix.md)).
 
 ### 3단계. 검증
 
@@ -1395,13 +1399,17 @@ az aks show -g "$(terraform output -raw resource_group_name)" -n "$(terraform ou
 # 권한: Azure RBAC 로 cluster-admin 과 동등한 권한이 있는가
 kubectl auth can-i '*' '*'
 
+# 아웃바운드: 인터넷이 보는 파드의 공인 IP 가 Lab 03 의 NAT Gateway 와 같은가
+kubectl run egress-test --rm -i --restart=Never --image=mcr.microsoft.com/cbl-mariner/busybox:2.0 -- wget -qO- http://api.ipify.org
+terraform -chdir=../03-network output -raw nat_gateway_public_ip
+
 # Gateway API: CRD 와 GatewayClass(approuting-istio) 가 준비되었는가
 kubectl get crd | grep gateway.networking.k8s.io
 kubectl get gatewayclass
 kubectl get pods -n aks-istio-system
 ```
 
-기대 결과: 노드 6대 이상(`system` 3 + `user` 3), `kubectl auth can-i` → `yes`, `GatewayClass approuting-istio` 가 `ACCEPTED True`.
+기대 결과: 노드 6대 이상(`system` 3 + `user` 3), `kubectl auth can-i` → `yes`, `GatewayClass approuting-istio` 가 `ACCEPTED True`, 두 아웃바운드 IP 가 같음(NAT Gateway 를 통해 나감).
 
 ### 4단계. 관측성 확인
 
@@ -1438,6 +1446,8 @@ kubectl get nodes -L kubernetes.azure.com/scalesetpriority    # 파드가 스케
 ```bash
 az aks command invoke -g <rg> -n <cluster> --command "kubectl get pods -A"
 ```
+
+`command invoke` 는 이 실습의 공용 클러스터에서도, `allowed_ip_ranges` 에 없는 주소(Cloud Shell, 다른 네트워크)에서 접속할 때 쓸 수 있습니다([부록 D](99-appendix.md)).
 
 ### 자동 검증 스크립트
 
@@ -1591,7 +1601,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then verify_stack; summary; fi
 <!-- /tf:include -->
 
 > [!TIP]
-> kubectl 단계가 "API 서버에 접속하지 못했습니다" 로 실패하면 공인 IP 가 바뀐 경우가 대부분입니다. `TF_VAR_allowed_ip_ranges` 를 갱신하고 05-aks 를 다시 `apply` 하세요.
+> kubectl 단계가 "API 서버에 접속하지 못했습니다" 로 실패하면 공인 IP 가 바뀌었거나(다른 네트워크, Cloud Shell 포함) 한 경우가 대부분입니다. `TF_VAR_allowed_ip_ranges` 를 갱신하고 05-aks 를 다시 `apply` 하세요. 이 IP 목록은 `04-platform` 과 `10-aks-automatic` 도 씁니다([부록 D](99-appendix.md)).
 > 기본 구성과 다르게 바꾼 설정(`sku_tier`, `enable_gateway_api`, 노드 수, Lab 09 의 업그레이드 채널)은 ✗ 대신 값을 보여 주거나 경고·건너뜀으로 표시합니다. 프라이빗 클러스터(`enable_private_cluster`)는 VNet 밖에서 kubectl 단계를 건너뜁니다.
 
 ## 자주 만나는 문제
@@ -1601,7 +1611,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then verify_stack; summary; fi
 | `QuotaExceeded` / `Operation could not be completed as it results in exceeding approved ... cores` | vCPU 쿼터 부족 → [Lab 01 의 4단계](01-prerequisites.md). 크기/개수를 줄이거나 쿼터 증설. |
 | `SkuNotAvailable`, `ZonalAllocationFailed` | 해당 영역에 VM 크기 재고 없음/제한. `var.zones` 를 `["1","2"]` 로 줄이거나 `*_node_vm_size` 변경. |
 | `AuthorizationFailed ... subnets/join/action` | Lab 04 의 Network Contributor 전파 지연 또는 누락. 5분 후 재시도. |
-| `Unable to connect to the server: ... i/o timeout` | 공인 IP 변경 → `TF_VAR_allowed_ip_ranges` 갱신 후 `terraform apply`. |
+| `Unable to connect to the server: ... i/o timeout` | 공인 IP 가 바뀌었거나 다른 네트워크·Cloud Shell 에서 접속 중 → `TF_VAR_allowed_ip_ranges` 갱신 후 `terraform apply` ([부록 D](99-appendix.md) 참고, 그동안은 `az aks command invoke` 가 됩니다). |
 | `error: You must be logged in to the server (Unauthorized)` | `az login` 재실행, `kubelogin convert-kubeconfig -l azurecli`. |
 | `Forbidden: ... cannot list resource` | Azure RBAC 역할 전파 대기(최대 5분). 또는 `grant_current_user_admin = false` 로 적용했다면 본인(또는 소속 그룹)의 Object ID 가 `admin_principal_ids` 에 있는지 확인. |
 | `terraform plan` 에서 `default_node_pool.*` 변경이 노드 풀 교체를 요구 | `temporary_name_for_rotation` 이 설정되어 있어 **순환 교체**됩니다. 교체 중 System 파드가 잠시 재스케줄됩니다. |

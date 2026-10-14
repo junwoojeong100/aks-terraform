@@ -629,6 +629,9 @@ terraform apply -var internal_gateway=true
 kubectl -n web get gateway web-gateway -o jsonpath='{.status.addresses[0].value}{"\n"}'   # 10.10.2.x
 ```
 
+> [!TIP]
+> More `kubectl` practice with pods and Deployments (logs, `exec`, `port-forward`, rollouts, troubleshooting) is in [Appendix E](99-appendix.md). This app is managed by Terraform, so do your experiments in a practice namespace: a change made with `kubectl` shows up as a difference in the next `terraform plan` (E-8).
+
 ### Extending to TLS (HTTPS)
 
 Add a `443/HTTPS` listener to the `Gateway` and point `tls.certificateRefs` at a Kubernetes Secret. The node NSG (03-network) already allows ports 80 and 443, so you don't need to change the NSG. The Microsoft baseline approach is to **keep the certificate in Key Vault and sync it to a Secret with the Secrets Store CSI driver's `secretObjects`** (the same SecretProviderClass pattern as in Lab 06; the `Key Vault Certificate User` role is required). For the detailed procedure, see [App Routing Gateway API: DNS and TLS](https://learn.microsoft.com/azure/aks/app-routing-gateway-api-dns-tls).

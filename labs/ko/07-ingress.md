@@ -629,6 +629,9 @@ terraform apply -var internal_gateway=true
 kubectl -n web get gateway web-gateway -o jsonpath='{.status.addresses[0].value}{"\n"}'   # 10.10.2.x
 ```
 
+> [!TIP]
+> 파드와 Deployment 에 `kubectl` 을 더 연습하려면(로그, `exec`, `port-forward`, 롤아웃, 문제 해결) [부록 E](99-appendix.md) 를 보세요. 이 앱은 Terraform 이 관리하므로 실험은 연습용 네임스페이스에서 하세요. `kubectl` 로 바꾼 값은 다음 `terraform plan` 에 차이로 나타납니다(E-8).
+
 ### TLS (HTTPS) 로 확장하기
 
 `Gateway` 에 `443/HTTPS` 리스너를 추가하고 `tls.certificateRefs` 로 쿠버네티스 Secret 을 가리킵니다. 노드 NSG(03-network)는 80 과 443 을 이미 허용하므로 NSG 를 고칠 필요가 없습니다. 인증서는 **Key Vault 에 두고 Secrets Store CSI 의 `secretObjects`** 로 Secret 에 동기화하는 것이 Microsoft 베이스라인 방식입니다(Lab 06 의 SecretProviderClass 패턴과 동일, `Key Vault Certificate User` 역할 필요). 자세한 절차는 [App Routing Gateway API: DNS 와 TLS](https://learn.microsoft.com/azure/aks/app-routing-gateway-api-dns-tls) 를 참고하세요.

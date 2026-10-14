@@ -2,11 +2,14 @@
 [English](../99-appendix.md) | **한국어**
 <!-- /lang-switch -->
 
-# 부록. 트러블슈팅 · 프로덕션 체크리스트 · 참고 자료 · 테스트 코드
+# 부록. 트러블슈팅 · 프로덕션 체크리스트 · 접속·워크로드 운영 · 참고 자료 · 테스트 코드
 
 | 소요 시간 | 예상 비용 | Terraform 스택 | 선행 실습 |
 |---|---|---|---|
 | 참고용 | 없음 | `terraform/mocks`, `scripts/`, `tools/validate-all.sh` | 없음 |
+
+> [!TIP]
+> Cloud Shell 이나 다른 PC 에서 클러스터에 접속하는 방법, 파드·Deployment 에 `kubectl` 을 쓰는 방법을 찾고 있다면 아래 **D. 클러스터 접속 경로와 인터넷 노출 요약** 과 **E. kubectl 로 쿠버네티스 워크로드 다루기** 를 보세요.
 
 ## A. 이 가이드를 검증한 방법과 한계
 
@@ -133,7 +136,8 @@
 | `Provider produced inconsistent result after apply` (kubernetes_manifest) | CRD 기본값/서버 정규화 차이. `terraform apply` 재시도 또는 `computed_fields` 사용. |
 | `StorageAccountAlreadyTaken` / `VaultAlreadyExists` / ACR 이름 충돌 | 전역 고유 이름 충돌. `TF_VAR_workload` 변경 또는 soft-deleted Key Vault 복구/purge. |
 | `terraform destroy` 가 `ScopeLocked` | 리소스 잠금 해제 ([Lab 08](08-governance.md), [Lab 11](11-cleanup.md)). |
-| `kubectl: Unable to connect ... i/o timeout` | 내 공인 IP 변경 → `TF_VAR_allowed_ip_ranges` 갱신 후 05-aks `apply` (API 서버 authorized IP). |
+| `kubectl: Unable to connect ... i/o timeout` | API 서버는 `allowed_ip_ranges` 의 IP 만 받습니다. 내 공인 IP 가 바뀌었거나, 다른 네트워크·Cloud Shell·CI 에서 접속하는 경우입니다 → D절(D-3, D-4) 참고: `TF_VAR_allowed_ip_ranges` 를 갱신하고 `04-platform`, `05-aks`, `10-aks-automatic` 을 `apply` 하세요. 그동안은 `az aks command invoke` 를 쓰세요. |
+| `kubectl` 이 엉뚱한 클러스터를 바꿈 | 클러스터가 2개일 때 `az aks get-credentials` 는 마지막으로 받은 클러스터를 현재 컨텍스트로 바꿉니다. `kubectl config current-context` 로 확인하고 `kubectl config use-context <이름>` 으로 바꾸세요(D-1 참고). |
 | `kubelogin` 오류 / `Unauthorized` | `az login` 재실행, `kubelogin convert-kubeconfig -l azurecli`, Azure RBAC 역할 전파 대기. |
 | `terraform plan` 이 매번 `node_count` 변경을 요구 | 오토스케일러와 충돌. 코드에 `node_count` 를 쓰지 말고 `min_count`/`max_count` 만 사용 ([Lab 09](09-operations.md)). |
 | `409 ... AnotherOperationInProgress` (`azapi_update_resource`) | 같은 클러스터에 대한 다른 작업(노드 풀 생성 등)과 겹친 것입니다. 이 가이드 코드는 `depends_on` 으로 순서를 고정했고, 겹쳤다면 작업이 끝난 뒤 `terraform apply` 를 다시 실행하세요. |
@@ -158,7 +162,357 @@
 | 모듈화 | 학습용 직접 정의 | 사내 모듈 또는 **Azure Verified Modules(AVM)** 로 표준화 |
 | 관측성 | 기본 대시보드 | Prometheus 알림 규칙(`azurerm_monitor_alert_prometheus_rule_group`) + Action Group, SLO 대시보드 |
 
-## D. 참고 자료
+## D. 클러스터 접속 경로와 인터넷 노출 요약
+
+Lab 05 와 Lab 10 을 마치면 같은 구독에 클러스터가 **2개** 생깁니다. 이 절은 둘을 구분하는 방법, 들어오고 나가는 트래픽, 그리고 실습에 쓴 랩탑이 아닌 곳(Azure Cloud Shell, 다른 PC, CI)에서 접속해야 할 때 할 일을 설명합니다.
+
+### D-1. 두 클러스터
+
+| | Standard (Lab 05) | Automatic (Lab 10) |
+|---|---|---|
+| Terraform 스택 | `terraform/05-aks` (03 네트워크, 04 플랫폼 스택 위에 만듦) | `terraform/10-aks-automatic` (Lab 03–05 와 독립) |
+| 기본 이름 | `rg-aksdemo-dev-krc-aks` 의 `aks-aksdemo-dev-krc` | `rg-aksdemo-dev-krc-automatic` 의 `aksa-aksdemo-dev-krc` |
+| `az aks list` 의 SKU | `Base` (티어 `Standard`) | `Automatic` (티어 `Standard`) |
+| 노드 | 직접 크기를 정하는 System/User 풀 (기본 3 + 3) | 관리형 System 풀 + 노드 자동 프로비저닝(NAP)이 필요할 때 추가하는 노드 |
+| `kubectl` 컨텍스트 | 클러스터 이름과 같음 | 클러스터 이름과 같음 |
+
+이름은 `TF_VAR_workload`, `TF_VAR_environment`, `TF_VAR_location` 에 따라 달라지므로 각 스택의 `cluster_name` 과 `resource_group_name` 출력으로 정확한 값을 확인하세요.
+
+```bash
+# 클러스터가 몇 개이고 각각 어떤 종류인가?
+az aks list --query "[].{name:name, rg:resourceGroup, sku:sku.name, tier:sku.tier, version:currentKubernetesVersion, power:powerState.code}" -o table
+
+# kubectl 이 지금 어느 클러스터를 보고 있나? (* 가 현재 컨텍스트)
+kubectl config get-contexts
+kubectl config current-context
+
+kubectl config use-context aks-aksdemo-dev-krc     # 기본 클러스터 바꾸기
+kubectl --context aksa-aksdemo-dev-krc get nodes   # 또는 명령 하나만 다른 클러스터로 보내기
+```
+
+> [!WARNING]
+> `az aks get-credentials` 는 **마지막으로 받은** 클러스터를 현재 컨텍스트로 바꿉니다. Lab 10 의 1단계 뒤에는 `kubectl config use-context` 로 되돌리기 전까지 일반 `kubectl` 명령이 모두 Automatic 클러스터로 갑니다. `apply`/`delete` 전에 `kubectl config current-context` 를 확인하세요. `scripts/verify.sh` 는 임시 kubeconfig 를 쓰므로 영향을 받지 않습니다.
+
+### D-2. 무엇이 어디에 연결되나
+
+| | Standard 클러스터 | Automatic 클러스터 |
+|---|---|---|
+| 아웃바운드(클러스터 → 인터넷) | 가능. Lab 03 의 NAT Gateway 를 거칩니다(고정 공인 IP, `nat_gateway_public_ip` 출력) | 가능. AKS 가 노드 리소스 그룹(`MC_…`)에 만든 관리형 NAT Gateway 를 거칩니다 |
+| API 서버 | API Server VNet Integration 을 쓰는 공용 엔드포인트. **`allowed_ip_ranges` 에 있는 IP 만 사용할 수 있습니다** | 같음 |
+| 인터넷에서 접근되는 앱 | Lab 07 의 Gateway 가 공인 IP 로 80/443 을 엽니다(노드 NSG 규칙 `AllowGatewayHttpHttps`). `internal_gateway=true` 로 사설 IP 로 바꿀 수 있습니다 | 없음. 이 가이드는 여기에 `LoadBalancer` Service 를 배포하지 않습니다 |
+| Lab 04 ACR 의 이미지 | Private Endpoint 로 pull 합니다. 이 클러스터의 kubelet ID 에만 `AcrPull` 이 있습니다 | **pull 할 수 없습니다**(`ErrImagePull … 403 Forbidden`). `mcr.microsoft.com` 같은 공개 이미지를 쓰거나, 쓰려는 레지스트리에 `AcrPull` 과 네트워크 접근을 따로 주세요 |
+
+Lab 04 의 플랫폼 서비스는 특정 클러스터에 속하지 않습니다. ACR 과 Key Vault 의 공용 엔드포인트는 `allowed_ip_ranges` 의 IP 만 받고, Grafana 는 Entra ID 로그인 뒤에 있는 공용 엔드포인트입니다.
+
+**클러스터 안에서 출구 IP 확인하기.** 아래 파드는 Automatic 클러스터의 Deployment Safeguards(리소스 요청 필수)도 지키므로 같은 매니페스트가 두 클러스터에서 모두 동작합니다.
+
+```bash
+kubectl apply -f - <<'EOF'
+apiVersion: v1
+kind: Pod
+metadata: { name: egress-test, namespace: default }
+spec:
+  restartPolicy: Never
+  containers:
+  - name: t
+    image: mcr.microsoft.com/cbl-mariner/busybox:2.0
+    command: ["sh", "-c", "wget -qO- -T 15 http://api.ipify.org; echo"]
+    resources:
+      requests: { cpu: 50m, memory: 32Mi }
+      limits: { cpu: 100m, memory: 64Mi }
+    readinessProbe: { exec: { command: ["true"] } }
+    livenessProbe: { exec: { command: ["true"] } }
+    securityContext:
+      allowPrivilegeEscalation: false
+      runAsNonRoot: true
+      runAsUser: 1000
+      capabilities: { drop: ["ALL"] }
+      seccompProfile: { type: RuntimeDefault }
+EOF
+kubectl wait --for=jsonpath='{.status.phase}'=Succeeded pod/egress-test --timeout=180s
+kubectl logs egress-test          # 인터넷이 보는 이 클러스터의 공인 IP
+kubectl delete pod egress-test
+
+# NAT Gateway 주소와 비교
+terraform -chdir=terraform/03-network output -raw nat_gateway_public_ip        # Standard 클러스터
+NODE_RG=$(az aks show -g <automatic-rg> -n <automatic-cluster> --query nodeResourceGroup -o tsv)
+az network public-ip list -g "$NODE_RG" --query "[].ipAddress" -o tsv            # Automatic 클러스터
+```
+
+### D-3. kubectl 을 어디서 실행할 수 있나
+
+| 실행 위치 | API 서버로 `kubectl` | 이유 |
+|---|---|---|
+| IP 가 `allowed_ip_ranges` 에 있는 랩탑 | 됩니다 | 허용된 IP |
+| 다른 네트워크(다른 Wi-Fi, VPN, 테더링)나 팀원의 PC | 막힙니다 | 허용되지 않은 IP |
+| Azure Cloud Shell | 막힙니다 | Cloud Shell 은 Microsoft 가 관리하는 Azure 주소에서 나가므로 내 허용 목록에 없고, 고정 주소도 보장되지 않습니다 |
+| CI 러너(예: GitHub 호스티드 러너) | 막힙니다 | 같은 이유 |
+| 어디서든 `az aks command invoke` 또는 포털 **Run command** | 됩니다 | 내 네트워크 경로가 아니라 Azure API 를 거쳐 클러스터 안에서 실행됩니다 |
+
+막힌 요청은 아무 응답도 받지 못하므로 `kubectl` 은 `Unable to connect to the server: dial tcp …:443: i/o timeout` 으로 끝납니다. (이 가이드에서 측정: 허용되지 않은 주소에서는 TCP 연결은 열리지만 HTTPS 요청에 응답이 없고, 허용된 주소에서는 같은 요청이 HTTP 401 을 돌려줍니다. 즉 API 서버까지 도달합니다.)
+
+**`az aks command invoke`** 는 Azure API 를 거쳐 클러스터 안에서 명령을 실행하므로, Azure 에 로그인되어 있으면 어디서든 됩니다.
+
+```bash
+az aks command invoke -g <rg> -n <cluster> --command "kubectl get nodes"
+az aks command invoke -g <rg> -n <cluster> --command "kubectl -n web get pods -o wide"
+```
+
+- 클러스터에 대한 Azure RBAC 권한이 필요합니다. 작업 `Microsoft.ContainerService/managedClusters/runcommand/action` 과 `Microsoft.ContainerService/managedClusters/commandResults/read` 입니다(Owner, Contributor, AKS Contributor 역할에 포함).
+- AKS 가 `aks-command` 네임스페이스에 짧게 사는 파드를 만들어 명령을 실행하고 텍스트 출력을 돌려줍니다. 대화형 셸, `exec -it`, `port-forward` 는 없으므로 한 번에 끝나는 명령만 쓰고, 매니페스트 같은 파일은 `--file` 로 붙입니다.
+- 포털에는 같은 기능이 **AKS 클러스터 → Run command** 로 있습니다.
+- 이 가이드의 두 클러스터에서 모두 시험했습니다.
+
+### D-4. 공인 IP 가 바뀌었거나 팀원이 접속해야 할 때
+
+1. 새 주소를 확인합니다([Lab 01](01-prerequisites.md) 5단계): `curl -s https://api.ipify.org`.
+2. 접속해야 하는 모든 머신을 `TF_VAR_allowed_ip_ranges`(머신마다 `/32` 하나인 JSON 목록)에 넣고 `env.sh` 에도 저장합니다. 예: `export TF_VAR_allowed_ip_ranges='["203.0.113.10/32","198.51.100.7/32"]'`.
+3. 이 목록을 쓰는 스택 세 개를 다시 `apply` 합니다.
+
+| 스택 | IP 목록이 여는 것 | 명령(저장소 루트에서) |
+|---|---|---|
+| `04-platform` | ACR 과 Key Vault 방화벽(`az acr import`, Key Vault 시크릿에 필요) | `terraform -chdir=terraform/04-platform apply` |
+| `05-aks` | Standard 클러스터 API 서버 | `terraform -chdir=terraform/05-aks apply` |
+| `10-aks-automatic` | Automatic 클러스터 API 서버 | `terraform -chdir=terraform/10-aks-automatic apply` |
+
+이 apply 들은 Azure Resource Manager 하고만 통신하므로 `kubectl` 이 막혀 있어도 실행됩니다. 새 목록이 반영되는 데 최대 2분이 걸립니다. 그동안은 `az aks command invoke` 를 쓰세요.
+
+> [!WARNING]
+> `TF_VAR_allowed_ip_ranges` 를 채우려고 Lab 01 의 한 줄(`curl … api.ipify.org`)을 Cloud Shell 안에서 실행하지 마세요. 내 랩탑이 아니라 Cloud Shell 의 주소가 등록됩니다. Terraform 은 내 머신에서 실행하고, Cloud Shell 에서는 `az aks command invoke` 를 쓰세요. 허용되지 않은 주소에서는 `scripts/verify.sh` 의 `kubectl` 단계와 `kubernetes` provider 를 쓰는 스택(06, 07)도 API 서버에 닿지 못합니다.
+
+## E. kubectl 로 쿠버네티스 워크로드 다루기
+
+Lab 01–10 은 플랫폼을 만듭니다. 이 절은 그 위에서 도는 쿠버네티스 오브젝트를 다루는 방법입니다. 조회, 변경, 디버깅, 그리고 Terraform · Azure RBAC 와 어떻게 맞물리는지를 설명합니다. 여기의 모든 명령은 이 가이드의 클러스터에서 임시 네임스페이스로 실제 실행해 확인했고, 따로 적지 않으면 두 클러스터에서 모두 동작합니다.
+
+### E-1. 클러스터와 네임스페이스 고르기
+
+```bash
+kubectl config current-context        # 어느 클러스터? (클러스터가 2개입니다: D-1)
+kubectl get ns                        # 어떤 네임스페이스가 있나?
+kubectl -n practice get pods          # -n 으로 네임스페이스 선택
+kubectl get pods -A                   # -A 는 모든 네임스페이스
+kubectl config set-context --current --namespace=practice    # 선택: practice 를 기본 네임스페이스로
+```
+
+### E-2. 연습 네임스페이스와 첫 Deployment 만들기
+
+Lab 06·07 의 앱(`demo`, `web`)을 건드리지 않도록 나만의 네임스페이스에서 연습하세요.
+
+```bash
+kubectl create namespace practice
+kubectl apply -f - <<'EOF'
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: hello, namespace: practice }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: hello } }
+  template:
+    metadata: { labels: { app: hello } }
+    spec:
+      containers:
+      - name: hello
+        image: mcr.microsoft.com/dotnet/samples:aspnetapp
+        ports: [{ containerPort: 8080 }]
+        resources:
+          requests: { cpu: 100m, memory: 128Mi }
+          limits: { cpu: 500m, memory: 256Mi }
+        readinessProbe: { httpGet: { path: /, port: 8080 } }
+        livenessProbe: { httpGet: { path: /, port: 8080 } }
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1654
+          capabilities: { drop: ["ALL"] }
+          seccompProfile: { type: RuntimeDefault }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: hello, namespace: practice }
+spec:
+  selector: { app: hello }
+  ports: [{ port: 80, targetPort: 8080 }]
+EOF
+kubectl -n practice rollout status deploy/hello
+```
+
+이 매니페스트는 Lab 07 앱과 같은 규칙을 따르므로 두 클러스터에서 모두 통과합니다.
+
+- `resources.requests` 와 `limits`: Automatic 클러스터([Lab 10](10-aks-automatic.md))에서는 요청이 없는 단독 파드를 Deployment Safeguards 가 **거부**하고, 요청이 없는 Deployment 에는 경고와 함께 기본값을 넣어 줍니다. 스케줄러도 어디서나 이 값이 필요합니다.
+- probe: readiness probe 는 트래픽을 받을 시점을, liveness probe 는 멈춘 컨테이너의 재시작을 정합니다. 없으면 Deployment Safeguards 가 경고합니다.
+- `runAsNonRoot`, `allowPrivilegeEscalation: false`, `drop: ["ALL"]`, `seccompProfile`: Pod Security 규칙과 Lab 08 의 정책입니다.
+- 이미지는 Automatic 클러스터에서도 돌도록 공개 샘플을 썼습니다(D-2 의 ACR 행 참고).
+
+### E-3. 살펴보기 (읽기 전용)
+
+```bash
+kubectl -n practice get all                          # 흔한 종류만: ConfigMap, Secret, Ingress 는 빠집니다
+kubectl -n practice get pods -o wide                 # 노드와 파드 IP
+kubectl -n practice get pods --show-labels
+kubectl -n practice get pods -l app=hello            # 라벨로 거르기
+kubectl -n practice get pods -w                      # 변화를 지켜보기 (Ctrl+C 로 종료)
+kubectl get pods -A --field-selector=status.phase!=Running      # 모든 네임스페이스에서 실행 중이 아닌 것
+
+# 필요한 필드만 뽑기
+kubectl -n practice get pods -o jsonpath='{.items[*].metadata.name}'
+kubectl -n practice get pods -o custom-columns=NAME:.metadata.name,NODE:.spec.nodeName,IP:.status.podIP
+kubectl -n practice get deploy hello -o yaml         # 클러스터가 저장한 전체 오브젝트
+
+kubectl -n practice describe deploy hello            # 설정 + 최근 이벤트
+kubectl -n practice get events --sort-by=.lastTimestamp
+
+# 로그
+kubectl -n practice logs deploy/hello --tail=20      # Deployment 의 파드 하나
+kubectl -n practice logs -l app=hello --prefix --tail=5    # 모든 파드, 앞에 파드 이름 표시
+kubectl -n practice logs <pod> -f                    # 따라가기
+kubectl -n practice logs <pod> --previous            # 마지막 재시작 이전 컨테이너
+kubectl -n practice logs <pod> -c <container>        # 컨테이너가 둘 이상인 파드
+
+# 리소스 사용량 (metrics-server 는 AKS 에 기본 포함)
+kubectl -n practice top pods
+kubectl top nodes
+
+kubectl explain deploy.spec.strategy                 # 어떤 필드든 설명 보기
+```
+
+### E-4. 파드 안으로 들어가기
+
+```bash
+kubectl -n practice exec -it deploy/hello -- sh                 # 컨테이너 안의 셸
+kubectl -n practice port-forward svc/hello 8080:80              # 그다음 http://localhost:8080 을 엽니다
+kubectl -n practice cp <pod>:/etc/hostname ./hostname           # 파일 꺼내기 (이미지에 tar 필요)
+
+# 셸이 없는 이미지? 실행 중인 파드에 임시 디버그 컨테이너를 붙입니다
+kubectl -n practice debug -it pod/<pod> --image=mcr.microsoft.com/cbl-mariner/busybox:2.0 --target=hello -- sh
+
+# 일회용 파드로 클러스터 안에서 Service 호출하기
+kubectl -n practice run tmp --rm -it --restart=Never --image=mcr.microsoft.com/cbl-mariner/busybox:2.0 -- wget -qO- http://hello
+```
+
+- `exec`, `logs`, `cp`, `port-forward` 는 API 서버를 거치므로 `kubectl` 이 되는 곳에서만 됩니다(D-3 참고).
+- 디버그 컨테이너는 파드가 교체될 때까지 파드 spec 에 남습니다.
+- Automatic 클러스터에서는 `kubectl run` 으로 리소스 요청을 줄 수 없어 일회용 파드가 거부됩니다. D-2 처럼 요청이 있는 매니페스트를 쓰세요.
+
+### E-5. 바꾸기
+
+```bash
+kubectl apply -f deploy.yaml                         # 선언형: 권장 방식, 매니페스트는 Git 에 보관
+kubectl diff -f deploy.yaml                          # 미리 보기 (종료 코드 1 은 차이가 있다는 뜻)
+kubectl apply --dry-run=server -f deploy.yaml        # 서버에서 검증 (admission, 정책 포함)
+
+kubectl -n practice scale deploy/hello --replicas=3
+kubectl -n practice set env deploy/hello MODE=demo   # 파드 템플릿이 바뀌므로 롤링 업데이트가 시작됩니다
+kubectl -n practice set image deploy/hello hello=<new-image>
+
+kubectl -n practice rollout status deploy/hello      # 롤아웃 완료까지 대기
+kubectl -n practice rollout history deploy/hello
+kubectl -n practice rollout undo deploy/hello        # 이전 리비전으로 되돌리기
+kubectl -n practice rollout restart deploy/hello     # spec 은 그대로 두고 파드만 다시 만들기
+
+kubectl -n practice patch deploy hello -p '{"spec":{"replicas":2}}'
+kubectl -n practice label pod <pod> tier=frontend
+kubectl -n practice annotate deploy hello kubernetes.io/change-cause="set MODE=demo"    # rollout history 에 표시됨
+kubectl -n practice autoscale deploy hello --min=2 --max=4 --cpu-percent=70
+kubectl -n practice edit deploy hello                # $EDITOR 로 오브젝트 열기
+kubectl -n practice delete pod <pod>                 # Deployment 가 대체 파드를 만듭니다
+```
+
+롤링 업데이트는 잘못된 릴리스로부터 보호해 줍니다. `kubectl -n practice set image deploy/hello hello=mcr.microsoft.com/dotnet/samples:does-not-exist` 를 해 보세요. **새** 파드만 `ImagePullBackOff` 가 되고 기존 파드는 계속 서비스하며, `rollout status` 는 결국 `timed out waiting for the condition` 으로 실패합니다. `kubectl -n practice rollout undo deploy/hello` 로 동작하던 리비전을 되돌립니다. 오토스케일러(HPA)가 있으면 복제본 수는 HPA 가 정하므로 손으로 한 `kubectl scale` 은 덮어써집니다.
+
+### E-6. 설정 데이터와 배치 작업
+
+```bash
+kubectl -n practice create configmap app-config --from-literal=MODE=demo
+kubectl -n practice create secret generic db --from-literal=password='<demo-value>'
+kubectl -n practice set env deploy/hello --from=configmap/app-config         # 환경 변수로 주입
+kubectl -n practice exec deploy/hello -- printenv MODE
+
+kubectl -n practice create job hello-job --image=mcr.microsoft.com/cbl-mariner/busybox:2.0 -- sh -c 'echo job-done'
+kubectl -n practice wait --for=condition=complete job/hello-job --timeout=90s
+kubectl -n practice logs job/hello-job
+
+kubectl -n practice create cronjob tick --image=mcr.microsoft.com/cbl-mariner/busybox:2.0 --schedule="*/5 * * * *" -- sh -c 'date'
+kubectl -n practice create job manual-run --from=cronjob/tick                # CronJob 을 지금 한 번 실행
+```
+
+> [!WARNING]
+> 쿠버네티스 Secret 은 **base64 로 인코딩**되어 있을 뿐 암호화된 것이 아닙니다. `kubectl get secret db -o jsonpath='{.data.password}'` 가 출력하는 값은 읽기 권한이 있는 누구나 디코딩할 수 있습니다. Secret 매니페스트를 커밋하지 말고, 진짜 시크릿은 셸 히스토리에 남기지 마세요. 실제 애플리케이션은 Key Vault 에서 시크릿을 읽으세요([Lab 06](06-workload-identity.md)).
+
+### E-7. 문제가 생겼을 때: 점검 플레이북
+
+먼저 아래 세 명령을 실행하고, 그다음 표를 보세요.
+
+```bash
+kubectl get pods -A --field-selector=status.phase!=Running      # 실행 중이 아닌 것은?
+kubectl -n practice describe pod <pod>                          # 맨 아래 Events 부터 읽기
+kubectl get events -A --sort-by=.lastTimestamp | tail -20       # 최근에 무슨 일이 있었나?
+```
+
+| 증상 | 어디를 보나 | 흔한 원인과 해결 |
+|---|---|---|
+| `Pending` | `describe pod` 의 Events. 예: `0/6 nodes are available: 3 Insufficient cpu, 3 node(s) had untolerated taint(s)` | 요청이 어떤 노드가 줄 수 있는 양보다 크거나, 남은 노드가 taint 된 노드뿐입니다(System 풀은 핵심 애드온만 받음). 요청을 줄이세요. 노드를 늘릴 수 없다면 vCPU 쿼터를 확인합니다([Lab 01](01-prerequisites.md) 4단계) |
+| `ImagePullBackOff` / `ErrImagePull` | `describe pod` 의 이벤트 메시지 | 이미지나 태그 오타, ACR 로 이미지를 가져오지 않음([Lab 04](04-platform.md), [Lab 06](06-workload-identity.md)), 클러스터에 `AcrPull` 이 없거나 레지스트리 방화벽에 막힘(`403 Forbidden`, D-2 참고) |
+| `CrashLoopBackOff` / `Error` | `kubectl logs <pod>`, `--previous`, `describe` 의 Last State 와 Exit Code | 애플리케이션이 종료됨: 잘못된 명령·환경 변수·설정, 실패하는 liveness probe, 없는 ConfigMap/Secret(`CreateContainerConfigError`). 아주 빨리 재시작하는 컨테이너는 `--previous` 를 못 읽을 수 있으니 현재 로그도 확인하세요 |
+| `OOMKilled` (종료 코드 137) | `describe pod` 의 Last State | 메모리 limit 이 프로세스에 필요한 양보다 작습니다. `limits.memory` 를 올리거나 누수를 고치고 `kubectl top pod` 와 비교하세요 |
+| 파드가 사라졌거나 `Evicted` | `get events` | 노드 압박, 또는 노드 통합(Automatic 의 NAP 는 덜 쓰는 노드를 비웁니다). 소유자가 없는 단독 파드는 다시 만들어지지 않으므로 워크로드는 Deployment 나 Job 으로 실행하세요 |
+| 만들기/적용 시 `Forbidden` | 메시지가 규칙을 알려 줍니다 | Gatekeeper 나 Deployment Safeguards 의 `denied the request`([Lab 08](08-governance.md), [Lab 10](10-aks-automatic.md)), `violates PodSecurity`, 또는 RBAC 오류(`kubectl auth can-i create deployments -n practice`) |
+| Service 가 응답하지 않음 | `kubectl -n practice get endpoints hello` | 엔드포인트가 없음: selector 가 파드 라벨과 맞지 않거나(`get pods --show-labels`) readiness probe 가 실패합니다 |
+| `Unable to connect … i/o timeout` | 내 공인 IP | 허용되지 않은 IP 입니다: D-3, D-4 참고 |
+| `You must be logged in to the server (Unauthorized)` | 내 로그인 | `az login` 과 `kubelogin convert-kubeconfig -l azurecli` 를 다시 실행하세요 |
+
+직접 해 보세요. 바로 종료하는 파드(`command: ["sh","-c","echo boom; exit 1"]`)는 `Error` 다음 `CrashLoopBackOff` 가 되고 출력은 `kubectl logs` 에 있습니다. `cpu: "64"` 를 요청하는 파드는 위의 스케줄러 이벤트와 함께 `Pending` 에 머뭅니다.
+
+### E-8. Terraform 이 관리하나, kubectl 이 관리하나?
+
+Lab 06·07 의 워크로드(`kv-demo`, `aspnetapp`, Gateway)는 **Terraform** 소유입니다. Terraform 이 관리하는 필드를 `kubectl` 로 바꾸면 다음 `terraform plan` 에 차이가 나오고 다음 `apply` 가 내 변경을 되돌립니다.
+
+```bash
+kubectl -n web patch svc aspnetapp -p '{"spec":{"sessionAffinity":"ClientIP"}}'
+terraform -chdir=terraform/07-ingress plan        # ~ session_affinity = "ClientIP" -> "None"
+kubectl -n web patch svc aspnetapp -p '{"spec":{"sessionAffinity":"None"}}'      # 원래대로
+```
+
+기준은 다음과 같습니다.
+
+1. **실험**은 나만의 네임스페이스에서 `kubectl` 로 합니다(이 절).
+2. Lab 06·07 워크로드의 **영구 변경**은 Terraform 코드나 변수를 고쳐 apply 합니다.
+3. 컨트롤러가 소유하는 필드는 일부러 제외했습니다. Lab 07 Deployment 의 복제본 수는 HPA 가 관리하므로 `ignore_changes` 이고, 손으로 바꿔도 차이로 나오지 않습니다.
+4. 수동 변경을 찾으려면 `terraform plan -detailed-exitcode` 를 주기적으로 실행하세요([Lab 09](09-operations.md)).
+
+### E-9. 누가 무엇을 할 수 있나: Kubernetes 용 Azure RBAC
+
+로컬 계정이 꺼져 있으므로 권한은 Azure 역할에서 나옵니다([Lab 05](05-aks.md)).
+
+| 역할 | 범위 | 허용하는 것 |
+|---|---|---|
+| Azure Kubernetes Service RBAC Reader | 클러스터 또는 네임스페이스 | 대부분의 오브젝트 읽기 |
+| Azure Kubernetes Service RBAC Writer | 클러스터 또는 네임스페이스 | 대부분의 오브젝트 읽기·쓰기 |
+| Azure Kubernetes Service RBAC Admin | 클러스터 또는 네임스페이스 | 대부분의 오브젝트 읽기·쓰기 + 네임스페이스 안의 role·role binding 관리 |
+| Azure Kubernetes Service RBAC Cluster Admin | 클러스터 | 모든 네임스페이스의 모든 것(실습에서는 로그인한 사용자에게 부여) |
+
+애플리케이션 팀에게 네임스페이스 하나만 허용하려면 역할을 네임스페이스 범위로 할당합니다. 그 사람은 `az aks get-credentials` 를 실행할 **Azure Kubernetes Service Cluster User Role** 도 클러스터에 가져야 하고, 자신의 IP 가 `allowed_ip_ranges` 에 있어야 합니다(D-4).
+
+```bash
+CLUSTER_ID=$(az aks show -g <rg> -n <cluster> --query id -o tsv)
+az role assignment create --assignee <user-or-group-object-id> \
+  --role "Azure Kubernetes Service RBAC Writer" --scope "$CLUSTER_ID/namespaces/practice"
+az role assignment list --scope "$CLUSTER_ID/namespaces/practice" -o table
+
+kubectl -n practice auth can-i create deployments       # 내 권한 확인: yes 또는 no
+```
+
+Azure RBAC 를 쓰는 클러스터에서는 `kubectl auth can-i --list` 가 불완전하므로(webhook authorizer 가 규칙 해석을 지원하지 않는다는 경고가 나옵니다) 권한을 하나씩 확인하세요. 팀에서는 개별 사용자보다 Entra 그룹을 쓰세요.
+
+### E-10. 연습 네임스페이스 정리
+
+```bash
+kubectl config current-context        # 의도한 클러스터인지 확인
+kubectl delete namespace practice     # 안의 모든 것을 삭제: Deployment, 파드, Service, Job, ConfigMap, Secret
+```
+
+Lab 06·07 워크로드나 Azure 리소스는 건드리지 않습니다.
+
+## F. 참고 자료
 
 | 주제 | 링크 |
 |---|---|
@@ -171,7 +525,7 @@
 | Microsoft 공식 Terraform 샘플 | [Azure/terraform quickstart](https://github.com/Azure/terraform/tree/master/quickstart): `101-aks-application-routing-gateway-api`, `101-aks-automatic-custom-network`, `101-aks-network-isolated`, `101-aks-use-azure-policy`, `101-aks-defender-containers`, `301-aks-enterprise` |
 | Prometheus 템플릿 | [Azure/prometheus-collector — AddonTerraformTemplate](https://github.com/Azure/prometheus-collector/tree/main/AddonTerraformTemplate) |
 
-## E. Terraform 파일 전체 목록 (어느 Lab 에 있나)
+## G. Terraform 파일 전체 목록 (어느 Lab 에 있나)
 
 | 스택 / 모듈 | 파일 | 실린 곳 |
 |---|---|---|
@@ -189,7 +543,7 @@
 > [!NOTE]
 > 모든 스택은 같은 파일 구성(`versions.tf` → `providers.tf` → `variables.tf` → `main.tf` → 주제별 파일 → `outputs.tf`)을 따릅니다. 파일을 한 곳에 모아 보고 싶다면 이 HTML 의 검색창에 파일 이름(예: `cluster.tf`)을 입력하세요.
 
-## F. 테스트/도구 코드 전체
+## H. 테스트/도구 코드 전체
 
 각 스택의 `tests/plan.tftest.hcl` 은 해당 Lab 의 코드 섹션에 있습니다. 공통 mock 값과 전체 검증 스크립트는 아래와 같습니다.
 
@@ -515,7 +869,7 @@ terraform.tfvars
 ```
 <!-- /tf:include -->
 
-## G. 검증 · 정리 스크립트
+## I. 검증 · 정리 스크립트
 
 실습 중 손으로 치던 확인/삭제 명령을 스크립트로 묶었습니다. 모두 저장소 루트의 `scripts/` 에 있으며 macOS · Linux · WSL · Azure Cloud Shell(bash)에서 동작합니다(필요: `terraform`, `az`, `jq`, 그리고 05 이후는 `kubectl`, `kubelogin`).
 

@@ -80,6 +80,12 @@ To check what static validation alone cannot reveal, the commands in the docs we
 
 As before, Azure created `NetworkWatcherRG` and Defender's default Log Analytics workspace (`DefaultResourceGroup-…`) during the run, and both were deleted by hand. The only thing left is one Key Vault in the soft-deleted state (purge protection is on, so it is removed automatically after 7 days, and it costs nothing).
 
+**Additional checks (2026-10-14).** The parts added after the English re-run were checked against the two live clusters, using a throwaway namespace (`practice`) that was deleted afterwards:
+
+- **Appendix D**: the public IP that a pod sees matched the NAT Gateway address on both clusters, `az aks command invoke` worked on both, and the Automatic cluster rejected a bare test pod that had no resource requests (the pod in D-2 follows the safeguards).
+- **Appendix E**: the sample Deployment ran on both clusters. On the Standard cluster the following behaved as described: the inspection commands, `exec`, `port-forward`, `top`, `debug` and `cp`, rollouts with `undo`, the `ImagePullBackOff`, `CrashLoopBackOff`, `Pending` and `OOMKilled` cases of the triage playbook, and the difference in the `terraform plan` of 07-ingress after a manual `sessionAffinity` patch. The Azure RBAC role names and the namespace scope format were confirmed as well. On the Automatic cluster, an image from the Lab 04 ACR failed with `403`, as D-2 says.
+- **Lab 08 Defender fix** (fix 14 below): applied to the live Standard cluster with the workspace that the Defender auto-provisioning policy had attached. The apply made one in-place change (only the casing of the workspace ID), the next plan with the same two variables showed no changes, and the 13 `microsoft-defender` pods were Running. Without `defender_log_analytics_workspace_id`, the plan stops at the precondition.
+
 ### A-3. Inconsistencies found and fixed during the run
 
 | # | Location | Symptom | Fix |
@@ -98,6 +104,7 @@ As before, Azure created `NetworkWatcherRG` and Defender's default Log Analytics
 | 12 | Lab 10 step 2 | Automatic was created at 1.35, so the Gateway API CRD is missing and `kubectl get gatewayclass` fails | Added a note that this applies only to 1.36+ |
 | 13 | Lab 05 · 08 | The number of resources stated for the plan did not match reality | Lab 05: corrected 16 → 15 (including the resource group); Lab 08: corrected to 8 policy assignments + 1 `time_static` = 9 |
 | 14 | Lab 08 steps 2 and 4, `05-aks` `enable_defender` | With `enable_defender=true` the Defender profile pointed at the platform workspace, which has local authentication disabled. The Defender sensor does not support that, and its `microsoft-defender-publisher` pods crash-looped (`Local authentication is disabled for the Log Analytics workspace`). The earlier runs did not look at those pods | Added `defender_log_analytics_workspace_id` (required with `enable_defender`) and a test for it, and rewrote the Lab 08 guidance to reuse the workspace that the policy attached |
+| 15 | Lab 05 step 2, Lab 10 step 1 | `$(terraform output -raw get_credentials_command)` failed with `unrecognized arguments`: the output is a command line that contains `&&`, and a bare `$(…)` hands the `&&` to `az` as an argument | Run it with `eval "$(…)"` |
 
 ### A-4. What could not be verified, and what varies by environment
 

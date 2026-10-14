@@ -289,7 +289,13 @@ terraform -chdir=terraform/modules/naming test        # 5 passed
 
 ## 부트스트랩 스택 코드
 
-**`versions.tf`** — Terraform/provider 버전을 고정합니다(`~> 5.9` = 5.9 이상 6 미만). 마지막의 주석 처리된 `backend` 블록은 아래 *4단계*에서 사용합니다.
+**`versions.tf`** — 스택의 `terraform {}` 설정입니다. 모든 스택에 하나씩 있고, 세 가지를 담습니다.
+
+- `required_version`: 이 스택을 실행할 수 있는 Terraform CLI 버전입니다(`~> 1.16` = 1.16 이상 2.0 미만).
+- `required_providers`: 각 provider 의 출처와 허용하는 버전 범위입니다(`~> 5.9` = 5.9 이상 6 미만). `terraform init` 이 실제로 고른 정확한 버전과 체크섬은 `.terraform.lock.hcl` 에 기록되며, 이 저장소는 그 파일을 커밋해 모두가 같은 provider 빌드를 쓰게 합니다.
+- `backend`: state 를 어디에 저장할지 정합니다. 블록에는 state `key` 와 Entra ID 인증만 고정하고, 스토리지 계정과 컨테이너는 `backend.hcl`(3단계)에서 받습니다. 이 스택만 예외로, state 저장소를 스스로 만들기 때문에 마지막의 블록을 주석 처리해 두었다가 아래 *4단계*에서만 사용합니다.
+
+`provider` 블록 자체는 `providers.tf` 에 있습니다. AWS 경험자라면 AWS 프로젝트의 `required_providers`, `backend "s3"` 와 같은 역할입니다.
 
 <!-- tf:include path="terraform/02-bootstrap/versions.tf" -->
 ```hcl title="terraform/02-bootstrap/versions.tf"
@@ -541,6 +547,9 @@ terraform init -migrate-state -backend-config=../backend.hcl
 # "Do you want to copy existing state to the new backend?" → yes
 ```
 
+> [!NOTE]
+> 이 수정은 내 환경에만 해당하므로 커밋하지 마세요. 저장소는 누구나 로컬 state 로 Lab 02 를 시작할 수 있도록 이 블록을 주석 처리한 채로 두며(이 저장소의 CI 는 블록이 켜져 있으면 실패합니다), Lab 11 의 2단계에서 다시 주석 처리합니다.
+
 ### 5단계. 검증
 
 ```bash
@@ -556,6 +565,8 @@ az storage account show -n "$ST" --query allowSharedKeyAccess -o tsv
 **잠금 동작 확인**: 터미널 두 개에서 동시에 `terraform plan` 을 실행하면 두 번째가 `Error acquiring the state lock`(blob lease) 로 대기/실패합니다. 이 때 `-lock-timeout=60s` 를 주면 잠금이 풀릴 때까지 기다립니다.
 
 ## 이후 모든 스택에서 쓰는 init 패턴
+
+03–10 스택은 `versions.tf` 의 `backend "azurerm"` 블록이 이미 켜져 있고, 그 스택의 state `key` 만 고정합니다. 스토리지 계정과 컨테이너는 `-backend-config` 로 `backend.hcl` 에서 받습니다.
 
 ```bash
 terraform init -backend-config=../backend.hcl

@@ -289,7 +289,13 @@ terraform -chdir=terraform/modules/naming test        # 5 passed
 
 ## Bootstrap stack code
 
-**`versions.tf`** — Pins the Terraform and provider versions (`~> 5.9` = 5.9 or later, below 6). The commented-out `backend` block at the end is used in *step 4* below.
+**`versions.tf`** — The `terraform {}` settings of a stack. Every stack has one, and it covers three things:
+
+- `required_version`: the Terraform CLI versions that may run the stack (`~> 1.16` = 1.16 or later, below 2.0).
+- `required_providers`: where each provider comes from and which versions are allowed (`~> 5.9` = 5.9 or later, below 6). `terraform init` records the exact versions it picked, with checksums, in `.terraform.lock.hcl`. This repository commits that file so that everyone gets the same provider builds.
+- `backend`: where the state is stored. The block fixes only the state `key` and Entra ID authentication; the storage account and container come from `backend.hcl` (step 3). This stack is the exception: it creates the state storage itself, so the block at the end is commented out and used only in *step 4* below.
+
+The `provider` blocks themselves live in `providers.tf`. If you come from AWS, this file plays the same role as `required_providers` and `backend "s3"` in an AWS project.
 
 <!-- tf:include path="terraform/02-bootstrap/versions.tf" -->
 ```hcl title="terraform/02-bootstrap/versions.tf"
@@ -541,6 +547,9 @@ terraform init -migrate-state -backend-config=../backend.hcl
 # "Do you want to copy existing state to the new backend?" → yes
 ```
 
+> [!NOTE]
+> This edit belongs to your own environment, so don't commit it. The repository keeps the block commented out so that Lab 02 starts with local state for everyone (the CI of this repository fails if the block is enabled). Lab 11 step 2 comments it out again.
+
 ### Step 5. Verify
 
 ```bash
@@ -556,6 +565,8 @@ az storage account show -n "$ST" --query allowSharedKeyAccess -o tsv
 **Check the locking behavior**: If you run `terraform plan` in two terminals at the same time, the second one waits or fails with `Error acquiring the state lock` (blob lease). If you pass `-lock-timeout=60s`, it waits until the lock is released.
 
 ## The init pattern used by all later stacks
+
+In stacks 03–10 the `backend "azurerm"` block in `versions.tf` is already enabled and fixes only that stack's state `key`. `-backend-config` supplies the storage account and container from `backend.hcl`:
 
 ```bash
 terraform init -backend-config=../backend.hcl

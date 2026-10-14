@@ -80,6 +80,12 @@
 
 이번에도 Azure 가 실행 중에 `NetworkWatcherRG` 와 Defender 의 기본 Log Analytics 작업 영역(`DefaultResourceGroup-…`)을 자동으로 만들어서 직접 삭제했습니다. 남은 것은 soft-delete 상태의 Key Vault 1개뿐이며, purge protection 이 켜져 있어 7일 뒤 자동 삭제되고 비용은 없습니다.
 
+**추가 확인 (2026-10-14).** 영문판 재검증 뒤에 추가한 부분은 실행 중인 두 클러스터에서 확인했고, 임시 네임스페이스(`practice`)는 확인 후 삭제했습니다.
+
+- **부록 D**: 파드에서 보이는 공인 IP 가 두 클러스터 모두 NAT Gateway 주소와 같았고, `az aks command invoke` 도 두 클러스터에서 동작했습니다. Automatic 클러스터는 리소스 요청이 없는 단독 시험 파드를 거부했습니다(D-2 의 파드는 이 규칙을 따릅니다).
+- **부록 E**: 샘플 Deployment 는 두 클러스터에서 실행됐습니다. Standard 클러스터에서는 다음이 설명대로 동작했습니다: 조회 명령, `exec` · `port-forward` · `top` · `debug` · `cp`, 롤아웃과 `undo`, 문제 해결 표의 `ImagePullBackOff` · `CrashLoopBackOff` · `Pending` · `OOMKilled` 사례, `sessionAffinity` 를 직접 패치한 뒤 07-ingress 의 `terraform plan` 에 생기는 차이. Azure RBAC 역할 이름과 네임스페이스 범위 형식도 확인했습니다. Automatic 클러스터에서는 Lab 04 ACR 의 이미지가 D-2 의 설명대로 `403` 으로 실패했습니다.
+- **Lab 08 Defender 수정**(아래 수정 14): 실행 중인 Standard 클러스터에 Defender 자동 프로비저닝 정책이 붙인 작업 영역으로 적용했습니다. apply 는 제자리 변경 1건(작업 영역 ID 의 대소문자뿐)이었고, 같은 변수 두 개로 다시 한 plan 은 변경 없음이었으며, `microsoft-defender` 파드 13개가 Running 이었습니다. `defender_log_analytics_workspace_id` 없이 켜면 plan 이 precondition 에서 멈춥니다.
+
 ### A-3. 실행하다 발견해서 고친 불일치
 
 | # | 위치 | 증상 | 수정 |
@@ -98,6 +104,7 @@
 | 12 | Lab 10 2단계 | Automatic 이 1.35 로 만들어져 Gateway API CRD 가 없고 `kubectl get gatewayclass` 가 실패 | 1.36+ 에서만 해당한다는 안내 추가 |
 | 13 | Lab 05 · 08 | plan 리소스 수 표기가 실제와 다름 | Lab 05 는 16 → 15(리소스 그룹 포함), Lab 08 은 정책 할당 8개 + `time_static` 1개 = 9개로 정정 |
 | 14 | Lab 08 2·4단계, `05-aks` 의 `enable_defender` | `enable_defender=true` 로 하면 Defender 프로필이 로컬 인증이 꺼진 플랫폼 작업 영역을 가리켰습니다. Defender sensor 는 이를 지원하지 않아 `microsoft-defender-publisher` 파드가 크래시했습니다(`Local authentication is disabled for the Log Analytics workspace`). 이전 실행에서는 이 파드를 확인하지 않았습니다 | `defender_log_analytics_workspace_id` 변수(`enable_defender` 와 함께 필수)와 테스트를 추가하고, Lab 08 안내를 정책이 붙인 작업 영역을 재사용하도록 고쳤습니다 |
+| 15 | Lab 05 2단계, Lab 10 1단계 | `$(terraform output -raw get_credentials_command)` 가 `unrecognized arguments` 로 실패. 출력이 `&&` 를 포함한 명령줄이라, 그냥 `$(…)` 로 실행하면 `&&` 가 `az` 의 인자로 넘어감 | `eval "$(…)"` 로 실행 |
 
 ### A-4. 확인하지 못했거나 환경에 따라 다른 것
 

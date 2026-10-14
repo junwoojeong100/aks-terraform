@@ -2662,7 +2662,13 @@ Stacks are linked through a <strong>naming convention + data sources</strong> in
 <figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 2 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">terraform -<span class="hljs-built_in">chdir</span>=terraform/modules/naming init -backend=<span class="hljs-literal">false</span>
 terraform -<span class="hljs-built_in">chdir</span>=terraform/modules/naming <span class="hljs-built_in">test</span>        <span class="hljs-comment"># 5 passed</span></code></pre></div></figure>
 <h2 id="02-bootstrap--bootstrap-stack-code">Bootstrap stack code<a class="anchor" href="#02-bootstrap--bootstrap-stack-code" aria-label="Link to this heading">#</a></h2>
-<p><strong><code>versions.tf</code></strong> — Pins the Terraform and provider versions (<code>~&gt; 5.9</code> = 5.9 or later, below 6). The commented-out <code>backend</code> block at the end is used in <em>step 4</em> below.</p>
+<p><strong><code>versions.tf</code></strong> — The <code>terraform {}</code> settings of a stack. Every stack has one, and it covers three things:</p>
+<ul>
+<li><code>required_version</code>: the Terraform CLI versions that may run the stack (<code>~&gt; 1.16</code> = 1.16 or later, below 2.0).</li>
+<li><code>required_providers</code>: where each provider comes from and which versions are allowed (<code>~&gt; 5.9</code> = 5.9 or later, below 6). <code>terraform init</code> records the exact versions it picked, with checksums, in <code>.terraform.lock.hcl</code>. This repository commits that file so that everyone gets the same provider builds.</li>
+<li><code>backend</code>: where the state is stored. The block fixes only the state <code>key</code> and Entra ID authentication; the storage account and container come from <code>backend.hcl</code> (step 3). This stack is the exception: it creates the state storage itself, so the block at the end is commented out and used only in <em>step 4</em> below.</li>
+</ul>
+<p>The <code>provider</code> blocks themselves live in <code>providers.tf</code>. If you come from AWS, this file plays the same role as <code>required_providers</code> and <code>backend &quot;s3&quot;</code> in an AWS project.</p>
 <figure class="code"><figcaption><span class="file">terraform/02-bootstrap/versions.tf</span><span class="meta">hcl · 19 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-keyword">terraform</span> {
 <span class="hljs-attr">  required_version</span> = <span class="hljs-string">&quot;~&gt; 1.16&quot;</span>
 
@@ -2858,6 +2864,8 @@ terraform apply tfplan</code></pre></div></figure>
 </ol>
 <figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 2 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">terraform init -migrate-state -backend-config=../backend.hcl
 <span class="hljs-comment"># &quot;Do you want to copy existing state to the new backend?&quot; → yes</span></code></pre></div></figure>
+<aside class="callout note"><div class="callout-title"><span>ℹ️</span><span>Note</span></div><p>This edit belongs to your own environment, so don&#39;t commit it. The repository keeps the block commented out so that Lab 02 starts with local state for everyone (the CI of this repository fails if the block is enabled). Lab 11 step 2 comments it out again.</p>
+</aside>
 <h3 id="02-bootstrap--step-5-verify">Step 5. Verify<a class="anchor" href="#02-bootstrap--step-5-verify" aria-label="Link to this heading">#</a></h3>
 <figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 7 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">ST=$(terraform output -raw tfstate_storage_account_name)
 
@@ -2868,6 +2876,7 @@ az storage blob list --account-name <span class="hljs-string">&quot;<span class=
 az storage account show -n <span class="hljs-string">&quot;<span class="hljs-variable">$ST</span>&quot;</span> --query allowSharedKeyAccess -o tsv</code></pre></div></figure>
 <p><strong>Check the locking behavior</strong>: If you run <code>terraform plan</code> in two terminals at the same time, the second one waits or fails with <code>Error acquiring the state lock</code> (blob lease). If you pass <code>-lock-timeout=60s</code>, it waits until the lock is released.</p>
 <h2 id="02-bootstrap--the-init-pattern-used-by-all-later-stacks">The init pattern used by all later stacks<a class="anchor" href="#02-bootstrap--the-init-pattern-used-by-all-later-stacks" aria-label="Link to this heading">#</a></h2>
+<p>In stacks 03–10 the <code>backend &quot;azurerm&quot;</code> block in <code>versions.tf</code> is already enabled and fixes only that stack&#39;s state <code>key</code>. <code>-backend-config</code> supplies the storage account and container from <code>backend.hcl</code>:</p>
 <figure class="code shell"><figcaption><span class="file">Terminal</span><span class="meta">bash · 1 lines</span><button class="copy" type="button">Copy</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">terraform init -backend-config=../backend.hcl</code></pre></div></figure>
 <h3 id="02-bootstrap--automated-verification-script">Automated verification script<a class="anchor" href="#02-bootstrap--automated-verification-script" aria-label="Link to this heading">#</a></h3>
 <p>This runs the manual checks from step 5 (key authentication blocked, versioning, container, state files) in one go. It is <strong>read-only</strong> and returns a <code>✓ passed / ✗ failed / ! warnings</code> summary and an exit code (1 if anything failed).</p>
@@ -11347,6 +11356,12 @@ az role assignment list --all --query <span class="hljs-string">&quot;[?principa
 </tbody></table>
 </div>
 <p>As before, Azure created <code>NetworkWatcherRG</code> and Defender&#39;s default Log Analytics workspace (<code>DefaultResourceGroup-…</code>) during the run, and both were deleted by hand. The only thing left is one Key Vault in the soft-deleted state (purge protection is on, so it is removed automatically after 7 days, and it costs nothing).</p>
+<p><strong>Additional checks (2026-10-14).</strong> The parts added after the English re-run were checked against the two live clusters, using a throwaway namespace (<code>practice</code>) that was deleted afterwards:</p>
+<ul>
+<li><strong>Appendix D</strong>: the public IP that a pod sees matched the NAT Gateway address on both clusters, <code>az aks command invoke</code> worked on both, and the Automatic cluster rejected a bare test pod that had no resource requests (the pod in D-2 follows the safeguards).</li>
+<li><strong>Appendix E</strong>: the sample Deployment ran on both clusters. On the Standard cluster the following behaved as described: the inspection commands, <code>exec</code>, <code>port-forward</code>, <code>top</code>, <code>debug</code> and <code>cp</code>, rollouts with <code>undo</code>, the <code>ImagePullBackOff</code>, <code>CrashLoopBackOff</code>, <code>Pending</code> and <code>OOMKilled</code> cases of the triage playbook, and the difference in the <code>terraform plan</code> of 07-ingress after a manual <code>sessionAffinity</code> patch. The Azure RBAC role names and the namespace scope format were confirmed as well. On the Automatic cluster, an image from the Lab 04 ACR failed with <code>403</code>, as D-2 says.</li>
+<li><strong>Lab 08 Defender fix</strong> (fix 14 below): applied to the live Standard cluster with the workspace that the Defender auto-provisioning policy had attached. The apply made one in-place change (only the casing of the workspace ID), the next plan with the same two variables showed no changes, and the 13 <code>microsoft-defender</code> pods were Running. Without <code>defender_log_analytics_workspace_id</code>, the plan stops at the precondition.</li>
+</ul>
 <h3 id="99-appendix--a-3-inconsistencies-found-and-fixed-during-the-run">A-3. Inconsistencies found and fixed during the run<a class="anchor" href="#99-appendix--a-3-inconsistencies-found-and-fixed-during-the-run" aria-label="Link to this heading">#</a></h3>
 <div class="table-wrap"><table>
 <thead>
@@ -11440,6 +11455,12 @@ az role assignment list --all --query <span class="hljs-string">&quot;[?principa
 <td>Lab 08 steps 2 and 4, <code>05-aks</code> <code>enable_defender</code></td>
 <td>With <code>enable_defender=true</code> the Defender profile pointed at the platform workspace, which has local authentication disabled. The Defender sensor does not support that, and its <code>microsoft-defender-publisher</code> pods crash-looped (<code>Local authentication is disabled for the Log Analytics workspace</code>). The earlier runs did not look at those pods</td>
 <td>Added <code>defender_log_analytics_workspace_id</code> (required with <code>enable_defender</code>) and a test for it, and rewrote the Lab 08 guidance to reuse the workspace that the policy attached</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Lab 05 step 2, Lab 10 step 1</td>
+<td><code>$(terraform output -raw get_credentials_command)</code> failed with <code>unrecognized arguments</code>: the output is a command line that contains <code>&amp;&amp;</code>, and a bare <code>$(…)</code> hands the <code>&amp;&amp;</code> to <code>az</code> as an argument</td>
+<td>Run it with <code>eval &quot;$(…)&quot;</code></td>
 </tr>
 </tbody></table>
 </div>

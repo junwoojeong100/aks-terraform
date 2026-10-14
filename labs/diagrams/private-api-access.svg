@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 960 632" width="960" height="632" role="img" aria-labelledby="private-api-access-t private-api-access-d"><title id="private-api-access-t">Two ways to reach a private API server</title><desc id="private-api-access-d">Method 1 routes clients (a jump host, a runner in a peered VNet, or a laptop over VPN or ExpressRoute) to the private IP of the API server load balancer in snet-aks-apiserver. Method 2 creates a Private Endpoint in the client VNet that connects to a Private Link Service in front of the same load balancer. Both methods need DNS to resolve the private FQDN.</desc><style>svg.dg{--dg-bg:#ffffff;--dg-fg:#1f2328;--dg-muted:#59636e;--dg-line:#6e7781;--dg-card:#f6f8fa;--dg-border:#d1d9e0;--dg-aws:#c2590a;--dg-aws-soft:#fff1e5;--dg-azure:#0b6ed0;--dg-azure-soft:#e5f1ff;--dg-ok:#1a7f37;--dg-ok-soft:#e6f6ea;--dg-id:#8250df;--dg-id-soft:#f3ecff;--dg-net:#0e7490;--dg-net-soft:#e0f4f8;--dg-warn:#9a6700;--dg-warn-soft:#fff6d6;--dg-danger:#cf222e;--dg-danger-soft:#ffebe9;font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", "Segoe UI", Roboto, sans-serif}
+@media (prefers-color-scheme:dark){svg.dg{--dg-bg:#0d1117;--dg-fg:#e6edf3;--dg-muted:#9198a1;--dg-line:#8b949e;--dg-card:#151b23;--dg-border:#30363d;--dg-aws:#f0883e;--dg-aws-soft:#2b1c10;--dg-azure:#58a6ff;--dg-azure-soft:#0f2238;--dg-ok:#3fb950;--dg-ok-soft:#0f2417;--dg-id:#b392f0;--dg-id-soft:#221a36;--dg-net:#39c5cf;--dg-net-soft:#0d2a2f;--dg-warn:#d29922;--dg-warn-soft:#2d2208;--dg-danger:#ff7b72;--dg-danger-soft:#3a1517}}
+.dg-bg{fill:var(--dg-bg)}
+.dg-t{fill:var(--dg-fg)}
+.dg-m{fill:var(--dg-muted)}
+.dg-b{font-weight:650}
+.dg-box,.dg-grp,.dg-chip{stroke-width:1.4}
+.dg-box{fill:var(--dg-card);stroke:var(--dg-border)}
+.dg-grp{fill:none;stroke:var(--dg-border)}
+.dg-dash{stroke-dasharray:6 4}
+.dg-chip{fill:var(--dg-bg);stroke:none}
+.dg-line{fill:none;stroke:var(--dg-line);stroke-width:1.8}
+.dg-ah{fill:var(--dg-line)}
+.dg-box.dg-aws{fill:var(--dg-aws-soft);stroke:var(--dg-aws)}
+.dg-grp.dg-aws{stroke:var(--dg-aws)}
+.dg-fill-aws{fill:var(--dg-aws)}
+.dg-tx-aws{fill:var(--dg-aws)}
+.dg-line.dg-aws{stroke:var(--dg-aws)}
+.dg-ah.dg-aws{fill:var(--dg-aws)}
+.dg-box.dg-azure{fill:var(--dg-azure-soft);stroke:var(--dg-azure)}
+.dg-grp.dg-azure{stroke:var(--dg-azure)}
+.dg-fill-azure{fill:var(--dg-azure)}
+.dg-tx-azure{fill:var(--dg-azure)}
+.dg-line.dg-azure{stroke:var(--dg-azure)}
+.dg-ah.dg-azure{fill:var(--dg-azure)}
+.dg-box.dg-ok{fill:var(--dg-ok-soft);stroke:var(--dg-ok)}
+.dg-grp.dg-ok{stroke:var(--dg-ok)}
+.dg-fill-ok{fill:var(--dg-ok)}
+.dg-tx-ok{fill:var(--dg-ok)}
+.dg-line.dg-ok{stroke:var(--dg-ok)}
+.dg-ah.dg-ok{fill:var(--dg-ok)}
+.dg-box.dg-id{fill:var(--dg-id-soft);stroke:var(--dg-id)}
+.dg-grp.dg-id{stroke:var(--dg-id)}
+.dg-fill-id{fill:var(--dg-id)}
+.dg-tx-id{fill:var(--dg-id)}
+.dg-line.dg-id{stroke:var(--dg-id)}
+.dg-ah.dg-id{fill:var(--dg-id)}
+.dg-box.dg-net{fill:var(--dg-net-soft);stroke:var(--dg-net)}
+.dg-grp.dg-net{stroke:var(--dg-net)}
+.dg-fill-net{fill:var(--dg-net)}
+.dg-tx-net{fill:var(--dg-net)}
+.dg-line.dg-net{stroke:var(--dg-net)}
+.dg-ah.dg-net{fill:var(--dg-net)}
+.dg-box.dg-warn{fill:var(--dg-warn-soft);stroke:var(--dg-warn)}
+.dg-grp.dg-warn{stroke:var(--dg-warn)}
+.dg-fill-warn{fill:var(--dg-warn)}
+.dg-tx-warn{fill:var(--dg-warn)}
+.dg-line.dg-warn{stroke:var(--dg-warn)}
+.dg-ah.dg-warn{fill:var(--dg-warn)}
+.dg-box.dg-danger{fill:var(--dg-danger-soft);stroke:var(--dg-danger)}
+.dg-grp.dg-danger{stroke:var(--dg-danger)}
+.dg-fill-danger{fill:var(--dg-danger)}
+.dg-tx-danger{fill:var(--dg-danger)}
+.dg-line.dg-danger{stroke:var(--dg-danger)}
+.dg-ah.dg-danger{fill:var(--dg-danger)}
+.dg-on{fill:#fff}</style><defs><marker id="private-api-access-ah-line" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah"/></marker><marker id="private-api-access-ah-net" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-net"/></marker><marker id="private-api-access-ah-ok" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-ok"/></marker><marker id="private-api-access-ah-azure" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-azure"/></marker><marker id="private-api-access-ah-id" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-id"/></marker><marker id="private-api-access-ah-warn" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-warn"/></marker></defs><rect width="960" height="632" class="dg-bg" rx="12"/>
+<text x="24" y="32" font-size="18" class="dg-t dg-b">Two ways to reach a private API server</text>
+<text x="24" y="54" font-size="12.5" class="dg-m">The API server has only a private IP (enable_private_cluster = true). The methods differ in how the client reaches it.</text>
+<rect x="24" y="88" width="912" height="200" rx="14" class="dg-grp dg-net"/>
+<text x="38" y="108" font-size="12.5" class="dg-tx-net dg-b" data-w="884">① Direct private IP · same VNet, peering, VPN / ExpressRoute</text>
+<rect x="40" y="118" width="236" height="48" rx="10" class="dg-box"/>
+<text x="50" y="138.5" font-size="12.5" class="dg-t dg-b" data-w="216">Jump host VM + Bastion</text>
+<text x="50" y="155" font-size="11" class="dg-m" data-w="216">in the AKS VNet, no public IP</text>
+<rect x="40" y="172" width="236" height="48" rx="10" class="dg-box"/>
+<text x="50" y="192.5" font-size="12.5" class="dg-t dg-b" data-w="216">Self-hosted runner · VM</text>
+<text x="50" y="209" font-size="11" class="dg-m" data-w="216">in a peered VNet (hub / ops)</text>
+<rect x="40" y="226" width="236" height="48" rx="10" class="dg-box"/>
+<text x="50" y="246.5" font-size="12.5" class="dg-t dg-b" data-w="216">Laptop · on-premises</text>
+<text x="50" y="263" font-size="11" class="dg-m" data-w="216">over VPN or ExpressRoute</text>
+<rect x="330" y="118" width="268" height="156" rx="10" class="dg-box dg-net"/>
+<text x="342" y="141" font-size="13" class="dg-t dg-b" data-w="244">Network path to the private IP</text>
+<text x="342" y="158" font-size="11.5" class="dg-m" data-w="244">Same VNet · VNet peering</text>
+<text x="342" y="174.5" font-size="11.5" class="dg-m" data-w="244">VPN gateway · ExpressRoute</text>
+<text x="342" y="191" font-size="11.5" class="dg-m" data-w="244">Address spaces must not overlap</text>
+<text x="342" y="207.5" font-size="11.5" class="dg-m" data-w="244">Peering is not transitive</text>
+<text x="342" y="224" font-size="11.5" class="dg-m" data-w="244">NSG / firewall: allow TCP 443</text>
+<rect x="660" y="118" width="260" height="156" rx="10" class="dg-box dg-ok"/>
+<text x="672" y="141" font-size="13" class="dg-t dg-b" data-w="236">snet-aks-apiserver</text>
+<text x="672" y="158" font-size="11.5" class="dg-m" data-w="236">10.10.1.0/28 (delegated)</text>
+<text x="672" y="174.5" font-size="11.5" class="dg-m" data-w="236">Internal load balancer (ILB)</text>
+<text x="672" y="191" font-size="11.5" class="dg-m" data-w="236">private IP · port 443</text>
+<text x="672" y="207.5" font-size="11.5" class="dg-m" data-w="236">No public endpoint</text>
+<text x="672" y="224" font-size="11.5" class="dg-m" data-w="236">Authorized IP ranges do not apply</text>
+<path d="M276 142 L330 142" class="dg-line dg-net" marker-end="url(#private-api-access-ah-net)"/>
+<path d="M276 196 L330 196" class="dg-line dg-net" marker-end="url(#private-api-access-ah-net)"/>
+<path d="M276 250 L330 250" class="dg-line dg-net" marker-end="url(#private-api-access-ah-net)"/>
+<path d="M598 196 L660 196" class="dg-line dg-ok" marker-end="url(#private-api-access-ah-ok)"/>
+<rect x="24" y="304" width="912" height="204" rx="14" class="dg-grp dg-azure"/>
+<text x="38" y="324" font-size="12.5" class="dg-tx-azure dg-b" data-w="884">② Private Link · Private Endpoint → Private Link Service</text>
+<rect x="40" y="336" width="400" height="160" rx="14" class="dg-grp"/>
+<text x="54" y="356" font-size="12" class="dg-m dg-b" data-w="372">Client VNet (any subscription or tenant)</text>
+<rect x="52" y="366" width="170" height="118" rx="10" class="dg-box"/>
+<text x="62" y="386.5" font-size="12.5" class="dg-t dg-b" data-w="150">Client VM · runner</text>
+<text x="62" y="403" font-size="11" class="dg-m" data-w="150">Any address space,</text>
+<text x="62" y="419" font-size="11" class="dg-m" data-w="150">overlap is fine</text>
+<text x="62" y="435" font-size="11" class="dg-m" data-w="150">No peering needed</text>
+<rect x="258" y="366" width="170" height="118" rx="10" class="dg-box dg-net"/>
+<text x="268" y="386.5" font-size="12.5" class="dg-t dg-b" data-w="150">Private Endpoint</text>
+<text x="268" y="403" font-size="11" class="dg-m" data-w="150">Private IP in the client</text>
+<text x="268" y="419" font-size="11" class="dg-m" data-w="150">subnet; an A record in</text>
+<text x="268" y="435" font-size="11" class="dg-m" data-w="150">your DNS zone points</text>
+<text x="268" y="451" font-size="11" class="dg-m" data-w="150">to it</text>
+<rect x="520" y="336" width="404" height="160" rx="14" class="dg-grp"/>
+<text x="534" y="356" font-size="12" class="dg-m dg-b" data-w="376">AKS VNet 10.10.0.0/16</text>
+<rect x="532" y="366" width="176" height="118" rx="10" class="dg-box dg-net"/>
+<text x="542" y="386.5" font-size="12.5" class="dg-t dg-b" data-w="156">snet-pls (new)</text>
+<text x="542" y="403" font-size="11" class="dg-m" data-w="156">Private Link Service</text>
+<text x="542" y="419" font-size="11" class="dg-m" data-w="156">in front of the API</text>
+<text x="542" y="435" font-size="11" class="dg-m" data-w="156">server load balancer</text>
+<rect x="744" y="366" width="168" height="118" rx="10" class="dg-box dg-ok"/>
+<text x="754" y="386.5" font-size="12.5" class="dg-t dg-b" data-w="148">API server</text>
+<text x="754" y="403" font-size="11" class="dg-m" data-w="148">kube-apiserver ILB</text>
+<text x="754" y="419" font-size="11" class="dg-m" data-w="148">snet-aks-apiserver</text>
+<text x="754" y="435" font-size="11" class="dg-m" data-w="148">private IP · port 443</text>
+<path d="M222 425 L258 425" class="dg-line dg-net" marker-end="url(#private-api-access-ah-net)"/>
+<path d="M428 425 L532 425" class="dg-line dg-azure" marker-end="url(#private-api-access-ah-azure)"/>
+<rect x="432.5" y="415" width="95" height="20" rx="6" class="dg-chip"/>
+<text x="480" y="429" font-size="11.5" text-anchor="middle" class="dg-tx-azure dg-b">Private Link</text>
+<path d="M708 425 L744 425" class="dg-line dg-ok" marker-end="url(#private-api-access-ah-ok)"/>
+<rect x="24" y="524" width="588" height="92" rx="10" class="dg-box dg-id"/>
+<text x="36" y="547" font-size="13" class="dg-t dg-b" data-w="564">DNS: the client must resolve the private FQDN</text>
+<text x="36" y="564" font-size="11.5" class="dg-m" data-w="564">① Link the cluster's private DNS zone to the client VNet,</text>
+<text x="36" y="580.5" font-size="11.5" class="dg-m" data-w="564">or forward the zone to Azure DNS Private Resolver</text>
+<text x="36" y="597" font-size="11.5" class="dg-m" data-w="564">② Own zone + A record pointing to the Private Endpoint IP</text>
+<rect x="632" y="524" width="304" height="92" rx="10" class="dg-box dg-warn"/>
+<text x="644" y="547" font-size="13" class="dg-t dg-b" data-w="280">No network path yet?</text>
+<text x="644" y="564" font-size="11.5" class="dg-m" data-w="280">az aks command invoke</text>
+<text x="644" y="580.5" font-size="11.5" class="dg-m" data-w="280">Runs through the Azure API,</text>
+<text x="644" y="597" font-size="11.5" class="dg-m" data-w="280">one-shot commands only (D-3)</text>
+</svg>

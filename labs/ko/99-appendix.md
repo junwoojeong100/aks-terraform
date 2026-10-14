@@ -2,14 +2,14 @@
 [English](../99-appendix.md) | **한국어**
 <!-- /lang-switch -->
 
-# 부록. 트러블슈팅 · 프로덕션 체크리스트 · 접속·워크로드 운영 · 참고 자료 · 테스트 코드
+# 부록. 트러블슈팅 · 프로덕션 체크리스트 · 접속·워크로드 운영 · 프라이빗 API 접속 · AVM · 참고 자료 · 테스트 코드
 
 | 소요 시간 | 예상 비용 | Terraform 스택 | 선행 실습 |
 |---|---|---|---|
 | 참고용 | 없음 | `terraform/mocks`, `scripts/`, `tools/validate-all.sh` | 없음 |
 
 > [!TIP]
-> Cloud Shell 이나 다른 PC 에서 클러스터에 접속하는 방법, 파드·Deployment 에 `kubectl` 을 쓰는 방법을 찾고 있다면 아래 **D. 클러스터 접속 경로와 인터넷 노출 요약** 과 **E. kubectl 로 쿠버네티스 워크로드 다루기** 를 보세요.
+> Cloud Shell 이나 다른 PC 에서 클러스터에 접속하는 방법, 파드·Deployment 에 `kubectl` 을 쓰는 방법을 찾고 있다면 아래 **D. 클러스터 접속 경로와 인터넷 노출 요약** 과 **E. kubectl 로 쿠버네티스 워크로드 다루기** 를 보세요. API 서버를 공용 인터넷에서 내리려면 **F. 프라이빗 네트워크로 API 서버에 접속하기** 를, 직접 작성한 Terraform 과 Azure Verified Modules 중에서 고르려면 **G. AKS 를 Terraform 으로 구성할 때: AVM 을 쓸까, 말까** 를 보세요.
 
 ## A. 이 가이드를 검증한 방법과 한계
 
@@ -80,10 +80,12 @@
 
 이번에도 Azure 가 실행 중에 `NetworkWatcherRG` 와 Defender 의 기본 Log Analytics 작업 영역(`DefaultResourceGroup-…`)을 자동으로 만들어서 직접 삭제했습니다. 남은 것은 soft-delete 상태의 Key Vault 1개뿐이며, purge protection 이 켜져 있어 7일 뒤 자동 삭제되고 비용은 없습니다.
 
-**추가 확인 (2026-10-14).** 영문판 재검증 뒤에 추가한 부분은 실행 중인 두 클러스터에서 확인했고, 임시 네임스페이스(`practice`)는 확인 후 삭제했습니다.
+**추가 확인 (2026-10-14).** 영문판 재검증 뒤에 추가한 부분은 실행 중인 두 클러스터에서 확인했고, 임시 네임스페이스(`practice`)는 확인 후 삭제했습니다. 부록 F · G 는 따로 만든 임시 환경에서 확인했습니다(아래).
 
 - **부록 D**: 파드에서 보이는 공인 IP 가 두 클러스터 모두 NAT Gateway 주소와 같았고, `az aks command invoke` 도 두 클러스터에서 동작했습니다. Automatic 클러스터는 리소스 요청이 없는 단독 시험 파드를 거부했습니다(D-2 의 파드는 이 규칙을 따릅니다).
 - **부록 E**: 샘플 Deployment 는 두 클러스터에서 실행됐습니다. Standard 클러스터에서는 다음이 설명대로 동작했습니다: 조회 명령, `exec` · `port-forward` · `top` · `debug` · `cp`, 롤아웃과 `undo`, 문제 해결 표의 `ImagePullBackOff` · `CrashLoopBackOff` · `Pending` · `OOMKilled` 사례, `sessionAffinity` 를 직접 패치한 뒤 07-ingress 의 `terraform plan` 에 생기는 차이. Azure RBAC 역할 이름과 네임스페이스 범위 형식도 확인했습니다. Automatic 클러스터에서는 Lab 04 ACR 의 이미지가 D-2 의 설명대로 `403` 으로 실패했습니다.
+- **부록 F** (같은 날 따로 만든 임시 환경에서 확인: `enable_private_cluster=true` 로 만든 03–05 스택, 풀마다 노드 1개, Managed Grafana 끔, VM 이 하나씩 있는 클라이언트 VNet 2개. 모두 삭제했습니다): `05-aks` 를 랩탑에서 `apply` 했고(15개 리소스), 클러스터에 공용 FQDN 이 없었으며, 랩탑에서는 프라이빗 FQDN 을 해석하지 못했습니다. **방법 1:** 피어링만 있을 때는 이름이 해석되지 않았지만(NXDOMAIN) 내부 로드밸런서의 TCP 443 은 열려 있었습니다. 클러스터의 프라이빗 DNS 존을 클라이언트 VNet 에 연결하자 피어링된 VNet 의 VM 이 `10.10.1.4` 로 해석하고 관리 ID 와 kubelogin 으로 `kubectl get nodes` 를 실행했습니다. **방법 2:** `kube-apiserver` 앞의 Private Link Service, `10.10.0.0/16` 과 겹치는 VNet(피어링 없음)의 Private Endpoint, A 레코드가 있는 프라이빗 DNS 존으로 같은 결과를 얻었습니다. `az aks command invoke` 가 동작했고, `scripts/verify.sh 05-aks` 는 Azure 점검을 통과하고 `kubectl` 점검은 건너뛰었으며, `terraform plan` 에서 `enable_private_cluster` 를 바꾸면 클러스터와 거기에 딸린 리소스가 `forces replacement` 로 나왔습니다. 실행 중인 클러스터를 `az aks update --disable-private-cluster` 다음 `--enable-private-cluster` 로 전환하는 것은 제자리에서 동작했습니다(각각 7–9분, 다른 플래그 불필요). 변수를 맞추자 plan 에 교체가 나오지 않았고, 다시 만들어진 프라이빗 DNS 존에는 추가해 둔 클라이언트 VNet 링크가 없었습니다.
+- **부록 G**: AVM 모듈 0.8.4 로 `terraform init` 이 AzAPI 2.13.0(이 가이드의 고정 버전)과 `modtm` 0.4.0, `random` 3.9.1 을 골랐고, `05-aks` 를 본뜬 입력(관리형 Gateway API 포함)으로 `terraform validate` 와 `terraform plan` 이 통과했습니다. plan 전용 `terraform test` 는 Azure 자격 증명도 mock 도 없이 실행되었습니다. 모듈의 변수 규칙은 잘못된 `sku.tier`, `os_sku`, `network_policy`, `os_disk_size_gb` 를 `plan` 에서 거부했지만, azurerm 5.9 는 잘못된 `os_sku` 와 `network_policy` 를 `validate` 에서 받아들였습니다. 모듈을 `apply` 하지는 않았습니다.
 - **Lab 08 Defender 수정**(아래 수정 14): 실행 중인 Standard 클러스터에 Defender 자동 프로비저닝 정책이 붙인 작업 영역으로 적용했습니다. apply 는 제자리 변경 1건(작업 영역 ID 의 대소문자뿐)이었고, 같은 변수 두 개로 다시 한 plan 은 변경 없음이었으며, `microsoft-defender` 파드 13개가 Running 이었습니다. `defender_log_analytics_workspace_id` 없이 켜면 plan 이 precondition 에서 멈춥니다.
 
 ### A-3. 실행하다 발견해서 고친 불일치
@@ -114,7 +116,8 @@
 - **Defender 자동 프로비저닝 정책이 있는 구독**: 클러스터를 만든 직후 한동안 `Updating` 이라 `verify.sh` 의 프로비저닝 상태가 일시적으로 실패하고, 05-aks plan 에 `microsoft_defender` 제거 diff 가 계속 보입니다. 같은 프로필을 선언하면(`enable_defender=true` 와, 정책이 쓴 작업 영역을 가리키는 `defender_log_analytics_workspace_id`) 사라집니다([Lab 08](08-governance.md) 2·4단계). 이때 플랫폼 작업 영역을 쓰면 안 됩니다(A-3 의 14번).
 - **조직 정책이 Storage 공용 접근을 끄는 구독**: 관리 그룹의 Azure Policy(Modify)가 Storage 계정의 공용 네트워크 접근을 `Disabled` 로 바꾸는 구독에서는 Lab 02 의 원격 state 접근이 `403 AuthorizationFailure` 로 실패했습니다(Terraform 이 `Enabled` 로 만들어도 정책이 바꿈). 이 가이드는 공용 엔드포인트 + Entra 인증을 전제로 하므로, 정책 예외를 받거나 다른 구독을 써야 합니다.
 - **`terraform plan -detailed-exitcode`**: provider 가 `available_kubernetes_versions` 출력 값만 바꿔도 `2` 를 돌려줍니다(실제 인프라 변경 없음). CI 의 "변경 없음" 판정에는 이 값을 무시하세요.
-- **실행하지 않은 것**: Windows(PowerShell) 명령, 다른 리전, 팀 환경(Entra 그룹 `admin_principal_ids`), `enable_private_cluster=true` 로 실제 배포(plan 만), TLS(443) 리스너, Application Gateway for Containers, Grafana 웹 UI 로그인, `az login` 의 대화형 로그인, [Lab 09](09-operations.md) §6 의 GitHub Actions 워크플로 예시.
+- **실행하지 않은 것**: Windows(PowerShell) 명령, 다른 리전, 팀 환경(Entra 그룹 `admin_principal_ids`), TLS(443) 리스너, Application Gateway for Containers, Grafana 웹 UI 로그인, `az login` 의 대화형 로그인, [Lab 09](09-operations.md) §6 의 GitHub Actions 워크플로 예시.
+- **부록 F · G 에서 실행하지 않은 것**: VPN · ExpressRoute, Azure DNS Private Resolver(하이브리드 DNS), Azure Bastion(테스트 VM 은 Bastion 을 거친 점프 호스트 대신 `az vm run-command` 로 다뤘습니다), 다른 구독의 Private Endpoint(`--visibility`, `--auto-approval`), VNet 안의 Cloud Shell, `az aks bastion`, API Server VNet Integration 을 쓰지 않는 프라이빗 클러스터, AVM 모듈 `apply`(초기화 · 검증 · plan 만 했습니다).
 - **Azure CLI 간헐 오류**: `az aks get-credentials` 가 `Error loading command module 'serviceconnector': deadlock` 으로 한 번 실패하고 다시 실행하면 성공했습니다(CLI 쪽 문제).
 
 ### A-5. 정리 결과 (Lab 11)
@@ -144,7 +147,7 @@
 | `Provider produced inconsistent result after apply` (kubernetes_manifest) | CRD 기본값/서버 정규화 차이. `terraform apply` 재시도 또는 `computed_fields` 사용. |
 | `StorageAccountAlreadyTaken` / `VaultAlreadyExists` / ACR 이름 충돌 | 전역 고유 이름 충돌. `TF_VAR_workload` 변경 또는 soft-deleted Key Vault 복구/purge. |
 | `terraform destroy` 가 `ScopeLocked` | 리소스 잠금 해제 ([Lab 08](08-governance.md), [Lab 11](11-cleanup.md)). |
-| `kubectl: Unable to connect ... i/o timeout` | API 서버는 `allowed_ip_ranges` 의 IP 만 받습니다. 내 공인 IP 가 바뀌었거나, 다른 네트워크·Cloud Shell·CI 에서 접속하는 경우입니다 → D절(D-3, D-4) 참고: `TF_VAR_allowed_ip_ranges` 를 갱신하고 `04-platform`, `05-aks`, `10-aks-automatic` 을 `apply` 하세요. 그동안은 `az aks command invoke` 를 쓰세요. |
+| `kubectl: Unable to connect ... i/o timeout` | API 서버는 `allowed_ip_ranges` 의 IP 만 받습니다. 내 공인 IP 가 바뀌었거나, 다른 네트워크·Cloud Shell·CI 에서 접속하는 경우입니다 → D절(D-3, D-4) 참고: `TF_VAR_allowed_ip_ranges` 를 갱신하고 `04-platform`, `05-aks`, `10-aks-automatic` 을 `apply` 하세요. 그동안은 `az aks command invoke` 를 쓰세요. 프라이빗 클러스터(`enable_private_cluster`)에서는 IP 목록이 도움이 되지 않습니다: F절 참고. |
 | `kubectl` 이 엉뚱한 클러스터를 바꿈 | 클러스터가 2개일 때 `az aks get-credentials` 는 마지막으로 받은 클러스터를 현재 컨텍스트로 바꿉니다. `kubectl config current-context` 로 확인하고 `kubectl config use-context <이름>` 으로 바꾸세요(D-1 참고). |
 | `kubelogin` 오류 / `Unauthorized` | `az login` 재실행, `kubelogin convert-kubeconfig -l azurecli`, Azure RBAC 역할 전파 대기. |
 | `terraform plan` 이 매번 `node_count` 변경을 요구 | 오토스케일러와 충돌. 코드에 `node_count` 를 쓰지 말고 `min_count`/`max_count` 만 사용 ([Lab 09](09-operations.md)). |
@@ -159,7 +162,7 @@
 | 영역 | 이 가이드 | 프로덕션 권장 |
 |---|---|---|
 | 네트워크 토폴로지 | 단일 VNet + NAT Gateway | **허브-스포크**: 허브에 Azure Firewall(egress 통제, UDR)·Bastion·VPN/ExpressRoute, 스포크에 AKS |
-| API 서버 | 공용 + authorized IP | **완전 프라이빗**(`enable_private_cluster`) + Bastion/점프 호스트/자체 호스팅 러너 |
+| API 서버 | 공용 + authorized IP | **완전 프라이빗**(`enable_private_cluster`) + Bastion/점프 호스트/자체 호스팅 러너(F절 참고) |
 | 인그레스 | Gateway API 공용 LB | **Application Gateway(WAF v2) 또는 Front Door** → 내부 Gateway, TLS 종단(Key Vault 인증서) |
 | 레지스트리/KV | Private Endpoint + 관리자 IP 허용 | 공용 접근 **완전 차단**, CI 는 VNet 내부/관리형 러너 |
 | ID | 사용자에게 직접 역할 | **Entra 그룹 + PIM(Just-in-time)**, 조건부 액세스, 접근 검토 |
@@ -167,7 +170,7 @@
 | 보안 | 선택적 Defender | Defender for Containers + (Sentinel 커넥터), 이미지 서명/스캔 파이프라인 |
 | 복원력 | 단일 리전(영역 3곳) | **Azure Backup for AKS**, 멀티 리전 + Front Door/Traffic Manager, Fleet Manager |
 | 배포 | `terraform apply` + kubectl | **GitOps(Flux 확장)** 로 클러스터 부트스트랩/앱 배포, 파이프라인에서 OIDC 로그인 |
-| 모듈화 | 학습용 직접 정의 | 사내 모듈 또는 **Azure Verified Modules(AVM)** 로 표준화 |
+| 모듈화 | 학습용 직접 정의 | 사내 모듈 또는 **Azure Verified Modules(AVM)** 로 표준화(장단점은 G절) |
 | 관측성 | 기본 대시보드 | Prometheus 알림 규칙(`azurerm_monitor_alert_prometheus_rule_group`) + Action Group, SLO 대시보드 |
 
 ## D. 클러스터 접속 경로와 인터넷 노출 요약
@@ -270,6 +273,8 @@ az aks command invoke -g <rg> -n <cluster> --command "kubectl -n web get pods -o
 - AKS 가 `aks-command` 네임스페이스에 짧게 사는 파드를 만들어 명령을 실행하고 텍스트 출력을 돌려줍니다. 대화형 셸, `exec -it`, `port-forward` 는 없으므로 한 번에 끝나는 명령만 쓰고, 매니페스트 같은 파일은 `--file` 로 붙입니다.
 - 포털에는 같은 기능이 **AKS 클러스터 → Run command** 로 있습니다.
 - 이 가이드의 두 클러스터에서 모두 시험했습니다.
+
+공용 엔드포인트를 아예 없애고 프라이빗 네트워크로만 API 서버에 접속하려면 F절을 보세요.
 
 ### D-4. 공인 IP 가 바뀌었거나 팀원이 접속해야 할 때
 
@@ -520,7 +525,172 @@ kubectl delete namespace practice     # 안의 모든 것을 삭제: Deployment,
 
 Lab 06·07 워크로드나 Azure 리소스는 건드리지 않습니다.
 
-## F. 참고 자료
+## F. 프라이빗 네트워크로 API 서버에 접속하기 (2가지 방법)
+
+실습에서는 API 서버가 공용 엔드포인트이고 `allowed_ip_ranges` 의 IP 만 쓸 수 있습니다(D). 인터넷에서 내리려면 `enable_private_cluster = true` 로 설정하세요. 이 클러스터는 이미 API Server VNet Integration 을 쓰므로, 그러면 API 서버는 `snet-aks-apiserver` 의 내부 로드밸런서 **사설 IP 로만** 열립니다. 아래 두 방법은 클라이언트가 그 IP 에 닿는 경로가 다릅니다.
+
+| | ① 사설 IP 로 직접 | ② Private Link |
+|---|---|---|
+| 동작 | 클라이언트 네트워크에서 `snet-aks-apiserver` 까지 라우팅 | 클라이언트 VNet 의 Private Endpoint 가 API 서버 내부 로드밸런서 앞의 Private Link Service 에 연결 |
+| 클라이언트 네트워크 | 같은 VNet, 피어링된 VNet, VPN 이나 ExpressRoute 로 연결한 온프레미스 | 다른 구독·테넌트를 포함한 모든 VNet. 주소 공간이 겹쳐도 됨 |
+| 추가 리소스 | VNet 피어링 또는 VPN/ExpressRoute 게이트웨이, DNS 링크 또는 포워더 | AKS VNet: 서브넷과 Private Link Service. 클라이언트 VNet: Private Endpoint, 프라이빗 DNS 존, A 레코드 |
+| 과금 | 게이트웨이와 Bastion 은 시간당, 피어링은 전송한 데이터량 기준 | Private Endpoint 는 시간당 + 처리한 데이터량(GB) 기준 |
+| 이럴 때 | 네트워크가 이미 연결되어 있을 때(허브-스포크, VPN) | 피어링할 수 없거나 하고 싶지 않을 때, 클라이언트가 다른 팀·회사일 때 |
+
+![프라이빗 API 서버에 접속하는 2가지 방법: 사설 IP 직접 접속과 Private Link](diagrams/private-api-access.svg)
+
+> [!NOTE]
+> F 와 G 는 Microsoft 문서(링크는 H)를 따랐고, 2026-10-14 에 실습 구독에서 F-1–F-3 의 명령과 G 의 AVM 모듈을 확인했습니다(A-2 참고). 단계는 적힌 그대로 실행되었고, 피어링된 VNet 의 VM(방법 1)과 주소 공간이 겹치는 VNet 의 VM(방법 2)에서 각각 `kubectl get nodes` 가 성공했습니다. 실행하지 않은 것: VPN · ExpressRoute, Azure DNS Private Resolver, Azure Bastion, 다른 구독의 Private Endpoint, VNet 안의 Cloud Shell, `az aks bastion`, AVM 모듈 `apply`(A-4 참고).
+
+### F-1. API 서버를 프라이빗으로 만들기
+
+```bash
+export TF_VAR_enable_private_cluster=true
+terraform -chdir=terraform/05-aks plan      # 이미 만든 클러스터라면 교체(replace)로 나옵니다
+terraform -chdir=terraform/05-aks apply
+```
+
+- 공용 엔드포인트가 사라지고 `allowed_ip_ranges` 는 API 서버에 적용되지 않습니다(`04-platform` 은 ACR · Key Vault 방화벽에 계속 씁니다). 코드가 이미 `private_cluster_public_fqdn_enabled = false` 로 두므로 공용 FQDN 도 없습니다.
+- **클러스터를 만들 때 정하세요.** azurerm 5.9 에서 `private_cluster_enabled` 와 `private_dns_zone_id` 는 바꾸면 새 클러스터를 만들고, 그 교체는 노드 풀 · 모니터링 연결 · AzAPI 업데이트로 이어집니다([Lab 05](05-aks.md) 심화 실험 (b)). Azure 자체는 VNet Integration 클러스터를 `az aks update --enable-private-cluster`(또는 `--disable-private-cluster`, 미리 보기)로 제자리에서 전환할 수 있고, 실습에서는 7–9분이 걸렸습니다. 그렇게 했다면 변수도 맞춰 두세요. 그러면 `terraform plan` 에 교체가 나오지 않았습니다. 이 전환은 프라이빗 DNS 존을 다시 만들므로 직접 추가한 링크(F-2 의 2단계)는 사라지니 다시 만들어야 합니다.
+- 기본적으로 AKS 는 **노드 리소스 그룹에 프라이빗 DNS 존을 만들고 클러스터 VNet 에만 연결**합니다. 다른 네트워크에서는 프라이빗 FQDN 을 해석하지 못하므로, 두 방법 모두 DNS 부터 해결해야 합니다.
+- 랩탑에서 계속 동작하는 것: Azure Resource Manager 하고만 통신하는 스택(`02`–`05`, `08`, `10`)과 `az aks command invoke`(D-3). 이제 API 서버까지 네트워크 경로가 필요한 것: Lab 05 이후의 `kubectl`, `kubernetes` provider 를 쓰는 스택(`06`, `07`), `scripts/verify.sh` 의 `kubectl` 단계(연결할 수 없으면 건너뜁니다). 이들은 아래 방법 중 하나로 연결된 머신에서 실행하세요.
+- Lab 10 의 Automatic 클러스터에는 이 변수가 없습니다. authorized IP 를 쓰는 공용 클러스터로 남습니다.
+
+### F-2. 방법 1: 사설 IP 로 직접 접속 (같은 VNet · 피어링 · VPN/ExpressRoute)
+
+`snet-aks-apiserver` 까지 라우팅되고 프라이빗 FQDN 을 해석할 수 있는 머신에서 `kubectl` 을 실행합니다.
+
+| 클라이언트 | 방법 | 참고 |
+|---|---|---|
+| 점프 호스트 VM | AKS VNet 의 별도 서브넷(노드 서브넷이 아님)에 **공인 IP 없는** VM 을 만들고 Azure Bastion 으로 접속 | `az`, `kubectl`, `kubelogin` 설치(`az aks install-cli`) |
+| 자체 호스팅 러너 | AKS VNet 또는 피어링된 VNet 에서 CI 에이전트 실행 | Microsoft 호스티드 Azure DevOps 에이전트는 프라이빗 클러스터에서 지원되지 않습니다 |
+| 랩탑 · 온프레미스 | AKS VNet 과 피어링된 허브 VNet 으로 VPN 게이트웨이(지점 간 또는 사이트 간)나 ExpressRoute 연결 | DNS 전달이 필요합니다(아래) |
+
+예시는 클라이언트 VNet 을 AKS VNet 과 피어링하고 클러스터의 프라이빗 DNS 존을 그 VNet 에 연결합니다.
+
+```bash
+# 1. 양방향으로 피어링합니다. 클라이언트 VNet 의 주소 공간은 10.10.0.0/16 과 겹치면 안 됩니다.
+az network vnet peering create -g <client-rg> --vnet-name <client-vnet> -n client-to-aks \
+  --remote-vnet <aks-vnet-id> --allow-vnet-access
+az network vnet peering create -g <network-rg> --vnet-name <aks-vnet> -n aks-to-client \
+  --remote-vnet <client-vnet-id> --allow-vnet-access
+
+# 2. 클러스터의 프라이빗 DNS 존(노드 리소스 그룹에 있음)을 클라이언트 VNet 에 연결
+NODE_RG=$(az aks show -g <rg> -n <cluster> --query nodeResourceGroup -o tsv)
+ZONE=$(az network private-dns zone list -g "$NODE_RG" --query "[0].name" -o tsv)
+az network private-dns link vnet create -g "$NODE_RG" -z "$ZONE" -n link-client \
+  -v <client-vnet-id> -e false
+
+# 3. 클라이언트에서: 이름이 사설 IP 로 해석되는지 확인한 뒤 평소처럼 kubectl 을 씁니다
+FQDN=$(az aks show -g <rg> -n <cluster> --query privateFqdn -o tsv)
+nslookup "$FQDN"                                    # 10.10.1.0/28 안의 주소
+az aks get-credentials -g <rg> -n <cluster> --overwrite-existing \
+  && kubelogin convert-kubeconfig -l azurecli
+kubectl get nodes
+```
+
+- **하이브리드 DNS.** 랩탑이나 온프레미스 네트워크는 VNet 에 연결된 존을 쓸 수 없습니다. 사내 DNS 서버에서 이 존의 이름을, 그 존에 연결된 VNet 의 Azure DNS Private Resolver 인바운드 엔드포인트로(또는 그 VNet 에서 `168.63.129.16` 으로 전달하는 DNS 포워더로) 전달하세요.
+- 피어링은 전이되지 않습니다. 스포크 VNet 은 허브가 트래픽을 넘겨 줄 때(Azure Firewall, 게이트웨이, 네트워크 가상 어플라이언스)만 AKS VNet 에 닿습니다.
+- 이 가이드는 `snet-aks-apiserver` 에 NSG 를 붙이지 않습니다. 붙인다면 클라이언트 네트워크의 TCP 443 도 허용하세요.
+- 이 구성 요소의 Terraform 리소스: `azurerm_virtual_network_peering`, `azurerm_private_dns_zone_virtual_network_link`, `azurerm_bastion_host`, `azurerm_virtual_network_gateway`, `azurerm_private_dns_resolver`.
+
+### F-3. 방법 2: Private Link (Private Endpoint → Private Link Service)
+
+클라이언트를 피어링할 수 없을 때 씁니다. 다른 구독·테넌트이거나 주소 공간이 `10.10.0.0/16` 과 겹치는 경우입니다. API Server VNet Integration 과 직접 만든 VNet 을 쓰는 프라이빗 클러스터에서 동작하며, `05-aks` 가 바로 그 구성입니다. 클러스터의 `kube-apiserver` 내부 로드밸런서 앞에 Private Link Service(PLS)를 두고, 클라이언트 VNet 이 Private Endpoint 로 거기에 연결합니다.
+
+```bash
+# AKS 쪽: PLS 용 서브넷을 추가하고(03-network 에는 없음),
+# API 서버 로드밸런서 앞에 PLS 를 만듭니다
+az network vnet subnet create -g <network-rg> --vnet-name <aks-vnet> -n snet-pls \
+  --address-prefixes 10.10.4.0/27 --disable-private-link-service-network-policies
+NODE_RG=$(az aks show -g <rg> -n <cluster> --query nodeResourceGroup -o tsv)
+LB_FRONTEND=$(az network lb show -g "$NODE_RG" -n kube-apiserver \
+  --query "frontendIPConfigurations[0].id" -o tsv)
+az network private-link-service create -g <network-rg> -n pls-aks-apiserver -l <region> \
+  --vnet-name <aks-vnet> --subnet snet-pls --lb-frontend-ip-configs "$LB_FRONTEND"
+
+# 클라이언트 쪽: PLS 로 가는 Private Endpoint 와 그 사설 IP
+PLS_ID=$(az network private-link-service show -g <network-rg> -n pls-aks-apiserver --query id -o tsv)
+az network private-endpoint create -g <client-rg> -n pe-aks-apiserver -l <region> \
+  --vnet-name <client-vnet> --subnet <client-subnet> \
+  --private-connection-resource-id "$PLS_ID" --connection-name aks-apiserver
+PE_NIC=$(az network private-endpoint show -g <client-rg> -n pe-aks-apiserver \
+  --query "networkInterfaces[0].id" -o tsv)
+PE_IP=$(az network nic show --ids "$PE_NIC" \
+  --query "ipConfigurations[0].privateIPAddress" -o tsv)
+
+# 클라이언트 쪽: A 레코드가 Private Endpoint 를 가리키는 프라이빗 DNS 존을 만들고
+# 클라이언트 VNet 에 연결합니다. 레코드 이름은 프라이빗 FQDN 의 <label>.<guid> 입니다.
+ZONE=private.<region>.azmk8s.io
+RECORD=$(az aks show -g <rg> -n <cluster> --query privateFqdn -o tsv | cut -d. -f1,2)
+az network private-dns zone create -g <client-rg> -n "$ZONE"
+az network private-dns record-set a add-record -g <client-rg> -z "$ZONE" -n "$RECORD" -a "$PE_IP"
+az network private-dns link vnet create -g <client-rg> -z "$ZONE" -n link-client \
+  -v <client-vnet-id> -e false
+```
+
+그다음 F-2 처럼 클라이언트 VNet 안의 머신에서 `kubectl get nodes` 를 실행합니다.
+
+- 클라이언트가 다른 구독에 있다면 PLS 에 그 구독 ID 를 추가하거나(`--visibility`, `--auto-approval`) PLS 에서 보류 중인 연결을 승인하세요.
+- A 레코드는 직접 관리해야 합니다. Private Endpoint 의 IP 가 바뀌면 레코드를 고치세요.
+- 로드밸런서는 클러스터에 속하므로, 클러스터를 교체하면 새 로드밸런서를 가리키는 PLS 를 새로 만들어야 합니다.
+- Terraform 리소스: `azurerm_private_link_service`, `azurerm_private_endpoint`, `azurerm_private_dns_zone`, `azurerm_private_dns_a_record`. PLS 서브넷에는 `private_link_service_network_policies_enabled = false` 가 필요하고, 데이터 소스 `azurerm_lb` 로 `kube-apiserver` 로드밸런서를 읽을 수 있습니다.
+- API Server VNet Integration 을 **쓰지 않는** 프라이빗 클러스터는 다르게 동작합니다. AKS 가 클러스터 VNet 에 Private Endpoint 를 직접 만들고, 다른 VNet 은 피어링 또는 클러스터의 `management` 하위 리소스에 대한 자기 Private Endpoint 로 연결합니다. 이 가이드는 그 모드를 쓰지 않습니다.
+
+### F-4. 네트워크 경로를 얻는 다른 방법
+
+| 방법 | 참고 |
+|---|---|
+| `az aks command invoke` | 네트워크 경로가 필요 없습니다. Azure API 를 거쳐 한 번에 끝나는 명령을 실행합니다(D-3) |
+| VNet 안의 Cloud Shell | API 서버에 닿는 VNet 에 Cloud Shell 을 배포합니다. AKS Automatic 이나 노드 리소스 그룹 잠금(lockdown) 클러스터에서는 지원되지 않습니다 |
+| Azure Bastion 네이티브 클라이언트 터널(`az aks bastion`, 미리 보기) | 네이티브 클라이언트를 켠 Standard 또는 Premium Bastion 과 `aks-preview` 확장이 필요합니다. AKS Automatic 이나 노드 리소스 그룹 잠금에서는 지원되지 않습니다. Microsoft 의 안내는 관리자 자격 증명을 가져오는데, 이 가이드의 클러스터는 로컬 계정을 꺼 두어 제공하지 않습니다 |
+
+### F-5. 연결이 안 될 때
+
+| 증상 | 확인할 것 |
+|---|---|
+| `nslookup` 이 아무것도 돌려주지 않거나 공인 주소를 돌려줌 | DNS: 존이 클라이언트 네트워크에 연결(또는 전달)되지 않았습니다. 방법 2 라면 A 레코드나 VNet 링크가 빠졌습니다 |
+| 이름은 해석되는데 `kubectl` 이 `dial tcp …:443: i/o timeout` 으로 끝남 | 경로: 피어링 상태 `Connected`, 게이트웨이 라우트, TCP 443 의 NSG · 방화벽 규칙. 방법 2 라면 Private Endpoint 연결이 `Approved` 여야 합니다 |
+| `Unauthorized` 또는 `Forbidden` | 네트워크는 정상입니다. ID 를 확인하세요: `az login`, `kubelogin convert-kubeconfig -l azurecli`, Azure RBAC 역할(E-9) |
+
+## G. AKS 를 Terraform 으로 구성할 때: AVM 을 쓸까, 말까
+
+**결론부터.** 이 가이드는 모든 설정이 한눈에 보이고 Azure 없이 `terraform test` 로 검증할 수 있도록 `azurerm_kubernetes_cluster` 를 직접 씁니다. [Azure Verified Modules(AVM)](https://azure.github.io/Azure-Verified-Modules/)는 공통 인터페이스를 가진, Microsoft 가 뒷받침하는 Terraform 모듈이며 AKS 용은 `Azure/avm-res-containerservice-managedcluster/azurerm` 입니다. 여러 팀이 같은 방식으로 클러스터를 만들어야 하고 버전 업그레이드를 감당할 수 있다면 AVM 을, 학습이나 소수의 클러스터이거나 완전한 통제와 적은 의존성을 원한다면 직접 리소스를 쓰세요. 2026-10-14 기준 AKS 모듈은 아직 0.x 라서 마이너 버전 사이에도 파괴적 변경이 있을 수 있습니다.
+
+### G-1. AKS AVM 모듈 현황
+
+| | 2026-10-14 기준 |
+|---|---|
+| 모듈 | `Azure/avm-res-containerservice-managedcluster/azurerm` ([Registry](https://registry.terraform.io/modules/Azure/avm-res-containerservice-managedcluster/azurerm/latest), [GitHub](https://github.com/Azure/terraform-azurerm-avm-res-containerservice-managedcluster)) |
+| 최신 버전 | 0.8.4(2026-10-08 게시). 아직 1.0 미만입니다. AVM 명세는 이런 모듈의 마이너 릴리스에서 파괴적 변경을 허용하지만, AVM FAQ 는 프로덕션에서 써도 된다고 설명합니다 |
+| 요구 사항 | Terraform `>= 1.11, < 2.0`, provider AzAPI `~> 2.12` · `modtm` `~> 0.3` · `random` `>= 3.5, < 4.0`. **azurerm 은 없습니다** |
+| 입력 | AKS ARM API 모양(`api_server_access_profile`, `network_profile`, `agent_pools` 등)에 공통 AVM 인터페이스(`lock`, `role_assignments`, `diagnostic_settings`, `private_endpoints`, `managed_identities`, `tags`, `enable_telemetry`)가 더해집니다 |
+| 예제 | `default`, `private`, `secure-baseline-private-cluster`, `waf-aligned`, `automatic`, `automatic-private` 등 |
+| 이 가이드와의 관계 | 요구 버전이 이 가이드의 고정 버전(Terraform `~> 1.16`, AzAPI `~> 2.13`)과 호환되고, `05-aks` 가 설정하는 항목(Entra ID · Azure RBAC, API Server VNet Integration, Azure CNI Overlay + Cilium, kubelet ID, 노드 풀, 유지 관리 창, KEDA · VPA, Managed Prometheus, Container Insights)에 해당하는 입력이 있습니다. 이 입력들로 AzAPI 2.13.0 에서 `terraform init`, `validate`, `plan` 이 성공했고 모듈을 `apply` 하지는 않았습니다 |
+
+### G-2. 장단점
+
+| 비교 항목 | AVM 사용 | 직접 리소스 (이 가이드) |
+|---|---|---|
+| 시작 | 필수 입력 3개(`name`, `location`, `parent_id`). 프라이빗 · WAF 정렬 · 보안 베이스라인 클러스터 예제와 테스트가 모듈에 포함됩니다 | 블록을 전부 직접 쓰지만 클러스터 전체가 파일 하나(`cluster.tf`)에서 읽힙니다 |
+| 표준화 | 모든 AVM 모듈과 같은 인터페이스 · 규약. 팀 사이에 하나의 베이스라인 | 직접 정한 규약을 직접 유지 |
+| 새 기능 | AzAPI 가 ARM 본문을 그대로 보내므로 모듈이 노출하는 즉시 속성을 쓸 수 있고 azurerm 을 기다리지 않습니다. `05-aks` 가 AzAPI 로 켜는 관리형 Gateway API 는 이미 입력(`ingress_profile.gateway_api`)이 있지만 컨트롤 플레인 메트릭은 없어서(0.8.4) 그 부분은 여전히 `azapi_update_resource` 를 추가해야 합니다 | azurerm 을 기다리거나 `05-aks` 처럼 `azapi_update_resource` 를 추가(`gateway-api.tf`, `monitoring.tf`) |
+| 안정성 | **0.x: 마이너 릴리스에서 깨질 수 있습니다.** 이 모듈은 azurerm 에서 AzAPI 로 바뀌며 많은 입력이 삭제 · 이름 변경되었고([UPGRADE.md](https://github.com/Azure/terraform-azurerm-avm-res-containerservice-managedcluster/blob/main/UPGRADE.md)), 0.8.0 으로 올릴 때는 private endpoint 에 `state rm` 과 `import` 를 손으로 해야 합니다([MIGRATION.md](https://github.com/Azure/terraform-azurerm-avm-res-containerservice-managedcluster/blob/main/MIGRATION.md)) | provider 업그레이드(예: azurerm 5.0)만, 시점은 내가 정함 |
+| 디버깅 | ARM 모양의 큰 객체라 AKS REST 구조를 알아야 하고(azurerm 의 `only_critical_addons_enabled` 는 여기서 `node_taints` 항목입니다) 오류가 `.terraform/modules` 안을 가리킵니다. 모듈 자체의 변수 규칙이 잘못된 값 여럿을 `plan` 에서 거부합니다(확인: `sku.tier`, `os_sku`, `network_policy`, `os_disk_size_gb`) | 리소스 주소가 단순하고 azurerm 방식의 인자를 씁니다. azurerm 5.9 는 잘못된 `os_sku` 와 `network_policy` 를 `validate` 에서 받아들였으므로 Azure 가 `apply` 에서 거부합니다 |
+| 지원 | 버그는 모듈의 GitHub 이슈로 접수하며 응답 시간은 정해져 있지 않습니다(AVM 은 2026-10-13 에 Azure engineering 으로 이관, [Module Support](https://azure.github.io/Azure-Verified-Modules/help-support/module-support/) 참고). 플랫폼 문제는 Azure 지원으로 | 나 자신과 azurerm provider 커뮤니티 |
+| 의존성 | `modtm` · `random` provider 와 `avm-utl-interfaces` 모듈이 추가되고 AzAPI 가 필수가 됩니다(오프라인이면 모두 미러링) | azurerm, 필요한 곳에만 AzAPI |
+| 데이터 수집 | 텔레메트리가 기본 켜짐(`modtm` 이 구독 ID · 테넌트 ID · 모듈 버전을 전송). `enable_telemetry = false` 로 끔([AVM telemetry](https://azure.github.io/Azure-Verified-Modules/help-support/telemetry/)) | 없음 |
+| 테스트 | 모듈에 대한 plan 전용 `terraform test` 가 Azure 자격 증명도 mock 도 없이 실행되었습니다(0.8.4). 내 입력을 테스트하는 것이지 모듈 내부를 테스트하는 것은 아닙니다 | `mock_provider "azurerm"` 하나로 오프라인에서 전부 검증(이 가이드처럼) |
+| 이관 | `azurerm_kubernetes_cluster` 로 만든 클러스터는 모듈의 `azapi_resource`(다른 리소스 타입)로 `import` 해야 하고, plan 에 교체가 없어야 합니다 | 옮길 것 없음 |
+
+### G-3. 어떻게 고를까
+
+- **AVM 을 쓰세요**: 여러 클러스터나 팀이 하나의 베이스라인(잠금 · 진단 · RBAC · private endpoint 를 같은 모양으로)을 따라야 할 때, `secure-baseline-private-cluster` 같은 Microsoft 가 관리하는 예제를 출발점으로 삼고 싶을 때, 버전을 고정하고 업그레이드마다 검토할 수 있을 때.
+- **직접 리소스를 쓰세요**: 학습 · PoC, 소수의 클러스터, 모든 설정을 오프라인으로 보고 테스트해야 할 때, 0.x 의 파괴적 변경 · 추가 provider · 텔레메트리를 받아들일 수 없을 때.
+- **중간 길**: 리소스를 내 모듈로 감싸고(이 가이드의 `modules/naming` 처럼) AVM 의 인터페이스 규약과 예제를 빌려 오며, AKS 모듈이 1.0 이 되면 다시 검토하세요. 예전 커뮤니티 모듈 `Azure/aks/azurerm` 은 보관(archived)되어 AVM 모듈로 안내하므로 새 작업의 "AVM 없는" 선택지가 아닙니다.
+- **AVM 을 도입한다면**: 정확한 버전으로 고정하고(`version = "0.8.4"`, 범위 지정 금지), 올릴 때마다 릴리스 노트 · `UPGRADE.md` · `MIGRATION.md` 를 읽고, 먼저 state 복사본에 `terraform plan` 을 돌려 보세요. 이 가이드의 구성이라면 `05-aks` 의 클러스터 리소스만 바꾸고 `03-network` 와 `04-platform` 은 그대로 둘 수 있습니다.
+
+## H. 참고 자료
 
 | 주제 | 링크 |
 |---|---|
@@ -529,11 +699,12 @@ Lab 06·07 워크로드나 Azure 리소스는 건드리지 않습니다.
 | AKS Automatic / NAP | [AKS Automatic 소개](https://learn.microsoft.com/azure/aks/intro-aks-automatic), [Node auto-provisioning](https://learn.microsoft.com/azure/aks/node-auto-provisioning) |
 | Gateway API | [App Routing Gateway API](https://learn.microsoft.com/azure/aks/app-routing-gateway-api), [NGINX → Gateway API 마이그레이션](https://learn.microsoft.com/azure/aks/app-routing-nginx-to-gateway-api-migration), [Managed Gateway API CRD](https://learn.microsoft.com/azure/aks/managed-gateway-api) |
 | 지원 버전/일정 | [Supported Kubernetes versions](https://learn.microsoft.com/azure/aks/supported-kubernetes-versions), [AKS 릴리스 노트](https://github.com/Azure/AKS/releases) |
-| Terraform | [azurerm 5.0 업그레이드 가이드](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/5.0-upgrade-guide), [`azurerm_kubernetes_cluster`](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster), [`azurerm_kubernetes_automatic_cluster`](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_automatic_cluster), [AzAPI](https://registry.terraform.io/providers/Azure/azapi/latest/docs), [AVM](https://azure.github.io/Azure-Verified-Modules/) |
+| 프라이빗 클러스터 접속 (F) | [Create a private AKS cluster](https://learn.microsoft.com/azure/aks/private-clusters), [Establish network connectivity to a private AKS cluster](https://learn.microsoft.com/azure/aks/private-cluster-connect), [API Server VNet Integration](https://learn.microsoft.com/azure/aks/api-server-vnet-integration), [Private Link with API Server VNet Integration](https://learn.microsoft.com/azure/aks/private-apiserver-vnet-integration-cluster), [Azure Bastion 으로 연결](https://learn.microsoft.com/azure/bastion/bastion-connect-to-aks-private-cluster) |
+| Terraform | [azurerm 5.0 업그레이드 가이드](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/5.0-upgrade-guide), [`azurerm_kubernetes_cluster`](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster), [`azurerm_kubernetes_automatic_cluster`](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_automatic_cluster), [AzAPI](https://registry.terraform.io/providers/Azure/azapi/latest/docs), [AVM](https://azure.github.io/Azure-Verified-Modules/), [AKS 용 AVM 모듈](https://registry.terraform.io/modules/Azure/avm-res-containerservice-managedcluster/azurerm/latest) |
 | Microsoft 공식 Terraform 샘플 | [Azure/terraform quickstart](https://github.com/Azure/terraform/tree/master/quickstart): `101-aks-application-routing-gateway-api`, `101-aks-automatic-custom-network`, `101-aks-network-isolated`, `101-aks-use-azure-policy`, `101-aks-defender-containers`, `301-aks-enterprise` |
 | Prometheus 템플릿 | [Azure/prometheus-collector — AddonTerraformTemplate](https://github.com/Azure/prometheus-collector/tree/main/AddonTerraformTemplate) |
 
-## G. Terraform 파일 전체 목록 (어느 Lab 에 있나)
+## I. Terraform 파일 전체 목록 (어느 Lab 에 있나)
 
 | 스택 / 모듈 | 파일 | 실린 곳 |
 |---|---|---|
@@ -546,12 +717,12 @@ Lab 06·07 워크로드나 Azure 리소스는 건드리지 않습니다.
 | `07-ingress` | `versions.tf` `providers.tf` `variables.tf` `main.tf` `app.tf` `gateway.tf` `outputs.tf` `tests/plan.tftest.hcl` | [Lab 07](07-ingress.md) |
 | `08-governance` | `versions.tf` `providers.tf` `variables.tf` `main.tf` `policy.tf` `security.tf` `budget.tf` `outputs.tf` `tests/plan.tftest.hcl` | [Lab 08](08-governance.md) |
 | `10-aks-automatic` | `versions.tf` `providers.tf` `variables.tf` `main.tf` `cluster.tf` `outputs.tf` `tests/plan.tftest.hcl` | [Lab 10](10-aks-automatic.md) |
-| `mocks` | `azurerm.tfmock.hcl` | 아래 F |
+| `mocks` | `azurerm.tfmock.hcl` | 아래 J |
 
 > [!NOTE]
 > 모든 스택은 같은 파일 구성(`versions.tf` → `providers.tf` → `variables.tf` → `main.tf` → 주제별 파일 → `outputs.tf`)을 따릅니다. 파일을 한 곳에 모아 보고 싶다면 이 HTML 의 검색창에 파일 이름(예: `cluster.tf`)을 입력하세요.
 
-## H. 테스트/도구 코드 전체
+## J. 테스트/도구 코드 전체
 
 각 스택의 `tests/plan.tftest.hcl` 은 해당 Lab 의 코드 섹션에 있습니다. 공통 mock 값과 전체 검증 스크립트는 아래와 같습니다.
 
@@ -877,7 +1048,7 @@ terraform.tfvars
 ```
 <!-- /tf:include -->
 
-## I. 검증 · 정리 스크립트
+## K. 검증 · 정리 스크립트
 
 실습 중 손으로 치던 확인/삭제 명령을 스크립트로 묶었습니다. 모두 저장소 루트의 `scripts/` 에 있으며 macOS · Linux · WSL · Azure Cloud Shell(bash)에서 동작합니다(필요: `terraform`, `az`, `jq`, 그리고 05 이후는 `kubectl`, `kubelogin`).
 
@@ -888,7 +1059,7 @@ terraform.tfvars
 | `scripts/verify/02…10.sh` | 위 스크립트가 호출 (직접 실행도 가능) | 스택별 검증 항목 | [02](02-bootstrap.md) [03](03-network.md) [04](04-platform.md) [05](05-aks.md) [06](06-workload-identity.md) [07](07-ingress.md) [08](08-governance.md) [10](10-aks-automatic.md) |
 | `scripts/cleanup.sh` | Lab 11, 실습을 마친 뒤 | 생성의 역순 `destroy`, 잠금 해제, 재실행 안전, 남은 리소스 점검 (`--dry-run` 지원) | [Lab 11](11-cleanup.md) |
 | `scripts/lib/common.sh` | 위 스크립트들이 `source` | 결과 출력(`pass`/`fail`/`warn`), 값 비교(`expect_*`), JSON 헬퍼(`jq`), `terraform output`/`az`/`kubectl` 래퍼 | 이 부록 |
-| `tools/validate-all.sh` | 코드를 고친 뒤 | `fmt` · `validate` · `terraform test` (구독 불필요) + 스크립트 문법 검사 | 위 F |
+| `tools/validate-all.sh` | 코드를 고친 뒤 | `fmt` · `validate` · `terraform test` (구독 불필요) + 스크립트 문법 검사 | 위 J |
 
 ```bash
 scripts/verify.sh                    # apply 한 모든 스택 검증 (안 한 스택은 건너뜀)

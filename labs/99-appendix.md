@@ -2,14 +2,14 @@
 **English** | [한국어](ko/99-appendix.md)
 <!-- /lang-switch -->
 
-# Appendix. Troubleshooting · production checklist · cluster access and workloads · references · test code
+# Appendix. Troubleshooting · production checklist · cluster access and workloads · private API access · AVM · references · test code
 
 | Duration | Estimated cost | Terraform stack | Prerequisite |
 |---|---|---|---|
 | Reference only | None | `terraform/mocks`, `scripts/`, `tools/validate-all.sh` | None |
 
 > [!TIP]
-> Looking for how to reach the clusters from Cloud Shell or another PC, or how to run `kubectl` against pods and Deployments? See **D. How to reach the clusters** and **E. Handling Kubernetes workloads with kubectl** below.
+> Looking for how to reach the clusters from Cloud Shell or another PC, or how to run `kubectl` against pods and Deployments? See **D. How to reach the clusters** and **E. Handling Kubernetes workloads with kubectl** below. To take the API server off the public internet, see **F. Reaching the API server over a private network**. To decide between hand-written Terraform and Azure Verified Modules, see **G. Building AKS with Terraform: with or without AVM**.
 
 ## A. How this guide was validated, and its limits
 
@@ -80,10 +80,12 @@ To check what static validation alone cannot reveal, the commands in the docs we
 
 As before, Azure created `NetworkWatcherRG` and Defender's default Log Analytics workspace (`DefaultResourceGroup-…`) during the run, and both were deleted by hand. The only thing left is one Key Vault in the soft-deleted state (purge protection is on, so it is removed automatically after 7 days, and it costs nothing).
 
-**Additional checks (2026-10-14).** The parts added after the English re-run were checked against the two live clusters, using a throwaway namespace (`practice`) that was deleted afterwards:
+**Additional checks (2026-10-14).** The parts added after the English re-run were checked against the two live clusters, using a throwaway namespace (`practice`) that was deleted afterwards, and Appendix F and G in a separate throwaway environment (below):
 
 - **Appendix D**: the public IP that a pod sees matched the NAT Gateway address on both clusters, `az aks command invoke` worked on both, and the Automatic cluster rejected a bare test pod that had no resource requests (the pod in D-2 follows the safeguards).
 - **Appendix E**: the sample Deployment ran on both clusters. On the Standard cluster the following behaved as described: the inspection commands, `exec`, `port-forward`, `top`, `debug` and `cp`, rollouts with `undo`, the `ImagePullBackOff`, `CrashLoopBackOff`, `Pending` and `OOMKilled` cases of the triage playbook, and the difference in the `terraform plan` of 07-ingress after a manual `sessionAffinity` patch. The Azure RBAC role names and the namespace scope format were confirmed as well. On the Automatic cluster, an image from the Lab 04 ACR failed with `403`, as D-2 says.
+- **Appendix F** (checked later the same day in a separate throwaway environment: stacks 03–05 with `enable_private_cluster=true`, one node per pool, Managed Grafana off, and two client VNets with one VM each; all deleted afterwards): `05-aks` applied from the laptop (15 resources), the cluster had no public FQDN, and the laptop could not resolve the private FQDN. **Method 1:** with the peering alone the name did not resolve (NXDOMAIN) although TCP 443 to the internal load balancer was open; after linking the cluster's private DNS zone to the client VNet, a VM in the peered VNet resolved it to `10.10.1.4` and ran `kubectl get nodes` with its managed identity and kubelogin. **Method 2:** a Private Link Service in front of `kube-apiserver`, a Private Endpoint in a VNet that overlaps `10.10.0.0/16` (no peering) and a private DNS zone with the A record gave the same result. `az aks command invoke` worked, `scripts/verify.sh 05-aks` passed its Azure checks and skipped the `kubectl` checks, and in `terraform plan` flipping `enable_private_cluster` showed `forces replacement` for the cluster and everything attached to it. Switching the live cluster with `az aks update --disable-private-cluster` and then `--enable-private-cluster` worked in place (7 to 9 minutes each, no other flag needed). With the variable set to match, the plan showed no replacement, and the recreated private DNS zone no longer had the client VNet link that had been added.
+- **Appendix G**: with the AVM module 0.8.4, `terraform init` picked AzAPI 2.13.0 (this guide's pin) together with `modtm` 0.4.0 and `random` 3.9.1, and `terraform validate` and `terraform plan` passed for inputs that mirror `05-aks`, including the managed Gateway API. A plan-only `terraform test` ran without Azure credentials and without mocks. The module's variable rules rejected an invalid `sku.tier`, `os_sku`, `network_policy` and `os_disk_size_gb` at `plan`, while azurerm 5.9 accepted an invalid `os_sku` and `network_policy` at `validate`. The module was not applied.
 - **Lab 08 Defender fix** (fix 14 below): applied to the live Standard cluster with the workspace that the Defender auto-provisioning policy had attached. The apply made one in-place change (only the casing of the workspace ID), the next plan with the same two variables showed no changes, and the 13 `microsoft-defender` pods were Running. Without `defender_log_analytics_workspace_id`, the plan stops at the precondition.
 
 ### A-3. Inconsistencies found and fixed during the run
@@ -114,7 +116,8 @@ As before, Azure created `NetworkWatcherRG` and Defender's default Log Analytics
 - **Subscriptions with a Defender auto-provisioning policy**: Right after the cluster is created, it stays in `Updating` for a while, so the provisioning-state check in `verify.sh` fails temporarily, and the 05-aks plan keeps showing a diff that removes `microsoft_defender`. Declaring the same profile (`enable_defender=true` plus `defender_log_analytics_workspace_id` set to the workspace that the policy used) makes the diff disappear ([Lab 08](08-governance.md) steps 2 and 4). Do not use the platform workspace for it (fix 14 in A-3).
 - **Subscriptions where an organization policy turns off public access to Storage**: In a subscription where an Azure Policy (Modify) at the management group changes a storage account's public network access to `Disabled`, remote state access in Lab 02 failed with `403 AuthorizationFailure` (even if Terraform creates the account with `Enabled`, the policy changes it). This guide assumes a public endpoint + Entra authentication, so you need a policy exemption or a different subscription.
 - **`terraform plan -detailed-exitcode`**: It returns `2` even when the provider changes only the `available_kubernetes_versions` output value (no actual infrastructure change). Ignore this value when your CI decides whether there are "no changes".
-- **Not run**: Windows (PowerShell) commands, other regions, team environments (Entra group `admin_principal_ids`), an actual deployment with `enable_private_cluster=true` (plan only), a TLS (443) listener, Application Gateway for Containers, signing in to the Grafana web UI, interactive sign-in with `az login`, and the GitHub Actions workflow example in [Lab 09](09-operations.md) §6.
+- **Not run**: Windows (PowerShell) commands, other regions, team environments (Entra group `admin_principal_ids`), a TLS (443) listener, Application Gateway for Containers, signing in to the Grafana web UI, interactive sign-in with `az login`, and the GitHub Actions workflow example in [Lab 09](09-operations.md) §6.
+- **Not run in Appendix F and G**: VPN or ExpressRoute, Azure DNS Private Resolver (hybrid DNS), Azure Bastion (the test VMs were reached with `az vm run-command` instead of a jump host over Bastion), a Private Endpoint from another subscription (`--visibility`, `--auto-approval`), Cloud Shell in a VNet, `az aks bastion`, a private cluster without API Server VNet Integration, and applying the AVM module (it was initialized, validated and planned only).
 - **Intermittent Azure CLI error**: `az aks get-credentials` failed once with `Error loading command module 'serviceconnector': deadlock` and succeeded when run again (a problem on the CLI side).
 
 ### A-5. Cleanup results (Lab 11)
@@ -144,7 +147,7 @@ At the subscription level, the `Microsoft.Quota` Resource Provider registration 
 | `Provider produced inconsistent result after apply` (kubernetes_manifest) | CRD defaults / server-side normalization differences. Retry `terraform apply` or use `computed_fields`. |
 | `StorageAccountAlreadyTaken` / `VaultAlreadyExists` / ACR name conflict | Globally unique name conflict. Change `TF_VAR_workload`, or recover/purge the soft-deleted Key Vault. |
 | `terraform destroy` fails with `ScopeLocked` | Remove the resource lock ([Lab 08](08-governance.md), [Lab 11](11-cleanup.md)). |
-| `kubectl: Unable to connect ... i/o timeout` | The API server only accepts the IPs in `allowed_ip_ranges`. Your public IP changed, or you are on another network, Cloud Shell or CI → see section D (D-3 and D-4): update `TF_VAR_allowed_ip_ranges` and `apply` `04-platform`, `05-aks` and `10-aks-automatic`; meanwhile use `az aks command invoke`. |
+| `kubectl: Unable to connect ... i/o timeout` | The API server only accepts the IPs in `allowed_ip_ranges`. Your public IP changed, or you are on another network, Cloud Shell or CI → see section D (D-3 and D-4): update `TF_VAR_allowed_ip_ranges` and `apply` `04-platform`, `05-aks` and `10-aks-automatic`; meanwhile use `az aks command invoke`. On a private cluster (`enable_private_cluster`) no IP list helps; see F. |
 | `kubectl` changes the wrong cluster | With two clusters, `az aks get-credentials` switches the current context to the cluster you fetched last. Check `kubectl config current-context`, then `kubectl config use-context <name>` (see D-1). |
 | `kubelogin` error / `Unauthorized` | Rerun `az login`, run `kubelogin convert-kubeconfig -l azurecli`, and wait for the Azure RBAC role to propagate. |
 | `terraform plan` asks for a `node_count` change every time | Conflict with the autoscaler. Don't set `node_count` in the code; use only `min_count`/`max_count` ([Lab 09](09-operations.md)). |
@@ -159,7 +162,7 @@ This guide is a **cost-balanced setup for learning and PoCs**. For production, u
 | Area | This guide | Production recommendation |
 |---|---|---|
 | Network topology | Single VNet + NAT Gateway | **Hub-and-spoke**: Azure Firewall (egress control, UDR) · Bastion · VPN/ExpressRoute in the hub, AKS in the spoke |
-| API server | Public + authorized IP | **Fully private** (`enable_private_cluster`) + Bastion / jump host / self-hosted runner |
+| API server | Public + authorized IP | **Fully private** (`enable_private_cluster`) + Bastion / jump host / self-hosted runner (see F) |
 | Ingress | Gateway API public LB | **Application Gateway (WAF v2) or Front Door** → internal Gateway, TLS termination (Key Vault certificate) |
 | Registry / KV | Private Endpoint + admin IP allowed | Public access **fully blocked**, CI on in-VNet / managed runners |
 | Identity | Roles assigned directly to users | **Entra groups + PIM (just-in-time)**, Conditional Access, access reviews |
@@ -167,7 +170,7 @@ This guide is a **cost-balanced setup for learning and PoCs**. For production, u
 | Security | Optional Defender | Defender for Containers + (Sentinel connector), image signing / scanning pipeline |
 | Resilience | Single region (3 zones) | **Azure Backup for AKS**, multi-region + Front Door / Traffic Manager, Fleet Manager |
 | Deployment | `terraform apply` + kubectl | **GitOps (Flux extension)** for cluster bootstrapping / app deployment, OIDC sign-in from pipelines |
-| Modularization | Defined directly, for learning | Standardize on in-house modules or **Azure Verified Modules (AVM)** |
+| Modularization | Defined directly, for learning | Standardize on in-house modules or **Azure Verified Modules (AVM)** (pros and cons: G) |
 | Observability | Default dashboards | Prometheus alert rules (`azurerm_monitor_alert_prometheus_rule_group`) + Action Group, SLO dashboards |
 
 ## D. How to reach the clusters, and what is exposed to the internet
@@ -270,6 +273,8 @@ az aks command invoke -g <rg> -n <cluster> --command "kubectl -n web get pods -o
 - AKS runs the command in a short-lived pod in the `aks-command` namespace and returns the text output. There is no interactive shell, `exec -it` or `port-forward`; keep each call to commands that finish on their own, and attach files such as a manifest with `--file`.
 - The portal offers the same feature as **AKS cluster → Run command**.
 - Tested on both clusters of this guide.
+
+To remove the public endpoint altogether and reach the API server only over a private network, see F.
 
 ### D-4. When your public IP changes, or a teammate needs access
 
@@ -520,7 +525,172 @@ kubectl delete namespace practice     # removes everything inside: Deployments, 
 
 This does not touch the Lab 06 and Lab 07 workloads or any Azure resource.
 
-## F. References
+## F. Reaching the API server over a private network (two ways)
+
+In the labs the API server has a public endpoint that only the IPs in `allowed_ip_ranges` may use (D). To take it off the internet, set `enable_private_cluster = true`. The cluster already uses API Server VNet Integration, so the API server is then reachable **only on a private IP**: an internal load balancer in `snet-aks-apiserver`. The two ways below differ in how a client reaches that IP.
+
+| | ① Direct private IP | ② Private Link |
+|---|---|---|
+| How it works | Route the client network to `snet-aks-apiserver` | A Private Endpoint in the client VNet connects to a Private Link Service in front of the API server's internal load balancer |
+| Client network | The same VNet, a peered VNet, or on-premises over VPN or ExpressRoute | Any VNet, including another subscription or tenant; address spaces may overlap |
+| Extra resources | VNet peering or a VPN/ExpressRoute gateway; a DNS link or forwarder | AKS VNet: a subnet and a Private Link Service. Client VNet: a Private Endpoint, a private DNS zone and an A record |
+| Billing | Gateways and Bastion by the hour; peering by data transferred | Private Endpoint by the hour and per GB processed |
+| Choose it when | Your networks are already connected (hub-and-spoke, VPN) | You cannot or do not want to peer, or the client belongs to another team or company |
+
+![Two ways to reach a private API server: direct private IP and Private Link](diagrams/private-api-access.svg)
+
+> [!NOTE]
+> F and G follow the Microsoft documentation (links in H). On 2026-10-14 the commands in F-1 to F-3 and the AVM module in G were checked in the lab subscription (see A-2): the steps ran as written, with a VM in a peered VNet (method 1) and a VM in a VNet whose address space overlaps (method 2) each running `kubectl get nodes`. Not run: VPN or ExpressRoute, Azure DNS Private Resolver, Azure Bastion, a Private Endpoint from another subscription, Cloud Shell in a VNet, `az aks bastion`, and applying the AVM module (see A-4).
+
+### F-1. Make the API server private
+
+```bash
+export TF_VAR_enable_private_cluster=true
+terraform -chdir=terraform/05-aks plan      # on an existing cluster this shows a replacement
+terraform -chdir=terraform/05-aks apply
+```
+
+- The public endpoint is gone, and `allowed_ip_ranges` no longer applies to the API server (`04-platform` still uses it for the ACR and Key Vault firewalls). The code already sets `private_cluster_public_fqdn_enabled = false`, so there is no public FQDN either.
+- **Decide when you create the cluster.** In azurerm 5.9, `private_cluster_enabled` and `private_dns_zone_id` force a new cluster, and the replacement cascades to the node pools, the monitoring associations and the AzAPI updates ([Lab 05](05-aks.md), advanced experiment (b)). Azure itself can switch a VNet-integrated cluster in place with `az aks update --enable-private-cluster` (or `--disable-private-cluster`, preview), which took 7 to 9 minutes in the lab. If you do that, also set the variable to match: `terraform plan` then showed no replacement. The switch recreates the private DNS zone, so a link you added to it (F-2, step 2) is lost and must be created again.
+- By default AKS creates a **private DNS zone in the node resource group and links it only to the cluster VNet**. Any other network cannot resolve the private FQDN, so DNS is the first thing to solve in both methods.
+- Still works from your laptop: the stacks that talk only to Azure Resource Manager (`02` to `05`, `08`, `10`) and `az aks command invoke` (D-3). Now needs a network path to the API server: `kubectl` from Lab 05 on, the stacks that use the `kubernetes` provider (`06`, `07`), and the `kubectl` steps of `scripts/verify.sh` (it skips them when it cannot connect). Run those from a machine that uses one of the methods below.
+- The Lab 10 Automatic cluster has no such variable; it stays public with authorized IPs.
+
+### F-2. Method 1: direct private IP (same VNet, peering, VPN/ExpressRoute)
+
+Run `kubectl` on a machine that can route to `snet-aks-apiserver` and resolve the private FQDN:
+
+| Client | How | Notes |
+|---|---|---|
+| Jump host VM | A VM **without a public IP** in its own subnet of the AKS VNet (not the node subnet), reached through Azure Bastion | Install `az`, `kubectl` and `kubelogin` (`az aks install-cli`) |
+| Self-hosted runner | A CI agent in the AKS VNet or in a peered VNet | Microsoft-hosted Azure DevOps agents are not supported with private clusters |
+| Laptop or on-premises network | A VPN gateway (point-to-site or site-to-site) or ExpressRoute into a hub VNet that is peered with the AKS VNet | Add DNS forwarding (below) |
+
+The example peers a client VNet with the AKS VNet and links the cluster's private DNS zone to it:
+
+```bash
+# 1. Peer in both directions. The client VNet's address space must not overlap with 10.10.0.0/16.
+az network vnet peering create -g <client-rg> --vnet-name <client-vnet> -n client-to-aks \
+  --remote-vnet <aks-vnet-id> --allow-vnet-access
+az network vnet peering create -g <network-rg> --vnet-name <aks-vnet> -n aks-to-client \
+  --remote-vnet <client-vnet-id> --allow-vnet-access
+
+# 2. Link the cluster's private DNS zone (it lives in the node resource group) to the client VNet
+NODE_RG=$(az aks show -g <rg> -n <cluster> --query nodeResourceGroup -o tsv)
+ZONE=$(az network private-dns zone list -g "$NODE_RG" --query "[0].name" -o tsv)
+az network private-dns link vnet create -g "$NODE_RG" -z "$ZONE" -n link-client \
+  -v <client-vnet-id> -e false
+
+# 3. On the client: the name must resolve to a private IP, then use kubectl as usual
+FQDN=$(az aks show -g <rg> -n <cluster> --query privateFqdn -o tsv)
+nslookup "$FQDN"                                    # an address inside 10.10.1.0/28
+az aks get-credentials -g <rg> -n <cluster> --overwrite-existing \
+  && kubelogin convert-kubeconfig -l azurecli
+kubectl get nodes
+```
+
+- **Hybrid DNS.** A laptop or an on-premises network cannot use a zone that is linked to a VNet. Forward the zone's name from your DNS server to an Azure DNS Private Resolver inbound endpoint in a VNet that is linked to the zone (or to a DNS forwarder in that VNet that forwards to `168.63.129.16`).
+- Peering is not transitive: a spoke VNet reaches the AKS VNet only if the hub forwards the traffic (Azure Firewall, a gateway or a network virtual appliance).
+- This guide attaches no NSG to `snet-aks-apiserver`. If you add one, also allow TCP 443 from your client network.
+- Terraform resources for these pieces: `azurerm_virtual_network_peering`, `azurerm_private_dns_zone_virtual_network_link`, `azurerm_bastion_host`, `azurerm_virtual_network_gateway` and `azurerm_private_dns_resolver`.
+
+### F-3. Method 2: Private Link (Private Endpoint to a Private Link Service)
+
+Use this when the client cannot be peered: another subscription or tenant, or an address space that overlaps `10.10.0.0/16`. It works for a private cluster that uses API Server VNet Integration with your own VNet, which is what `05-aks` builds. You put a Private Link Service (PLS) in front of the cluster's `kube-apiserver` internal load balancer, and the client VNet connects to it through a Private Endpoint.
+
+```bash
+# AKS side: add a subnet for the PLS (03-network has none),
+# then create the PLS in front of the API server's load balancer
+az network vnet subnet create -g <network-rg> --vnet-name <aks-vnet> -n snet-pls \
+  --address-prefixes 10.10.4.0/27 --disable-private-link-service-network-policies
+NODE_RG=$(az aks show -g <rg> -n <cluster> --query nodeResourceGroup -o tsv)
+LB_FRONTEND=$(az network lb show -g "$NODE_RG" -n kube-apiserver \
+  --query "frontendIPConfigurations[0].id" -o tsv)
+az network private-link-service create -g <network-rg> -n pls-aks-apiserver -l <region> \
+  --vnet-name <aks-vnet> --subnet snet-pls --lb-frontend-ip-configs "$LB_FRONTEND"
+
+# Client side: a Private Endpoint to the PLS, and its private IP
+PLS_ID=$(az network private-link-service show -g <network-rg> -n pls-aks-apiserver --query id -o tsv)
+az network private-endpoint create -g <client-rg> -n pe-aks-apiserver -l <region> \
+  --vnet-name <client-vnet> --subnet <client-subnet> \
+  --private-connection-resource-id "$PLS_ID" --connection-name aks-apiserver
+PE_NIC=$(az network private-endpoint show -g <client-rg> -n pe-aks-apiserver \
+  --query "networkInterfaces[0].id" -o tsv)
+PE_IP=$(az network nic show --ids "$PE_NIC" \
+  --query "ipConfigurations[0].privateIPAddress" -o tsv)
+
+# Client side: a private DNS zone whose A record points to the Private Endpoint,
+# linked to the client VNet. The record name is <label>.<guid> of the private FQDN.
+ZONE=private.<region>.azmk8s.io
+RECORD=$(az aks show -g <rg> -n <cluster> --query privateFqdn -o tsv | cut -d. -f1,2)
+az network private-dns zone create -g <client-rg> -n "$ZONE"
+az network private-dns record-set a add-record -g <client-rg> -z "$ZONE" -n "$RECORD" -a "$PE_IP"
+az network private-dns link vnet create -g <client-rg> -z "$ZONE" -n link-client \
+  -v <client-vnet-id> -e false
+```
+
+Then run `kubectl get nodes` from a machine in the client VNet, as in F-2.
+
+- The client may be in another subscription: add its subscription ID to the PLS (`--visibility`, `--auto-approval`) or approve the pending connection on the PLS.
+- The A record is yours to maintain: if the Private Endpoint's IP changes, update it.
+- The load balancer belongs to the cluster, so after you replace the cluster, point a new PLS at its load balancer.
+- Terraform resources: `azurerm_private_link_service`, `azurerm_private_endpoint`, `azurerm_private_dns_zone` and `azurerm_private_dns_a_record`. The PLS subnet needs `private_link_service_network_policies_enabled = false`, and the data source `azurerm_lb` can read the `kube-apiserver` load balancer.
+- A private cluster **without** API Server VNet Integration works differently: AKS itself puts a Private Endpoint in the cluster VNet, and other VNets connect through peering or their own Private Endpoint to the cluster's `management` sub-resource. This guide does not use that mode.
+
+### F-4. Other ways to get a network path
+
+| Way | Notes |
+|---|---|
+| `az aks command invoke` | No network path needed; one-shot commands through the Azure API (D-3) |
+| Cloud Shell in a VNet | Deploy Cloud Shell into a VNet that can reach the API server. Not supported with AKS Automatic or clusters with node resource group lockdown |
+| Azure Bastion native client tunnel (`az aks bastion`, preview) | Needs a Standard or Premium Bastion with native client support, and the `aks-preview` extension. Not supported with AKS Automatic or node resource group lockdown. The Microsoft walkthrough fetches admin credentials, which the clusters in this guide do not offer (local accounts are disabled) |
+
+### F-5. If it does not connect
+
+| Symptom | Check |
+|---|---|
+| `nslookup` returns nothing or a public address | DNS: the zone is not linked to (or forwarded from) the client network. For method 2, the A record or the VNet link is missing |
+| The name resolves, but `kubectl` ends with `dial tcp …:443: i/o timeout` | The route: peering state `Connected`, gateway routes, NSG or firewall rules for TCP 443. For method 2, the Private Endpoint connection must be `Approved` |
+| `Unauthorized` or `Forbidden` | The network is fine; check identity: `az login`, `kubelogin convert-kubeconfig -l azurecli`, and the Azure RBAC roles (E-9) |
+
+## G. Building AKS with Terraform: with or without AVM
+
+**Short answer.** This guide writes `azurerm_kubernetes_cluster` by hand so that every setting is visible and `terraform test` can check it without Azure. [Azure Verified Modules (AVM)](https://azure.github.io/Azure-Verified-Modules/) are Microsoft-backed Terraform modules with common interfaces; for AKS the module is `Azure/avm-res-containerservice-managedcluster/azurerm`. Choose AVM when several teams must build clusters the same way and can absorb version upgrades. Choose direct resources for learning, for a few clusters, or when you want full control and few dependencies. As of 2026-10-14 the AKS module is still 0.x, so expect breaking changes between minor versions.
+
+### G-1. The AKS AVM module today
+
+| | As of 2026-10-14 |
+|---|---|
+| Module | `Azure/avm-res-containerservice-managedcluster/azurerm` ([Registry](https://registry.terraform.io/modules/Azure/avm-res-containerservice-managedcluster/azurerm/latest), [GitHub](https://github.com/Azure/terraform-azurerm-avm-res-containerservice-managedcluster)) |
+| Latest version | 0.8.4, published 2026-10-08. Still below 1.0: the AVM specification allows breaking changes in minor releases of such modules, although the AVM FAQ says they can be used in production |
+| Requirements | Terraform `>= 1.11, < 2.0`; providers AzAPI `~> 2.12`, `modtm` `~> 0.3` and `random` `>= 3.5, < 4.0`. **No azurerm** |
+| Inputs | Shaped like the AKS ARM API (`api_server_access_profile`, `network_profile`, `agent_pools` and so on), plus the common AVM interfaces (`lock`, `role_assignments`, `diagnostic_settings`, `private_endpoints`, `managed_identities`, `tags`, `enable_telemetry`) |
+| Examples | `default`, `private`, `secure-baseline-private-cluster`, `waf-aligned`, `automatic`, `automatic-private` and more |
+| Fit with this guide | Its requirements are compatible with this guide's pins (Terraform `~> 1.16`, AzAPI `~> 2.13`), and it has inputs for what `05-aks` configures: Entra ID and Azure RBAC, API Server VNet Integration, Azure CNI Overlay with Cilium, the kubelet identity, node pools, maintenance windows, KEDA and VPA, Managed Prometheus and Container Insights. `terraform init`, `validate` and `plan` succeeded with AzAPI 2.13.0 and these inputs; the module was not applied |
+
+### G-2. Pros and cons
+
+| Aspect | With AVM | Direct resources (this guide) |
+|---|---|---|
+| Getting started | Three required inputs (`name`, `location`, `parent_id`); examples and tests ship with the module, including private, WAF-aligned and secure-baseline clusters | You write every block, but the whole cluster is readable in one file (`cluster.tf`) |
+| Standardization | The same interfaces and conventions as every AVM module: one baseline across teams | Your own conventions, which you maintain |
+| New AKS features | AzAPI sends the ARM body, so a property is usable as soon as the module exposes it, without waiting for azurerm. The managed Gateway API that `05-aks` enables through AzAPI is already an input (`ingress_profile.gateway_api`), but the control plane metrics are not (0.8.4), so there you would still add an `azapi_update_resource` | Wait for azurerm, or add `azapi_update_resource` as `05-aks` does (`gateway-api.tf`, `monitoring.tf`) |
+| Stability | **0.x: minor releases may break.** This module moved from azurerm to AzAPI with many removed and renamed inputs ([UPGRADE.md](https://github.com/Azure/terraform-azurerm-avm-res-containerservice-managedcluster/blob/main/UPGRADE.md)), and upgrading to 0.8.0 needs manual `state rm` and `import` for private endpoints ([MIGRATION.md](https://github.com/Azure/terraform-azurerm-avm-res-containerservice-managedcluster/blob/main/MIGRATION.md)) | Only provider upgrades (such as azurerm 5.0), at a time you choose |
+| Debugging | Large ARM-shaped objects: you need to know the AKS REST structure (azurerm's `only_critical_addons_enabled` is a `node_taints` entry here), and errors point into `.terraform/modules`. The module's own variable rules reject many bad values at `plan` (checked: `sku.tier`, `os_sku`, `network_policy`, `os_disk_size_gb`) | Plain resource addresses and azurerm-style arguments. azurerm 5.9 accepted a bad `os_sku` and `network_policy` at `validate`, so Azure rejects them at `apply` |
+| Support | Bugs go to the module's GitHub issues with no fixed response time (AVM moved to Azure engineering on 2026-10-13, see [Module Support](https://azure.github.io/Azure-Verified-Modules/help-support/module-support/)); platform problems go to Azure support | You, plus the azurerm provider community |
+| Dependencies | Adds the `modtm` and `random` providers and the `avm-utl-interfaces` module, and makes AzAPI mandatory (mirror them all if you work offline) | azurerm, plus AzAPI where needed |
+| Telemetry | On by default (`modtm` sends the subscription ID, tenant ID and module version); `enable_telemetry = false` turns it off ([AVM telemetry](https://azure.github.io/Azure-Verified-Modules/help-support/telemetry/)) | None |
+| Testing | A plan-only `terraform test` of the module ran without Azure credentials and without mocks (0.8.4); you test your inputs, not the module's internals | `mock_provider "azurerm"` covers everything offline, as in this guide |
+| Existing clusters | A cluster created with `azurerm_kubernetes_cluster` has to be imported into the module's `azapi_resource` (a different resource type), and the plan must show no replacement | Nothing to migrate |
+
+### G-3. How to choose
+
+- **Use AVM** when many clusters or teams must follow one baseline (locks, diagnostics, RBAC and private endpoints in the same shape), when you want Microsoft-maintained examples such as `secure-baseline-private-cluster` as a starting point, and when you can pin a version and review every upgrade.
+- **Use direct resources** for learning and proofs of concept, for a small number of clusters, when you need to see and test every setting offline, or when you cannot accept 0.x breaking changes, extra providers or telemetry.
+- **Middle path:** wrap the resources in your own module (as `modules/naming` does here), borrow AVM's interface conventions and examples, and revisit AVM when the AKS module reaches 1.0. The older community module `Azure/aks/azurerm` is archived and points to the AVM module, so it is not a "no AVM" option for new work.
+- **If you adopt AVM:** pin the exact version (`version = "0.8.4"`, not a range), read the release notes, `UPGRADE.md` and `MIGRATION.md` before every bump, and run `terraform plan` against a copy of the state first. With this guide's layout you can replace only the cluster resource in `05-aks` and leave `03-network` and `04-platform` unchanged.
+
+## H. References
 
 | Topic | Links |
 |---|---|
@@ -529,11 +699,12 @@ This does not touch the Lab 06 and Lab 07 workloads or any Azure resource.
 | AKS Automatic / NAP | [Introduction to AKS Automatic](https://learn.microsoft.com/azure/aks/intro-aks-automatic), [Node auto-provisioning](https://learn.microsoft.com/azure/aks/node-auto-provisioning) |
 | Gateway API | [App Routing Gateway API](https://learn.microsoft.com/azure/aks/app-routing-gateway-api), [NGINX → Gateway API migration](https://learn.microsoft.com/azure/aks/app-routing-nginx-to-gateway-api-migration), [Managed Gateway API CRD](https://learn.microsoft.com/azure/aks/managed-gateway-api) |
 | Supported versions / schedule | [Supported Kubernetes versions](https://learn.microsoft.com/azure/aks/supported-kubernetes-versions), [AKS release notes](https://github.com/Azure/AKS/releases) |
-| Terraform | [azurerm 5.0 upgrade guide](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/5.0-upgrade-guide), [`azurerm_kubernetes_cluster`](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster), [`azurerm_kubernetes_automatic_cluster`](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_automatic_cluster), [AzAPI](https://registry.terraform.io/providers/Azure/azapi/latest/docs), [AVM](https://azure.github.io/Azure-Verified-Modules/) |
+| Private cluster access (F) | [Create a private AKS cluster](https://learn.microsoft.com/azure/aks/private-clusters), [Establish network connectivity to a private AKS cluster](https://learn.microsoft.com/azure/aks/private-cluster-connect), [API Server VNet Integration](https://learn.microsoft.com/azure/aks/api-server-vnet-integration), [Private Link with API Server VNet Integration](https://learn.microsoft.com/azure/aks/private-apiserver-vnet-integration-cluster), [Connect with Azure Bastion](https://learn.microsoft.com/azure/bastion/bastion-connect-to-aks-private-cluster) |
+| Terraform | [azurerm 5.0 upgrade guide](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/5.0-upgrade-guide), [`azurerm_kubernetes_cluster`](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster), [`azurerm_kubernetes_automatic_cluster`](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_automatic_cluster), [AzAPI](https://registry.terraform.io/providers/Azure/azapi/latest/docs), [AVM](https://azure.github.io/Azure-Verified-Modules/), [AVM module for AKS](https://registry.terraform.io/modules/Azure/avm-res-containerservice-managedcluster/azurerm/latest) |
 | Official Microsoft Terraform samples | [Azure/terraform quickstart](https://github.com/Azure/terraform/tree/master/quickstart): `101-aks-application-routing-gateway-api`, `101-aks-automatic-custom-network`, `101-aks-network-isolated`, `101-aks-use-azure-policy`, `101-aks-defender-containers`, `301-aks-enterprise` |
 | Prometheus template | [Azure/prometheus-collector — AddonTerraformTemplate](https://github.com/Azure/prometheus-collector/tree/main/AddonTerraformTemplate) |
 
-## G. Complete list of Terraform files (which lab has each)
+## I. Complete list of Terraform files (which lab has each)
 
 | Stack / module | Files | Included in |
 |---|---|---|
@@ -546,12 +717,12 @@ This does not touch the Lab 06 and Lab 07 workloads or any Azure resource.
 | `07-ingress` | `versions.tf` `providers.tf` `variables.tf` `main.tf` `app.tf` `gateway.tf` `outputs.tf` `tests/plan.tftest.hcl` | [Lab 07](07-ingress.md) |
 | `08-governance` | `versions.tf` `providers.tf` `variables.tf` `main.tf` `policy.tf` `security.tf` `budget.tf` `outputs.tf` `tests/plan.tftest.hcl` | [Lab 08](08-governance.md) |
 | `10-aks-automatic` | `versions.tf` `providers.tf` `variables.tf` `main.tf` `cluster.tf` `outputs.tf` `tests/plan.tftest.hcl` | [Lab 10](10-aks-automatic.md) |
-| `mocks` | `azurerm.tfmock.hcl` | F below |
+| `mocks` | `azurerm.tfmock.hcl` | J below |
 
 > [!NOTE]
 > All stacks follow the same file layout (`versions.tf` → `providers.tf` → `variables.tf` → `main.tf` → topic-specific files → `outputs.tf`). To see the files in one place, type a file name (e.g., `cluster.tf`) into the search box of this HTML page.
 
-## H. Complete test and tooling code
+## J. Complete test and tooling code
 
 Each stack's `tests/plan.tftest.hcl` is in the Code section of its lab. The shared mock values and the script that validates all stacks are below.
 
@@ -877,7 +1048,7 @@ terraform.tfvars
 ```
 <!-- /tf:include -->
 
-## I. Verification and cleanup scripts
+## K. Verification and cleanup scripts
 
 The check and delete commands you type by hand during the labs are bundled into scripts. They all live in `scripts/` at the repository root and run on macOS · Linux · WSL · Azure Cloud Shell (bash) (requires `terraform`, `az`, `jq`, and, from 05 onward, `kubectl` and `kubelogin`).
 
@@ -888,7 +1059,7 @@ The check and delete commands you type by hand during the labs are bundled into 
 | `scripts/verify/02…10.sh` | Called by the script above (can also be run directly) | Per-stack verification items | [02](02-bootstrap.md) [03](03-network.md) [04](04-platform.md) [05](05-aks.md) [06](06-workload-identity.md) [07](07-ingress.md) [08](08-governance.md) [10](10-aks-automatic.md) |
 | `scripts/cleanup.sh` | Lab 11, after you finish the labs | `destroy` in reverse order of creation, resource lock removal, safe to re-run, check for leftover resources (supports `--dry-run`) | [Lab 11](11-cleanup.md) |
 | `scripts/lib/common.sh` | The scripts above `source` it | Result output (`pass`/`fail`/`warn`), value comparison (`expect_*`), JSON helpers (`jq`), `terraform output`/`az`/`kubectl` wrappers | This appendix |
-| `tools/validate-all.sh` | After you change the code | `fmt` · `validate` · `terraform test` (no subscription needed) + script syntax checks | F above |
+| `tools/validate-all.sh` | After you change the code | `fmt` · `validate` · `terraform test` (no subscription needed) + script syntax checks | J above |
 
 ```bash
 scripts/verify.sh                    # verify every stack you applied (stacks not yet applied are skipped)

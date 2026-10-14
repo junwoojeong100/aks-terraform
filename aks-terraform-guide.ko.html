@@ -343,7 +343,7 @@ figure.code.shell figcaption .file::before { content: '$ '; color: var(--hl-var)
 </header>
 <div class="progress"></div>
 <div class="layout">
-  <nav class="sidebar" aria-label="목차"><h4>시작하기</h4><a class="lab-link" data-lab="readme" href="#lab-readme"><span class="num">★</span><span>개요 · 학습 경로</span></a><div class="sub"><a href="#readme--기준-버전-2026-10-14">기준 버전 (2026-10-14)</a><a href="#readme--학습-경로">학습 경로</a><a href="#readme--아키텍처-개요">아키텍처 개요</a><a href="#readme--빠른-시작">빠른 시작</a><a href="#readme--언어">언어</a><a href="#readme--실습-스크립트">실습 스크립트</a><a href="#readme--저장소-구조">저장소 구조</a><a href="#readme--검증과-html-재생성">검증과 HTML 재생성</a><a href="#readme--참고-자료">참고 자료</a><a href="#readme--라이선스">라이선스</a></div><a class="lab-link" data-lab="00-aws-azure-mapping" href="#lab-00-aws-azure-mapping"><span class="num">00</span><span>AWS ↔ Azure 인프라 서비스 비교 (EKS 경험자용)</span></a><div class="sub"><a href="#00-aws-azure-mapping--1-먼저-바꿔야-할-사고방식-10가지">1. 먼저 바꿔야 할 사고방식 10가지</a><a href="#00-aws-azure-mapping--2-조직계정리전">2. 조직·계정·리전</a><a href="#00-aws-azure-mapping--3-네트워킹">3. 네트워킹</a><a href="#00-aws-azure-mapping--4-id권한시크릿">4. ID·권한·시크릿</a><a href="#00-aws-azure-mapping--5-컨테이너쿠버네티스-eks-aks">5. 컨테이너·쿠버네티스 (EKS ↔ AKS)</a><a href="#00-aws-azure-mapping--6-스토리지상태-저장">6. 스토리지·상태 저장</a><a href="#00-aws-azure-mapping--7-비용-관리">7. 비용 관리</a><a href="#00-aws-azure-mapping--8-terraform-관점의-차이">8. Terraform 관점의 차이</a><a href="#00-aws-azure-mapping--9-명령어-치트시트">9. 명령어 치트시트</a><a href="#00-aws-azure-mapping--10-이-실습이-따르는-best-practice-요약">10. 이 실습이 따르는 Best Practice (요약)</a></div><a class="lab-link" data-lab="01-prerequisites" href="#lab-01-prerequisites"><span class="num">01</span><span>Lab 01. 사전 준비: 도구, 로그인, 권한, 환경 변수</span></a><div class="sub"><a href="#01-prerequisites--이번-실습의-목표">이번 실습의 목표</a><a href="#01-prerequisites--1-도구-설치">1. 도구 설치</a><a href="#01-prerequisites--2-로그인과-구독-선택">2. 로그인과 구독 선택</a><a href="#01-prerequisites--3-resource-provider-등록">3. Resource Provider 등록</a><a href="#01-prerequisites--4-vcpu-쿼터-확인">4. vCPU 쿼터 확인</a><a href="#01-prerequisites--5-환경-변수-설정">5. 환경 변수 설정</a><a href="#01-prerequisites--6-한-번에-점검하기-preflight-스크립트">6. 한 번에 점검하기: preflight 스크립트</a><a href="#01-prerequisites--7-저장소-구조">7. 저장소 구조</a><a href="#01-prerequisites--8-선택-azure-없이-코드-검증하기">8. (선택) Azure 없이 코드 검증하기</a><a href="#01-prerequisites--9-비용-안내-대략적인-추정">9. 비용 안내 (대략적인 추정)</a></div><h4>Part 1 · 기반 구축</h4><a class="lab-link" data-lab="02-bootstrap" href="#lab-02-bootstrap"><span class="num">02</span><span>Lab 02. Terraform 원격 State: S3 + DynamoDB ↔ Blob Storage</span></a><div class="sub"><a href="#02-bootstrap--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#02-bootstrap--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#02-bootstrap--공통-모듈-modulesnaming">공통 모듈: modules/naming</a><a href="#02-bootstrap--부트스트랩-스택-코드">부트스트랩 스택 코드</a><a href="#02-bootstrap--실습-따라하기">실습 따라하기</a><a href="#02-bootstrap--이후-모든-스택에서-쓰는-init-패턴">이후 모든 스택에서 쓰는 init 패턴</a><a href="#02-bootstrap--자주-만나는-문제">자주 만나는 문제</a></div><a class="lab-link" data-lab="03-network" href="#lab-03-network"><span class="num">03</span><span>Lab 03. 네트워크: VNet · NSG · NAT Gateway · Private DNS</span></a><div class="sub"><a href="#03-network--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#03-network--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#03-network--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#03-network--nsg-인바운드-규칙">NSG 인바운드 규칙</a><a href="#03-network--코드">코드</a><a href="#03-network--실습-따라하기">실습 따라하기</a><a href="#03-network--자주-만나는-문제">자주 만나는 문제</a></div><a class="lab-link" data-lab="04-platform" href="#lab-04-platform"><span class="num">04</span><span>Lab 04. 플랫폼 서비스: ACR · Key Vault · 모니터링 · AKS 용 ID</span></a><div class="sub"><a href="#04-platform--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#04-platform--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#04-platform--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#04-platform--코드">코드</a><a href="#04-platform--실습-따라하기">실습 따라하기</a><a href="#04-platform--자주-만나는-문제">자주 만나는 문제</a></div><h4>Part 2 · AKS 클러스터</h4><a class="lab-link" data-lab="05-aks" href="#lab-05-aks"><span class="num">05</span><span>Lab 05. AKS 클러스터 (Standard): EKS 와 무엇이 다른가</span></a><div class="sub"><a href="#05-aks--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#05-aks--eks-경험자를-위한-비교">EKS 경험자를 위한 비교</a><a href="#05-aks--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#05-aks--코드">코드</a><a href="#05-aks--실습-따라하기">실습 따라하기</a><a href="#05-aks--심화-실험">심화 실험</a><a href="#05-aks--자주-만나는-문제">자주 만나는 문제</a></div><a class="lab-link" data-lab="06-workload-identity" href="#lab-06-workload-identity"><span class="num">06</span><span>Lab 06. Workload Identity + Key Vault CSI: IRSA 의 Azure 버전</span></a><div class="sub"><a href="#06-workload-identity--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#06-workload-identity--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#06-workload-identity--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#06-workload-identity--코드">코드</a><a href="#06-workload-identity--실습-따라하기">실습 따라하기</a><a href="#06-workload-identity--자주-만나는-문제">자주 만나는 문제</a></div><a class="lab-link" data-lab="07-ingress" href="#lab-07-ingress"><span class="num">07</span><span>Lab 07. 인그레스: ALB Controller → Gateway API (approuting-istio)</span></a><div class="sub"><a href="#07-ingress--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#07-ingress--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#07-ingress--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#07-ingress--코드">코드</a><a href="#07-ingress--실습-따라하기">실습 따라하기</a><a href="#07-ingress--자주-만나는-문제">자주 만나는 문제</a></div><h4>Part 3 · 거버넌스 · 운영</h4><a class="lab-link" data-lab="08-governance" href="#lab-08-governance"><span class="num">08</span><span>Lab 08. 거버넌스와 보안: Azure Policy · Defender · 잠금 · 예산</span></a><div class="sub"><a href="#08-governance--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#08-governance--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#08-governance--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#08-governance--코드">코드</a><a href="#08-governance--실습-따라하기">실습 따라하기</a><a href="#08-governance--자주-만나는-문제">자주 만나는 문제</a></div><a class="lab-link" data-lab="09-operations" href="#lab-09-operations"><span class="num">09</span><span>Lab 09. Day-2 운영: 업그레이드 · 스케일링 · 노드 교체 · 테스트</span></a><div class="sub"><a href="#09-operations--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#09-operations--1-업그레이드-전략">1. 업그레이드 전략</a><a href="#09-operations--2-스케일링">2. 스케일링</a><a href="#09-operations--3-노드-풀-변경과-교체">3. 노드 풀 변경과 교체</a><a href="#09-operations--4-비용을-아끼는-운영-습관">4. 비용을 아끼는 운영 습관</a><a href="#09-operations--5-백업-재해-복구-개념">5. 백업 · 재해 복구 (개념)</a><a href="#09-operations--6-terraform-코드-품질과-ci">6. Terraform 코드 품질과 CI</a></div><a class="lab-link" data-lab="10-aks-automatic" href="#lab-10-aks-automatic"><span class="num">10</span><span>Lab 10. AKS Automatic: EKS Auto Mode 에 해당하는 &quot;운영까지 맡기는&quot; 모드</span></a><div class="sub"><a href="#10-aks-automatic--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#10-aks-automatic--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#10-aks-automatic--standard-vs-automatic-무엇을-고를까">Standard vs Automatic: 무엇을 고를까</a><a href="#10-aks-automatic--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#10-aks-automatic--코드">코드</a><a href="#10-aks-automatic--실습-따라하기">실습 따라하기</a><a href="#10-aks-automatic--자주-만나는-문제">자주 만나는 문제</a></div><a class="lab-link" data-lab="11-cleanup" href="#lab-11-cleanup"><span class="num">11</span><span>Lab 11. 정리: 비용이 새지 않게 모두 삭제하기</span></a><div class="sub"><a href="#11-cleanup--가장-쉬운-방법-정리-스크립트">가장 쉬운 방법: 정리 스크립트</a><a href="#11-cleanup--삭제-순서-생성의-역순">삭제 순서 (생성의 역순)</a><a href="#11-cleanup--사전-점검-잠금과-구독-단위-설정">사전 점검 (잠금과 구독 단위 설정)</a><a href="#11-cleanup--1단계-스택별-destroy">1단계. 스택별 destroy</a><a href="#11-cleanup--2단계-부트스트랩state-저장소-삭제">2단계. 부트스트랩(state 저장소) 삭제</a><a href="#11-cleanup--3단계-정리-확인">3단계. 정리 확인</a><a href="#11-cleanup--비상-정리-terraform-이-실패할-때">비상 정리 (Terraform 이 실패할 때)</a><a href="#11-cleanup--비용-확인">비용 확인</a></div><h4>부록</h4><a class="lab-link" data-lab="99-appendix" href="#lab-99-appendix"><span class="num">A</span><span>부록. 트러블슈팅 · 프로덕션 체크리스트 · 접속·워크로드 운영 · 참고 자료 · 테스트 코드</span></a><div class="sub"><a href="#99-appendix--a-이-가이드를-검증한-방법과-한계">A. 이 가이드를 검증한 방법과 한계</a><a href="#99-appendix--b-트러블슈팅-모음">B. 트러블슈팅 모음</a><a href="#99-appendix--c-프로덕션으로-가기-전-체크리스트">C. 프로덕션으로 가기 전 체크리스트</a><a href="#99-appendix--d-클러스터-접속-경로와-인터넷-노출-요약">D. 클러스터 접속 경로와 인터넷 노출 요약</a><a href="#99-appendix--e-kubectl-로-쿠버네티스-워크로드-다루기">E. kubectl 로 쿠버네티스 워크로드 다루기</a><a href="#99-appendix--f-참고-자료">F. 참고 자료</a><a href="#99-appendix--g-terraform-파일-전체-목록-어느-lab-에-있나">G. Terraform 파일 전체 목록 (어느 Lab 에 있나)</a><a href="#99-appendix--h-테스트도구-코드-전체">H. 테스트/도구 코드 전체</a><a href="#99-appendix--i-검증-정리-스크립트">I. 검증 · 정리 스크립트</a></div></nav>
+  <nav class="sidebar" aria-label="목차"><h4>시작하기</h4><a class="lab-link" data-lab="readme" href="#lab-readme"><span class="num">★</span><span>개요 · 학습 경로</span></a><div class="sub"><a href="#readme--기준-버전-2026-10-14">기준 버전 (2026-10-14)</a><a href="#readme--학습-경로">학습 경로</a><a href="#readme--아키텍처-개요">아키텍처 개요</a><a href="#readme--빠른-시작">빠른 시작</a><a href="#readme--언어">언어</a><a href="#readme--실습-스크립트">실습 스크립트</a><a href="#readme--저장소-구조">저장소 구조</a><a href="#readme--검증과-html-재생성">검증과 HTML 재생성</a><a href="#readme--참고-자료">참고 자료</a><a href="#readme--라이선스">라이선스</a></div><a class="lab-link" data-lab="00-aws-azure-mapping" href="#lab-00-aws-azure-mapping"><span class="num">00</span><span>AWS ↔ Azure 인프라 서비스 비교 (EKS 경험자용)</span></a><div class="sub"><a href="#00-aws-azure-mapping--1-먼저-바꿔야-할-사고방식-10가지">1. 먼저 바꿔야 할 사고방식 10가지</a><a href="#00-aws-azure-mapping--2-조직계정리전">2. 조직·계정·리전</a><a href="#00-aws-azure-mapping--3-네트워킹">3. 네트워킹</a><a href="#00-aws-azure-mapping--4-id권한시크릿">4. ID·권한·시크릿</a><a href="#00-aws-azure-mapping--5-컨테이너쿠버네티스-eks-aks">5. 컨테이너·쿠버네티스 (EKS ↔ AKS)</a><a href="#00-aws-azure-mapping--6-스토리지상태-저장">6. 스토리지·상태 저장</a><a href="#00-aws-azure-mapping--7-비용-관리">7. 비용 관리</a><a href="#00-aws-azure-mapping--8-terraform-관점의-차이">8. Terraform 관점의 차이</a><a href="#00-aws-azure-mapping--9-명령어-치트시트">9. 명령어 치트시트</a><a href="#00-aws-azure-mapping--10-이-실습이-따르는-best-practice-요약">10. 이 실습이 따르는 Best Practice (요약)</a></div><a class="lab-link" data-lab="01-prerequisites" href="#lab-01-prerequisites"><span class="num">01</span><span>Lab 01. 사전 준비: 도구, 로그인, 권한, 환경 변수</span></a><div class="sub"><a href="#01-prerequisites--이번-실습의-목표">이번 실습의 목표</a><a href="#01-prerequisites--1-도구-설치">1. 도구 설치</a><a href="#01-prerequisites--2-로그인과-구독-선택">2. 로그인과 구독 선택</a><a href="#01-prerequisites--3-resource-provider-등록">3. Resource Provider 등록</a><a href="#01-prerequisites--4-vcpu-쿼터-확인">4. vCPU 쿼터 확인</a><a href="#01-prerequisites--5-환경-변수-설정">5. 환경 변수 설정</a><a href="#01-prerequisites--6-한-번에-점검하기-preflight-스크립트">6. 한 번에 점검하기: preflight 스크립트</a><a href="#01-prerequisites--7-저장소-구조">7. 저장소 구조</a><a href="#01-prerequisites--8-선택-azure-없이-코드-검증하기">8. (선택) Azure 없이 코드 검증하기</a><a href="#01-prerequisites--9-비용-안내-대략적인-추정">9. 비용 안내 (대략적인 추정)</a></div><h4>Part 1 · 기반 구축</h4><a class="lab-link" data-lab="02-bootstrap" href="#lab-02-bootstrap"><span class="num">02</span><span>Lab 02. Terraform 원격 State: S3 + DynamoDB ↔ Blob Storage</span></a><div class="sub"><a href="#02-bootstrap--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#02-bootstrap--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#02-bootstrap--공통-모듈-modulesnaming">공통 모듈: modules/naming</a><a href="#02-bootstrap--부트스트랩-스택-코드">부트스트랩 스택 코드</a><a href="#02-bootstrap--실습-따라하기">실습 따라하기</a><a href="#02-bootstrap--이후-모든-스택에서-쓰는-init-패턴">이후 모든 스택에서 쓰는 init 패턴</a><a href="#02-bootstrap--자주-만나는-문제">자주 만나는 문제</a></div><a class="lab-link" data-lab="03-network" href="#lab-03-network"><span class="num">03</span><span>Lab 03. 네트워크: VNet · NSG · NAT Gateway · Private DNS</span></a><div class="sub"><a href="#03-network--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#03-network--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#03-network--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#03-network--nsg-인바운드-규칙">NSG 인바운드 규칙</a><a href="#03-network--코드">코드</a><a href="#03-network--실습-따라하기">실습 따라하기</a><a href="#03-network--자주-만나는-문제">자주 만나는 문제</a></div><a class="lab-link" data-lab="04-platform" href="#lab-04-platform"><span class="num">04</span><span>Lab 04. 플랫폼 서비스: ACR · Key Vault · 모니터링 · AKS 용 ID</span></a><div class="sub"><a href="#04-platform--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#04-platform--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#04-platform--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#04-platform--코드">코드</a><a href="#04-platform--실습-따라하기">실습 따라하기</a><a href="#04-platform--자주-만나는-문제">자주 만나는 문제</a></div><h4>Part 2 · AKS 클러스터</h4><a class="lab-link" data-lab="05-aks" href="#lab-05-aks"><span class="num">05</span><span>Lab 05. AKS 클러스터 (Standard): EKS 와 무엇이 다른가</span></a><div class="sub"><a href="#05-aks--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#05-aks--eks-경험자를-위한-비교">EKS 경험자를 위한 비교</a><a href="#05-aks--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#05-aks--코드">코드</a><a href="#05-aks--실습-따라하기">실습 따라하기</a><a href="#05-aks--심화-실험">심화 실험</a><a href="#05-aks--자주-만나는-문제">자주 만나는 문제</a></div><a class="lab-link" data-lab="06-workload-identity" href="#lab-06-workload-identity"><span class="num">06</span><span>Lab 06. Workload Identity + Key Vault CSI: IRSA 의 Azure 버전</span></a><div class="sub"><a href="#06-workload-identity--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#06-workload-identity--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#06-workload-identity--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#06-workload-identity--코드">코드</a><a href="#06-workload-identity--실습-따라하기">실습 따라하기</a><a href="#06-workload-identity--자주-만나는-문제">자주 만나는 문제</a></div><a class="lab-link" data-lab="07-ingress" href="#lab-07-ingress"><span class="num">07</span><span>Lab 07. 인그레스: ALB Controller → Gateway API (approuting-istio)</span></a><div class="sub"><a href="#07-ingress--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#07-ingress--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#07-ingress--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#07-ingress--코드">코드</a><a href="#07-ingress--실습-따라하기">실습 따라하기</a><a href="#07-ingress--자주-만나는-문제">자주 만나는 문제</a></div><h4>Part 3 · 거버넌스 · 운영</h4><a class="lab-link" data-lab="08-governance" href="#lab-08-governance"><span class="num">08</span><span>Lab 08. 거버넌스와 보안: Azure Policy · Defender · 잠금 · 예산</span></a><div class="sub"><a href="#08-governance--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#08-governance--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#08-governance--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#08-governance--코드">코드</a><a href="#08-governance--실습-따라하기">실습 따라하기</a><a href="#08-governance--자주-만나는-문제">자주 만나는 문제</a></div><a class="lab-link" data-lab="09-operations" href="#lab-09-operations"><span class="num">09</span><span>Lab 09. Day-2 운영: 업그레이드 · 스케일링 · 노드 교체 · 테스트</span></a><div class="sub"><a href="#09-operations--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#09-operations--1-업그레이드-전략">1. 업그레이드 전략</a><a href="#09-operations--2-스케일링">2. 스케일링</a><a href="#09-operations--3-노드-풀-변경과-교체">3. 노드 풀 변경과 교체</a><a href="#09-operations--4-비용을-아끼는-운영-습관">4. 비용을 아끼는 운영 습관</a><a href="#09-operations--5-백업-재해-복구-개념">5. 백업 · 재해 복구 (개념)</a><a href="#09-operations--6-terraform-코드-품질과-ci">6. Terraform 코드 품질과 CI</a></div><a class="lab-link" data-lab="10-aks-automatic" href="#lab-10-aks-automatic"><span class="num">10</span><span>Lab 10. AKS Automatic: EKS Auto Mode 에 해당하는 &quot;운영까지 맡기는&quot; 모드</span></a><div class="sub"><a href="#10-aks-automatic--이번-실습에서-만드는-것">이번 실습에서 만드는 것</a><a href="#10-aks-automatic--aws-경험자를-위한-비교">AWS 경험자를 위한 비교</a><a href="#10-aks-automatic--standard-vs-automatic-무엇을-고를까">Standard vs Automatic: 무엇을 고를까</a><a href="#10-aks-automatic--설계-결정-best-practice">설계 결정 (Best practice)</a><a href="#10-aks-automatic--코드">코드</a><a href="#10-aks-automatic--실습-따라하기">실습 따라하기</a><a href="#10-aks-automatic--자주-만나는-문제">자주 만나는 문제</a></div><a class="lab-link" data-lab="11-cleanup" href="#lab-11-cleanup"><span class="num">11</span><span>Lab 11. 정리: 비용이 새지 않게 모두 삭제하기</span></a><div class="sub"><a href="#11-cleanup--가장-쉬운-방법-정리-스크립트">가장 쉬운 방법: 정리 스크립트</a><a href="#11-cleanup--삭제-순서-생성의-역순">삭제 순서 (생성의 역순)</a><a href="#11-cleanup--사전-점검-잠금과-구독-단위-설정">사전 점검 (잠금과 구독 단위 설정)</a><a href="#11-cleanup--1단계-스택별-destroy">1단계. 스택별 destroy</a><a href="#11-cleanup--2단계-부트스트랩state-저장소-삭제">2단계. 부트스트랩(state 저장소) 삭제</a><a href="#11-cleanup--3단계-정리-확인">3단계. 정리 확인</a><a href="#11-cleanup--비상-정리-terraform-이-실패할-때">비상 정리 (Terraform 이 실패할 때)</a><a href="#11-cleanup--비용-확인">비용 확인</a></div><h4>부록</h4><a class="lab-link" data-lab="99-appendix" href="#lab-99-appendix"><span class="num">A</span><span>부록. 트러블슈팅 · 프로덕션 체크리스트 · 접속·워크로드 운영 · 프라이빗 API 접속 · AVM · 참고 자료 · 테스트 코드</span></a><div class="sub"><a href="#99-appendix--a-이-가이드를-검증한-방법과-한계">A. 이 가이드를 검증한 방법과 한계</a><a href="#99-appendix--b-트러블슈팅-모음">B. 트러블슈팅 모음</a><a href="#99-appendix--c-프로덕션으로-가기-전-체크리스트">C. 프로덕션으로 가기 전 체크리스트</a><a href="#99-appendix--d-클러스터-접속-경로와-인터넷-노출-요약">D. 클러스터 접속 경로와 인터넷 노출 요약</a><a href="#99-appendix--e-kubectl-로-쿠버네티스-워크로드-다루기">E. kubectl 로 쿠버네티스 워크로드 다루기</a><a href="#99-appendix--f-프라이빗-네트워크로-api-서버에-접속하기-2가지-방법">F. 프라이빗 네트워크로 API 서버에 접속하기 (2가지 방법)</a><a href="#99-appendix--g-aks-를-terraform-으로-구성할-때-avm-을-쓸까-말까">G. AKS 를 Terraform 으로 구성할 때: AVM 을 쓸까, 말까</a><a href="#99-appendix--h-참고-자료">H. 참고 자료</a><a href="#99-appendix--i-terraform-파일-전체-목록-어느-lab-에-있나">I. Terraform 파일 전체 목록 (어느 Lab 에 있나)</a><a href="#99-appendix--j-테스트도구-코드-전체">J. 테스트/도구 코드 전체</a><a href="#99-appendix--k-검증-정리-스크립트">K. 검증 · 정리 스크립트</a></div></nav>
   <main class="content">
     <div class="content-inner">
       <div class="hero">
@@ -487,7 +487,7 @@ figure.code.shell figcaption .file::before { content: '$ '; color: var(--hl-var)
 <tr>
 <td><a href="#lab-99-appendix">99</a></td>
 <td>부록</td>
-<td>트러블슈팅, 프로덕션 체크리스트, <strong>접속 경로·인터넷 노출 요약(D)</strong>, <strong>kubectl 로 쿠버네티스 워크로드 다루기(E)</strong>, 참고 자료, 테스트 코드</td>
+<td>트러블슈팅, 프로덕션 체크리스트, <strong>접속 경로·인터넷 노출 요약(D)</strong>, <strong>kubectl 로 쿠버네티스 워크로드 다루기(E)</strong>, <strong>프라이빗 네트워크로 API 서버에 접속하기(F)</strong>, <strong>Terraform AVM 사용 여부 비교(G)</strong>, 참고 자료, 테스트 코드</td>
 </tr>
 </tbody></table>
 </div>
@@ -2158,7 +2158,7 @@ roles=<span class="hljs-string">&quot;<span class="hljs-subst">$(az role assignm
 <span class="hljs-keyword">fi</span>
 
 summary</code></pre></div><button class="expand" type="button" data-label="전체 코드 보기 (144줄) ▼">전체 코드 보기 (144줄) ▼</button></figure>
-<aside class="callout note"><div class="callout-title"><span>ℹ️</span><span>참고</span></div><p>스크립트들이 함께 쓰는 공통 함수(<code>scripts/lib/common.sh</code>)는 <a href="#lab-99-appendix">부록 I</a> 에 있습니다. 실행 결과의 <code>✓ 통과 / ✗ 실패 / ! 경고 / - 건너뜀</code> 은 모든 검증 스크립트가 같은 형식으로 보여 줍니다.</p>
+<aside class="callout note"><div class="callout-title"><span>ℹ️</span><span>참고</span></div><p>스크립트들이 함께 쓰는 공통 함수(<code>scripts/lib/common.sh</code>)는 <a href="#lab-99-appendix">부록 K</a> 에 있습니다. 실행 결과의 <code>✓ 통과 / ✗ 실패 / ! 경고 / - 건너뜀</code> 은 모든 검증 스크립트가 같은 형식으로 보여 줍니다.</p>
 </aside>
 <h2 id="01-prerequisites--7-저장소-구조">7. 저장소 구조<a class="anchor" href="#01-prerequisites--7-저장소-구조" aria-label="이 제목 링크">#</a></h2>
 <figure class="code diagram"><figcaption><span class="file">다이어그램</span><span class="meta">text · 25줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-text">aks-terraform/
@@ -6708,7 +6708,7 @@ az monitor log-analytics query -w <span class="hljs-string">&quot;<span class="h
 <figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 2줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">terraform apply -var enable_spot_pool=<span class="hljs-literal">true</span>
 kubectl get nodes -L kubernetes.azure.com/scalesetpriority    <span class="hljs-comment"># 파드가 스케줄되면 노드가 0 → N 으로 늘어납니다</span></code></pre></div></figure>
 <h3 id="05-aks--b-완전-프라이빗-클러스터로-전환">(b) 완전 프라이빗 클러스터로 전환<a class="anchor" href="#05-aks--b-완전-프라이빗-클러스터로-전환" aria-label="이 제목 링크">#</a></h3>
-<p><code>terraform plan -var enable_private_cluster=true</code> 를 실행해 보세요. <code>private_cluster_enabled</code> 는 <strong>변경 시 클러스터 재생성(forces replacement)</strong> 입니다. 운영에서는 처음부터 결정해야 하며, 프라이빗이면 <code>kubectl</code>/Terraform kubernetes provider 는 VNet 내부(VPN, Bastion, 점프 호스트)에서만 접근할 수 있습니다. 임시 점검은 <code>az aks command invoke</code> 로 가능합니다.</p>
+<p><code>terraform plan -var enable_private_cluster=true</code> 를 실행해 보세요. <code>private_cluster_enabled</code> 는 <strong>변경 시 클러스터 재생성(forces replacement)</strong> 입니다. 운영에서는 처음부터 결정해야 하며, 프라이빗이면 <code>kubectl</code>/Terraform kubernetes provider 는 VNet 내부(VPN, Bastion, 점프 호스트)에서만 접근할 수 있습니다. 임시 점검은 <code>az aks command invoke</code> 로 가능합니다. 네트워크 경로를 얻는 두 가지 방법(사설 IP 직접 접속, Private Link)은 <a href="#lab-99-appendix">부록 F</a> 에 있습니다.</p>
 <figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 1줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">az aks <span class="hljs-built_in">command</span> invoke -g &lt;rg&gt; -n &lt;cluster&gt; --<span class="hljs-built_in">command</span> <span class="hljs-string">&quot;kubectl get pods -A&quot;</span></code></pre></div></figure>
 <p><code>command invoke</code> 는 이 실습의 공용 클러스터에서도, <code>allowed_ip_ranges</code> 에 없는 주소(Cloud Shell, 다른 네트워크)에서 접속할 때 쓸 수 있습니다(<a href="#lab-99-appendix">부록 D</a>).</p>
 <h3 id="05-aks--자동-검증-스크립트">자동 검증 스크립트<a class="anchor" href="#05-aks--자동-검증-스크립트" aria-label="이 제목 링크">#</a></h3>
@@ -11070,8 +11070,8 @@ az role assignment list --all --query <span class="hljs-string">&quot;[?principa
 </li>
 </ul>
 <p>다음 → <a href="#lab-99-appendix">부록</a></p>
-<label class="lab-done"><input type="checkbox" class="lab-done-cb"> 이 실습을 완료했어요 (진행 상황은 이 브라우저에 저장됩니다)</label><nav class="pager"><a class="prev" href="#lab-10-aks-automatic"><small>← 이전</small>Lab 10. AKS Automatic: EKS Auto Mode 에 해당하는 &quot;운영까지 맡기는&quot; 모드</a><a class="next" href="#lab-99-appendix"><small>다음 →</small>부록. 트러블슈팅 · 프로덕션 체크리스트 · 접속·워크로드 운영 · 참고 자료 · 테스트 코드</a></nav></section>
-<section class="lab" id="lab-99-appendix" data-lab="99-appendix" data-title="부록. 트러블슈팅 · 프로덕션 체크리스트 · 접속·워크로드 운영 · 참고 자료 · 테스트 코드"><div class="lab-kicker">부록</div><h1 id="99-appendix--부록-트러블슈팅-프로덕션-체크리스트-접속워크로드-운영-참고-자료-테스트-코드">부록. 트러블슈팅 · 프로덕션 체크리스트 · 접속·워크로드 운영 · 참고 자료 · 테스트 코드<a class="anchor" href="#99-appendix--부록-트러블슈팅-프로덕션-체크리스트-접속워크로드-운영-참고-자료-테스트-코드" aria-label="이 제목 링크">#</a></h1>
+<label class="lab-done"><input type="checkbox" class="lab-done-cb"> 이 실습을 완료했어요 (진행 상황은 이 브라우저에 저장됩니다)</label><nav class="pager"><a class="prev" href="#lab-10-aks-automatic"><small>← 이전</small>Lab 10. AKS Automatic: EKS Auto Mode 에 해당하는 &quot;운영까지 맡기는&quot; 모드</a><a class="next" href="#lab-99-appendix"><small>다음 →</small>부록. 트러블슈팅 · 프로덕션 체크리스트 · 접속·워크로드 운영 · 프라이빗 API 접속 · AVM · 참고 자료 · 테스트 코드</a></nav></section>
+<section class="lab" id="lab-99-appendix" data-lab="99-appendix" data-title="부록. 트러블슈팅 · 프로덕션 체크리스트 · 접속·워크로드 운영 · 프라이빗 API 접속 · AVM · 참고 자료 · 테스트 코드"><div class="lab-kicker">부록</div><h1 id="99-appendix--부록-트러블슈팅-프로덕션-체크리스트-접속워크로드-운영-프라이빗-api-접속-avm-참고-자료-테스트-코드">부록. 트러블슈팅 · 프로덕션 체크리스트 · 접속·워크로드 운영 · 프라이빗 API 접속 · AVM · 참고 자료 · 테스트 코드<a class="anchor" href="#99-appendix--부록-트러블슈팅-프로덕션-체크리스트-접속워크로드-운영-프라이빗-api-접속-avm-참고-자료-테스트-코드" aria-label="이 제목 링크">#</a></h1>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -11089,7 +11089,7 @@ az role assignment list --all --query <span class="hljs-string">&quot;[?principa
 </tr>
 </tbody></table>
 </div>
-<aside class="callout tip"><div class="callout-title"><span>💡</span><span>팁</span></div><p>Cloud Shell 이나 다른 PC 에서 클러스터에 접속하는 방법, 파드·Deployment 에 <code>kubectl</code> 을 쓰는 방법을 찾고 있다면 아래 <strong>D. 클러스터 접속 경로와 인터넷 노출 요약</strong> 과 <strong>E. kubectl 로 쿠버네티스 워크로드 다루기</strong> 를 보세요.</p>
+<aside class="callout tip"><div class="callout-title"><span>💡</span><span>팁</span></div><p>Cloud Shell 이나 다른 PC 에서 클러스터에 접속하는 방법, 파드·Deployment 에 <code>kubectl</code> 을 쓰는 방법을 찾고 있다면 아래 <strong>D. 클러스터 접속 경로와 인터넷 노출 요약</strong> 과 <strong>E. kubectl 로 쿠버네티스 워크로드 다루기</strong> 를 보세요. API 서버를 공용 인터넷에서 내리려면 <strong>F. 프라이빗 네트워크로 API 서버에 접속하기</strong> 를, 직접 작성한 Terraform 과 Azure Verified Modules 중에서 고르려면 <strong>G. AKS 를 Terraform 으로 구성할 때: AVM 을 쓸까, 말까</strong> 를 보세요.</p>
 </aside>
 <h2 id="99-appendix--a-이-가이드를-검증한-방법과-한계">A. 이 가이드를 검증한 방법과 한계<a class="anchor" href="#99-appendix--a-이-가이드를-검증한-방법과-한계" aria-label="이 제목 링크">#</a></h2>
 <h3 id="99-appendix--a-1-정적-검증-azure-불필요">A-1. 정적 검증 (Azure 불필요)<a class="anchor" href="#99-appendix--a-1-정적-검증-azure-불필요" aria-label="이 제목 링크">#</a></h3>
@@ -11335,10 +11335,12 @@ az role assignment list --all --query <span class="hljs-string">&quot;[?principa
 </tbody></table>
 </div>
 <p>이번에도 Azure 가 실행 중에 <code>NetworkWatcherRG</code> 와 Defender 의 기본 Log Analytics 작업 영역(<code>DefaultResourceGroup-…</code>)을 자동으로 만들어서 직접 삭제했습니다. 남은 것은 soft-delete 상태의 Key Vault 1개뿐이며, purge protection 이 켜져 있어 7일 뒤 자동 삭제되고 비용은 없습니다.</p>
-<p><strong>추가 확인 (2026-10-14).</strong> 영문판 재검증 뒤에 추가한 부분은 실행 중인 두 클러스터에서 확인했고, 임시 네임스페이스(<code>practice</code>)는 확인 후 삭제했습니다.</p>
+<p><strong>추가 확인 (2026-10-14).</strong> 영문판 재검증 뒤에 추가한 부분은 실행 중인 두 클러스터에서 확인했고, 임시 네임스페이스(<code>practice</code>)는 확인 후 삭제했습니다. 부록 F · G 는 따로 만든 임시 환경에서 확인했습니다(아래).</p>
 <ul>
 <li><strong>부록 D</strong>: 파드에서 보이는 공인 IP 가 두 클러스터 모두 NAT Gateway 주소와 같았고, <code>az aks command invoke</code> 도 두 클러스터에서 동작했습니다. Automatic 클러스터는 리소스 요청이 없는 단독 시험 파드를 거부했습니다(D-2 의 파드는 이 규칙을 따릅니다).</li>
 <li><strong>부록 E</strong>: 샘플 Deployment 는 두 클러스터에서 실행됐습니다. Standard 클러스터에서는 다음이 설명대로 동작했습니다: 조회 명령, <code>exec</code> · <code>port-forward</code> · <code>top</code> · <code>debug</code> · <code>cp</code>, 롤아웃과 <code>undo</code>, 문제 해결 표의 <code>ImagePullBackOff</code> · <code>CrashLoopBackOff</code> · <code>Pending</code> · <code>OOMKilled</code> 사례, <code>sessionAffinity</code> 를 직접 패치한 뒤 07-ingress 의 <code>terraform plan</code> 에 생기는 차이. Azure RBAC 역할 이름과 네임스페이스 범위 형식도 확인했습니다. Automatic 클러스터에서는 Lab 04 ACR 의 이미지가 D-2 의 설명대로 <code>403</code> 으로 실패했습니다.</li>
+<li><strong>부록 F</strong> (같은 날 따로 만든 임시 환경에서 확인: <code>enable_private_cluster=true</code> 로 만든 03–05 스택, 풀마다 노드 1개, Managed Grafana 끔, VM 이 하나씩 있는 클라이언트 VNet 2개. 모두 삭제했습니다): <code>05-aks</code> 를 랩탑에서 <code>apply</code> 했고(15개 리소스), 클러스터에 공용 FQDN 이 없었으며, 랩탑에서는 프라이빗 FQDN 을 해석하지 못했습니다. <strong>방법 1:</strong> 피어링만 있을 때는 이름이 해석되지 않았지만(NXDOMAIN) 내부 로드밸런서의 TCP 443 은 열려 있었습니다. 클러스터의 프라이빗 DNS 존을 클라이언트 VNet 에 연결하자 피어링된 VNet 의 VM 이 <code>10.10.1.4</code> 로 해석하고 관리 ID 와 kubelogin 으로 <code>kubectl get nodes</code> 를 실행했습니다. <strong>방법 2:</strong> <code>kube-apiserver</code> 앞의 Private Link Service, <code>10.10.0.0/16</code> 과 겹치는 VNet(피어링 없음)의 Private Endpoint, A 레코드가 있는 프라이빗 DNS 존으로 같은 결과를 얻었습니다. <code>az aks command invoke</code> 가 동작했고, <code>scripts/verify.sh 05-aks</code> 는 Azure 점검을 통과하고 <code>kubectl</code> 점검은 건너뛰었으며, <code>terraform plan</code> 에서 <code>enable_private_cluster</code> 를 바꾸면 클러스터와 거기에 딸린 리소스가 <code>forces replacement</code> 로 나왔습니다. 실행 중인 클러스터를 <code>az aks update --disable-private-cluster</code> 다음 <code>--enable-private-cluster</code> 로 전환하는 것은 제자리에서 동작했습니다(각각 7–9분, 다른 플래그 불필요). 변수를 맞추자 plan 에 교체가 나오지 않았고, 다시 만들어진 프라이빗 DNS 존에는 추가해 둔 클라이언트 VNet 링크가 없었습니다.</li>
+<li><strong>부록 G</strong>: AVM 모듈 0.8.4 로 <code>terraform init</code> 이 AzAPI 2.13.0(이 가이드의 고정 버전)과 <code>modtm</code> 0.4.0, <code>random</code> 3.9.1 을 골랐고, <code>05-aks</code> 를 본뜬 입력(관리형 Gateway API 포함)으로 <code>terraform validate</code> 와 <code>terraform plan</code> 이 통과했습니다. plan 전용 <code>terraform test</code> 는 Azure 자격 증명도 mock 도 없이 실행되었습니다. 모듈의 변수 규칙은 잘못된 <code>sku.tier</code>, <code>os_sku</code>, <code>network_policy</code>, <code>os_disk_size_gb</code> 를 <code>plan</code> 에서 거부했지만, azurerm 5.9 는 잘못된 <code>os_sku</code> 와 <code>network_policy</code> 를 <code>validate</code> 에서 받아들였습니다. 모듈을 <code>apply</code> 하지는 않았습니다.</li>
 <li><strong>Lab 08 Defender 수정</strong>(아래 수정 14): 실행 중인 Standard 클러스터에 Defender 자동 프로비저닝 정책이 붙인 작업 영역으로 적용했습니다. apply 는 제자리 변경 1건(작업 영역 ID 의 대소문자뿐)이었고, 같은 변수 두 개로 다시 한 plan 은 변경 없음이었으며, <code>microsoft-defender</code> 파드 13개가 Running 이었습니다. <code>defender_log_analytics_workspace_id</code> 없이 켜면 plan 이 precondition 에서 멈춥니다.</li>
 </ul>
 <h3 id="99-appendix--a-3-실행하다-발견해서-고친-불일치">A-3. 실행하다 발견해서 고친 불일치<a class="anchor" href="#99-appendix--a-3-실행하다-발견해서-고친-불일치" aria-label="이 제목 링크">#</a></h3>
@@ -11451,7 +11453,8 @@ az role assignment list --all --query <span class="hljs-string">&quot;[?principa
 <li><strong>Defender 자동 프로비저닝 정책이 있는 구독</strong>: 클러스터를 만든 직후 한동안 <code>Updating</code> 이라 <code>verify.sh</code> 의 프로비저닝 상태가 일시적으로 실패하고, 05-aks plan 에 <code>microsoft_defender</code> 제거 diff 가 계속 보입니다. 같은 프로필을 선언하면(<code>enable_defender=true</code> 와, 정책이 쓴 작업 영역을 가리키는 <code>defender_log_analytics_workspace_id</code>) 사라집니다(<a href="#lab-08-governance">Lab 08</a> 2·4단계). 이때 플랫폼 작업 영역을 쓰면 안 됩니다(A-3 의 14번).</li>
 <li><strong>조직 정책이 Storage 공용 접근을 끄는 구독</strong>: 관리 그룹의 Azure Policy(Modify)가 Storage 계정의 공용 네트워크 접근을 <code>Disabled</code> 로 바꾸는 구독에서는 Lab 02 의 원격 state 접근이 <code>403 AuthorizationFailure</code> 로 실패했습니다(Terraform 이 <code>Enabled</code> 로 만들어도 정책이 바꿈). 이 가이드는 공용 엔드포인트 + Entra 인증을 전제로 하므로, 정책 예외를 받거나 다른 구독을 써야 합니다.</li>
 <li><strong><code>terraform plan -detailed-exitcode</code></strong>: provider 가 <code>available_kubernetes_versions</code> 출력 값만 바꿔도 <code>2</code> 를 돌려줍니다(실제 인프라 변경 없음). CI 의 &quot;변경 없음&quot; 판정에는 이 값을 무시하세요.</li>
-<li><strong>실행하지 않은 것</strong>: Windows(PowerShell) 명령, 다른 리전, 팀 환경(Entra 그룹 <code>admin_principal_ids</code>), <code>enable_private_cluster=true</code> 로 실제 배포(plan 만), TLS(443) 리스너, Application Gateway for Containers, Grafana 웹 UI 로그인, <code>az login</code> 의 대화형 로그인, <a href="#lab-09-operations">Lab 09</a> §6 의 GitHub Actions 워크플로 예시.</li>
+<li><strong>실행하지 않은 것</strong>: Windows(PowerShell) 명령, 다른 리전, 팀 환경(Entra 그룹 <code>admin_principal_ids</code>), TLS(443) 리스너, Application Gateway for Containers, Grafana 웹 UI 로그인, <code>az login</code> 의 대화형 로그인, <a href="#lab-09-operations">Lab 09</a> §6 의 GitHub Actions 워크플로 예시.</li>
+<li><strong>부록 F · G 에서 실행하지 않은 것</strong>: VPN · ExpressRoute, Azure DNS Private Resolver(하이브리드 DNS), Azure Bastion(테스트 VM 은 Bastion 을 거친 점프 호스트 대신 <code>az vm run-command</code> 로 다뤘습니다), 다른 구독의 Private Endpoint(<code>--visibility</code>, <code>--auto-approval</code>), VNet 안의 Cloud Shell, <code>az aks bastion</code>, API Server VNet Integration 을 쓰지 않는 프라이빗 클러스터, AVM 모듈 <code>apply</code>(초기화 · 검증 · plan 만 했습니다).</li>
 <li><strong>Azure CLI 간헐 오류</strong>: <code>az aks get-credentials</code> 가 <code>Error loading command module &#39;serviceconnector&#39;: deadlock</code> 으로 한 번 실패하고 다시 실행하면 성공했습니다(CLI 쪽 문제).</li>
 </ul>
 <h3 id="99-appendix--a-5-정리-결과-lab-11">A-5. 정리 결과 (Lab 11)<a class="anchor" href="#99-appendix--a-5-정리-결과-lab-11" aria-label="이 제목 링크">#</a></h3>
@@ -11539,7 +11542,7 @@ az role assignment list --all --query <span class="hljs-string">&quot;[?principa
 </tr>
 <tr>
 <td><code>kubectl: Unable to connect ... i/o timeout</code></td>
-<td>API 서버는 <code>allowed_ip_ranges</code> 의 IP 만 받습니다. 내 공인 IP 가 바뀌었거나, 다른 네트워크·Cloud Shell·CI 에서 접속하는 경우입니다 → D절(D-3, D-4) 참고: <code>TF_VAR_allowed_ip_ranges</code> 를 갱신하고 <code>04-platform</code>, <code>05-aks</code>, <code>10-aks-automatic</code> 을 <code>apply</code> 하세요. 그동안은 <code>az aks command invoke</code> 를 쓰세요.</td>
+<td>API 서버는 <code>allowed_ip_ranges</code> 의 IP 만 받습니다. 내 공인 IP 가 바뀌었거나, 다른 네트워크·Cloud Shell·CI 에서 접속하는 경우입니다 → D절(D-3, D-4) 참고: <code>TF_VAR_allowed_ip_ranges</code> 를 갱신하고 <code>04-platform</code>, <code>05-aks</code>, <code>10-aks-automatic</code> 을 <code>apply</code> 하세요. 그동안은 <code>az aks command invoke</code> 를 쓰세요. 프라이빗 클러스터(<code>enable_private_cluster</code>)에서는 IP 목록이 도움이 되지 않습니다: F절 참고.</td>
 </tr>
 <tr>
 <td><code>kubectl</code> 이 엉뚱한 클러스터를 바꿈</td>
@@ -11585,7 +11588,7 @@ az role assignment list --all --query <span class="hljs-string">&quot;[?principa
 <tr>
 <td>API 서버</td>
 <td>공용 + authorized IP</td>
-<td><strong>완전 프라이빗</strong>(<code>enable_private_cluster</code>) + Bastion/점프 호스트/자체 호스팅 러너</td>
+<td><strong>완전 프라이빗</strong>(<code>enable_private_cluster</code>) + Bastion/점프 호스트/자체 호스팅 러너(F절 참고)</td>
 </tr>
 <tr>
 <td>인그레스</td>
@@ -11625,7 +11628,7 @@ az role assignment list --all --query <span class="hljs-string">&quot;[?principa
 <tr>
 <td>모듈화</td>
 <td>학습용 직접 정의</td>
-<td>사내 모듈 또는 <strong>Azure Verified Modules(AVM)</strong> 로 표준화</td>
+<td>사내 모듈 또는 <strong>Azure Verified Modules(AVM)</strong> 로 표준화(장단점은 G절)</td>
 </tr>
 <tr>
 <td>관측성</td>
@@ -11793,6 +11796,7 @@ az aks <span class="hljs-built_in">command</span> invoke -g &lt;rg&gt; -n &lt;cl
 <li>포털에는 같은 기능이 <strong>AKS 클러스터 → Run command</strong> 로 있습니다.</li>
 <li>이 가이드의 두 클러스터에서 모두 시험했습니다.</li>
 </ul>
+<p>공용 엔드포인트를 아예 없애고 프라이빗 네트워크로만 API 서버에 접속하려면 F절을 보세요.</p>
 <h3 id="99-appendix--d-4-공인-ip-가-바뀌었거나-팀원이-접속해야-할-때">D-4. 공인 IP 가 바뀌었거나 팀원이 접속해야 할 때<a class="anchor" href="#99-appendix--d-4-공인-ip-가-바뀌었거나-팀원이-접속해야-할-때" aria-label="이 제목 링크">#</a></h3>
 <ol>
 <li>새 주소를 확인합니다(<a href="#lab-01-prerequisites">Lab 01</a> 5단계): <code>curl -s https://api.ipify.org</code>.</li>
@@ -12074,7 +12078,426 @@ kubectl -n practice auth can-i create deployments       <span class="hljs-commen
 <figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 2줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash">kubectl config current-context        <span class="hljs-comment"># 의도한 클러스터인지 확인</span>
 kubectl delete namespace practice     <span class="hljs-comment"># 안의 모든 것을 삭제: Deployment, 파드, Service, Job, ConfigMap, Secret</span></code></pre></div></figure>
 <p>Lab 06·07 워크로드나 Azure 리소스는 건드리지 않습니다.</p>
-<h2 id="99-appendix--f-참고-자료">F. 참고 자료<a class="anchor" href="#99-appendix--f-참고-자료" aria-label="이 제목 링크">#</a></h2>
+<h2 id="99-appendix--f-프라이빗-네트워크로-api-서버에-접속하기-2가지-방법">F. 프라이빗 네트워크로 API 서버에 접속하기 (2가지 방법)<a class="anchor" href="#99-appendix--f-프라이빗-네트워크로-api-서버에-접속하기-2가지-방법" aria-label="이 제목 링크">#</a></h2>
+<p>실습에서는 API 서버가 공용 엔드포인트이고 <code>allowed_ip_ranges</code> 의 IP 만 쓸 수 있습니다(D). 인터넷에서 내리려면 <code>enable_private_cluster = true</code> 로 설정하세요. 이 클러스터는 이미 API Server VNet Integration 을 쓰므로, 그러면 API 서버는 <code>snet-aks-apiserver</code> 의 내부 로드밸런서 <strong>사설 IP 로만</strong> 열립니다. 아래 두 방법은 클라이언트가 그 IP 에 닿는 경로가 다릅니다.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>① 사설 IP 로 직접</th>
+<th>② Private Link</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>동작</td>
+<td>클라이언트 네트워크에서 <code>snet-aks-apiserver</code> 까지 라우팅</td>
+<td>클라이언트 VNet 의 Private Endpoint 가 API 서버 내부 로드밸런서 앞의 Private Link Service 에 연결</td>
+</tr>
+<tr>
+<td>클라이언트 네트워크</td>
+<td>같은 VNet, 피어링된 VNet, VPN 이나 ExpressRoute 로 연결한 온프레미스</td>
+<td>다른 구독·테넌트를 포함한 모든 VNet. 주소 공간이 겹쳐도 됨</td>
+</tr>
+<tr>
+<td>추가 리소스</td>
+<td>VNet 피어링 또는 VPN/ExpressRoute 게이트웨이, DNS 링크 또는 포워더</td>
+<td>AKS VNet: 서브넷과 Private Link Service. 클라이언트 VNet: Private Endpoint, 프라이빗 DNS 존, A 레코드</td>
+</tr>
+<tr>
+<td>과금</td>
+<td>게이트웨이와 Bastion 은 시간당, 피어링은 전송한 데이터량 기준</td>
+<td>Private Endpoint 는 시간당 + 처리한 데이터량(GB) 기준</td>
+</tr>
+<tr>
+<td>이럴 때</td>
+<td>네트워크가 이미 연결되어 있을 때(허브-스포크, VPN)</td>
+<td>피어링할 수 없거나 하고 싶지 않을 때, 클라이언트가 다른 팀·회사일 때</td>
+</tr>
+</tbody></table>
+</div>
+<figure class="diagram-fig"><div class="diagram-scroll"><svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 960 632" width="960" height="632" role="img" aria-labelledby="private-api-access-t private-api-access-d"><title id="private-api-access-t">프라이빗 API 서버에 접속하는 2가지 방법</title><desc id="private-api-access-d">방법 1 은 클라이언트(점프 호스트, 피어링된 VNet 의 러너, VPN 이나 ExpressRoute 로 연결한 노트북)를 snet-aks-apiserver 에 있는 API 서버 로드밸런서의 사설 IP 로 연결한다. 방법 2 는 클라이언트 VNet 에 Private Endpoint 를 만들어 같은 로드밸런서 앞의 Private Link Service 에 연결한다. 두 방법 모두 프라이빗 FQDN 을 해석할 DNS 가 필요하다.</desc><style>svg.dg{--dg-bg:#ffffff;--dg-fg:#1f2328;--dg-muted:#59636e;--dg-line:#6e7781;--dg-card:#f6f8fa;--dg-border:#d1d9e0;--dg-aws:#c2590a;--dg-aws-soft:#fff1e5;--dg-azure:#0b6ed0;--dg-azure-soft:#e5f1ff;--dg-ok:#1a7f37;--dg-ok-soft:#e6f6ea;--dg-id:#8250df;--dg-id-soft:#f3ecff;--dg-net:#0e7490;--dg-net-soft:#e0f4f8;--dg-warn:#9a6700;--dg-warn-soft:#fff6d6;--dg-danger:#cf222e;--dg-danger-soft:#ffebe9;font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", "Segoe UI", Roboto, sans-serif}
+@media (prefers-color-scheme:dark){svg.dg{--dg-bg:#0d1117;--dg-fg:#e6edf3;--dg-muted:#9198a1;--dg-line:#8b949e;--dg-card:#151b23;--dg-border:#30363d;--dg-aws:#f0883e;--dg-aws-soft:#2b1c10;--dg-azure:#58a6ff;--dg-azure-soft:#0f2238;--dg-ok:#3fb950;--dg-ok-soft:#0f2417;--dg-id:#b392f0;--dg-id-soft:#221a36;--dg-net:#39c5cf;--dg-net-soft:#0d2a2f;--dg-warn:#d29922;--dg-warn-soft:#2d2208;--dg-danger:#ff7b72;--dg-danger-soft:#3a1517}}
+.dg-bg{fill:var(--dg-bg)}
+.dg-t{fill:var(--dg-fg)}
+.dg-m{fill:var(--dg-muted)}
+.dg-b{font-weight:650}
+.dg-box,.dg-grp,.dg-chip{stroke-width:1.4}
+.dg-box{fill:var(--dg-card);stroke:var(--dg-border)}
+.dg-grp{fill:none;stroke:var(--dg-border)}
+.dg-dash{stroke-dasharray:6 4}
+.dg-chip{fill:var(--dg-bg);stroke:none}
+.dg-line{fill:none;stroke:var(--dg-line);stroke-width:1.8}
+.dg-ah{fill:var(--dg-line)}
+.dg-box.dg-aws{fill:var(--dg-aws-soft);stroke:var(--dg-aws)}
+.dg-grp.dg-aws{stroke:var(--dg-aws)}
+.dg-fill-aws{fill:var(--dg-aws)}
+.dg-tx-aws{fill:var(--dg-aws)}
+.dg-line.dg-aws{stroke:var(--dg-aws)}
+.dg-ah.dg-aws{fill:var(--dg-aws)}
+.dg-box.dg-azure{fill:var(--dg-azure-soft);stroke:var(--dg-azure)}
+.dg-grp.dg-azure{stroke:var(--dg-azure)}
+.dg-fill-azure{fill:var(--dg-azure)}
+.dg-tx-azure{fill:var(--dg-azure)}
+.dg-line.dg-azure{stroke:var(--dg-azure)}
+.dg-ah.dg-azure{fill:var(--dg-azure)}
+.dg-box.dg-ok{fill:var(--dg-ok-soft);stroke:var(--dg-ok)}
+.dg-grp.dg-ok{stroke:var(--dg-ok)}
+.dg-fill-ok{fill:var(--dg-ok)}
+.dg-tx-ok{fill:var(--dg-ok)}
+.dg-line.dg-ok{stroke:var(--dg-ok)}
+.dg-ah.dg-ok{fill:var(--dg-ok)}
+.dg-box.dg-id{fill:var(--dg-id-soft);stroke:var(--dg-id)}
+.dg-grp.dg-id{stroke:var(--dg-id)}
+.dg-fill-id{fill:var(--dg-id)}
+.dg-tx-id{fill:var(--dg-id)}
+.dg-line.dg-id{stroke:var(--dg-id)}
+.dg-ah.dg-id{fill:var(--dg-id)}
+.dg-box.dg-net{fill:var(--dg-net-soft);stroke:var(--dg-net)}
+.dg-grp.dg-net{stroke:var(--dg-net)}
+.dg-fill-net{fill:var(--dg-net)}
+.dg-tx-net{fill:var(--dg-net)}
+.dg-line.dg-net{stroke:var(--dg-net)}
+.dg-ah.dg-net{fill:var(--dg-net)}
+.dg-box.dg-warn{fill:var(--dg-warn-soft);stroke:var(--dg-warn)}
+.dg-grp.dg-warn{stroke:var(--dg-warn)}
+.dg-fill-warn{fill:var(--dg-warn)}
+.dg-tx-warn{fill:var(--dg-warn)}
+.dg-line.dg-warn{stroke:var(--dg-warn)}
+.dg-ah.dg-warn{fill:var(--dg-warn)}
+.dg-box.dg-danger{fill:var(--dg-danger-soft);stroke:var(--dg-danger)}
+.dg-grp.dg-danger{stroke:var(--dg-danger)}
+.dg-fill-danger{fill:var(--dg-danger)}
+.dg-tx-danger{fill:var(--dg-danger)}
+.dg-line.dg-danger{stroke:var(--dg-danger)}
+.dg-ah.dg-danger{fill:var(--dg-danger)}
+.dg-on{fill:#fff}</style><defs><marker id="private-api-access-ah-line" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah"/></marker><marker id="private-api-access-ah-net" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-net"/></marker><marker id="private-api-access-ah-ok" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-ok"/></marker><marker id="private-api-access-ah-azure" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-azure"/></marker><marker id="private-api-access-ah-id" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-id"/></marker><marker id="private-api-access-ah-warn" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-warn"/></marker></defs><rect width="960" height="632" class="dg-bg" rx="12"/>
+<text x="24" y="32" font-size="18" class="dg-t dg-b">프라이빗 API 서버에 접속하는 2가지 방법</text>
+<text x="24" y="54" font-size="12.5" class="dg-m">API 서버는 사설 IP 로만 열립니다(enable_private_cluster = true). 두 방법은 클라이언트가 그 IP 에 닿는 경로가 다릅니다.</text>
+<rect x="24" y="88" width="912" height="200" rx="14" class="dg-grp dg-net"/>
+<text x="38" y="108" font-size="12.5" class="dg-tx-net dg-b" data-w="884">① 사설 IP 로 직접 접속 · 같은 VNet · 피어링 · VPN / ExpressRoute</text>
+<rect x="40" y="118" width="236" height="48" rx="10" class="dg-box"/>
+<text x="50" y="138.5" font-size="12.5" class="dg-t dg-b" data-w="216">점프 호스트 VM + Bastion</text>
+<text x="50" y="155" font-size="11" class="dg-m" data-w="216">AKS VNet 안, 공인 IP 없음</text>
+<rect x="40" y="172" width="236" height="48" rx="10" class="dg-box"/>
+<text x="50" y="192.5" font-size="12.5" class="dg-t dg-b" data-w="216">자체 호스팅 러너 · VM</text>
+<text x="50" y="209" font-size="11" class="dg-m" data-w="216">피어링된 VNet(허브 · 운영)</text>
+<rect x="40" y="226" width="236" height="48" rx="10" class="dg-box"/>
+<text x="50" y="246.5" font-size="12.5" class="dg-t dg-b" data-w="216">노트북 · 온프레미스</text>
+<text x="50" y="263" font-size="11" class="dg-m" data-w="216">VPN 또는 ExpressRoute 로</text>
+<rect x="330" y="118" width="268" height="156" rx="10" class="dg-box dg-net"/>
+<text x="342" y="141" font-size="13" class="dg-t dg-b" data-w="244">사설 IP 까지의 네트워크 경로</text>
+<text x="342" y="158" font-size="11.5" class="dg-m" data-w="244">같은 VNet · VNet 피어링</text>
+<text x="342" y="174.5" font-size="11.5" class="dg-m" data-w="244">VPN 게이트웨이 · ExpressRoute</text>
+<text x="342" y="191" font-size="11.5" class="dg-m" data-w="244">주소 공간이 겹치면 안 됩니다</text>
+<text x="342" y="207.5" font-size="11.5" class="dg-m" data-w="244">피어링은 전이되지 않습니다</text>
+<text x="342" y="224" font-size="11.5" class="dg-m" data-w="244">NSG · 방화벽: TCP 443 허용</text>
+<rect x="660" y="118" width="260" height="156" rx="10" class="dg-box dg-ok"/>
+<text x="672" y="141" font-size="13" class="dg-t dg-b" data-w="236">snet-aks-apiserver</text>
+<text x="672" y="158" font-size="11.5" class="dg-m" data-w="236">10.10.1.0/28 (위임)</text>
+<text x="672" y="174.5" font-size="11.5" class="dg-m" data-w="236">내부 로드밸런서(ILB)</text>
+<text x="672" y="191" font-size="11.5" class="dg-m" data-w="236">사설 IP · 443 포트</text>
+<text x="672" y="207.5" font-size="11.5" class="dg-m" data-w="236">공용 엔드포인트 없음</text>
+<text x="672" y="224" font-size="11.5" class="dg-m" data-w="236">Authorized IP 범위는 적용되지 않음</text>
+<path d="M276 142 L330 142" class="dg-line dg-net" marker-end="url(#private-api-access-ah-net)"/>
+<path d="M276 196 L330 196" class="dg-line dg-net" marker-end="url(#private-api-access-ah-net)"/>
+<path d="M276 250 L330 250" class="dg-line dg-net" marker-end="url(#private-api-access-ah-net)"/>
+<path d="M598 196 L660 196" class="dg-line dg-ok" marker-end="url(#private-api-access-ah-ok)"/>
+<rect x="24" y="304" width="912" height="204" rx="14" class="dg-grp dg-azure"/>
+<text x="38" y="324" font-size="12.5" class="dg-tx-azure dg-b" data-w="884">② Private Link 로 접속 · Private Endpoint → Private Link Service</text>
+<rect x="40" y="336" width="400" height="160" rx="14" class="dg-grp"/>
+<text x="54" y="356" font-size="12" class="dg-m dg-b" data-w="372">클라이언트 VNet (다른 구독 · 테넌트)</text>
+<rect x="52" y="366" width="170" height="118" rx="10" class="dg-box"/>
+<text x="62" y="386.5" font-size="12.5" class="dg-t dg-b" data-w="150">클라이언트 VM · 러너</text>
+<text x="62" y="403" font-size="11" class="dg-m" data-w="150">주소 공간이 겹쳐도</text>
+<text x="62" y="419" font-size="11" class="dg-m" data-w="150">상관없음</text>
+<text x="62" y="435" font-size="11" class="dg-m" data-w="150">피어링 불필요</text>
+<rect x="258" y="366" width="170" height="118" rx="10" class="dg-box dg-net"/>
+<text x="268" y="386.5" font-size="12.5" class="dg-t dg-b" data-w="150">Private Endpoint</text>
+<text x="268" y="403" font-size="11" class="dg-m" data-w="150">클라이언트 서브넷의</text>
+<text x="268" y="419" font-size="11" class="dg-m" data-w="150">사설 IP. 직접 만든</text>
+<text x="268" y="435" font-size="11" class="dg-m" data-w="150">DNS 존의 A 레코드가</text>
+<text x="268" y="451" font-size="11" class="dg-m" data-w="150">이 IP 를 가리킴</text>
+<rect x="520" y="336" width="404" height="160" rx="14" class="dg-grp"/>
+<text x="534" y="356" font-size="12" class="dg-m dg-b" data-w="376">AKS VNet 10.10.0.0/16</text>
+<rect x="532" y="366" width="176" height="118" rx="10" class="dg-box dg-net"/>
+<text x="542" y="386.5" font-size="12.5" class="dg-t dg-b" data-w="156">snet-pls (new)</text>
+<text x="542" y="403" font-size="11" class="dg-m" data-w="156">Private Link Service</text>
+<text x="542" y="419" font-size="11" class="dg-m" data-w="156">API 서버 로드밸런서</text>
+<text x="542" y="435" font-size="11" class="dg-m" data-w="156">앞단에 연결</text>
+<rect x="744" y="366" width="168" height="118" rx="10" class="dg-box dg-ok"/>
+<text x="754" y="386.5" font-size="12.5" class="dg-t dg-b" data-w="148">API 서버</text>
+<text x="754" y="403" font-size="11" class="dg-m" data-w="148">kube-apiserver ILB</text>
+<text x="754" y="419" font-size="11" class="dg-m" data-w="148">snet-aks-apiserver</text>
+<text x="754" y="435" font-size="11" class="dg-m" data-w="148">사설 IP · 443 포트</text>
+<path d="M222 425 L258 425" class="dg-line dg-net" marker-end="url(#private-api-access-ah-net)"/>
+<path d="M428 425 L532 425" class="dg-line dg-azure" marker-end="url(#private-api-access-ah-azure)"/>
+<rect x="432.5" y="415" width="95" height="20" rx="6" class="dg-chip"/>
+<text x="480" y="429" font-size="11.5" text-anchor="middle" class="dg-tx-azure dg-b">Private Link</text>
+<path d="M708 425 L744 425" class="dg-line dg-ok" marker-end="url(#private-api-access-ah-ok)"/>
+<rect x="24" y="524" width="588" height="92" rx="10" class="dg-box dg-id"/>
+<text x="36" y="547" font-size="13" class="dg-t dg-b" data-w="564">DNS: 클라이언트가 프라이빗 FQDN 을 해석해야 합니다</text>
+<text x="36" y="564" font-size="11.5" class="dg-m" data-w="564">① 클러스터의 프라이빗 DNS 존을 클라이언트 VNet 에 연결하거나</text>
+<text x="36" y="580.5" font-size="11.5" class="dg-m" data-w="564">Azure DNS Private Resolver 로 전달</text>
+<text x="36" y="597" font-size="11.5" class="dg-m" data-w="564">② 직접 만든 존 + Private Endpoint IP 를 가리키는 A 레코드</text>
+<rect x="632" y="524" width="304" height="92" rx="10" class="dg-box dg-warn"/>
+<text x="644" y="547" font-size="13" class="dg-t dg-b" data-w="280">아직 네트워크 경로가 없다면?</text>
+<text x="644" y="564" font-size="11.5" class="dg-m" data-w="280">az aks command invoke</text>
+<text x="644" y="580.5" font-size="11.5" class="dg-m" data-w="280">Azure API 를 거쳐 실행,</text>
+<text x="644" y="597" font-size="11.5" class="dg-m" data-w="280">한 번에 끝나는 명령만 (D-3)</text>
+</svg></div></figure>
+
+<aside class="callout note"><div class="callout-title"><span>ℹ️</span><span>참고</span></div><p>F 와 G 는 Microsoft 문서(링크는 H)를 따랐고, 2026-10-14 에 실습 구독에서 F-1–F-3 의 명령과 G 의 AVM 모듈을 확인했습니다(A-2 참고). 단계는 적힌 그대로 실행되었고, 피어링된 VNet 의 VM(방법 1)과 주소 공간이 겹치는 VNet 의 VM(방법 2)에서 각각 <code>kubectl get nodes</code> 가 성공했습니다. 실행하지 않은 것: VPN · ExpressRoute, Azure DNS Private Resolver, Azure Bastion, 다른 구독의 Private Endpoint, VNet 안의 Cloud Shell, <code>az aks bastion</code>, AVM 모듈 <code>apply</code>(A-4 참고).</p>
+</aside>
+<h3 id="99-appendix--f-1-api-서버를-프라이빗으로-만들기">F-1. API 서버를 프라이빗으로 만들기<a class="anchor" href="#99-appendix--f-1-api-서버를-프라이빗으로-만들기" aria-label="이 제목 링크">#</a></h3>
+<figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 3줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-built_in">export</span> TF_VAR_enable_private_cluster=<span class="hljs-literal">true</span>
+terraform -<span class="hljs-built_in">chdir</span>=terraform/05-aks plan      <span class="hljs-comment"># 이미 만든 클러스터라면 교체(replace)로 나옵니다</span>
+terraform -<span class="hljs-built_in">chdir</span>=terraform/05-aks apply</code></pre></div></figure>
+<ul>
+<li>공용 엔드포인트가 사라지고 <code>allowed_ip_ranges</code> 는 API 서버에 적용되지 않습니다(<code>04-platform</code> 은 ACR · Key Vault 방화벽에 계속 씁니다). 코드가 이미 <code>private_cluster_public_fqdn_enabled = false</code> 로 두므로 공용 FQDN 도 없습니다.</li>
+<li><strong>클러스터를 만들 때 정하세요.</strong> azurerm 5.9 에서 <code>private_cluster_enabled</code> 와 <code>private_dns_zone_id</code> 는 바꾸면 새 클러스터를 만들고, 그 교체는 노드 풀 · 모니터링 연결 · AzAPI 업데이트로 이어집니다(<a href="#lab-05-aks">Lab 05</a> 심화 실험 (b)). Azure 자체는 VNet Integration 클러스터를 <code>az aks update --enable-private-cluster</code>(또는 <code>--disable-private-cluster</code>, 미리 보기)로 제자리에서 전환할 수 있고, 실습에서는 7–9분이 걸렸습니다. 그렇게 했다면 변수도 맞춰 두세요. 그러면 <code>terraform plan</code> 에 교체가 나오지 않았습니다. 이 전환은 프라이빗 DNS 존을 다시 만들므로 직접 추가한 링크(F-2 의 2단계)는 사라지니 다시 만들어야 합니다.</li>
+<li>기본적으로 AKS 는 <strong>노드 리소스 그룹에 프라이빗 DNS 존을 만들고 클러스터 VNet 에만 연결</strong>합니다. 다른 네트워크에서는 프라이빗 FQDN 을 해석하지 못하므로, 두 방법 모두 DNS 부터 해결해야 합니다.</li>
+<li>랩탑에서 계속 동작하는 것: Azure Resource Manager 하고만 통신하는 스택(<code>02</code>–<code>05</code>, <code>08</code>, <code>10</code>)과 <code>az aks command invoke</code>(D-3). 이제 API 서버까지 네트워크 경로가 필요한 것: Lab 05 이후의 <code>kubectl</code>, <code>kubernetes</code> provider 를 쓰는 스택(<code>06</code>, <code>07</code>), <code>scripts/verify.sh</code> 의 <code>kubectl</code> 단계(연결할 수 없으면 건너뜁니다). 이들은 아래 방법 중 하나로 연결된 머신에서 실행하세요.</li>
+<li>Lab 10 의 Automatic 클러스터에는 이 변수가 없습니다. authorized IP 를 쓰는 공용 클러스터로 남습니다.</li>
+</ul>
+<h3 id="99-appendix--f-2-방법-1-사설-ip-로-직접-접속-같은-vnet-피어링-vpnexpressroute">F-2. 방법 1: 사설 IP 로 직접 접속 (같은 VNet · 피어링 · VPN/ExpressRoute)<a class="anchor" href="#99-appendix--f-2-방법-1-사설-ip-로-직접-접속-같은-vnet-피어링-vpnexpressroute" aria-label="이 제목 링크">#</a></h3>
+<p><code>snet-aks-apiserver</code> 까지 라우팅되고 프라이빗 FQDN 을 해석할 수 있는 머신에서 <code>kubectl</code> 을 실행합니다.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>클라이언트</th>
+<th>방법</th>
+<th>참고</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>점프 호스트 VM</td>
+<td>AKS VNet 의 별도 서브넷(노드 서브넷이 아님)에 <strong>공인 IP 없는</strong> VM 을 만들고 Azure Bastion 으로 접속</td>
+<td><code>az</code>, <code>kubectl</code>, <code>kubelogin</code> 설치(<code>az aks install-cli</code>)</td>
+</tr>
+<tr>
+<td>자체 호스팅 러너</td>
+<td>AKS VNet 또는 피어링된 VNet 에서 CI 에이전트 실행</td>
+<td>Microsoft 호스티드 Azure DevOps 에이전트는 프라이빗 클러스터에서 지원되지 않습니다</td>
+</tr>
+<tr>
+<td>랩탑 · 온프레미스</td>
+<td>AKS VNet 과 피어링된 허브 VNet 으로 VPN 게이트웨이(지점 간 또는 사이트 간)나 ExpressRoute 연결</td>
+<td>DNS 전달이 필요합니다(아래)</td>
+</tr>
+</tbody></table>
+</div>
+<p>예시는 클라이언트 VNet 을 AKS VNet 과 피어링하고 클러스터의 프라이빗 DNS 존을 그 VNet 에 연결합니다.</p>
+<figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 18줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-comment"># 1. 양방향으로 피어링합니다. 클라이언트 VNet 의 주소 공간은 10.10.0.0/16 과 겹치면 안 됩니다.</span>
+az network vnet peering create -g &lt;client-rg&gt; --vnet-name &lt;client-vnet&gt; -n client-to-aks \
+  --remote-vnet &lt;aks-vnet-id&gt; --allow-vnet-access
+az network vnet peering create -g &lt;network-rg&gt; --vnet-name &lt;aks-vnet&gt; -n aks-to-client \
+  --remote-vnet &lt;client-vnet-id&gt; --allow-vnet-access
+
+<span class="hljs-comment"># 2. 클러스터의 프라이빗 DNS 존(노드 리소스 그룹에 있음)을 클라이언트 VNet 에 연결</span>
+NODE_RG=$(az aks show -g &lt;rg&gt; -n &lt;cluster&gt; --query nodeResourceGroup -o tsv)
+ZONE=$(az network private-dns zone list -g <span class="hljs-string">&quot;<span class="hljs-variable">$NODE_RG</span>&quot;</span> --query <span class="hljs-string">&quot;[0].name&quot;</span> -o tsv)
+az network private-dns <span class="hljs-built_in">link</span> vnet create -g <span class="hljs-string">&quot;<span class="hljs-variable">$NODE_RG</span>&quot;</span> -z <span class="hljs-string">&quot;<span class="hljs-variable">$ZONE</span>&quot;</span> -n link-client \
+  -v &lt;client-vnet-id&gt; -e <span class="hljs-literal">false</span>
+
+<span class="hljs-comment"># 3. 클라이언트에서: 이름이 사설 IP 로 해석되는지 확인한 뒤 평소처럼 kubectl 을 씁니다</span>
+FQDN=$(az aks show -g &lt;rg&gt; -n &lt;cluster&gt; --query privateFqdn -o tsv)
+nslookup <span class="hljs-string">&quot;<span class="hljs-variable">$FQDN</span>&quot;</span>                                    <span class="hljs-comment"># 10.10.1.0/28 안의 주소</span>
+az aks get-credentials -g &lt;rg&gt; -n &lt;cluster&gt; --overwrite-existing \
+  &amp;&amp; kubelogin convert-kubeconfig -l azurecli
+kubectl get nodes</code></pre></div></figure>
+<ul>
+<li><strong>하이브리드 DNS.</strong> 랩탑이나 온프레미스 네트워크는 VNet 에 연결된 존을 쓸 수 없습니다. 사내 DNS 서버에서 이 존의 이름을, 그 존에 연결된 VNet 의 Azure DNS Private Resolver 인바운드 엔드포인트로(또는 그 VNet 에서 <code>168.63.129.16</code> 으로 전달하는 DNS 포워더로) 전달하세요.</li>
+<li>피어링은 전이되지 않습니다. 스포크 VNet 은 허브가 트래픽을 넘겨 줄 때(Azure Firewall, 게이트웨이, 네트워크 가상 어플라이언스)만 AKS VNet 에 닿습니다.</li>
+<li>이 가이드는 <code>snet-aks-apiserver</code> 에 NSG 를 붙이지 않습니다. 붙인다면 클라이언트 네트워크의 TCP 443 도 허용하세요.</li>
+<li>이 구성 요소의 Terraform 리소스: <code>azurerm_virtual_network_peering</code>, <code>azurerm_private_dns_zone_virtual_network_link</code>, <code>azurerm_bastion_host</code>, <code>azurerm_virtual_network_gateway</code>, <code>azurerm_private_dns_resolver</code>.</li>
+</ul>
+<h3 id="99-appendix--f-3-방법-2-private-link-private-endpoint-private-link-service">F-3. 방법 2: Private Link (Private Endpoint → Private Link Service)<a class="anchor" href="#99-appendix--f-3-방법-2-private-link-private-endpoint-private-link-service" aria-label="이 제목 링크">#</a></h3>
+<p>클라이언트를 피어링할 수 없을 때 씁니다. 다른 구독·테넌트이거나 주소 공간이 <code>10.10.0.0/16</code> 과 겹치는 경우입니다. API Server VNet Integration 과 직접 만든 VNet 을 쓰는 프라이빗 클러스터에서 동작하며, <code>05-aks</code> 가 바로 그 구성입니다. 클러스터의 <code>kube-apiserver</code> 내부 로드밸런서 앞에 Private Link Service(PLS)를 두고, 클라이언트 VNet 이 Private Endpoint 로 거기에 연결합니다.</p>
+<figure class="code shell"><figcaption><span class="file">터미널</span><span class="meta">bash · 28줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-bash"><span class="hljs-comment"># AKS 쪽: PLS 용 서브넷을 추가하고(03-network 에는 없음),</span>
+<span class="hljs-comment"># API 서버 로드밸런서 앞에 PLS 를 만듭니다</span>
+az network vnet subnet create -g &lt;network-rg&gt; --vnet-name &lt;aks-vnet&gt; -n snet-pls \
+  --address-prefixes 10.10.4.0/27 --disable-private-link-service-network-policies
+NODE_RG=$(az aks show -g &lt;rg&gt; -n &lt;cluster&gt; --query nodeResourceGroup -o tsv)
+LB_FRONTEND=$(az network lb show -g <span class="hljs-string">&quot;<span class="hljs-variable">$NODE_RG</span>&quot;</span> -n kube-apiserver \
+  --query <span class="hljs-string">&quot;frontendIPConfigurations[0].id&quot;</span> -o tsv)
+az network private-link-service create -g &lt;network-rg&gt; -n pls-aks-apiserver -l &lt;region&gt; \
+  --vnet-name &lt;aks-vnet&gt; --subnet snet-pls --lb-frontend-ip-configs <span class="hljs-string">&quot;<span class="hljs-variable">$LB_FRONTEND</span>&quot;</span>
+
+<span class="hljs-comment"># 클라이언트 쪽: PLS 로 가는 Private Endpoint 와 그 사설 IP</span>
+PLS_ID=$(az network private-link-service show -g &lt;network-rg&gt; -n pls-aks-apiserver --query <span class="hljs-built_in">id</span> -o tsv)
+az network private-endpoint create -g &lt;client-rg&gt; -n pe-aks-apiserver -l &lt;region&gt; \
+  --vnet-name &lt;client-vnet&gt; --subnet &lt;client-subnet&gt; \
+  --private-connection-resource-id <span class="hljs-string">&quot;<span class="hljs-variable">$PLS_ID</span>&quot;</span> --connection-name aks-apiserver
+PE_NIC=$(az network private-endpoint show -g &lt;client-rg&gt; -n pe-aks-apiserver \
+  --query <span class="hljs-string">&quot;networkInterfaces[0].id&quot;</span> -o tsv)
+PE_IP=$(az network nic show --ids <span class="hljs-string">&quot;<span class="hljs-variable">$PE_NIC</span>&quot;</span> \
+  --query <span class="hljs-string">&quot;ipConfigurations[0].privateIPAddress&quot;</span> -o tsv)
+
+<span class="hljs-comment"># 클라이언트 쪽: A 레코드가 Private Endpoint 를 가리키는 프라이빗 DNS 존을 만들고</span>
+<span class="hljs-comment"># 클라이언트 VNet 에 연결합니다. 레코드 이름은 프라이빗 FQDN 의 &lt;label&gt;.&lt;guid&gt; 입니다.</span>
+ZONE=private.&lt;region&gt;.azmk8s.io
+RECORD=$(az aks show -g &lt;rg&gt; -n &lt;cluster&gt; --query privateFqdn -o tsv | <span class="hljs-built_in">cut</span> -d. -f1,2)
+az network private-dns zone create -g &lt;client-rg&gt; -n <span class="hljs-string">&quot;<span class="hljs-variable">$ZONE</span>&quot;</span>
+az network private-dns record-set a add-record -g &lt;client-rg&gt; -z <span class="hljs-string">&quot;<span class="hljs-variable">$ZONE</span>&quot;</span> -n <span class="hljs-string">&quot;<span class="hljs-variable">$RECORD</span>&quot;</span> -a <span class="hljs-string">&quot;<span class="hljs-variable">$PE_IP</span>&quot;</span>
+az network private-dns <span class="hljs-built_in">link</span> vnet create -g &lt;client-rg&gt; -z <span class="hljs-string">&quot;<span class="hljs-variable">$ZONE</span>&quot;</span> -n link-client \
+  -v &lt;client-vnet-id&gt; -e <span class="hljs-literal">false</span></code></pre></div></figure>
+<p>그다음 F-2 처럼 클라이언트 VNet 안의 머신에서 <code>kubectl get nodes</code> 를 실행합니다.</p>
+<ul>
+<li>클라이언트가 다른 구독에 있다면 PLS 에 그 구독 ID 를 추가하거나(<code>--visibility</code>, <code>--auto-approval</code>) PLS 에서 보류 중인 연결을 승인하세요.</li>
+<li>A 레코드는 직접 관리해야 합니다. Private Endpoint 의 IP 가 바뀌면 레코드를 고치세요.</li>
+<li>로드밸런서는 클러스터에 속하므로, 클러스터를 교체하면 새 로드밸런서를 가리키는 PLS 를 새로 만들어야 합니다.</li>
+<li>Terraform 리소스: <code>azurerm_private_link_service</code>, <code>azurerm_private_endpoint</code>, <code>azurerm_private_dns_zone</code>, <code>azurerm_private_dns_a_record</code>. PLS 서브넷에는 <code>private_link_service_network_policies_enabled = false</code> 가 필요하고, 데이터 소스 <code>azurerm_lb</code> 로 <code>kube-apiserver</code> 로드밸런서를 읽을 수 있습니다.</li>
+<li>API Server VNet Integration 을 <strong>쓰지 않는</strong> 프라이빗 클러스터는 다르게 동작합니다. AKS 가 클러스터 VNet 에 Private Endpoint 를 직접 만들고, 다른 VNet 은 피어링 또는 클러스터의 <code>management</code> 하위 리소스에 대한 자기 Private Endpoint 로 연결합니다. 이 가이드는 그 모드를 쓰지 않습니다.</li>
+</ul>
+<h3 id="99-appendix--f-4-네트워크-경로를-얻는-다른-방법">F-4. 네트워크 경로를 얻는 다른 방법<a class="anchor" href="#99-appendix--f-4-네트워크-경로를-얻는-다른-방법" aria-label="이 제목 링크">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>방법</th>
+<th>참고</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>az aks command invoke</code></td>
+<td>네트워크 경로가 필요 없습니다. Azure API 를 거쳐 한 번에 끝나는 명령을 실행합니다(D-3)</td>
+</tr>
+<tr>
+<td>VNet 안의 Cloud Shell</td>
+<td>API 서버에 닿는 VNet 에 Cloud Shell 을 배포합니다. AKS Automatic 이나 노드 리소스 그룹 잠금(lockdown) 클러스터에서는 지원되지 않습니다</td>
+</tr>
+<tr>
+<td>Azure Bastion 네이티브 클라이언트 터널(<code>az aks bastion</code>, 미리 보기)</td>
+<td>네이티브 클라이언트를 켠 Standard 또는 Premium Bastion 과 <code>aks-preview</code> 확장이 필요합니다. AKS Automatic 이나 노드 리소스 그룹 잠금에서는 지원되지 않습니다. Microsoft 의 안내는 관리자 자격 증명을 가져오는데, 이 가이드의 클러스터는 로컬 계정을 꺼 두어 제공하지 않습니다</td>
+</tr>
+</tbody></table>
+</div>
+<h3 id="99-appendix--f-5-연결이-안-될-때">F-5. 연결이 안 될 때<a class="anchor" href="#99-appendix--f-5-연결이-안-될-때" aria-label="이 제목 링크">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>증상</th>
+<th>확인할 것</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>nslookup</code> 이 아무것도 돌려주지 않거나 공인 주소를 돌려줌</td>
+<td>DNS: 존이 클라이언트 네트워크에 연결(또는 전달)되지 않았습니다. 방법 2 라면 A 레코드나 VNet 링크가 빠졌습니다</td>
+</tr>
+<tr>
+<td>이름은 해석되는데 <code>kubectl</code> 이 <code>dial tcp …:443: i/o timeout</code> 으로 끝남</td>
+<td>경로: 피어링 상태 <code>Connected</code>, 게이트웨이 라우트, TCP 443 의 NSG · 방화벽 규칙. 방법 2 라면 Private Endpoint 연결이 <code>Approved</code> 여야 합니다</td>
+</tr>
+<tr>
+<td><code>Unauthorized</code> 또는 <code>Forbidden</code></td>
+<td>네트워크는 정상입니다. ID 를 확인하세요: <code>az login</code>, <code>kubelogin convert-kubeconfig -l azurecli</code>, Azure RBAC 역할(E-9)</td>
+</tr>
+</tbody></table>
+</div>
+<h2 id="99-appendix--g-aks-를-terraform-으로-구성할-때-avm-을-쓸까-말까">G. AKS 를 Terraform 으로 구성할 때: AVM 을 쓸까, 말까<a class="anchor" href="#99-appendix--g-aks-를-terraform-으로-구성할-때-avm-을-쓸까-말까" aria-label="이 제목 링크">#</a></h2>
+<p><strong>결론부터.</strong> 이 가이드는 모든 설정이 한눈에 보이고 Azure 없이 <code>terraform test</code> 로 검증할 수 있도록 <code>azurerm_kubernetes_cluster</code> 를 직접 씁니다. <a href="https://azure.github.io/Azure-Verified-Modules/" target="_blank" rel="noopener noreferrer">Azure Verified Modules(AVM)</a>는 공통 인터페이스를 가진, Microsoft 가 뒷받침하는 Terraform 모듈이며 AKS 용은 <code>Azure/avm-res-containerservice-managedcluster/azurerm</code> 입니다. 여러 팀이 같은 방식으로 클러스터를 만들어야 하고 버전 업그레이드를 감당할 수 있다면 AVM 을, 학습이나 소수의 클러스터이거나 완전한 통제와 적은 의존성을 원한다면 직접 리소스를 쓰세요. 2026-10-14 기준 AKS 모듈은 아직 0.x 라서 마이너 버전 사이에도 파괴적 변경이 있을 수 있습니다.</p>
+<h3 id="99-appendix--g-1-aks-avm-모듈-현황">G-1. AKS AVM 모듈 현황<a class="anchor" href="#99-appendix--g-1-aks-avm-모듈-현황" aria-label="이 제목 링크">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>2026-10-14 기준</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>모듈</td>
+<td><code>Azure/avm-res-containerservice-managedcluster/azurerm</code> (<a href="https://registry.terraform.io/modules/Azure/avm-res-containerservice-managedcluster/azurerm/latest" target="_blank" rel="noopener noreferrer">Registry</a>, <a href="https://github.com/Azure/terraform-azurerm-avm-res-containerservice-managedcluster" target="_blank" rel="noopener noreferrer">GitHub</a>)</td>
+</tr>
+<tr>
+<td>최신 버전</td>
+<td>0.8.4(2026-10-08 게시). 아직 1.0 미만입니다. AVM 명세는 이런 모듈의 마이너 릴리스에서 파괴적 변경을 허용하지만, AVM FAQ 는 프로덕션에서 써도 된다고 설명합니다</td>
+</tr>
+<tr>
+<td>요구 사항</td>
+<td>Terraform <code>&gt;= 1.11, &lt; 2.0</code>, provider AzAPI <code>~&gt; 2.12</code> · <code>modtm</code> <code>~&gt; 0.3</code> · <code>random</code> <code>&gt;= 3.5, &lt; 4.0</code>. <strong>azurerm 은 없습니다</strong></td>
+</tr>
+<tr>
+<td>입력</td>
+<td>AKS ARM API 모양(<code>api_server_access_profile</code>, <code>network_profile</code>, <code>agent_pools</code> 등)에 공통 AVM 인터페이스(<code>lock</code>, <code>role_assignments</code>, <code>diagnostic_settings</code>, <code>private_endpoints</code>, <code>managed_identities</code>, <code>tags</code>, <code>enable_telemetry</code>)가 더해집니다</td>
+</tr>
+<tr>
+<td>예제</td>
+<td><code>default</code>, <code>private</code>, <code>secure-baseline-private-cluster</code>, <code>waf-aligned</code>, <code>automatic</code>, <code>automatic-private</code> 등</td>
+</tr>
+<tr>
+<td>이 가이드와의 관계</td>
+<td>요구 버전이 이 가이드의 고정 버전(Terraform <code>~&gt; 1.16</code>, AzAPI <code>~&gt; 2.13</code>)과 호환되고, <code>05-aks</code> 가 설정하는 항목(Entra ID · Azure RBAC, API Server VNet Integration, Azure CNI Overlay + Cilium, kubelet ID, 노드 풀, 유지 관리 창, KEDA · VPA, Managed Prometheus, Container Insights)에 해당하는 입력이 있습니다. 이 입력들로 AzAPI 2.13.0 에서 <code>terraform init</code>, <code>validate</code>, <code>plan</code> 이 성공했고 모듈을 <code>apply</code> 하지는 않았습니다</td>
+</tr>
+</tbody></table>
+</div>
+<h3 id="99-appendix--g-2-장단점">G-2. 장단점<a class="anchor" href="#99-appendix--g-2-장단점" aria-label="이 제목 링크">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>비교 항목</th>
+<th>AVM 사용</th>
+<th>직접 리소스 (이 가이드)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>시작</td>
+<td>필수 입력 3개(<code>name</code>, <code>location</code>, <code>parent_id</code>). 프라이빗 · WAF 정렬 · 보안 베이스라인 클러스터 예제와 테스트가 모듈에 포함됩니다</td>
+<td>블록을 전부 직접 쓰지만 클러스터 전체가 파일 하나(<code>cluster.tf</code>)에서 읽힙니다</td>
+</tr>
+<tr>
+<td>표준화</td>
+<td>모든 AVM 모듈과 같은 인터페이스 · 규약. 팀 사이에 하나의 베이스라인</td>
+<td>직접 정한 규약을 직접 유지</td>
+</tr>
+<tr>
+<td>새 기능</td>
+<td>AzAPI 가 ARM 본문을 그대로 보내므로 모듈이 노출하는 즉시 속성을 쓸 수 있고 azurerm 을 기다리지 않습니다. <code>05-aks</code> 가 AzAPI 로 켜는 관리형 Gateway API 는 이미 입력(<code>ingress_profile.gateway_api</code>)이 있지만 컨트롤 플레인 메트릭은 없어서(0.8.4) 그 부분은 여전히 <code>azapi_update_resource</code> 를 추가해야 합니다</td>
+<td>azurerm 을 기다리거나 <code>05-aks</code> 처럼 <code>azapi_update_resource</code> 를 추가(<code>gateway-api.tf</code>, <code>monitoring.tf</code>)</td>
+</tr>
+<tr>
+<td>안정성</td>
+<td><strong>0.x: 마이너 릴리스에서 깨질 수 있습니다.</strong> 이 모듈은 azurerm 에서 AzAPI 로 바뀌며 많은 입력이 삭제 · 이름 변경되었고(<a href="https://github.com/Azure/terraform-azurerm-avm-res-containerservice-managedcluster/blob/main/UPGRADE.md" target="_blank" rel="noopener noreferrer">UPGRADE.md</a>), 0.8.0 으로 올릴 때는 private endpoint 에 <code>state rm</code> 과 <code>import</code> 를 손으로 해야 합니다(<a href="https://github.com/Azure/terraform-azurerm-avm-res-containerservice-managedcluster/blob/main/MIGRATION.md" target="_blank" rel="noopener noreferrer">MIGRATION.md</a>)</td>
+<td>provider 업그레이드(예: azurerm 5.0)만, 시점은 내가 정함</td>
+</tr>
+<tr>
+<td>디버깅</td>
+<td>ARM 모양의 큰 객체라 AKS REST 구조를 알아야 하고(azurerm 의 <code>only_critical_addons_enabled</code> 는 여기서 <code>node_taints</code> 항목입니다) 오류가 <code>.terraform/modules</code> 안을 가리킵니다. 모듈 자체의 변수 규칙이 잘못된 값 여럿을 <code>plan</code> 에서 거부합니다(확인: <code>sku.tier</code>, <code>os_sku</code>, <code>network_policy</code>, <code>os_disk_size_gb</code>)</td>
+<td>리소스 주소가 단순하고 azurerm 방식의 인자를 씁니다. azurerm 5.9 는 잘못된 <code>os_sku</code> 와 <code>network_policy</code> 를 <code>validate</code> 에서 받아들였으므로 Azure 가 <code>apply</code> 에서 거부합니다</td>
+</tr>
+<tr>
+<td>지원</td>
+<td>버그는 모듈의 GitHub 이슈로 접수하며 응답 시간은 정해져 있지 않습니다(AVM 은 2026-10-13 에 Azure engineering 으로 이관, <a href="https://azure.github.io/Azure-Verified-Modules/help-support/module-support/" target="_blank" rel="noopener noreferrer">Module Support</a> 참고). 플랫폼 문제는 Azure 지원으로</td>
+<td>나 자신과 azurerm provider 커뮤니티</td>
+</tr>
+<tr>
+<td>의존성</td>
+<td><code>modtm</code> · <code>random</code> provider 와 <code>avm-utl-interfaces</code> 모듈이 추가되고 AzAPI 가 필수가 됩니다(오프라인이면 모두 미러링)</td>
+<td>azurerm, 필요한 곳에만 AzAPI</td>
+</tr>
+<tr>
+<td>데이터 수집</td>
+<td>텔레메트리가 기본 켜짐(<code>modtm</code> 이 구독 ID · 테넌트 ID · 모듈 버전을 전송). <code>enable_telemetry = false</code> 로 끔(<a href="https://azure.github.io/Azure-Verified-Modules/help-support/telemetry/" target="_blank" rel="noopener noreferrer">AVM telemetry</a>)</td>
+<td>없음</td>
+</tr>
+<tr>
+<td>테스트</td>
+<td>모듈에 대한 plan 전용 <code>terraform test</code> 가 Azure 자격 증명도 mock 도 없이 실행되었습니다(0.8.4). 내 입력을 테스트하는 것이지 모듈 내부를 테스트하는 것은 아닙니다</td>
+<td><code>mock_provider &quot;azurerm&quot;</code> 하나로 오프라인에서 전부 검증(이 가이드처럼)</td>
+</tr>
+<tr>
+<td>이관</td>
+<td><code>azurerm_kubernetes_cluster</code> 로 만든 클러스터는 모듈의 <code>azapi_resource</code>(다른 리소스 타입)로 <code>import</code> 해야 하고, plan 에 교체가 없어야 합니다</td>
+<td>옮길 것 없음</td>
+</tr>
+</tbody></table>
+</div>
+<h3 id="99-appendix--g-3-어떻게-고를까">G-3. 어떻게 고를까<a class="anchor" href="#99-appendix--g-3-어떻게-고를까" aria-label="이 제목 링크">#</a></h3>
+<ul>
+<li><strong>AVM 을 쓰세요</strong>: 여러 클러스터나 팀이 하나의 베이스라인(잠금 · 진단 · RBAC · private endpoint 를 같은 모양으로)을 따라야 할 때, <code>secure-baseline-private-cluster</code> 같은 Microsoft 가 관리하는 예제를 출발점으로 삼고 싶을 때, 버전을 고정하고 업그레이드마다 검토할 수 있을 때.</li>
+<li><strong>직접 리소스를 쓰세요</strong>: 학습 · PoC, 소수의 클러스터, 모든 설정을 오프라인으로 보고 테스트해야 할 때, 0.x 의 파괴적 변경 · 추가 provider · 텔레메트리를 받아들일 수 없을 때.</li>
+<li><strong>중간 길</strong>: 리소스를 내 모듈로 감싸고(이 가이드의 <code>modules/naming</code> 처럼) AVM 의 인터페이스 규약과 예제를 빌려 오며, AKS 모듈이 1.0 이 되면 다시 검토하세요. 예전 커뮤니티 모듈 <code>Azure/aks/azurerm</code> 은 보관(archived)되어 AVM 모듈로 안내하므로 새 작업의 &quot;AVM 없는&quot; 선택지가 아닙니다.</li>
+<li><strong>AVM 을 도입한다면</strong>: 정확한 버전으로 고정하고(<code>version = &quot;0.8.4&quot;</code>, 범위 지정 금지), 올릴 때마다 릴리스 노트 · <code>UPGRADE.md</code> · <code>MIGRATION.md</code> 를 읽고, 먼저 state 복사본에 <code>terraform plan</code> 을 돌려 보세요. 이 가이드의 구성이라면 <code>05-aks</code> 의 클러스터 리소스만 바꾸고 <code>03-network</code> 와 <code>04-platform</code> 은 그대로 둘 수 있습니다.</li>
+</ul>
+<h2 id="99-appendix--h-참고-자료">H. 참고 자료<a class="anchor" href="#99-appendix--h-참고-자료" aria-label="이 제목 링크">#</a></h2>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -12103,8 +12526,12 @@ kubectl delete namespace practice     <span class="hljs-comment"># 안의 모든
 <td><a href="https://learn.microsoft.com/azure/aks/supported-kubernetes-versions" target="_blank" rel="noopener noreferrer">Supported Kubernetes versions</a>, <a href="https://github.com/Azure/AKS/releases" target="_blank" rel="noopener noreferrer">AKS 릴리스 노트</a></td>
 </tr>
 <tr>
+<td>프라이빗 클러스터 접속 (F)</td>
+<td><a href="https://learn.microsoft.com/azure/aks/private-clusters" target="_blank" rel="noopener noreferrer">Create a private AKS cluster</a>, <a href="https://learn.microsoft.com/azure/aks/private-cluster-connect" target="_blank" rel="noopener noreferrer">Establish network connectivity to a private AKS cluster</a>, <a href="https://learn.microsoft.com/azure/aks/api-server-vnet-integration" target="_blank" rel="noopener noreferrer">API Server VNet Integration</a>, <a href="https://learn.microsoft.com/azure/aks/private-apiserver-vnet-integration-cluster" target="_blank" rel="noopener noreferrer">Private Link with API Server VNet Integration</a>, <a href="https://learn.microsoft.com/azure/bastion/bastion-connect-to-aks-private-cluster" target="_blank" rel="noopener noreferrer">Azure Bastion 으로 연결</a></td>
+</tr>
+<tr>
 <td>Terraform</td>
-<td><a href="https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/5.0-upgrade-guide" target="_blank" rel="noopener noreferrer">azurerm 5.0 업그레이드 가이드</a>, <a href="https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster" target="_blank" rel="noopener noreferrer"><code>azurerm_kubernetes_cluster</code></a>, <a href="https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_automatic_cluster" target="_blank" rel="noopener noreferrer"><code>azurerm_kubernetes_automatic_cluster</code></a>, <a href="https://registry.terraform.io/providers/Azure/azapi/latest/docs" target="_blank" rel="noopener noreferrer">AzAPI</a>, <a href="https://azure.github.io/Azure-Verified-Modules/" target="_blank" rel="noopener noreferrer">AVM</a></td>
+<td><a href="https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/5.0-upgrade-guide" target="_blank" rel="noopener noreferrer">azurerm 5.0 업그레이드 가이드</a>, <a href="https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster" target="_blank" rel="noopener noreferrer"><code>azurerm_kubernetes_cluster</code></a>, <a href="https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_automatic_cluster" target="_blank" rel="noopener noreferrer"><code>azurerm_kubernetes_automatic_cluster</code></a>, <a href="https://registry.terraform.io/providers/Azure/azapi/latest/docs" target="_blank" rel="noopener noreferrer">AzAPI</a>, <a href="https://azure.github.io/Azure-Verified-Modules/" target="_blank" rel="noopener noreferrer">AVM</a>, <a href="https://registry.terraform.io/modules/Azure/avm-res-containerservice-managedcluster/azurerm/latest" target="_blank" rel="noopener noreferrer">AKS 용 AVM 모듈</a></td>
 </tr>
 <tr>
 <td>Microsoft 공식 Terraform 샘플</td>
@@ -12116,7 +12543,7 @@ kubectl delete namespace practice     <span class="hljs-comment"># 안의 모든
 </tr>
 </tbody></table>
 </div>
-<h2 id="99-appendix--g-terraform-파일-전체-목록-어느-lab-에-있나">G. Terraform 파일 전체 목록 (어느 Lab 에 있나)<a class="anchor" href="#99-appendix--g-terraform-파일-전체-목록-어느-lab-에-있나" aria-label="이 제목 링크">#</a></h2>
+<h2 id="99-appendix--i-terraform-파일-전체-목록-어느-lab-에-있나">I. Terraform 파일 전체 목록 (어느 Lab 에 있나)<a class="anchor" href="#99-appendix--i-terraform-파일-전체-목록-어느-lab-에-있나" aria-label="이 제목 링크">#</a></h2>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -12173,13 +12600,13 @@ kubectl delete namespace practice     <span class="hljs-comment"># 안의 모든
 <tr>
 <td><code>mocks</code></td>
 <td><code>azurerm.tfmock.hcl</code></td>
-<td>아래 F</td>
+<td>아래 J</td>
 </tr>
 </tbody></table>
 </div>
 <aside class="callout note"><div class="callout-title"><span>ℹ️</span><span>참고</span></div><p>모든 스택은 같은 파일 구성(<code>versions.tf</code> → <code>providers.tf</code> → <code>variables.tf</code> → <code>main.tf</code> → 주제별 파일 → <code>outputs.tf</code>)을 따릅니다. 파일을 한 곳에 모아 보고 싶다면 이 HTML 의 검색창에 파일 이름(예: <code>cluster.tf</code>)을 입력하세요.</p>
 </aside>
-<h2 id="99-appendix--h-테스트도구-코드-전체">H. 테스트/도구 코드 전체<a class="anchor" href="#99-appendix--h-테스트도구-코드-전체" aria-label="이 제목 링크">#</a></h2>
+<h2 id="99-appendix--j-테스트도구-코드-전체">J. 테스트/도구 코드 전체<a class="anchor" href="#99-appendix--j-테스트도구-코드-전체" aria-label="이 제목 링크">#</a></h2>
 <p>각 스택의 <code>tests/plan.tftest.hcl</code> 은 해당 Lab 의 코드 섹션에 있습니다. 공통 mock 값과 전체 검증 스크립트는 아래와 같습니다.</p>
 <p><strong><code>terraform/mocks/azurerm.tfmock.hcl</code></strong> — 모든 스택의 mock 테스트가 공유하는 azurerm 모의 값</p>
 <figure class="code collapsed"><figcaption><span class="file">terraform/mocks/azurerm.tfmock.hcl</span><span class="meta">hcl · 221줄</span><button class="copy" type="button">복사</button></figcaption><div class="code-body"><pre><code class="hljs language-hcl"><span class="hljs-comment"># Mock values for the azurerm provider, for use with terraform test.</span>
@@ -12485,7 +12912,7 @@ terraform.tfvars
 
 # Committing .terraform.lock.hcl is recommended (it pins provider versions/checksums).
 # At first, check the file that terraform init created, then add the checksums of other OSes with `terraform providers lock -platform=linux_amd64 -platform=darwin_arm64 -platform=windows_amd64`.</code></pre></div></figure>
-<h2 id="99-appendix--i-검증-정리-스크립트">I. 검증 · 정리 스크립트<a class="anchor" href="#99-appendix--i-검증-정리-스크립트" aria-label="이 제목 링크">#</a></h2>
+<h2 id="99-appendix--k-검증-정리-스크립트">K. 검증 · 정리 스크립트<a class="anchor" href="#99-appendix--k-검증-정리-스크립트" aria-label="이 제목 링크">#</a></h2>
 <p>실습 중 손으로 치던 확인/삭제 명령을 스크립트로 묶었습니다. 모두 저장소 루트의 <code>scripts/</code> 에 있으며 macOS · Linux · WSL · Azure Cloud Shell(bash)에서 동작합니다(필요: <code>terraform</code>, <code>az</code>, <code>jq</code>, 그리고 05 이후는 <code>kubectl</code>, <code>kubelogin</code>).</p>
 <div class="table-wrap"><table>
 <thead>
@@ -12530,7 +12957,7 @@ terraform.tfvars
 <td><code>tools/validate-all.sh</code></td>
 <td>코드를 고친 뒤</td>
 <td><code>fmt</code> · <code>validate</code> · <code>terraform test</code> (구독 불필요) + 스크립트 문법 검사</td>
-<td>위 F</td>
+<td>위 J</td>
 </tr>
 </tbody></table>
 </div>

@@ -326,7 +326,7 @@ summary
 <!-- /tf:include -->
 
 > [!NOTE]
-> The common functions shared by the scripts (`scripts/lib/common.sh`) are in [Appendix I](99-appendix.md). All the verification scripts report their results in the same format: `✓ passed / ✗ failed / ! warnings / - skipped`.
+> The common functions shared by the scripts (`scripts/lib/common.sh`) are in [Appendix K](99-appendix.md). All the verification scripts report their results in the same format: `✓ passed / ✗ failed / ! warnings / - skipped`.
 
 ## 7. Repository structure
 

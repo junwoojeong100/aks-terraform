@@ -1470,7 +1470,7 @@ kubectl get nodes -L kubernetes.azure.com/scalesetpriority    # 파드가 스케
 
 ### (b) 완전 프라이빗 클러스터로 전환
 
-`terraform plan -var enable_private_cluster=true` 를 실행해 보세요. `private_cluster_enabled` 는 **변경 시 클러스터 재생성(forces replacement)** 입니다. 운영에서는 처음부터 결정해야 하며, 프라이빗이면 `kubectl`/Terraform kubernetes provider 는 VNet 내부(VPN, Bastion, 점프 호스트)에서만 접근할 수 있습니다. 임시 점검은 `az aks command invoke` 로 가능합니다.
+`terraform plan -var enable_private_cluster=true` 를 실행해 보세요. `private_cluster_enabled` 는 **변경 시 클러스터 재생성(forces replacement)** 입니다. 운영에서는 처음부터 결정해야 하며, 프라이빗이면 `kubectl`/Terraform kubernetes provider 는 VNet 내부(VPN, Bastion, 점프 호스트)에서만 접근할 수 있습니다. 임시 점검은 `az aks command invoke` 로 가능합니다. 네트워크 경로를 얻는 두 가지 방법(사설 IP 직접 접속, Private Link)은 [부록 F](99-appendix.md) 에 있습니다.
 
 ```bash
 az aks command invoke -g <rg> -n <cluster> --command "kubectl get pods -A"

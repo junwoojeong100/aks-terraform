@@ -43,7 +43,7 @@ Each lab is an independent Terraform stack, and every piece of code in the docs 
 | [09](labs/09-operations.md) | Day-2 operations | Upgrades, scaling, node replacement, testing/CI (workload operations with kubectl: Appendix E) |
 | [10](labs/10-aks-automatic.md) | AKS Automatic | The fully managed mode, equivalent to EKS Auto Mode |
 | [11](labs/11-cleanup.md) | Cleanup | `destroy` in reverse order, Key Vault soft-delete, cost check |
-| [99](labs/99-appendix.md) | Appendix | Troubleshooting, production checklist, **cluster access and internet exposure (D)**, **handling Kubernetes workloads with kubectl (E)**, references, test code |
+| [99](labs/99-appendix.md) | Appendix | Troubleshooting, production checklist, **cluster access and internet exposure (D)**, **handling Kubernetes workloads with kubectl (E)**, **reaching the API server over a private network (F)**, **Terraform with or without AVM (G)**, references, test code |
 
 ## Architecture overview
 

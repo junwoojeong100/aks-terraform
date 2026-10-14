@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 960 632" width="960" height="632" role="img" aria-labelledby="private-api-access-t private-api-access-d"><title id="private-api-access-t">프라이빗 API 서버에 접속하는 2가지 방법</title><desc id="private-api-access-d">방법 1 은 클라이언트(점프 호스트, 피어링된 VNet 의 러너, VPN 이나 ExpressRoute 로 연결한 노트북)를 snet-aks-apiserver 에 있는 API 서버 로드밸런서의 사설 IP 로 연결한다. 방법 2 는 클라이언트 VNet 에 Private Endpoint 를 만들어 같은 로드밸런서 앞의 Private Link Service 에 연결한다. 두 방법 모두 프라이빗 FQDN 을 해석할 DNS 가 필요하다.</desc><style>svg.dg{--dg-bg:#ffffff;--dg-fg:#1f2328;--dg-muted:#59636e;--dg-line:#6e7781;--dg-card:#f6f8fa;--dg-border:#d1d9e0;--dg-aws:#c2590a;--dg-aws-soft:#fff1e5;--dg-azure:#0b6ed0;--dg-azure-soft:#e5f1ff;--dg-ok:#1a7f37;--dg-ok-soft:#e6f6ea;--dg-id:#8250df;--dg-id-soft:#f3ecff;--dg-net:#0e7490;--dg-net-soft:#e0f4f8;--dg-warn:#9a6700;--dg-warn-soft:#fff6d6;--dg-danger:#cf222e;--dg-danger-soft:#ffebe9;font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", "Segoe UI", Roboto, sans-serif}
+@media (prefers-color-scheme:dark){svg.dg{--dg-bg:#0d1117;--dg-fg:#e6edf3;--dg-muted:#9198a1;--dg-line:#8b949e;--dg-card:#151b23;--dg-border:#30363d;--dg-aws:#f0883e;--dg-aws-soft:#2b1c10;--dg-azure:#58a6ff;--dg-azure-soft:#0f2238;--dg-ok:#3fb950;--dg-ok-soft:#0f2417;--dg-id:#b392f0;--dg-id-soft:#221a36;--dg-net:#39c5cf;--dg-net-soft:#0d2a2f;--dg-warn:#d29922;--dg-warn-soft:#2d2208;--dg-danger:#ff7b72;--dg-danger-soft:#3a1517}}
+.dg-bg{fill:var(--dg-bg)}
+.dg-t{fill:var(--dg-fg)}
+.dg-m{fill:var(--dg-muted)}
+.dg-b{font-weight:650}
+.dg-box,.dg-grp,.dg-chip{stroke-width:1.4}
+.dg-box{fill:var(--dg-card);stroke:var(--dg-border)}
+.dg-grp{fill:none;stroke:var(--dg-border)}
+.dg-dash{stroke-dasharray:6 4}
+.dg-chip{fill:var(--dg-bg);stroke:none}
+.dg-line{fill:none;stroke:var(--dg-line);stroke-width:1.8}
+.dg-ah{fill:var(--dg-line)}
+.dg-box.dg-aws{fill:var(--dg-aws-soft);stroke:var(--dg-aws)}
+.dg-grp.dg-aws{stroke:var(--dg-aws)}
+.dg-fill-aws{fill:var(--dg-aws)}
+.dg-tx-aws{fill:var(--dg-aws)}
+.dg-line.dg-aws{stroke:var(--dg-aws)}
+.dg-ah.dg-aws{fill:var(--dg-aws)}
+.dg-box.dg-azure{fill:var(--dg-azure-soft);stroke:var(--dg-azure)}
+.dg-grp.dg-azure{stroke:var(--dg-azure)}
+.dg-fill-azure{fill:var(--dg-azure)}
+.dg-tx-azure{fill:var(--dg-azure)}
+.dg-line.dg-azure{stroke:var(--dg-azure)}
+.dg-ah.dg-azure{fill:var(--dg-azure)}
+.dg-box.dg-ok{fill:var(--dg-ok-soft);stroke:var(--dg-ok)}
+.dg-grp.dg-ok{stroke:var(--dg-ok)}
+.dg-fill-ok{fill:var(--dg-ok)}
+.dg-tx-ok{fill:var(--dg-ok)}
+.dg-line.dg-ok{stroke:var(--dg-ok)}
+.dg-ah.dg-ok{fill:var(--dg-ok)}
+.dg-box.dg-id{fill:var(--dg-id-soft);stroke:var(--dg-id)}
+.dg-grp.dg-id{stroke:var(--dg-id)}
+.dg-fill-id{fill:var(--dg-id)}
+.dg-tx-id{fill:var(--dg-id)}
+.dg-line.dg-id{stroke:var(--dg-id)}
+.dg-ah.dg-id{fill:var(--dg-id)}
+.dg-box.dg-net{fill:var(--dg-net-soft);stroke:var(--dg-net)}
+.dg-grp.dg-net{stroke:var(--dg-net)}
+.dg-fill-net{fill:var(--dg-net)}
+.dg-tx-net{fill:var(--dg-net)}
+.dg-line.dg-net{stroke:var(--dg-net)}
+.dg-ah.dg-net{fill:var(--dg-net)}
+.dg-box.dg-warn{fill:var(--dg-warn-soft);stroke:var(--dg-warn)}
+.dg-grp.dg-warn{stroke:var(--dg-warn)}
+.dg-fill-warn{fill:var(--dg-warn)}
+.dg-tx-warn{fill:var(--dg-warn)}
+.dg-line.dg-warn{stroke:var(--dg-warn)}
+.dg-ah.dg-warn{fill:var(--dg-warn)}
+.dg-box.dg-danger{fill:var(--dg-danger-soft);stroke:var(--dg-danger)}
+.dg-grp.dg-danger{stroke:var(--dg-danger)}
+.dg-fill-danger{fill:var(--dg-danger)}
+.dg-tx-danger{fill:var(--dg-danger)}
+.dg-line.dg-danger{stroke:var(--dg-danger)}
+.dg-ah.dg-danger{fill:var(--dg-danger)}
+.dg-on{fill:#fff}</style><defs><marker id="private-api-access-ah-line" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah"/></marker><marker id="private-api-access-ah-net" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-net"/></marker><marker id="private-api-access-ah-ok" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-ok"/></marker><marker id="private-api-access-ah-azure" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-azure"/></marker><marker id="private-api-access-ah-id" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-id"/></marker><marker id="private-api-access-ah-warn" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-ah dg-warn"/></marker></defs><rect width="960" height="632" class="dg-bg" rx="12"/>
+<text x="24" y="32" font-size="18" class="dg-t dg-b">프라이빗 API 서버에 접속하는 2가지 방법</text>
+<text x="24" y="54" font-size="12.5" class="dg-m">API 서버는 사설 IP 로만 열립니다(enable_private_cluster = true). 두 방법은 클라이언트가 그 IP 에 닿는 경로가 다릅니다.</text>
+<rect x="24" y="88" width="912" height="200" rx="14" class="dg-grp dg-net"/>
+<text x="38" y="108" font-size="12.5" class="dg-tx-net dg-b" data-w="884">① 사설 IP 로 직접 접속 · 같은 VNet · 피어링 · VPN / ExpressRoute</text>
+<rect x="40" y="118" width="236" height="48" rx="10" class="dg-box"/>
+<text x="50" y="138.5" font-size="12.5" class="dg-t dg-b" data-w="216">점프 호스트 VM + Bastion</text>
+<text x="50" y="155" font-size="11" class="dg-m" data-w="216">AKS VNet 안, 공인 IP 없음</text>
+<rect x="40" y="172" width="236" height="48" rx="10" class="dg-box"/>
+<text x="50" y="192.5" font-size="12.5" class="dg-t dg-b" data-w="216">자체 호스팅 러너 · VM</text>
+<text x="50" y="209" font-size="11" class="dg-m" data-w="216">피어링된 VNet(허브 · 운영)</text>
+<rect x="40" y="226" width="236" height="48" rx="10" class="dg-box"/>
+<text x="50" y="246.5" font-size="12.5" class="dg-t dg-b" data-w="216">노트북 · 온프레미스</text>
+<text x="50" y="263" font-size="11" class="dg-m" data-w="216">VPN 또는 ExpressRoute 로</text>
+<rect x="330" y="118" width="268" height="156" rx="10" class="dg-box dg-net"/>
+<text x="342" y="141" font-size="13" class="dg-t dg-b" data-w="244">사설 IP 까지의 네트워크 경로</text>
+<text x="342" y="158" font-size="11.5" class="dg-m" data-w="244">같은 VNet · VNet 피어링</text>
+<text x="342" y="174.5" font-size="11.5" class="dg-m" data-w="244">VPN 게이트웨이 · ExpressRoute</text>
+<text x="342" y="191" font-size="11.5" class="dg-m" data-w="244">주소 공간이 겹치면 안 됩니다</text>
+<text x="342" y="207.5" font-size="11.5" class="dg-m" data-w="244">피어링은 전이되지 않습니다</text>
+<text x="342" y="224" font-size="11.5" class="dg-m" data-w="244">NSG · 방화벽: TCP 443 허용</text>
+<rect x="660" y="118" width="260" height="156" rx="10" class="dg-box dg-ok"/>
+<text x="672" y="141" font-size="13" class="dg-t dg-b" data-w="236">snet-aks-apiserver</text>
+<text x="672" y="158" font-size="11.5" class="dg-m" data-w="236">10.10.1.0/28 (위임)</text>
+<text x="672" y="174.5" font-size="11.5" class="dg-m" data-w="236">내부 로드밸런서(ILB)</text>
+<text x="672" y="191" font-size="11.5" class="dg-m" data-w="236">사설 IP · 443 포트</text>
+<text x="672" y="207.5" font-size="11.5" class="dg-m" data-w="236">공용 엔드포인트 없음</text>
+<text x="672" y="224" font-size="11.5" class="dg-m" data-w="236">Authorized IP 범위는 적용되지 않음</text>
+<path d="M276 142 L330 142" class="dg-line dg-net" marker-end="url(#private-api-access-ah-net)"/>
+<path d="M276 196 L330 196" class="dg-line dg-net" marker-end="url(#private-api-access-ah-net)"/>
+<path d="M276 250 L330 250" class="dg-line dg-net" marker-end="url(#private-api-access-ah-net)"/>
+<path d="M598 196 L660 196" class="dg-line dg-ok" marker-end="url(#private-api-access-ah-ok)"/>
+<rect x="24" y="304" width="912" height="204" rx="14" class="dg-grp dg-azure"/>
+<text x="38" y="324" font-size="12.5" class="dg-tx-azure dg-b" data-w="884">② Private Link 로 접속 · Private Endpoint → Private Link Service</text>
+<rect x="40" y="336" width="400" height="160" rx="14" class="dg-grp"/>
+<text x="54" y="356" font-size="12" class="dg-m dg-b" data-w="372">클라이언트 VNet (다른 구독 · 테넌트)</text>
+<rect x="52" y="366" width="170" height="118" rx="10" class="dg-box"/>
+<text x="62" y="386.5" font-size="12.5" class="dg-t dg-b" data-w="150">클라이언트 VM · 러너</text>
+<text x="62" y="403" font-size="11" class="dg-m" data-w="150">주소 공간이 겹쳐도</text>
+<text x="62" y="419" font-size="11" class="dg-m" data-w="150">상관없음</text>
+<text x="62" y="435" font-size="11" class="dg-m" data-w="150">피어링 불필요</text>
+<rect x="258" y="366" width="170" height="118" rx="10" class="dg-box dg-net"/>
+<text x="268" y="386.5" font-size="12.5" class="dg-t dg-b" data-w="150">Private Endpoint</text>
+<text x="268" y="403" font-size="11" class="dg-m" data-w="150">클라이언트 서브넷의</text>
+<text x="268" y="419" font-size="11" class="dg-m" data-w="150">사설 IP. 직접 만든</text>
+<text x="268" y="435" font-size="11" class="dg-m" data-w="150">DNS 존의 A 레코드가</text>
+<text x="268" y="451" font-size="11" class="dg-m" data-w="150">이 IP 를 가리킴</text>
+<rect x="520" y="336" width="404" height="160" rx="14" class="dg-grp"/>
+<text x="534" y="356" font-size="12" class="dg-m dg-b" data-w="376">AKS VNet 10.10.0.0/16</text>
+<rect x="532" y="366" width="176" height="118" rx="10" class="dg-box dg-net"/>
+<text x="542" y="386.5" font-size="12.5" class="dg-t dg-b" data-w="156">snet-pls (new)</text>
+<text x="542" y="403" font-size="11" class="dg-m" data-w="156">Private Link Service</text>
+<text x="542" y="419" font-size="11" class="dg-m" data-w="156">API 서버 로드밸런서</text>
+<text x="542" y="435" font-size="11" class="dg-m" data-w="156">앞단에 연결</text>
+<rect x="744" y="366" width="168" height="118" rx="10" class="dg-box dg-ok"/>
+<text x="754" y="386.5" font-size="12.5" class="dg-t dg-b" data-w="148">API 서버</text>
+<text x="754" y="403" font-size="11" class="dg-m" data-w="148">kube-apiserver ILB</text>
+<text x="754" y="419" font-size="11" class="dg-m" data-w="148">snet-aks-apiserver</text>
+<text x="754" y="435" font-size="11" class="dg-m" data-w="148">사설 IP · 443 포트</text>
+<path d="M222 425 L258 425" class="dg-line dg-net" marker-end="url(#private-api-access-ah-net)"/>
+<path d="M428 425 L532 425" class="dg-line dg-azure" marker-end="url(#private-api-access-ah-azure)"/>
+<rect x="432.5" y="415" width="95" height="20" rx="6" class="dg-chip"/>
+<text x="480" y="429" font-size="11.5" text-anchor="middle" class="dg-tx-azure dg-b">Private Link</text>
+<path d="M708 425 L744 425" class="dg-line dg-ok" marker-end="url(#private-api-access-ah-ok)"/>
+<rect x="24" y="524" width="588" height="92" rx="10" class="dg-box dg-id"/>
+<text x="36" y="547" font-size="13" class="dg-t dg-b" data-w="564">DNS: 클라이언트가 프라이빗 FQDN 을 해석해야 합니다</text>
+<text x="36" y="564" font-size="11.5" class="dg-m" data-w="564">① 클러스터의 프라이빗 DNS 존을 클라이언트 VNet 에 연결하거나</text>
+<text x="36" y="580.5" font-size="11.5" class="dg-m" data-w="564">Azure DNS Private Resolver 로 전달</text>
+<text x="36" y="597" font-size="11.5" class="dg-m" data-w="564">② 직접 만든 존 + Private Endpoint IP 를 가리키는 A 레코드</text>
+<rect x="632" y="524" width="304" height="92" rx="10" class="dg-box dg-warn"/>
+<text x="644" y="547" font-size="13" class="dg-t dg-b" data-w="280">아직 네트워크 경로가 없다면?</text>
+<text x="644" y="564" font-size="11.5" class="dg-m" data-w="280">az aks command invoke</text>
+<text x="644" y="580.5" font-size="11.5" class="dg-m" data-w="280">Azure API 를 거쳐 실행,</text>
+<text x="644" y="597" font-size="11.5" class="dg-m" data-w="280">한 번에 끝나는 명령만 (D-3)</text>
+</svg>

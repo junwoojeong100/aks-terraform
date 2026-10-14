@@ -1470,7 +1470,7 @@ kubectl get nodes -L kubernetes.azure.com/scalesetpriority    # when a pod is sc
 
 ### (b) Switch to a fully private cluster
 
-Run `terraform plan -var enable_private_cluster=true`. Changing `private_cluster_enabled` **recreates the cluster (forces replacement)**. In production, decide this from the start. With a private cluster, `kubectl` and the Terraform kubernetes provider can connect only from inside the VNet (VPN, Bastion, or a jump host). For an ad-hoc check, use `az aks command invoke`.
+Run `terraform plan -var enable_private_cluster=true`. Changing `private_cluster_enabled` **recreates the cluster (forces replacement)**. In production, decide this from the start. With a private cluster, `kubectl` and the Terraform kubernetes provider can connect only from inside the VNet (VPN, Bastion, or a jump host). For an ad-hoc check, use `az aks command invoke`. The two ways to get a network path (direct private IP or Private Link) are in [Appendix F](99-appendix.md).
 
 ```bash
 az aks command invoke -g <rg> -n <cluster> --command "kubectl get pods -A"

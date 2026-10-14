@@ -19,7 +19,7 @@ const ASSETS = join(import.meta.dirname ?? dirname(fileURLToPath(import.meta.url
 const CSS = readFileSync(join(ASSETS, 'style.css'), 'utf8');
 const JS = readFileSync(join(ASSETS, 'app.js'), 'utf8');
 
-const VERIFIED_AT = '2026-10-13';
+const VERIFIED_AT = '2026-10-14';
 const VERSIONS = [
   ['Terraform', '1.16.5'],
   ['azurerm', '5.9.0'],

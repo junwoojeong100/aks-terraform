@@ -16,7 +16,7 @@ Each lab is an independent Terraform stack, and every piece of code in the docs 
 > [!IMPORTANT]
 > On top of **static validation** (`terraform fmt`, `validate`, and `terraform test` with a mock provider), the code in this guide was **run end to end, Lab 01–11 from scratch, in a real Azure subscription** on 2026-10-13. The discrepancies found then were fixed, and the items that could not be confirmed (Spot scale-up, running an upgrade, etc.) are listed in [Appendix A](labs/99-appendix.md). After the guide was translated into English, the same end-to-end run was repeated on 2026-10-14 with the same results. Results can differ with your subscription's quotas, organization policies, and regional capacity, so read the `terraform plan` output carefully the first time you run it. After the labs, be sure to clean up with [Lab 11](labs/11-cleanup.md) (a cluster left running keeps costing money).
 
-## Baseline versions (2026-10-13)
+## Baseline versions (2026-10-14)
 
 | Component | Version | Notes |
 |---|---|---|

@@ -1,0 +1,4 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793936764, "title": "Actual Azure execution / http-probe", "env": {"TERM": "xterm-256color"}}
+[0.000406, "o", "$ curl --fail --silent --show-error --max-time 20 -o /dev/null -w 'HTTP %{http_code}\r\n' http://20.200.238.132/\r\n"]
+[0.088681, "o", "HTTP 200\r\n"]
+[0.089012, "o", "[recorder] exit=0; elapsed=0.089s\r\n"]

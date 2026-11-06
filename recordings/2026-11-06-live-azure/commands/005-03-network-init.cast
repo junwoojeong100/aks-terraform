@@ -1,0 +1,13 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793934635, "title": "Actual Azure execution / 03-network-init", "env": {"TERM": "xterm-256color"}}
+[0.00055, "o", "$ terraform -chdir=terraform/03-network init -input=false -no-color -lockfile=readonly -backend-config=$LAB_WORK/private/backend.hcl\r\n"]
+[0.076747, "o", "Initializing the backend...\r\n"]
+[3.23253, "o", "\r\n"]
+[3.232684, "o", "Initializing modules...\r\n"]
+[3.237356, "o", "- naming in ../modules/naming\r\n"]
+[3.243649, "o", "\r\n"]
+[3.247474, "o", "\r\n"]
+[3.247562, "o", "Error: Failed to get existing workspaces: listing blobs: executing request: unexpected status 403 (403 This request is not authorized to perform this operation.) with AuthorizationFailure: This request is not authorized to perform this operation.\r\n"]
+[3.247618, "o", "RequestId:<GUID>\r\n"]
+[3.247657, "o", "Time:2026-11-06T03:10:38.7521599Z\r\n"]
+[3.247694, "o", "\r\n"]
+[3.250601, "o", "[recorder] exit=1; elapsed=3.251s\r\n"]

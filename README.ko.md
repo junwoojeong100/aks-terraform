@@ -73,6 +73,13 @@ scripts/cleanup.sh --dry-run          # 실습을 마치면: 지울 목록 확�
 
 자세한 단계는 [Lab 01](labs/ko/01-prerequisites.md) 부터 따라가세요. **단일 HTML 가이드**는 [온라인](https://junwoojeong100.github.io/aks-terraform/aks-terraform-guide.ko.html)에서 바로 보거나, 저장소의 `aks-terraform-guide.ko.html` 을 브라우저로 여세요(오프라인 동작, 검색/복사 버튼/다크 모드/진행 체크 지원).
 
+## 실습 녹화
+
+`recordings/2026-11-06-live-azure/`에 [실제 Azure 실습 녹화](https://github.com/junwoojeong100/aks-terraform/tree/main/recordings/2026-11-06-live-azure)를
+추가했습니다. 생성·Ready 노드 3개·HTTP 200·정리를 담은 별도의 무해설 터미널 replay입니다.
+축소한 단일 AZ 구성, 조직 정책에 따른 명시적 local backend override, 06-workload의 실제 비밀 mount 미검증 등
+실행 범위는 해당 폴더의 설명을 먼저 확인하세요. 유튜브용 내레이션 편집본은 별도 `build-and-run-it` 리포에 둡니다.
+
 ## 언어
 
 이 가이드는 **영어(기본)** 와 **한국어** 로 제공합니다. 한국어판은 `README.ko.md`, `labs/ko/`, `aks-terraform-guide.ko.html` 에 있습니다. 두 판이 같은 소스 파일을 그대로 가져오므로 Terraform 코드, 코드 주석, 스크립트 메시지는 영어로만 작성합니다.
@@ -102,6 +109,7 @@ scripts/cleanup.sh --dry-run          # 실습을 마치면: 지울 목록 확�
 │   ├── mocks/                   # terraform test 용 mock 값
 │   └── 02-bootstrap … 10-aks-automatic/
 ├── scripts/                     # preflight.sh · verify.sh(+verify/) · cleanup.sh · lib/common.sh
+├── recordings/                  # 별도의 실제 Azure 실습 영상과 식별자를 가린 실행 근거
 └── tools/
     ├── validate-all.sh          # fmt + validate + test (Azure 불필요) + 스크립트 검사
     ├── sync-code.mjs            # md 의 코드 블록/숫자를 소스와 동기화

@@ -1,0 +1,5 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793934512, "title": "Actual Azure execution / 02-bootstrap-validate", "env": {"TERM": "xterm-256color"}}
+[0.000512, "o", "$ terraform -chdir=terraform/02-bootstrap validate -no-color\r\n"]
+[0.743597, "o", "Success! The configuration is valid.\r\n"]
+[0.743704, "o", "\r\n"]
+[0.74517, "o", "[recorder] exit=0; elapsed=0.745s\r\n"]

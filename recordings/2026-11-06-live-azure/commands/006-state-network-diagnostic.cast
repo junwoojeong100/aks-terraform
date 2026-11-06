@@ -1,0 +1,11 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793934719, "title": "Actual Azure execution / state-network-diagnostic", "env": {"TERM": "xterm-256color"}}
+[0.000446, "o", "$ az storage account show -g rg-ep03live-test-krc-tfstate -n sttfstateep03live855a7 --query '{state:provisioningState,public:publicNetworkAccess,defaultAction:networkRuleSet.defaultAction,ipRules:networkRuleSet.ipRules,bypass:networkRuleSet.bypass,allowSharedKey:allowSharedKeyAccess}' -o json --subscription <GUID>\r\n"]
+[1.676857, "o", "{\r\n"]
+[1.677003, "o", "  \"allowSharedKey\": false,\r\n"]
+[1.677052, "o", "  \"bypass\": \"AzureServices\",\r\n"]
+[1.677099, "o", "  \"defaultAction\": \"Allow\",\r\n"]
+[1.677139, "o", "  \"ipRules\": [],\r\n"]
+[1.677174, "o", "  \"public\": \"Disabled\",\r\n"]
+[1.677205, "o", "  \"state\": \"Succeeded\"\r\n"]
+[1.677235, "o", "}\r\n"]
+[1.758081, "o", "[recorder] exit=0; elapsed=1.758s\r\n"]

@@ -73,6 +73,13 @@ scripts/cleanup.sh --dry-run          # when you're done: review what will be de
 
 Follow the detailed steps starting from [Lab 01](labs/01-prerequisites.md). The **single-file HTML guide** is published [online](https://junwoojeong100.github.io/aks-terraform/aks-terraform-guide.html); you can also open `aks-terraform-guide.html` from this repository in a browser (works offline; supports search, copy buttons, dark mode, and progress checkboxes).
 
+## Practice recording
+
+An [actual Azure lab recording](https://github.com/junwoojeong100/aks-terraform/tree/main/recordings/2026-11-06-live-azure)
+is included under `recordings/2026-11-06-live-azure/`: a separate, unnarrated terminal replay of creation,
+3 Ready nodes, HTTP 200 and cleanup. Read its scope notes: a smaller single-zone lab, a disclosed policy-driven
+local-backend override, and no live Lab 06 secret-mount claim. The narrated YouTube edit belongs in `build-and-run-it`.
+
 ## Languages
 
 The guide is available in **English (default)** and **Korean**: the Korean edition lives in `README.ko.md`, `labs/ko/`, and `aks-terraform-guide.ko.html`. Terraform code, comments, and script messages are English-only, because both editions embed the same source files verbatim.
@@ -102,6 +109,7 @@ The check, verify, and delete commands you would otherwise type by hand are bund
 │   ├── mocks/                   # Mock values for terraform test
 │   └── 02-bootstrap … 10-aks-automatic/
 ├── scripts/                     # preflight.sh · verify.sh (+verify/) · cleanup.sh · lib/common.sh
+├── recordings/                  # Separate real Azure practice recording and redacted execution evidence
 └── tools/
     ├── validate-all.sh          # fmt + validate + test (no Azure needed) + script checks
     ├── sync-code.mjs            # Syncs the code blocks/numbers in md with the sources

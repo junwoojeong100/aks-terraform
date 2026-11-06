@@ -1,0 +1,13 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793934511, "title": "Actual Azure execution / 02-bootstrap-init", "env": {"TERM": "xterm-256color"}}
+[0.000419, "o", "$ terraform -chdir=terraform/02-bootstrap init -input=false -no-color -lockfile=readonly\r\n"]
+[0.267439, "o", "Initializing the backend...\r\n"]
+[0.272084, "o", "\r\n"]
+[0.272914, "o", "Initializing modules...\r\n"]
+[0.292522, "o", "- naming in ../modules/naming\r\n"]
+[0.302689, "o", "\r\n"]
+[0.304734, "o", "Initializing provider plugins...\r\n"]
+[0.30482, "o", "- Reusing previous version of hashicorp/azurerm from the dependency lock file\r\n"]
+[0.78493, "o", "- Using hashicorp/azurerm v5.9.0 from the shared cache directory\r\n"]
+[1.128494, "o", "\r\n"]
+[1.128607, "o", "Terraform has been successfully initialized!\r\n"]
+[1.131553, "o", "[recorder] exit=0; elapsed=1.132s\r\n"]

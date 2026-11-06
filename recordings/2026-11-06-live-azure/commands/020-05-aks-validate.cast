@@ -1,0 +1,5 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793935307, "title": "Actual Azure execution / 05-aks-validate", "env": {"TERM": "xterm-256color"}}
+[0.000517, "o", "$ terraform -chdir=terraform/05-aks validate -no-color\r\n"]
+[1.020208, "o", "Success! The configuration is valid.\r\n"]
+[1.020317, "o", "\r\n"]
+[1.023352, "o", "[recorder] exit=0; elapsed=1.023s\r\n"]

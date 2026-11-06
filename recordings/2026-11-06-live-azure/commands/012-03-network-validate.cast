@@ -1,0 +1,5 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793934921, "title": "Actual Azure execution / 03-network-validate", "env": {"TERM": "xterm-256color"}}
+[0.000606, "o", "$ terraform -chdir=terraform/03-network validate -no-color\r\n"]
+[0.695048, "o", "Success! The configuration is valid.\r\n"]
+[0.695173, "o", "\r\n"]
+[0.697956, "o", "[recorder] exit=0; elapsed=0.698s\r\n"]

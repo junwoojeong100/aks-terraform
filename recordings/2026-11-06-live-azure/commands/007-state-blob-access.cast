@@ -1,0 +1,7 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793934721, "title": "Actual Azure execution / state-blob-access", "env": {"TERM": "xterm-256color"}}
+[0.000488, "o", "$ az storage blob list --account-name sttfstateep03live855a7 --container-name tfstate --auth-mode login --query 'length(@)' -o tsv --subscription <GUID>\r\n"]
+[1.388253, "o", "ERROR: \r\n"]
+[1.388414, "o", "The request may be blocked by network rules of storage account. Please check network rule set using 'az storage account show -n accountname --query networkRuleSet'.\r\n"]
+[1.388486, "o", "If you want to change the default action to apply when no rule matches, please use 'az storage account update'.\r\n"]
+[1.388538, "o", "                    \r\n"]
+[1.519687, "o", "[recorder] exit=1; elapsed=1.520s\r\n"]

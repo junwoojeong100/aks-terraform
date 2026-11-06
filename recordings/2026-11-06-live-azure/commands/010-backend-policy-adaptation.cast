@@ -1,0 +1,10 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793934919, "title": "Actual Azure execution / backend-policy-adaptation", "env": {"TERM": "xterm-256color"}}
+[0.000482, "o", "$ cat terraform/03-network/recording_override.tf\r\n"]
+[0.007785, "o", "# Recording-only override: organizational policy disables public Blob access.\r\n"]
+[0.007882, "o", "# Preserve the policy; this single-operator temporary lab uses protected local state.\r\n"]
+[0.007924, "o", "terraform {\r\n"]
+[0.00796, "o", "  backend \"local\" {\r\n"]
+[0.007996, "o", "    path = \"terraform.tfstate\"\r\n"]
+[0.008029, "o", "  }\r\n"]
+[0.008059, "o", "}\r\n"]
+[0.008118, "o", "[recorder] exit=0; elapsed=0.008s\r\n"]

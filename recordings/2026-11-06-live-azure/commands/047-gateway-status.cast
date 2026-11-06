@@ -1,0 +1,8 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793936891, "title": "Actual Azure execution / gateway-status", "env": {"TERM": "xterm-256color"}}
+[0.001705, "o", "$ kubectl -n web get gateway,httproute -o wide\r\n"]
+[0.768555, "o", "NAME                                            CLASS              ADDRESS          PROGRAMMED   AGE\r\n"]
+[0.768673, "o", "gateway.gateway.networking.k8s.io/web-gateway   approuting-istio   20.200.238.132   True         2m49s\r\n"]
+[0.768721, "o", "\r\n"]
+[0.76876, "o", "NAME                                            HOSTNAMES   AGE\r\n"]
+[0.768799, "o", "httproute.gateway.networking.k8s.io/aspnetapp               2m48s\r\n"]
+[0.77056, "o", "[recorder] exit=0; elapsed=0.771s\r\n"]

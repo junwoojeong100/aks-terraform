@@ -1,0 +1,822 @@
+{
+  "source_commit": "f9b7c047467f28e9ad2d430422bd69e3520ddbe8",
+  "recording_id": "ep03-portal-20261106T053813Z",
+  "region": "koreacentral",
+  "workload": "ep03ui",
+  "environment": "test",
+  "configuration": {
+    "sku": "Standard",
+    "system_nodes": 2,
+    "user_nodes": 1,
+    "vm_size": "Standard_D4ds_v5",
+    "zones": [
+      "1"
+    ],
+    "grafana": false,
+    "private_cluster": false,
+    "api_access": "administrator IP only",
+    "scope": "Temporary reduced-size lab, not a production HA baseline.",
+    "preflight_adjustment": "The first preflight rejected the initial 10-character label before any resources were created. The workload was shortened to ep03ui; the failed recording is preserved.",
+    "state_backend": "local",
+    "backend_reason": "Organization policy set the new state account's publicNetworkAccess to Disabled. The original Blob backend failed with HTTP 403. No policy exemption or public-access change was made. A declared recording-only backend override keeps state in the git-ignored local workspace.",
+    "backend_override_sha256": "93c17f25afd05517aa8d9426e71ae5f16b3ee3e033ff337407785f0897d5a563"
+  },
+  "commands": [
+    {
+      "label": "preflight",
+      "command": "bash scripts/preflight.sh",
+      "started_at": "2026-11-06T05:38:13.776280+00:00",
+      "cast": "data/portal/000-preflight.cast",
+      "status": "failed",
+      "exit_code": 1,
+      "duration": 97.681059,
+      "cast_sha256": "a66287fb1f623bac33211b0385230d1cf1099f43497fc353aaf433e1bc44fd63"
+    },
+    {
+      "label": "preflight",
+      "command": "bash scripts/preflight.sh",
+      "started_at": "2026-11-06T05:41:07.661371+00:00",
+      "cast": "data/portal/001-preflight.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 111.825538,
+      "cast_sha256": "c3774b7b7e7fcc9716e0e1f1281e01f3a55528e3688a752a54d2b0cd1db8d59c"
+    },
+    {
+      "label": "backend-policy-adaptation",
+      "command": "cat terraform/03-network/recording_override.tf",
+      "started_at": "2026-11-06T05:42:59.511731+00:00",
+      "cast": "data/portal/002-backend-policy-adaptation.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 0.010978,
+      "cast_sha256": "d1b2a3a4f321dfea9e39cd52ae3ad39aff11832c900ab14115a548e1810f0f1d"
+    },
+    {
+      "label": "02-bootstrap-init",
+      "command": "terraform -chdir=terraform/02-bootstrap init -input=false -no-color -lockfile=readonly -reconfigure",
+      "started_at": "2026-11-06T05:42:59.527425+00:00",
+      "cast": "data/portal/003-02-bootstrap-init.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 1.182485,
+      "cast_sha256": "1711df33a60ba8bccdbac418fdbbdb3c28bd7632915e78959914577a83a3f223"
+    },
+    {
+      "label": "02-bootstrap-validate",
+      "command": "terraform -chdir=terraform/02-bootstrap validate -no-color",
+      "started_at": "2026-11-06T05:43:00.715550+00:00",
+      "cast": "data/portal/004-02-bootstrap-validate.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 0.753281,
+      "cast_sha256": "1e5653ee0059c5a3e30d012049ccc42d9dd497a5888045f654c40db893f838f9"
+    },
+    {
+      "label": "02-bootstrap-plan",
+      "command": "terraform -chdir=terraform/02-bootstrap plan -input=false -no-color -lock-timeout=300s -out=live.tfplan",
+      "started_at": "2026-11-06T05:43:01.476359+00:00",
+      "cast": "data/portal/005-02-bootstrap-plan.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 2.838792,
+      "cast_sha256": "8db586d8215fb491ed4836e19ac92ab8ce8a427c84313aa92e4e983a47a624f8"
+    },
+    {
+      "label": "02-bootstrap-apply",
+      "command": "terraform -chdir=terraform/02-bootstrap apply -input=false -auto-approve -no-color -lock-timeout=300s live.tfplan",
+      "started_at": "2026-11-06T05:43:04.779613+00:00",
+      "cast": "data/portal/006-02-bootstrap-apply.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 102.188134,
+      "cast_sha256": "454165142cb5522e643f5f460500fd24b7f12143c79f7ba8c3456d5b66820ad9"
+    },
+    {
+      "label": "03-network-init",
+      "command": "terraform -chdir=terraform/03-network init -input=false -no-color -lockfile=readonly -reconfigure",
+      "started_at": "2026-11-06T05:44:47.183826+00:00",
+      "cast": "data/portal/007-03-network-init.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 0.652339,
+      "cast_sha256": "e0bead9620304b78d0708f5839af0e98f0bc693209ef298c6d1a929f902a98dd"
+    },
+    {
+      "label": "03-network-validate",
+      "command": "terraform -chdir=terraform/03-network validate -no-color",
+      "started_at": "2026-11-06T05:44:47.844614+00:00",
+      "cast": "data/portal/008-03-network-validate.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 0.605359,
+      "cast_sha256": "7768e4179a63142da769e31c7cb678fadb3c00e7a885bcbf594ff17e76ae279b"
+    },
+    {
+      "label": "03-network-plan",
+      "command": "terraform -chdir=terraform/03-network plan -input=false -no-color -lock-timeout=300s -out=live.tfplan",
+      "started_at": "2026-11-06T05:44:48.458254+00:00",
+      "cast": "data/portal/009-03-network-plan.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 2.857403,
+      "cast_sha256": "f2dd828b0a4675532ba14c8865cec1c1c4a77e39917d6fd4e85c2c538e600dfb"
+    },
+    {
+      "label": "03-network-apply",
+      "command": "terraform -chdir=terraform/03-network apply -input=false -auto-approve -no-color -lock-timeout=300s live.tfplan",
+      "started_at": "2026-11-06T05:44:51.789740+00:00",
+      "cast": "data/portal/010-03-network-apply.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 126.541744,
+      "cast_sha256": "e569c976f21f9da33886c2027b8de6b2ad23c7c68d394f6687ef1ec5402c7d6a"
+    },
+    {
+      "label": "04-platform-init",
+      "command": "terraform -chdir=terraform/04-platform init -input=false -no-color -lockfile=readonly -reconfigure",
+      "started_at": "2026-11-06T05:46:58.340656+00:00",
+      "cast": "data/portal/011-04-platform-init.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 0.635512,
+      "cast_sha256": "a4188eee13681c992fda25ec938bbcf88545a9e40a38660b244578322478d191"
+    },
+    {
+      "label": "04-platform-validate",
+      "command": "terraform -chdir=terraform/04-platform validate -no-color",
+      "started_at": "2026-11-06T05:46:58.981915+00:00",
+      "cast": "data/portal/012-04-platform-validate.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 0.577646,
+      "cast_sha256": "d149228030db4da6c273c1d8b8e162e851d5c7c618ef7957e0feff092088e6d3"
+    },
+    {
+      "label": "04-platform-plan",
+      "command": "terraform -chdir=terraform/04-platform plan -input=false -no-color -lock-timeout=300s -out=live.tfplan",
+      "started_at": "2026-11-06T05:46:59.563791+00:00",
+      "cast": "data/portal/013-04-platform-plan.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 3.843016,
+      "cast_sha256": "a710c164027aeddc24e68ca271ceed6684238544b405e560a478a6c78b2ff93d"
+    },
+    {
+      "label": "04-platform-apply",
+      "command": "terraform -chdir=terraform/04-platform apply -input=false -auto-approve -no-color -lock-timeout=300s live.tfplan",
+      "started_at": "2026-11-06T05:47:03.856697+00:00",
+      "cast": "data/portal/014-04-platform-apply.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 231.400203,
+      "cast_sha256": "52a73c2970abf5efb6206796967d419e2f6d8f743a91e58cc395fb7c540ed64f"
+    },
+    {
+      "label": "05-aks-init",
+      "command": "terraform -chdir=terraform/05-aks init -input=false -no-color -lockfile=readonly -reconfigure",
+      "started_at": "2026-11-06T05:50:55.267462+00:00",
+      "cast": "data/portal/015-05-aks-init.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 2.09588,
+      "cast_sha256": "624a0904c28c501673c626031c52be86571babe46f04502d9fa4d10c61c6892a"
+    },
+    {
+      "label": "05-aks-validate",
+      "command": "terraform -chdir=terraform/05-aks validate -no-color",
+      "started_at": "2026-11-06T05:50:57.373005+00:00",
+      "cast": "data/portal/016-05-aks-validate.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 1.033847,
+      "cast_sha256": "24e6e831db197a3008cc2f9f86f26cc347a38317b357fd9249c53301d854cdcf"
+    },
+    {
+      "label": "05-aks-plan",
+      "command": "terraform -chdir=terraform/05-aks plan -input=false -no-color -lock-timeout=300s -out=live.tfplan",
+      "started_at": "2026-11-06T05:50:58.414904+00:00",
+      "cast": "data/portal/017-05-aks-plan.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 4.74205,
+      "cast_sha256": "cd385b96e913ecf30c412bb727ca788716fa02556ab17384adefd61bdf818135"
+    },
+    {
+      "label": "05-aks-apply",
+      "command": "terraform -chdir=terraform/05-aks apply -input=false -auto-approve -no-color -lock-timeout=300s live.tfplan",
+      "started_at": "2026-11-06T05:51:03.992469+00:00",
+      "cast": "data/portal/018-05-aks-apply.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 1041.413974,
+      "cast_sha256": "0c17c992ac1c4472bef5e828c7454f50e85c5be580a938d3bbaca4b5cde00ae2"
+    },
+    {
+      "label": "azure-cluster",
+      "command": "az aks show -g rg-ep03ui-test-krc-aks -n aks-ep03ui-test-krc --query '{name:name,state:provisioningState,version:currentKubernetesVersion,private:apiServerAccessProfile.enablePrivateCluster,vnetIntegration:apiServerAccessProfile.enableVnetIntegration,localAccountsDisabled:disableLocalAccounts,workloadIdentity:securityProfile.workloadIdentity.enabled,network:networkProfile.networkPluginMode,dataplane:networkProfile.networkDataplane}' -o json --subscription <GUID>",
+      "started_at": "2026-11-06T06:08:24.423128+00:00",
+      "cast": "data/portal/019-azure-cluster.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 4.40513,
+      "cast_sha256": "120813e9bb6fabdf5dba27614ea8a631d9cf9ce3c85a3fc40a9f575eff6cead7"
+    },
+    {
+      "label": "credentials",
+      "command": "az aks get-credentials -g rg-ep03ui-test-krc-aks -n aks-ep03ui-test-krc --file $LAB_WORK/private/kubeconfig --overwrite-existing --subscription <GUID>",
+      "started_at": "2026-11-06T06:08:28.834883+00:00",
+      "cast": "data/portal/020-credentials.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 6.463726,
+      "cast_sha256": "71c54072d3867507c74c45037a405df5cbf156ffdb71495542e27494c67b62c8"
+    },
+    {
+      "label": "entra-login",
+      "command": "kubelogin convert-kubeconfig -l azurecli --kubeconfig $LAB_WORK/private/kubeconfig",
+      "started_at": "2026-11-06T06:08:35.305533+00:00",
+      "cast": "data/portal/021-entra-login.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 0.024788,
+      "cast_sha256": "ec5e7659bc587c1713b4cb725441502831c4020ac5642e096f500793ce5f7cf7"
+    },
+    {
+      "label": "api-ready",
+      "command": "kubectl get --raw=/readyz",
+      "started_at": "2026-11-06T06:08:35.336252+00:00",
+      "cast": "data/portal/022-api-ready.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 2.965845,
+      "cast_sha256": "92317f527d0debccdca0181d37211c4e92c048dbe570cb90b2b3cd659478e921"
+    },
+    {
+      "label": "nodes-ready",
+      "command": "kubectl wait --for=condition=Ready nodes --all --timeout=300s",
+      "started_at": "2026-11-06T06:08:38.308331+00:00",
+      "cast": "data/portal/023-nodes-ready.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 1.92769,
+      "cast_sha256": "74c0ea429e7c0a91417623c47c21c4a73e5038068879b35f5218dab01a39fa5d"
+    },
+    {
+      "label": "nodes",
+      "command": "kubectl get nodes -o wide",
+      "started_at": "2026-11-06T06:08:40.241464+00:00",
+      "cast": "data/portal/024-nodes.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 0.79879,
+      "cast_sha256": "5237c978224845eddb948b0a87416bec67878c9cbc4a4e232de42c64408ee4ac"
+    },
+    {
+      "label": "system-pods",
+      "command": "kubectl get pods -A -o wide",
+      "started_at": "2026-11-06T06:08:41.051400+00:00",
+      "cast": "data/portal/025-system-pods.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 0.843015,
+      "cast_sha256": "f1724bc7551cde4904aac8bd2111be5c8002a8bb864d41b9365706ad8d253d97"
+    },
+    {
+      "label": "saved-creation-plan",
+      "command": "bash -o pipefail -c 'terraform -chdir=terraform/05-aks show -json live.tfplan | jq '\"'\"' .resource_changes[] | select(.type == \"azurerm_kubernetes_cluster\" and .mode == \"managed\") | {resource: .address, actions: .change.actions, cluster: .change.after.name, version: .change.after.kubernetes_version, private_cluster: .change.after.private_cluster_enabled, vnet_integration: .change.after.api_server_access_profile[0].virtual_network_integration_enabled, system_min: .change.after.default_node_pool[0].min_count, system_max: .change.after.default_node_pool[0].max_count, vm_size: .change.after.default_node_pool[0].vm_size, zones: .change.after.default_node_pool[0].zones}'\"'\"''",
+      "started_at": "2026-11-06T06:08:45.712810+00:00",
+      "cast": "data/portal/026-saved-creation-plan.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 1.957398,
+      "cast_sha256": "82b1028e5c96c984af54c676ed9016af3185f913e669066296459dd6853b6e4c"
+    },
+    {
+      "label": "vault-network",
+      "command": "az keyvault show -n kv-ep03ui-test-089ab --query '{state:properties.provisioningState,publicNetworkAccess:properties.publicNetworkAccess,defaultAction:properties.networkAcls.defaultAction}' -o json --subscription <GUID>",
+      "started_at": "2026-11-06T06:08:47.923516+00:00",
+      "cast": "data/portal/027-vault-network.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 1.462264,
+      "cast_sha256": "d1173ee1abe776ce48e960a8c2bf93b07bc55a277837f42bbb3946f181caeb73"
+    },
+    {
+      "label": "vault-data-plane-probe",
+      "command": "az keyvault secret list --vault-name kv-ep03ui-test-089ab --query 'length(@)' -o tsv --subscription <GUID>",
+      "started_at": "2026-11-06T06:08:49.392708+00:00",
+      "cast": "data/portal/028-vault-data-plane-probe.cast",
+      "status": "failed",
+      "exit_code": 1,
+      "duration": 1.310479,
+      "cast_sha256": "bd14cb6ebcdc92af13286baf9d12e8c9d535deeda4874245e9aede6c91516c45"
+    },
+    {
+      "label": "import-busybox",
+      "command": "az acr import -n acrep03uitestkrc089ab --source mcr.microsoft.com/cbl-mariner/busybox:2.0 --image demo/busybox:2.0 --subscription <GUID>",
+      "started_at": "2026-11-06T06:08:50.913527+00:00",
+      "cast": "data/portal/029-import-busybox.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 14.270973,
+      "cast_sha256": "7e44eee520f652e227d69bc911fad10893089414231bc6cc40649aad04655bf9"
+    },
+    {
+      "label": "import-aspnetapp",
+      "command": "az acr import -n acrep03uitestkrc089ab --source mcr.microsoft.com/dotnet/samples:aspnetapp --image demo/aspnetapp:v1 --subscription <GUID>",
+      "started_at": "2026-11-06T06:09:05.191977+00:00",
+      "cast": "data/portal/030-import-aspnetapp.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 44.143275,
+      "cast_sha256": "6394b0da7a1c9842647a101a619cedf8aa890be814c64af9aacbb30c8ddf3e22"
+    },
+    {
+      "label": "07-ingress-init",
+      "command": "terraform -chdir=terraform/07-ingress init -input=false -no-color -lockfile=readonly -reconfigure",
+      "started_at": "2026-11-06T06:09:49.342040+00:00",
+      "cast": "data/portal/031-07-ingress-init.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 1.343068,
+      "cast_sha256": "b9337820d3b46ce7d3b4d129fe51bb48bb884dd13a448097e1404f118be43920"
+    },
+    {
+      "label": "07-ingress-validate",
+      "command": "terraform -chdir=terraform/07-ingress validate -no-color",
+      "started_at": "2026-11-06T06:09:50.695631+00:00",
+      "cast": "data/portal/032-07-ingress-validate.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 0.967444,
+      "cast_sha256": "d048780beecf86f3af0760f0f814b21966b4ae6a2d4214183cc521ec75085257"
+    },
+    {
+      "label": "07-ingress-plan",
+      "command": "terraform -chdir=terraform/07-ingress plan -input=false -no-color -lock-timeout=300s -out=live.tfplan",
+      "started_at": "2026-11-06T06:09:51.667614+00:00",
+      "cast": "data/portal/033-07-ingress-plan.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 7.368288,
+      "cast_sha256": "0e7c92d9b43c21625ac198316ff6f9d3149f0bb88e0047631ca929d24f184aca"
+    },
+    {
+      "label": "07-ingress-apply",
+      "command": "terraform -chdir=terraform/07-ingress apply -input=false -auto-approve -no-color -lock-timeout=300s live.tfplan",
+      "started_at": "2026-11-06T06:09:59.685243+00:00",
+      "cast": "data/portal/034-07-ingress-apply.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 42.644388,
+      "cast_sha256": "b2393d025543eb8faaa4fd0521666a659da26ddd356b7067732bf9bd54cd1b7e"
+    },
+    {
+      "label": "web-app-ready",
+      "command": "kubectl -n web rollout status deploy/aspnetapp --timeout=300s",
+      "started_at": "2026-11-06T06:10:42.344101+00:00",
+      "cast": "data/portal/035-web-app-ready.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 1.195062,
+      "cast_sha256": "8b9b23b3778dcf61c4cfa099c9a70b0035c3d91e082fb2683fd69810a11fca76"
+    },
+    {
+      "label": "gateway-ready",
+      "command": "kubectl -n web wait --for=condition=Programmed gateway/web-gateway --timeout=300s",
+      "started_at": "2026-11-06T06:10:43.552050+00:00",
+      "cast": "data/portal/036-gateway-ready.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 9.535608,
+      "cast_sha256": "da2885be7e35d518a2186d9fedf582f65bc0c96e9e3b9dda293a00b4fedd5b3a"
+    },
+    {
+      "label": "gateway-status",
+      "command": "kubectl -n web get gateway,httproute -o wide",
+      "started_at": "2026-11-06T06:10:53.099260+00:00",
+      "cast": "data/portal/037-gateway-status.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 0.884933,
+      "cast_sha256": "d7fc774aba66b7af4968e067e7c8d26942589263a2e438f3d92679c907c7eb3e"
+    },
+    {
+      "label": "http-probe",
+      "command": "curl --fail --silent --show-error --max-time 20 -o /dev/null -w 'HTTP %{http_code}\n' http://20.200.205.153/",
+      "started_at": "2026-11-06T06:10:54.807276+00:00",
+      "cast": "data/portal/038-http-probe.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 0.170548,
+      "cast_sha256": "3803f3f3c73f415cb05dec38dbec0d0c8fe3609f107230c986bfd59999c89094"
+    },
+    {
+      "label": "browser-gateway-services",
+      "command": "kubectl -n web get services -o json",
+      "started_at": "2026-11-06T06:29:06.835243+00:00",
+      "cast": "data/portal/039-browser-gateway-services.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 1.416039,
+      "cast_sha256": "835fea56ba492784a9a3c60f7e333fe70ecedd82d2dfa8934c8740843196938e"
+    },
+    {
+      "label": "browser-https-image",
+      "command": "az acr import -n acrep03uitestkrc089ab --source docker.io/library/caddy:2.11.9 --image demo/caddy:2.11.9 --force --subscription <GUID>",
+      "started_at": "2026-11-06T06:32:36.267090+00:00",
+      "cast": "data/portal/040-browser-https-image.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 565.138234,
+      "cast_sha256": "df87a5be8c58c98b8567067cee56c73944a2a06c9800b6bca575105528a44da3"
+    },
+    {
+      "label": "browser-https-service",
+      "command": "kubectl apply -f $LAB_WORK/private/browser-https.json",
+      "started_at": "2026-11-06T06:42:03.631182+00:00",
+      "cast": "data/portal/041-browser-https-service.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 2.109059,
+      "cast_sha256": "d11ec453d244bdba6a03e30960d010da931b7d1b7ac80a2db981d40a16a26b54"
+    },
+    {
+      "label": "browser-https-dns",
+      "command": "az network public-ip list -g rg-ep03ui-test-krc-aks-nodes --query '[?ipAddress=='\"'\"'4.230.97.213'\"'\"'].dnsSettings.fqdn | [0]' -o tsv --subscription <GUID>",
+      "started_at": "2026-11-06T06:42:29.869111+00:00",
+      "cast": "data/portal/042-browser-https-dns.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 1.195006,
+      "cast_sha256": "c493e9a2cb757c97436bfffd806f9ba29a566c54c46a0c7ed589201dc742fb07"
+    },
+    {
+      "label": "browser-https-deploy",
+      "command": "kubectl apply -f $LAB_WORK/private/browser-https.json",
+      "started_at": "2026-11-06T06:42:31.070428+00:00",
+      "cast": "data/portal/043-browser-https-deploy.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 1.795458,
+      "cast_sha256": "263f8fe23a6323512c8d8de3b8ba8ca848870e91e12884dd6a8299b0d8a1412f"
+    },
+    {
+      "label": "browser-https-ready",
+      "command": "kubectl -n web rollout status deployment/browser-https --timeout=300s",
+      "started_at": "2026-11-06T06:42:32.880738+00:00",
+      "cast": "data/portal/044-browser-https-ready.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 2.225163,
+      "cast_sha256": "9f4a2589ff388cc75de0a17ce64d6bc2b7fbb4d3d30e6c113f8a1fb70fe32f8a"
+    },
+    {
+      "label": "browser-https-probe",
+      "command": "curl --fail --silent --show-error --max-time 20 -o $LAB_WORK/private/browser-https-response.html -w 'HTTPS %{http_code}; TLS verification %{ssl_verify_result}\n' https://ep03ui-20261106t053813z.koreacentral.cloudapp.azure.com/",
+      "started_at": "2026-11-06T06:42:35.119631+00:00",
+      "cast": "data/portal/045-browser-https-probe.cast",
+      "status": "failed",
+      "exit_code": 35,
+      "duration": 11.098234,
+      "cast_sha256": "1c2a914f2f3e3a2257ecca0698aa53b72e2249808696b6819d5239f6d7af4e88"
+    },
+    {
+      "label": "browser-https-probe",
+      "command": "curl --fail --silent --show-error --max-time 20 -o $LAB_WORK/private/browser-https-response.html -w 'HTTPS %{http_code}; TLS verification %{ssl_verify_result}\n' https://ep03ui-20261106t053813z.koreacentral.cloudapp.azure.com/",
+      "started_at": "2026-11-06T06:42:56.229810+00:00",
+      "cast": "data/portal/046-browser-https-probe.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 0.065509,
+      "cast_sha256": "b91967df9cf264dd0ce349e4f423f5005c5c5b1d0a226425f30b28e53f4fd7e7"
+    },
+    {
+      "label": "browser-https-redirect",
+      "command": "curl --silent --show-error --max-time 20 -D $LAB_WORK/private/browser-https-redirect.txt -o /dev/null -w 'HTTP redirect %{http_code}\n' http://ep03ui-20261106t053813z.koreacentral.cloudapp.azure.com/",
+      "started_at": "2026-11-06T06:42:56.320287+00:00",
+      "cast": "data/portal/047-browser-https-redirect.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 0.034356,
+      "cast_sha256": "b65aa5ff5bc8890f2ec5923babe8120c10c9b2e2a36c8f05424488946a379870"
+    },
+    {
+      "label": "browser-https-cleanup",
+      "command": "kubectl -n web delete service/browser-https deployment/browser-https configmap/browser-https --ignore-not-found --wait=true --timeout=300s",
+      "started_at": "2026-11-06T06:47:21.035782+00:00",
+      "cast": "data/portal/048-browser-https-cleanup.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 42.284925,
+      "cast_sha256": "bfd4ac200aa033a04b78f2d42da5ef93acb8b8a7990a660c8ec4842c37d03ea9"
+    },
+    {
+      "label": "vault-retention",
+      "command": "az keyvault show -n kv-ep03ui-test-089ab --query '{purge_protection:properties.enablePurgeProtection,retention_days:properties.softDeleteRetentionInDays}' -o json --subscription <GUID>",
+      "started_at": "2026-11-06T06:48:03.924254+00:00",
+      "cast": "data/portal/049-vault-retention.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 2.037946,
+      "cast_sha256": "33cc6d3037c9c3f1aee723a25a2fb6ef22a07461d4c6e7a73a8616631e4b2a4d"
+    },
+    {
+      "label": "07-ingress-destroy-plan",
+      "command": "terraform -chdir=terraform/07-ingress plan -destroy -input=false -no-color -lock-timeout=300s -out=cleanup.tfplan",
+      "started_at": "2026-11-06T06:48:07.108898+00:00",
+      "cast": "data/portal/050-07-ingress-destroy-plan.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 13.537305,
+      "cast_sha256": "f90882f3edbdbf18efcadcb71104734d63e9bfb512d465bd08980f8fbf3529a5"
+    },
+    {
+      "label": "07-ingress-destroy",
+      "command": "terraform -chdir=terraform/07-ingress apply -input=false -auto-approve -no-color -lock-timeout=300s cleanup.tfplan",
+      "started_at": "2026-11-06T06:48:20.656362+00:00",
+      "cast": "data/portal/051-07-ingress-destroy.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 67.850021,
+      "cast_sha256": "8380a6a0e457e9f549fc5d4f5c58f6528a4dc425b7b4f11afa441fa0c1ca5cec"
+    },
+    {
+      "label": "05-aks-destroy-plan",
+      "command": "terraform -chdir=terraform/05-aks plan -destroy -input=false -no-color -lock-timeout=300s -out=cleanup.tfplan",
+      "started_at": "2026-11-06T06:49:29.986508+00:00",
+      "cast": "data/portal/052-05-aks-destroy-plan.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 26.719006,
+      "cast_sha256": "d5f7333e014a24c0b968ac0eba4e72297b2edd71318453cb9ddc3132f166b9e2"
+    },
+    {
+      "label": "05-aks-destroy",
+      "command": "terraform -chdir=terraform/05-aks apply -input=false -auto-approve -no-color -lock-timeout=300s cleanup.tfplan",
+      "started_at": "2026-11-06T06:49:56.720627+00:00",
+      "cast": "data/portal/053-05-aks-destroy.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 454.801923,
+      "cast_sha256": "0cb1db757c2248963ad4b66e5d67e32dfe79dc218ae262858ffbb566cadebdf9"
+    },
+    {
+      "label": "04-platform-destroy-plan",
+      "command": "terraform -chdir=terraform/04-platform plan -destroy -input=false -no-color -lock-timeout=300s -out=cleanup.tfplan",
+      "started_at": "2026-11-06T06:57:34.819336+00:00",
+      "cast": "data/portal/054-04-platform-destroy-plan.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 120.723103,
+      "cast_sha256": "17a7608b90119f6abe23e257d5fdf116746ecbcbc6aeb1fe6bf2ceb328f2e675"
+    },
+    {
+      "label": "04-platform-destroy",
+      "command": "terraform -chdir=terraform/04-platform apply -input=false -auto-approve -no-color -lock-timeout=300s cleanup.tfplan",
+      "started_at": "2026-11-06T06:59:35.622823+00:00",
+      "cast": "data/portal/055-04-platform-destroy.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 119.829365,
+      "cast_sha256": "bd4ff19ee0bcf6030e05e3191c551694b40269904f14d4e8b9f23eec3d89ad15"
+    },
+    {
+      "label": "03-network-destroy-plan",
+      "command": "terraform -chdir=terraform/03-network plan -destroy -input=false -no-color -lock-timeout=300s -out=cleanup.tfplan",
+      "started_at": "2026-11-06T07:01:41.397142+00:00",
+      "cast": "data/portal/056-03-network-destroy-plan.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 271.638565,
+      "cast_sha256": "c3e1aa87a9ac593286b69ed9896533112235b628227100398fd85cdeeb332d51"
+    },
+    {
+      "label": "03-network-destroy",
+      "command": "terraform -chdir=terraform/03-network apply -input=false -auto-approve -no-color -lock-timeout=300s cleanup.tfplan",
+      "started_at": "2026-11-06T07:06:13.323638+00:00",
+      "cast": "data/portal/057-03-network-destroy.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 190.759813,
+      "cast_sha256": "73ae6f21be70b205834fd78cffb6773c19be4ebcde6e9d10d9c46e47f47b27dc"
+    },
+    {
+      "label": "02-bootstrap-destroy-plan",
+      "command": "terraform -chdir=terraform/02-bootstrap plan -destroy -input=false -no-color -lock-timeout=300s -out=cleanup.tfplan",
+      "started_at": "2026-11-06T07:09:24.803266+00:00",
+      "cast": "data/portal/058-02-bootstrap-destroy-plan.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 8.252545,
+      "cast_sha256": "a068f1af54414a78f0a22e1c5aed5ec58d7b2431fa0a69355e4fc3d9421a648e"
+    },
+    {
+      "label": "02-bootstrap-destroy",
+      "command": "terraform -chdir=terraform/02-bootstrap apply -input=false -auto-approve -no-color -lock-timeout=300s cleanup.tfplan",
+      "started_at": "2026-11-06T07:09:33.065095+00:00",
+      "cast": "data/portal/059-02-bootstrap-destroy.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 25.615255,
+      "cast_sha256": "ed87935649771695647c2abad34230f3f421b940d6caf90ce9dbb3a4f4319fc4"
+    },
+    {
+      "label": "cleanup-groups",
+      "command": "az group list --query '[?starts_with(name,'\"'\"'rg-ep03ui-test-krc-'\"'\"')].name' -o json --subscription <GUID>",
+      "started_at": "2026-11-06T07:09:58.690177+00:00",
+      "cast": "data/portal/060-cleanup-groups.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 1.537462,
+      "cast_sha256": "61ea56031932ebcd1ba719fe2d9fb843c1f8c669b6c8b533f848ea0de972c359"
+    },
+    {
+      "label": "cleanup-soft-deleted-vault",
+      "command": "az keyvault list-deleted --query '[?starts_with(name,'\"'\"'kv-ep03ui-test-'\"'\"')].{name:name,purgeProtection:properties.purgeProtectionEnabled}' -o json --subscription <GUID>",
+      "started_at": "2026-11-06T07:10:02.654865+00:00",
+      "cast": "data/portal/061-cleanup-soft-deleted-vault.cast",
+      "status": "passed",
+      "exit_code": 0,
+      "duration": 10.454441,
+      "cast_sha256": "5506141c93c75d4bab102dae2767cb4764126b0fd12b6824cec6a7e58828f7a0"
+    }
+  ],
+  "stacks": {
+    "02-bootstrap": {
+      "applied": true,
+      "attempted": true,
+      "plan": {
+        "create": 4,
+        "update": 0,
+        "no-op": 0
+      },
+      "commands": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "destroyed": true
+    },
+    "03-network": {
+      "applied": true,
+      "attempted": true,
+      "plan": {
+        "create": 26,
+        "update": 0,
+        "no-op": 0
+      },
+      "commands": [
+        7,
+        8,
+        9,
+        10
+      ],
+      "destroyed": true
+    },
+    "04-platform": {
+      "applied": true,
+      "attempted": true,
+      "plan": {
+        "create": 15,
+        "update": 0,
+        "no-op": 0
+      },
+      "commands": [
+        11,
+        12,
+        13,
+        14
+      ],
+      "destroyed": true
+    },
+    "05-aks": {
+      "applied": true,
+      "attempted": true,
+      "plan": {
+        "create": 15,
+        "update": 0,
+        "no-op": 0
+      },
+      "commands": [
+        15,
+        16,
+        17,
+        18
+      ],
+      "destroyed": true
+    },
+    "07-ingress": {
+      "applied": true,
+      "attempted": true,
+      "plan": {
+        "create": 8,
+        "update": 0,
+        "no-op": 0
+      },
+      "commands": [
+        31,
+        32,
+        33,
+        34
+      ],
+      "destroyed": true
+    }
+  },
+  "verification": {
+    "cluster": {
+      "provisioning_state": "Succeeded",
+      "version": "1.36.5",
+      "ready_nodes": 3,
+      "all_nodes_ready": true,
+      "local_accounts_disabled": true,
+      "vnet_integration": true,
+      "private_cluster": false,
+      "workload_identity": true,
+      "node_pools": [
+        {
+          "mode": "System",
+          "count": 2,
+          "vm_size": "Standard_D4ds_v5",
+          "zones": [
+            "1"
+          ]
+        },
+        {
+          "mode": "User",
+          "count": 1,
+          "vm_size": "Standard_D4ds_v5",
+          "zones": [
+            "1"
+          ]
+        }
+      ]
+    },
+    "vault_data_plane": {
+      "public_network_access": "Disabled",
+      "probe_exit_code": 1,
+      "probe_error_code": "ForbiddenByRbac",
+      "secret_values_read": false,
+      "live_mount_test_performed": false,
+      "scope": "The vault reports public access Disabled. The metadata-only probe was rejected with ForbiddenByRbac; this does not isolate a network failure. No private client path or extra vault data-role grant was established for this runner. Lab 06 is not applied; workload identity is explained from source, not claimed as live-tested."
+    },
+    "image_imports": true,
+    "workloads": {
+      "vault_secret_mounted": null,
+      "secret_value_printed": false,
+      "http_status": 200,
+      "gateway_programmed": true,
+      "listener": "HTTP port 80; no production TLS claim",
+      "application_url": "http://20.200.205.153/",
+      "vault_test_scope": "not run: public endpoint disabled; metadata probe rejected; no private runner/data-role setup"
+    },
+    "browser_https": {
+      "application_url": "https://ep03ui-20261106t053813z.koreacentral.cloudapp.azure.com/",
+      "http_status": 200,
+      "http_redirect_status": 308,
+      "tls_verify_result": 0,
+      "upstream_gateway": "http://20.200.205.153/",
+      "upstream_service": "web-gateway-approuting-istio.web.svc.cluster.local:80",
+      "image": "acrep03uitestkrc089ab.azurecr.io/demo/caddy@sha256:c2aeffaeb80d5403e9c8d1d908b50e191aad204e16129f991ae357ada642094d",
+      "tls_protocol": "TLSv1.3",
+      "certificate_issuer": [
+        [
+          [
+            "countryName",
+            "US"
+          ]
+        ],
+        [
+          [
+            "organizationName",
+            "Let's Encrypt"
+          ]
+        ],
+        [
+          [
+            "commonName",
+            "YE1"
+          ]
+        ]
+      ],
+      "certificate_expires": "Feb  4 05:44:15 2027 GMT",
+      "certificate_sha256": "06da45e1962c4bdc9fbb73d431afad3484c77f2708a4ea2aa0cef68462c908e1",
+      "manifest_sha256": "446dd8546d791f13016b8bc94ae301ff24f7432dd787121b750f98791be8e735",
+      "scope": "Temporary public Caddy TLS frontend in the same AKS namespace, reverse-proxying the existing HTTP Gateway and sample app. Public Let's Encrypt certificate; no trust-store changes or insecure verification overrides. Pod-lifetime certificate storage; not production ingress certification.",
+      "removed_before_cluster_cleanup": true
+    },
+    "vault_retention": {
+      "purge_protection": true,
+      "retention_days": 7
+    }
+  },
+  "cleanup": {
+    "remaining_demo_resource_groups": [],
+    "all_applied_stacks_destroyed": true,
+    "key_vault_retention": "Purge-protected soft-deleted vault; not purged. Observed retention: 7 days.",
+    "verified_at": "2026-11-06T07:10:13.120000+00:00"
+  },
+  "privacy": "Account identifiers, user name, administrator IP and local paths are redacted."
+}

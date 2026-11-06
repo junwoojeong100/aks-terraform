@@ -1,0 +1,22 @@
+{
+  "guide-overview": {
+    "file": "guide-overview.webm",
+    "start": 1.5,
+    "label": "Recorded offline guide / scripted navigation / final frame held"
+  },
+  "guide-network": {
+    "file": "guide-network.webm",
+    "start": 1.5,
+    "label": "Recorded offline guide / scripted navigation / final frame held"
+  },
+  "guide-automatic": {
+    "file": "guide-automatic.webm",
+    "start": 1.5,
+    "label": "Recorded offline guide / scripted navigation / final frame held"
+  },
+  "guide-cleanup": {
+    "file": "guide-cleanup.webm",
+    "start": 1.5,
+    "label": "Recorded offline guide / scripted navigation / final frame held"
+  }
+}

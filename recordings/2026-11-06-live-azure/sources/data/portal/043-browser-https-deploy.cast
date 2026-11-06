@@ -1,0 +1,6 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793947351, "title": "Actual Azure execution / browser-https-deploy", "env": {"TERM": "xterm-256color"}}
+[0.000388, "o", "$ kubectl apply -f $LAB_WORK/private/browser-https.json\r\n"]
+[1.134812, "o", "service/browser-https unchanged\r\n"]
+[1.510229, "o", "configmap/browser-https created\r\n"]
+[1.789225, "o", "deployment.apps/browser-https created\r\n"]
+[1.795677, "o", "[recorder] exit=0; elapsed=1.795s\r\n"]

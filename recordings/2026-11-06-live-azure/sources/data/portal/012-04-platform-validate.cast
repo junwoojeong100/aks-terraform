@@ -1,0 +1,5 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793944018, "title": "Actual Azure execution / 04-platform-validate", "env": {"TERM": "xterm-256color"}}
+[0.000424, "o", "$ terraform -chdir=terraform/04-platform validate -no-color\r\n"]
+[0.57583, "o", "Success! The configuration is valid.\r\n"]
+[0.57594, "o", "\r\n"]
+[0.577679, "o", "[recorder] exit=0; elapsed=0.578s\r\n"]

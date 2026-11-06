@@ -1,0 +1,6 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793945318, "title": "Actual Azure execution / nodes-ready", "env": {"TERM": "xterm-256color"}}
+[0.000463, "o", "$ kubectl wait --for=condition=Ready nodes --all --timeout=300s\r\n"]
+[1.721449, "o", "node/aks-system-25576657-vmss000000 condition met\r\n"]
+[1.822802, "o", "node/aks-system-25576657-vmss000001 condition met\r\n"]
+[1.925634, "o", "node/aks-user-32548366-vmss000000 condition met\r\n"]
+[1.927737, "o", "[recorder] exit=0; elapsed=1.928s\r\n"]

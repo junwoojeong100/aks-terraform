@@ -1,0 +1,4 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793945442, "title": "Actual Azure execution / web-app-ready", "env": {"TERM": "xterm-256color"}}
+[0.000422, "o", "$ kubectl -n web rollout status deploy/aspnetapp --timeout=300s\r\n"]
+[1.191283, "o", "deployment \"aspnetapp\" successfully rolled out\r\n"]
+[1.195143, "o", "[recorder] exit=0; elapsed=1.195s\r\n"]

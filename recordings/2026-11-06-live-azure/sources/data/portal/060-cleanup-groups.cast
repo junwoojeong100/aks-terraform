@@ -1,0 +1,4 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793948998, "title": "Actual Azure execution / cleanup-groups", "env": {"TERM": "xterm-256color"}}
+[0.000394, "o", "$ az group list --query '[?starts_with(name,'\"'\"'rg-ep03ui-test-krc-'\"'\"')].name' -o json --subscription <GUID>\r\n"]
+[1.452869, "o", "[]\r\n"]
+[1.537537, "o", "[recorder] exit=0; elapsed=1.537s\r\n"]

@@ -1,0 +1,5 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793947355, "title": "Actual Azure execution / browser-https-probe", "env": {"TERM": "xterm-256color"}}
+[0.001077, "o", "$ curl --fail --silent --show-error --max-time 20 -o $LAB_WORK/private/browser-https-response.html -w 'HTTPS %{http_code}; TLS verification %{ssl_verify_result}\r\n' https://ep03ui-20261106t053813z.koreacentral.cloudapp.azure.com/\r\n"]
+[11.097107, "o", "curl: (35) LibreSSL/3.3.6: error:1404B438:SSL routines:ST_CONNECT:tlsv1 alert internal error\r\n"]
+[11.097672, "o", "HTTPS 000; TLS verification 1\r\n"]
+[11.098295, "o", "[recorder] exit=35; elapsed=11.098s\r\n"]

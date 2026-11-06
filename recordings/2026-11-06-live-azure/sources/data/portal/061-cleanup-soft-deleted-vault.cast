@@ -1,0 +1,9 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793949002, "title": "Actual Azure execution / cleanup-soft-deleted-vault", "env": {"TERM": "xterm-256color"}}
+[0.000512, "o", "$ az keyvault list-deleted --query '[?starts_with(name,'\"'\"'kv-ep03ui-test-'\"'\"')].{name:name,purgeProtection:properties.purgeProtectionEnabled}' -o json --subscription <GUID>\r\n"]
+[10.36947, "o", "[\r\n"]
+[10.369613, "o", "  {\r\n"]
+[10.369664, "o", "    \"name\": \"kv-ep03ui-test-089ab\",\r\n"]
+[10.369707, "o", "    \"purgeProtection\": true\r\n"]
+[10.369747, "o", "  }\r\n"]
+[10.369783, "o", "]\r\n"]
+[10.454541, "o", "[recorder] exit=0; elapsed=10.454s\r\n"]

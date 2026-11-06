@@ -1,0 +1,4 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793947349, "title": "Actual Azure execution / browser-https-dns", "env": {"TERM": "xterm-256color"}}
+[0.000459, "o", "$ az network public-ip list -g rg-ep03ui-test-krc-aks-nodes --query '[?ipAddress=='\"'\"'4.230.97.213'\"'\"'].dnsSettings.fqdn | [0]' -o tsv --subscription <GUID>\r\n"]
+[1.053181, "o", "ep03ui-20261106t053813z.koreacentral.cloudapp.azure.com\r\n"]
+[1.195079, "o", "[recorder] exit=0; elapsed=1.195s\r\n"]

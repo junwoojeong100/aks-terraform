@@ -1,19 +1,29 @@
-00:00:00 01-prerequisites / preflight
-00:02:02 02-bootstrap
-00:04:10 03-network / recorded failure
-00:04:15 Storage policy / diagnosis and compliant adaptation
-00:04:31 03-network
-00:06:46 04-platform
-00:11:03 05-aks
-00:30:39 Live AKS verification
-00:30:59 Live workload and HTTP verification
-00:31:05 Import official lab images into ACR
-00:31:56 Live workload and HTTP verification
-00:32:01 07-ingress
-00:32:51 Live workload and HTTP verification
-00:33:33 Cleanup / 07-ingress
-00:34:54 Cleanup / 05-aks
-00:43:07 Cleanup / 04-platform
-00:45:29 Cleanup / 03-network
-00:48:46 Cleanup / 02-bootstrap
-00:49:24 Cleanup verification
+00:00:00 Source repository / GitHub
+00:00:18 Offline source guide / guide overview
+00:00:31 01-prerequisites / preflight
+00:02:34 02-bootstrap
+00:04:42 Offline source guide / network diagram
+00:04:56 03-network / recorded failure
+00:05:00 Storage policy / diagnosis and compliant adaptation
+00:05:16 03-network
+00:07:32 04-platform
+00:11:49 05-aks
+00:31:25 Live AKS verification
+00:31:42 Actual Azure Portal / cluster overview
+00:32:01 Actual Azure Portal / node pools
+00:32:17 Live AKS verification
+00:32:19 Live workload and HTTP verification
+00:32:26 Import official lab images into ACR
+00:33:16 Live workload and HTTP verification
+00:33:21 07-ingress
+00:34:11 Live workload and HTTP verification
+00:34:50 Actual application / trusted HTTPS / Home + refresh
+00:35:16 Live workload and HTTP verification
+00:35:19 Offline source guide / AKS Automatic / NOT deployed
+00:35:33 Offline source guide / cleanup instructions
+00:35:47 Cleanup / 07-ingress
+00:37:08 Cleanup / 05-aks
+00:45:22 Cleanup / 04-platform
+00:47:44 Cleanup / 03-network
+00:51:01 Cleanup / 02-bootstrap
+00:51:39 Cleanup verification

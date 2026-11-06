@@ -1,0 +1,3 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793946756, "title": "Actual Azure execution / browser-https-image", "env": {"TERM": "xterm-256color"}}
+[0.000762, "o", "$ az acr import -n acrep03uitestkrc089ab --source docker.io/library/caddy:2.11.9 --image demo/caddy:2.11.9 --force --subscription <GUID>\r\n"]
+[565.138862, "o", "[recorder] exit=0; elapsed=565.138s\r\n"]

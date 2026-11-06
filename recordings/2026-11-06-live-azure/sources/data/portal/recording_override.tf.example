@@ -1,0 +1,7 @@
+# Recording-only override: organizational policy disables public Blob access.
+# Preserve the policy; this single-operator temporary lab uses protected local state.
+terraform {
+  backend "local" {
+    path = "terraform.tfstate"
+  }
+}

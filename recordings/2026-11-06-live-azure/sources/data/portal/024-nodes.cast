@@ -1,0 +1,7 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793945320, "title": "Actual Azure execution / nodes", "env": {"TERM": "xterm-256color"}}
+[0.00059, "o", "$ kubectl get nodes -o wide\r\n"]
+[0.796877, "o", "NAME                             STATUS   ROLES    AGE     VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                    KERNEL-VERSION             CONTAINER-RUNTIME\r\n"]
+[0.797007, "o", "aks-system-25576657-vmss000000   Ready    <none>   13m     v1.36.5   10.10.0.4     <none>        Microsoft Azure Linux 3.0   6.6.159.1-2.azl3 (amd64)   containerd://2.2.4\r\n"]
+[0.797062, "o", "aks-system-25576657-vmss000001   Ready    <none>   13m     v1.36.5   10.10.0.5     <none>        Microsoft Azure Linux 3.0   6.6.159.1-2.azl3 (amd64)   containerd://2.2.4\r\n"]
+[0.797114, "o", "aks-user-32548366-vmss000000     Ready    <none>   9m18s   v1.36.5   10.10.0.6     <none>        Microsoft Azure Linux 3.0   6.6.159.1-2.azl3 (amd64)   containerd://2.2.4\r\n"]
+[0.798837, "o", "[recorder] exit=0; elapsed=0.799s\r\n"]

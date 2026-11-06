@@ -1,0 +1,8 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793945327, "title": "Actual Azure execution / vault-network", "env": {"TERM": "xterm-256color"}}
+[0.000526, "o", "$ az keyvault show -n kv-ep03ui-test-089ab --query '{state:properties.provisioningState,publicNetworkAccess:properties.publicNetworkAccess,defaultAction:properties.networkAcls.defaultAction}' -o json --subscription <GUID>\r\n"]
+[1.407422, "o", "{\r\n"]
+[1.407544, "o", "  \"defaultAction\": \"Deny\",\r\n"]
+[1.407594, "o", "  \"publicNetworkAccess\": \"Disabled\",\r\n"]
+[1.407634, "o", "  \"state\": \"Succeeded\"\r\n"]
+[1.407669, "o", "}\r\n"]
+[1.462347, "o", "[recorder] exit=0; elapsed=1.462s\r\n"]

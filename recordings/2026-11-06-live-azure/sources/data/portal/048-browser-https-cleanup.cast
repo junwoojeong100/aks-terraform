@@ -1,0 +1,6 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793947641, "title": "Actual Azure execution / browser-https-cleanup", "env": {"TERM": "xterm-256color"}}
+[0.001112, "o", "$ kubectl -n web delete service/browser-https deployment/browser-https configmap/browser-https --ignore-not-found --wait=true --timeout=300s\r\n"]
+[0.725751, "o", "service \"browser-https\" deleted from web namespace\r\n"]
+[0.936934, "o", "deployment.apps \"browser-https\" deleted from web namespace\r\n"]
+[1.263007, "o", "configmap \"browser-https\" deleted from web namespace\r\n"]
+[42.285129, "o", "[recorder] exit=0; elapsed=42.285s\r\n"]

@@ -1,0 +1,4 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793945443, "title": "Actual Azure execution / gateway-ready", "env": {"TERM": "xterm-256color"}}
+[0.000712, "o", "$ kubectl -n web wait --for=condition=Programmed gateway/web-gateway --timeout=300s\r\n"]
+[9.532247, "o", "gateway.gateway.networking.k8s.io/web-gateway condition met\r\n"]
+[9.535743, "o", "[recorder] exit=0; elapsed=9.536s\r\n"]

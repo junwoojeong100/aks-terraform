@@ -1,0 +1,3 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793945330, "title": "Actual Azure execution / import-busybox", "env": {"TERM": "xterm-256color"}}
+[0.000525, "o", "$ az acr import -n acrep03uitestkrc089ab --source mcr.microsoft.com/cbl-mariner/busybox:2.0 --image demo/busybox:2.0 --subscription <GUID>\r\n"]
+[14.271147, "o", "[recorder] exit=0; elapsed=14.271s\r\n"]

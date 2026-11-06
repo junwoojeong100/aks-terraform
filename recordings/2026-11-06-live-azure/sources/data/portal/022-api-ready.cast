@@ -1,0 +1,4 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793945315, "title": "Actual Azure execution / api-ready", "env": {"TERM": "xterm-256color"}}
+[0.000386, "o", "$ kubectl get --raw=/readyz\r\n"]
+[2.965681, "o", "ok"]
+[2.965903, "o", "[recorder] exit=0; elapsed=2.966s\r\n"]

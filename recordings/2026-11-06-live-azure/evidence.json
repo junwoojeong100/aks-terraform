@@ -30,8 +30,10 @@
       "exit_code": 0,
       "duration": 121.657512,
       "cast_sha256": "a91f80878e4ff944c301bee189dfd8eb9e88b2f91392d4b9e236379e62f01c1c",
-      "video_start": 0.0,
-      "video_end": 122.7
+      "cast_start": 0.0,
+      "cast_end": 122.7,
+      "video_start": 31.7,
+      "video_end": 154.4
     },
     {
       "label": "02-bootstrap-init",
@@ -42,8 +44,10 @@
       "exit_code": 0,
       "duration": 1.131513,
       "cast_sha256": "a60a7860d75d44851851c966e7b7ba5e91a14a5e81ae226d632e008950444478",
-      "video_start": 122.7,
-      "video_end": 124.9
+      "cast_start": 122.7,
+      "cast_end": 124.9,
+      "video_start": 154.4,
+      "video_end": 156.6
     },
     {
       "label": "02-bootstrap-validate",
@@ -54,8 +58,10 @@
       "exit_code": 0,
       "duration": 0.745128,
       "cast_sha256": "f78c8ce371bb8974306b24919fafb251bb65aa8fe365da1507b74cd89c1b8c5d",
-      "video_start": 124.9,
-      "video_end": 126.7
+      "cast_start": 124.9,
+      "cast_end": 126.7,
+      "video_start": 156.6,
+      "video_end": 158.4
     },
     {
       "label": "02-bootstrap-plan",
@@ -66,8 +72,10 @@
       "exit_code": 0,
       "duration": 3.420227,
       "cast_sha256": "d7cb0e9de4f33258ca5af22ae35d2dd972b96e973a9e60289a62f16b9afcc6e7",
-      "video_start": 126.7,
-      "video_end": 131.2
+      "cast_start": 126.7,
+      "cast_end": 131.2,
+      "video_start": 158.4,
+      "video_end": 162.9
     },
     {
       "label": "02-bootstrap-apply",
@@ -78,8 +86,10 @@
       "exit_code": 0,
       "duration": 118.427493,
       "cast_sha256": "0ca2c23ffc563df91b818a2e0f3e8ce9e5d9e2615c1866c93c5e7920bd0b2820",
-      "video_start": 131.2,
-      "video_end": 250.7
+      "cast_start": 131.2,
+      "cast_end": 250.7,
+      "video_start": 162.9,
+      "video_end": 282.4
     },
     {
       "label": "03-network-init",
@@ -90,8 +100,10 @@
       "exit_code": 1,
       "duration": 3.250544,
       "cast_sha256": "5b8d0d6f229b6658241772ff1a8f1d2825e00e512522fab98db2e75b9ce7a651",
-      "video_start": 250.7,
-      "video_end": 255.0
+      "cast_start": 250.7,
+      "cast_end": 255.0,
+      "video_start": 296.3,
+      "video_end": 300.6
     },
     {
       "label": "state-network-diagnostic",
@@ -102,8 +114,10 @@
       "exit_code": 0,
       "duration": 1.757994,
       "cast_sha256": "dc8b765244bc6bb0376b4de08be77efadca0afc4499d91b9d6dc36fcd72ff997",
-      "video_start": 255.0,
-      "video_end": 257.8
+      "cast_start": 255.0,
+      "cast_end": 257.8,
+      "video_start": 300.6,
+      "video_end": 303.4
     },
     {
       "label": "state-blob-access",
@@ -114,8 +128,10 @@
       "exit_code": 1,
       "duration": 1.519609,
       "cast_sha256": "bb95edf900306b97275da6f26bf743f2939906fa7f58dba9dd8abe91efcb8bb3",
-      "video_start": 257.8,
-      "video_end": 260.4
+      "cast_start": 257.8,
+      "cast_end": 260.4,
+      "video_start": 303.4,
+      "video_end": 306.0
     },
     {
       "label": "state-change-events",
@@ -126,8 +142,10 @@
       "exit_code": 0,
       "duration": 1.864947,
       "cast_sha256": "5e9651c5456f8a0df712a2dc38d758c50920eb02b6eb6c3ec6e724d15b722735",
-      "video_start": 260.4,
-      "video_end": 263.3
+      "cast_start": 260.4,
+      "cast_end": 263.3,
+      "video_start": 306.0,
+      "video_end": 308.9
     },
     {
       "label": "state-refresh-plan",
@@ -138,8 +156,10 @@
       "exit_code": 0,
       "duration": 5.529921,
       "cast_sha256": "77bb8708dda4322cf24bc0bad49a200232b34760bb60a1c02585983402994088",
-      "video_start": 263.3,
-      "video_end": 269.9
+      "cast_start": 263.3,
+      "cast_end": 269.9,
+      "video_start": 308.9,
+      "video_end": 315.5
     },
     {
       "label": "backend-policy-adaptation",
@@ -150,8 +170,10 @@
       "exit_code": 0,
       "duration": 0.008103,
       "cast_sha256": "0253c8df5daa91d1199b2ffb1b92b05161bae3feefee5ddbdfca5c1e2f4aa69b",
-      "video_start": 269.9,
-      "video_end": 271.0
+      "cast_start": 269.9,
+      "cast_end": 271.0,
+      "video_start": 315.5,
+      "video_end": 316.6
     },
     {
       "label": "03-network-init",
@@ -162,8 +184,10 @@
       "exit_code": 0,
       "duration": 1.071321,
       "cast_sha256": "8e77d7f92626b85d85e9b8fc9ee7fd668781a3d54049893f40a7105561614b5c",
-      "video_start": 271.0,
-      "video_end": 273.1
+      "cast_start": 271.0,
+      "cast_end": 273.1,
+      "video_start": 316.6,
+      "video_end": 318.7
     },
     {
       "label": "03-network-validate",
@@ -174,8 +198,10 @@
       "exit_code": 0,
       "duration": 0.697931,
       "cast_sha256": "f44d8eb91ab421ac0fa0e5b87213a5fb4a150bb16a7985d2634bbe62d84d36e7",
-      "video_start": 273.1,
-      "video_end": 274.8
+      "cast_start": 273.1,
+      "cast_end": 274.8,
+      "video_start": 318.7,
+      "video_end": 320.4
     },
     {
       "label": "03-network-plan",
@@ -186,8 +212,10 @@
       "exit_code": 0,
       "duration": 2.935665,
       "cast_sha256": "9667a1e07fe3be50492e09846d4399c23115642a0840a7bff01ec8f91414983e",
-      "video_start": 274.8,
-      "video_end": 278.8
+      "cast_start": 274.8,
+      "cast_end": 278.8,
+      "video_start": 320.4,
+      "video_end": 324.4
     },
     {
       "label": "03-network-apply",
@@ -198,8 +226,10 @@
       "exit_code": 0,
       "duration": 126.872598,
       "cast_sha256": "f722ce2b0ef8bdcb3efa76a239f4a810ff48963a4b75c18463695d96530b4e11",
-      "video_start": 278.8,
-      "video_end": 406.7
+      "cast_start": 278.8,
+      "cast_end": 406.7,
+      "video_start": 324.4,
+      "video_end": 452.3
     },
     {
       "label": "04-platform-init",
@@ -210,8 +240,10 @@
       "exit_code": 0,
       "duration": 0.690441,
       "cast_sha256": "dae1c357446d9ec153a39cf038fd0d64a6ec1b3760c2cd897bb06331621caab0",
-      "video_start": 406.7,
-      "video_end": 408.4
+      "cast_start": 406.7,
+      "cast_end": 408.4,
+      "video_start": 452.3,
+      "video_end": 454.0
     },
     {
       "label": "04-platform-validate",
@@ -222,8 +254,10 @@
       "exit_code": 0,
       "duration": 0.582013,
       "cast_sha256": "e299b3c6e1db45232a0cbf43c6e47ddd1b67d4844548a5f164319672605d23d6",
-      "video_start": 408.4,
-      "video_end": 410.0
+      "cast_start": 408.4,
+      "cast_end": 410.0,
+      "video_start": 454.0,
+      "video_end": 455.6
     },
     {
       "label": "04-platform-plan",
@@ -234,8 +268,10 @@
       "exit_code": 0,
       "duration": 3.707795,
       "cast_sha256": "a1a19c357e4f4c8d790afc061391318be2a0e345e37a195600a81a0501015a3b",
-      "video_start": 410.0,
-      "video_end": 414.8
+      "cast_start": 410.0,
+      "cast_end": 414.8,
+      "video_start": 455.6,
+      "video_end": 460.4
     },
     {
       "label": "04-platform-apply",
@@ -246,8 +282,10 @@
       "exit_code": 0,
       "duration": 248.055519,
       "cast_sha256": "5655326135c0336470a49e970612d6c068fd61dd5705c802fb757174eca09355",
-      "video_start": 414.8,
-      "video_end": 663.9
+      "cast_start": 414.8,
+      "cast_end": 663.9,
+      "video_start": 460.4,
+      "video_end": 709.5
     },
     {
       "label": "05-aks-init",
@@ -258,8 +296,10 @@
       "exit_code": 0,
       "duration": 1.998266,
       "cast_sha256": "1e967adff5f9b170d3fbbcbad1cb39b52d872502fc5cfb2ffec78df77bd99b23",
-      "video_start": 663.9,
-      "video_end": 666.9
+      "cast_start": 663.9,
+      "cast_end": 666.9,
+      "video_start": 709.5,
+      "video_end": 712.5
     },
     {
       "label": "05-aks-validate",
@@ -270,8 +310,10 @@
       "exit_code": 0,
       "duration": 1.023307,
       "cast_sha256": "eff1846bb2424f249d6ef7660c19a8cf935df57c615fb3e2c8013036e0539a52",
-      "video_start": 666.9,
-      "video_end": 669.0
+      "cast_start": 666.9,
+      "cast_end": 669.0,
+      "video_start": 712.5,
+      "video_end": 714.6
     },
     {
       "label": "05-aks-plan",
@@ -282,8 +324,10 @@
       "exit_code": 0,
       "duration": 4.633198,
       "cast_sha256": "b8a44785cc74766091a4f710195a0e8a6324fdf26611b2eaaf107ed1a8daa958",
-      "video_start": 669.0,
-      "video_end": 674.7
+      "cast_start": 669.0,
+      "cast_end": 674.7,
+      "video_start": 714.6,
+      "video_end": 720.3
     },
     {
       "label": "05-aks-apply",
@@ -294,8 +338,10 @@
       "exit_code": 0,
       "duration": 1163.629342,
       "cast_sha256": "7ca9fe8ffd5c304f6fd892750b333f4eb496a690945b261fba10c9d999244b9d",
-      "video_start": 674.7,
-      "video_end": 1839.4
+      "cast_start": 674.7,
+      "cast_end": 1839.4,
+      "video_start": 720.3,
+      "video_end": 1885.0
     },
     {
       "label": "azure-cluster",
@@ -306,8 +352,10 @@
       "exit_code": 0,
       "duration": 2.206662,
       "cast_sha256": "80d71558431601e8697702a49e350f2f657b1d9a6d06367e1aa7acdca8246f77",
-      "video_start": 1839.4,
-      "video_end": 1842.7
+      "cast_start": 1839.4,
+      "cast_end": 1842.7,
+      "video_start": 1885.0,
+      "video_end": 1888.3
     },
     {
       "label": "credentials",
@@ -318,8 +366,10 @@
       "exit_code": 0,
       "duration": 2.07213,
       "cast_sha256": "5314f018b3cf029b14fdc4c208575726d8277ee541d053d88bb7f9f25b78f3c3",
-      "video_start": 1842.7,
-      "video_end": 1845.8
+      "cast_start": 1842.7,
+      "cast_end": 1845.8,
+      "video_start": 1888.3,
+      "video_end": 1891.4
     },
     {
       "label": "entra-login",
@@ -330,8 +380,10 @@
       "exit_code": 0,
       "duration": 0.020958,
       "cast_sha256": "b38a8c2df9bdf788f0ee2045477306e84c8b5caaef39c70022ef8c9df421ea55",
-      "video_start": 1845.8,
-      "video_end": 1846.9
+      "cast_start": 1845.8,
+      "cast_end": 1846.9,
+      "video_start": 1891.4,
+      "video_end": 1892.5
     },
     {
       "label": "api-ready",
@@ -342,8 +394,10 @@
       "exit_code": 0,
       "duration": 2.430142,
       "cast_sha256": "f427c6455f5969f0a7fd0e0a335a8e61e6a64be292be0a46ac29aa5a31706b74",
-      "video_start": 1846.9,
-      "video_end": 1850.4
+      "cast_start": 1846.9,
+      "cast_end": 1850.4,
+      "video_start": 1892.5,
+      "video_end": 1896.0
     },
     {
       "label": "nodes-ready",
@@ -354,8 +408,10 @@
       "exit_code": 0,
       "duration": 1.819607,
       "cast_sha256": "3f8fcbc3af8b3eccf966898c4d9b8d87f07967f107b9db93f9821caafc2b6bbc",
-      "video_start": 1850.4,
-      "video_end": 1853.3
+      "cast_start": 1850.4,
+      "cast_end": 1853.3,
+      "video_start": 1896.0,
+      "video_end": 1898.9
     },
     {
       "label": "nodes",
@@ -366,8 +422,10 @@
       "exit_code": 0,
       "duration": 0.753356,
       "cast_sha256": "de85e5afa96729bbf2869617450209b1feb4754ea9069f8d0873b151b2067bed",
-      "video_start": 1853.3,
-      "video_end": 1855.1
+      "cast_start": 1853.3,
+      "cast_end": 1855.1,
+      "video_start": 1898.9,
+      "video_end": 1900.7
     },
     {
       "label": "system-pods",
@@ -378,8 +436,10 @@
       "exit_code": 0,
       "duration": 0.860634,
       "cast_sha256": "693d0c62419ff5522d224ebac2774bbf62e529fbc029f6013cec82d27c6231cf",
-      "video_start": 1855.1,
-      "video_end": 1857.0
+      "cast_start": 1855.1,
+      "cast_end": 1857.0,
+      "video_start": 1900.7,
+      "video_end": 1902.6
     },
     {
       "label": "saved-creation-plan",
@@ -390,8 +450,10 @@
       "exit_code": 0,
       "duration": 1.510491,
       "cast_sha256": "7ce9a3af034f2578e8f6d5cce2beddd296a6a73056d1255c9488640d484176ed",
-      "video_start": 1857.0,
-      "video_end": 1859.6
+      "cast_start": 1857.0,
+      "cast_end": 1859.6,
+      "video_start": 1937.2,
+      "video_end": 1939.8
     },
     {
       "label": "vault-network",
@@ -402,8 +464,10 @@
       "exit_code": 0,
       "duration": 2.664398,
       "cast_sha256": "11d54956992634759c172ac615285f7f1fc497a8b54b45c759ce2a46a654b1d1",
-      "video_start": 1859.6,
-      "video_end": 1863.3
+      "cast_start": 1859.6,
+      "cast_end": 1863.3,
+      "video_start": 1939.8,
+      "video_end": 1943.5
     },
     {
       "label": "vault-data-plane-probe",
@@ -414,8 +478,10 @@
       "exit_code": 1,
       "duration": 1.553336,
       "cast_sha256": "1862685064162a0275cccb0c4acde4c4ebb51d1ce4a2048c26b8a1c470e18ec0",
-      "video_start": 1863.3,
-      "video_end": 1865.9
+      "cast_start": 1863.3,
+      "cast_end": 1865.9,
+      "video_start": 1943.5,
+      "video_end": 1946.1
     },
     {
       "label": "import-busybox",
@@ -426,8 +492,10 @@
       "exit_code": 0,
       "duration": 14.452461,
       "cast_sha256": "aa1388bf727018aab598f28f36728c0eb60e45639d75b19b7e11642337dff45f",
-      "video_start": 1865.9,
-      "video_end": 1881.4
+      "cast_start": 1865.9,
+      "cast_end": 1881.4,
+      "video_start": 1946.1,
+      "video_end": 1961.6
     },
     {
       "label": "import-aspnetapp",
@@ -438,8 +506,10 @@
       "exit_code": 0,
       "duration": 34.090646,
       "cast_sha256": "a7539a0d7c8c7a1838ab6a588f995889c2cbc8f036610141e98ac1b875df51b6",
-      "video_start": 1881.4,
-      "video_end": 1916.5
+      "cast_start": 1881.4,
+      "cast_end": 1916.5,
+      "video_start": 1961.6,
+      "video_end": 1996.7
     },
     {
       "label": "vault-network",
@@ -450,8 +520,10 @@
       "exit_code": 0,
       "duration": 1.417869,
       "cast_sha256": "5110a30b7e46bd07c5f401939cc61720a3c91f8041fd7f11aa63fa83269fdc83",
-      "video_start": 1916.5,
-      "video_end": 1919.0
+      "cast_start": 1916.5,
+      "cast_end": 1919.0,
+      "video_start": 1996.7,
+      "video_end": 1999.2
     },
     {
       "label": "vault-data-plane-probe",
@@ -462,8 +534,10 @@
       "exit_code": 1,
       "duration": 1.30454,
       "cast_sha256": "b8e3e6106e5acee3e822a548dda5c883116531ade2e1a7c3929d64ffa108b821",
-      "video_start": 1919.0,
-      "video_end": 1921.4
+      "cast_start": 1919.0,
+      "cast_end": 1921.4,
+      "video_start": 1999.2,
+      "video_end": 2001.6
     },
     {
       "label": "07-ingress-init",
@@ -474,8 +548,10 @@
       "exit_code": 0,
       "duration": 13.026348,
       "cast_sha256": "565c838be7ae1528c366709260d66d0211afed266c25c2b4d94d68979585809b",
-      "video_start": 1921.4,
-      "video_end": 1935.5
+      "cast_start": 1921.4,
+      "cast_end": 1935.5,
+      "video_start": 2001.6,
+      "video_end": 2015.7
     },
     {
       "label": "07-ingress-validate",
@@ -486,8 +562,10 @@
       "exit_code": 0,
       "duration": 4.340537,
       "cast_sha256": "5d6fddf5d63d6409abaf17905b65652d2a8548b5701de441b04645e86cb91991",
-      "video_start": 1935.5,
-      "video_end": 1940.9
+      "cast_start": 1935.5,
+      "cast_end": 1940.9,
+      "video_start": 2015.7,
+      "video_end": 2021.1
     },
     {
       "label": "07-ingress-plan",
@@ -498,8 +576,10 @@
       "exit_code": 0,
       "duration": 8.17967,
       "cast_sha256": "cd2d1702b5d7f580ba970832eaf95b0c92cbdc065e2b63c0886872f7543c9fa6",
-      "video_start": 1940.9,
-      "video_end": 1950.1
+      "cast_start": 1940.9,
+      "cast_end": 1950.1,
+      "video_start": 2021.1,
+      "video_end": 2030.3
     },
     {
       "label": "07-ingress-apply",
@@ -510,8 +590,10 @@
       "exit_code": 0,
       "duration": 20.147974,
       "cast_sha256": "3dbb342a10798ebdce53870f275ec0d68bad0e037626d3d3ba78c21573c9a285",
-      "video_start": 1950.1,
-      "video_end": 1971.3
+      "cast_start": 1950.1,
+      "cast_end": 1971.3,
+      "video_start": 2030.3,
+      "video_end": 2051.5
     },
     {
       "label": "web-app-ready",
@@ -522,8 +604,10 @@
       "exit_code": 0,
       "duration": 0.814301,
       "cast_sha256": "8f61d4244c7639d2371ebad60191dcb08687bcc51d772eebf95ce478c01564a5",
-      "video_start": 1971.3,
-      "video_end": 1973.2
+      "cast_start": 1971.3,
+      "cast_end": 1973.2,
+      "video_start": 2051.5,
+      "video_end": 2053.4
     },
     {
       "label": "gateway-ready",
@@ -534,8 +618,10 @@
       "exit_code": 0,
       "duration": 25.631021,
       "cast_sha256": "a8ba4bd3249e8728c2db5eabff52c391f0aee6f82800dadebc22a4c08070f066",
-      "video_start": 1973.2,
-      "video_end": 1999.9
+      "cast_start": 1973.2,
+      "cast_end": 1999.9,
+      "video_start": 2053.4,
+      "video_end": 2080.1
     },
     {
       "label": "gateway-status",
@@ -546,8 +632,10 @@
       "exit_code": 0,
       "duration": 1.094959,
       "cast_sha256": "207b195e7ec9759c3009be5b6f4aa28e54c7c46bc4a71d8b159669ad671b26d8",
-      "video_start": 1999.9,
-      "video_end": 2002.0
+      "cast_start": 1999.9,
+      "cast_end": 2002.0,
+      "video_start": 2080.1,
+      "video_end": 2082.2
     },
     {
       "label": "http-probe",
@@ -558,8 +646,10 @@
       "exit_code": 0,
       "duration": 0.08893,
       "cast_sha256": "e2cf790386dba7073204bdafaaa03ff97779cf6498b0922372af0b295e20f083",
-      "video_start": 2002.0,
-      "video_end": 2003.1
+      "cast_start": 2002.0,
+      "cast_end": 2003.1,
+      "video_start": 2082.2,
+      "video_end": 2083.3
     },
     {
       "label": "web-app-ready",
@@ -570,8 +660,10 @@
       "exit_code": 0,
       "duration": 1.11561,
       "cast_sha256": "e497f8228213d1b4f39af982145aa0915af0c5ad99b316a748177f2c1d22f4d5",
-      "video_start": 2003.1,
-      "video_end": 2005.3
+      "cast_start": 2003.1,
+      "cast_end": 2005.3,
+      "video_start": 2083.3,
+      "video_end": 2085.5
     },
     {
       "label": "gateway-ready",
@@ -582,8 +674,10 @@
       "exit_code": 0,
       "duration": 0.807186,
       "cast_sha256": "5b929e0c032ecc4bb95a0e7532ca4ad1a10333dba59d443eb7ba14f6c5cb1287",
-      "video_start": 2005.3,
-      "video_end": 2007.2
+      "cast_start": 2005.3,
+      "cast_end": 2007.2,
+      "video_start": 2085.5,
+      "video_end": 2087.4
     },
     {
       "label": "gateway-status",
@@ -594,8 +688,10 @@
       "exit_code": 0,
       "duration": 0.770511,
       "cast_sha256": "5c015819df518d455d79ab2cb08d5b1732003145209df32d4ed97b8e8d11325a",
-      "video_start": 2007.2,
-      "video_end": 2009.0
+      "cast_start": 2007.2,
+      "cast_end": 2009.0,
+      "video_start": 2087.4,
+      "video_end": 2089.2
     },
     {
       "label": "http-probe",
@@ -606,8 +702,10 @@
       "exit_code": 0,
       "duration": 0.037732,
       "cast_sha256": "c5d868424b41e406c60125f93f1183b8ffab2a3c112043f2eabed8a03c307823",
-      "video_start": 2009.0,
-      "video_end": 2010.1
+      "cast_start": 2009.0,
+      "cast_end": 2010.1,
+      "video_start": 2089.2,
+      "video_end": 2090.3
     },
     {
       "label": "vault-retention",
@@ -618,8 +716,10 @@
       "exit_code": 0,
       "duration": 1.922301,
       "cast_sha256": "c3e1da30cc683330a0f4820419d7cec361f819be4fff358ce1dfa5dcf24c322e",
-      "video_start": 2010.1,
-      "video_end": 2013.1
+      "cast_start": 2010.1,
+      "cast_end": 2013.1,
+      "video_start": 2116.3,
+      "video_end": 2119.3
     },
     {
       "label": "07-ingress-destroy-plan",
@@ -630,8 +730,10 @@
       "exit_code": 0,
       "duration": 10.918211,
       "cast_sha256": "911405d2e9c79cf3eb041015c1aed4d5e04f1c55af1fa58fdf98b303a351b0a7",
-      "video_start": 2013.1,
-      "video_end": 2025.1
+      "cast_start": 2013.1,
+      "cast_end": 2025.1,
+      "video_start": 2147.6,
+      "video_end": 2159.6
     },
     {
       "label": "07-ingress-destroy",
@@ -642,8 +744,10 @@
       "exit_code": 0,
       "duration": 68.092891,
       "cast_sha256": "0c074eb727f5069af3fdb99b6f752993ad4843e40db2fbd17c6707d0c48fcd33",
-      "video_start": 2025.1,
-      "video_end": 2094.2
+      "cast_start": 2025.1,
+      "cast_end": 2094.2,
+      "video_start": 2159.6,
+      "video_end": 2228.7
     },
     {
       "label": "05-aks-destroy-plan",
@@ -654,8 +758,10 @@
       "exit_code": 0,
       "duration": 44.103661,
       "cast_sha256": "8df3c3e175d65e3c17d22ce7768e68b15f13d47b22aa94d36e97623116852427",
-      "video_start": 2094.2,
-      "video_end": 2139.4
+      "cast_start": 2094.2,
+      "cast_end": 2139.4,
+      "video_start": 2228.7,
+      "video_end": 2273.9
     },
     {
       "label": "05-aks-destroy",
@@ -666,8 +772,10 @@
       "exit_code": 0,
       "duration": 447.249909,
       "cast_sha256": "e31ae53ebf0ff488f29dde3bc075f7e3aca15926b38ba2afe82743f44c3dbadf",
-      "video_start": 2139.4,
-      "video_end": 2587.7
+      "cast_start": 2139.4,
+      "cast_end": 2587.7,
+      "video_start": 2273.9,
+      "video_end": 2722.2
     },
     {
       "label": "04-platform-destroy-plan",
@@ -678,8 +786,10 @@
       "exit_code": 0,
       "duration": 14.912536,
       "cast_sha256": "55bf043fbe10ef279fd0bb00256b4e025cef7d413bdb9a7370f41e5fb8440678",
-      "video_start": 2587.7,
-      "video_end": 2603.7
+      "cast_start": 2587.7,
+      "cast_end": 2603.7,
+      "video_start": 2722.2,
+      "video_end": 2738.2
     },
     {
       "label": "04-platform-destroy",
@@ -690,8 +800,10 @@
       "exit_code": 0,
       "duration": 125.031291,
       "cast_sha256": "814475a416ce5f056a4e8f83f05dabc2f7b6c42aea8a14be56a5be761c307d5a",
-      "video_start": 2603.7,
-      "video_end": 2729.8
+      "cast_start": 2603.7,
+      "cast_end": 2729.8,
+      "video_start": 2738.2,
+      "video_end": 2864.3
     },
     {
       "label": "03-network-destroy-plan",
@@ -702,8 +814,10 @@
       "exit_code": 0,
       "duration": 8.410187,
       "cast_sha256": "655df0c1ae81dd6459c0d1c960db13ee87bcaebf4747dc3238c8e0b4f3f21004",
-      "video_start": 2729.8,
-      "video_end": 2739.3
+      "cast_start": 2729.8,
+      "cast_end": 2739.3,
+      "video_start": 2864.3,
+      "video_end": 2873.8
     },
     {
       "label": "03-network-destroy",
@@ -714,8 +828,10 @@
       "exit_code": 0,
       "duration": 186.553955,
       "cast_sha256": "f7e786256d1a63929c4450d268d11c9cf40ec72da7b1ad70df2a2ddf5c9ab26b",
-      "video_start": 2739.3,
-      "video_end": 2926.9
+      "cast_start": 2739.3,
+      "cast_end": 2926.9,
+      "video_start": 2873.8,
+      "video_end": 3061.4
     },
     {
       "label": "02-bootstrap-destroy-plan",
@@ -726,8 +842,10 @@
       "exit_code": 0,
       "duration": 9.984769,
       "cast_sha256": "98b8070ba2f4d5804afd3325bb27f62476ef2527cc3e949103bbfac042266398",
-      "video_start": 2926.9,
-      "video_end": 2937.9
+      "cast_start": 2926.9,
+      "cast_end": 2937.9,
+      "video_start": 3061.4,
+      "video_end": 3072.4
     },
     {
       "label": "02-bootstrap-destroy",
@@ -738,8 +856,10 @@
       "exit_code": 0,
       "duration": 25.534669,
       "cast_sha256": "850aff7617cff6ebc4e19b5a689dfd63383a683638bdfbcc3472f584766736bf",
-      "video_start": 2937.9,
-      "video_end": 2964.5
+      "cast_start": 2937.9,
+      "cast_end": 2964.5,
+      "video_start": 3072.4,
+      "video_end": 3099.0
     },
     {
       "label": "cleanup-groups",
@@ -750,8 +870,10 @@
       "exit_code": 0,
       "duration": 6.050963,
       "cast_sha256": "e0ef38aadd0280da0274205e9422358af371507418de94ba643385b505a91c85",
-      "video_start": 2964.5,
-      "video_end": 2971.6
+      "cast_start": 2964.5,
+      "cast_end": 2971.6,
+      "video_start": 3099.0,
+      "video_end": 3106.1
     },
     {
       "label": "cleanup-soft-deleted-vault",
@@ -762,8 +884,10 @@
       "exit_code": 0,
       "duration": 8.491947,
       "cast_sha256": "018910c7c41549148d9600da424875d23eaed53cd7bdc88ed09bbe726d9352a1",
-      "video_start": 2971.6,
-      "video_end": 2981.1
+      "cast_start": 2971.6,
+      "cast_end": 2981.1,
+      "video_start": 3106.1,
+      "video_end": 3115.6
     }
   ],
   "stacks": {
@@ -902,20 +1026,892 @@
     "verified_at": "2026-11-06T04:04:17.374883+00:00"
   },
   "privacy": "Account identifiers, user name, administrator IP and local paths are redacted.",
+  "combined_cast": {
+    "file": "lab.cast",
+    "duration": 2981.1,
+    "sha256": "fd45b657dbfbba501116646bc3fdf949118e0f2a7e51e3ff19e4d184e7149541",
+    "timing": "Unchanged terminal-only replay; cast_start/end exclude inserted screen footage."
+  },
+  "supplemental_media": {
+    "source_commit": "f9b7c047467f28e9ad2d430422bd69e3520ddbe8",
+    "browser_recording_id": "ep03-portal-20261106T053813Z",
+    "browser_evidence": "sources/data/browser_run.json",
+    "azure_evidence": "sources/data/portal_run.json",
+    "guide_evidence": "sources/guide/guide.json",
+    "scope": "Episode 03's existing public browser clips and offline-guide screenshots/recordings, reused without recreating Azure resources. Portal/app footage belongs to the separate, cleaned-up ep03ui lab; ep03live command recordings remain unchanged.",
+    "visual_sources": [
+      {
+        "name": "browser-repo",
+        "kind": "browser-video",
+        "file": "sources/data/browser/browser-repo.mp4",
+        "sha256": "535683ded6c37914741f6759b10f3c84d5a8dce3002aab0c757e055d455806f8",
+        "chapter": "Source repository / GitHub",
+        "scope": "Actual public repository / source f9b7c04 / 1x playback",
+        "recording_id": "ep03-portal-20261106T053813Z",
+        "source_start": 0.0,
+        "source_duration": 18.5,
+        "duration": 18.5,
+        "screenshot": {
+          "file": "sources/data/browser/browser-repo.png",
+          "source_time": 3.0,
+          "sha256": "ed30858bd3061e2286ad8d9dfefde522b1d1395d2670388602e9d0519ee1ad7b"
+        }
+      },
+      {
+        "name": "browser-portal-overview",
+        "kind": "browser-video",
+        "file": "sources/data/browser/browser-portal-overview.mp4",
+        "sha256": "f54d91e29c8ccf5ec8ebf801f2ebce3af140a7facc0d75ac1ee550ade886096c",
+        "chapter": "Actual Azure Portal / cluster overview",
+        "scope": "Separate ep03ui lab, not the ep03live terminal run / removed after filming / 1x playback",
+        "recording_id": "ep03-portal-20261106T053813Z",
+        "source_start": 0.0,
+        "source_duration": 18.533333,
+        "duration": 18.6,
+        "screenshot": {
+          "file": "sources/data/browser/browser-portal-overview.png",
+          "source_time": 3.0,
+          "sha256": "a10c06725280f6897224c133363efd66704e996929618bd56b529a58a8027357"
+        }
+      },
+      {
+        "name": "browser-portal-pools",
+        "kind": "browser-video",
+        "file": "sources/data/browser/browser-portal-pools.mp4",
+        "sha256": "174fcebf2fa30418b6637a0f9c42ad802d8c60b31c1468cda8b9319a6c0731f5",
+        "chapter": "Actual Azure Portal / node pools",
+        "scope": "Separate ep03ui lab / System 2 + User 1 / single zone, not production HA / 1x playback",
+        "recording_id": "ep03-portal-20261106T053813Z",
+        "source_start": 0.0,
+        "source_duration": 15.966667,
+        "duration": 16.0,
+        "screenshot": {
+          "file": "sources/data/browser/browser-portal-pools.png",
+          "source_time": 3.0,
+          "sha256": "6b7081e1603c28ddf4080cc97990ee2030f6317f97a9dd19b32c24186f8284df"
+        }
+      },
+      {
+        "name": "browser-app",
+        "kind": "browser-video",
+        "file": "sources/data/browser/browser-app.mp4",
+        "sha256": "4784d7519691bcf72106519a64f1eb905700dd4db9a3128aa07506dddf90bb52",
+        "chapter": "Actual application / trusted HTTPS / Home + refresh",
+        "scope": "Separate ep03ui lab / temporary public-certificate frontend, not production TLS / 1x playback",
+        "recording_id": "ep03-portal-20261106T053813Z",
+        "source_start": 0.0,
+        "source_duration": 26.0,
+        "duration": 26.0,
+        "screenshot": {
+          "file": "sources/data/browser/browser-app.png",
+          "source_time": 3.0,
+          "sha256": "d0425452c00f38b552cc6aa29cc7964b210e9434361585c68ade6f81db17c910"
+        }
+      },
+      {
+        "name": "guide-overview-still",
+        "kind": "screenshot",
+        "file": "sources/guide/guide-overview.png",
+        "sha256": "bc4510e51e6ca55038cddbff15cf6db20da3fde7217e4f166c66d01ed86be5c3",
+        "chapter": "Offline source guide / guide overview",
+        "scope": "Episode 03 source walkthrough / scripted offline HTML navigation / not live deployment evidence",
+        "recording_id": null,
+        "source_start": 0.0,
+        "source_duration": 4.0,
+        "duration": 4.0
+      },
+      {
+        "name": "guide-overview",
+        "kind": "guide-video",
+        "file": "sources/guide/guide-overview.webm",
+        "sha256": "bf94b8b7bfcb2c3c28ae5820d37ab7150c1a0cfefb9f20a60e4f42771ab3c940",
+        "chapter": "Offline source guide / guide overview",
+        "scope": "Episode 03 source walkthrough / scripted offline HTML navigation / not live deployment evidence",
+        "recording_id": null,
+        "source_start": 1.5,
+        "source_duration": 9.18,
+        "duration": 9.2
+      },
+      {
+        "name": "guide-network-still",
+        "kind": "screenshot",
+        "file": "sources/guide/guide-network.png",
+        "sha256": "0174c8086b83933b218e8f7ad521a47244c6098f65175c07e835a35115f3547d",
+        "chapter": "Offline source guide / network diagram",
+        "scope": "Episode 03 source walkthrough / scripted offline HTML navigation / not live deployment evidence",
+        "recording_id": null,
+        "source_start": 0.0,
+        "source_duration": 4.0,
+        "duration": 4.0
+      },
+      {
+        "name": "guide-network",
+        "kind": "guide-video",
+        "file": "sources/guide/guide-network.webm",
+        "sha256": "6d6c8a9b4739d67d465b4d0602096c4108d6aa94b865f95a04775ac40ca99070",
+        "chapter": "Offline source guide / network diagram",
+        "scope": "Episode 03 source walkthrough / scripted offline HTML navigation / not live deployment evidence",
+        "recording_id": null,
+        "source_start": 1.5,
+        "source_duration": 9.82,
+        "duration": 9.9
+      },
+      {
+        "name": "guide-automatic-still",
+        "kind": "screenshot",
+        "file": "sources/guide/guide-automatic.png",
+        "sha256": "bce3fa1ad54c9be311a737cff348d78969706ae03100f461a048d0fea2845261",
+        "chapter": "Offline source guide / AKS Automatic / NOT deployed",
+        "scope": "Episode 03 source walkthrough / scripted offline HTML navigation / not live deployment evidence",
+        "recording_id": null,
+        "source_start": 0.0,
+        "source_duration": 4.0,
+        "duration": 4.0
+      },
+      {
+        "name": "guide-automatic",
+        "kind": "guide-video",
+        "file": "sources/guide/guide-automatic.webm",
+        "sha256": "fc282c47a830076720544e1640106ef5666bdecd3ed80f31886d6ea096d3a8e4",
+        "chapter": "Offline source guide / AKS Automatic / NOT deployed",
+        "scope": "Episode 03 source walkthrough / scripted offline HTML navigation / not live deployment evidence",
+        "recording_id": null,
+        "source_start": 1.5,
+        "source_duration": 10.06,
+        "duration": 10.1
+      },
+      {
+        "name": "guide-cleanup-still",
+        "kind": "screenshot",
+        "file": "sources/guide/guide-cleanup.png",
+        "sha256": "28d537d52ef92ee3fa785673d31d2797c078e9fb947e324d18b7f7e45305b354",
+        "chapter": "Offline source guide / cleanup instructions",
+        "scope": "Episode 03 source walkthrough / scripted offline HTML navigation / not live deployment evidence",
+        "recording_id": null,
+        "source_start": 0.0,
+        "source_duration": 4.0,
+        "duration": 4.0
+      },
+      {
+        "name": "guide-cleanup",
+        "kind": "guide-video",
+        "file": "sources/guide/guide-cleanup.webm",
+        "sha256": "4cccabd15b8d5dc751b3876fc3bfd217cf647c0fe055d38688ef5f8447aa6254",
+        "chapter": "Offline source guide / cleanup instructions",
+        "scope": "Episode 03 source walkthrough / scripted offline HTML navigation / not live deployment evidence",
+        "recording_id": null,
+        "source_start": 1.5,
+        "source_duration": 10.14,
+        "duration": 10.2
+      }
+    ]
+  },
   "lab_video": {
     "file": "AKS_Terraform_Live_Lab_2026-11-06_1080p.mp4",
-    "duration": 2981.1,
+    "duration": 3115.6,
     "width": 1920,
     "height": 1080,
     "fps": 10,
     "audio": "silent stereo track; no narration",
-    "timing": "Original within-command timing, one-second reading holds; between-command preparation gaps omitted.",
-    "sha256": "5b41b880e4db1d186ec38ece87c5ee3d339439dd97ccf5b1ce413944f5218405",
+    "timing": "Original within-command timing and one-second reading holds preserved; between-command preparation gaps omitted. Added screen recordings play at 1x, rounded up to 10 fps with a final-frame hold below 0.1 s; guide screenshots hold for 4 s.",
+    "sha256": "8ba864ddc93a947bbac781fe6aa9671c11e68f692bb4bc43bc6dfdb076d2e78c",
+    "segments": [
+      {
+        "name": "browser-repo",
+        "kind": "browser-video",
+        "file": "sources/data/browser/browser-repo.mp4",
+        "sha256": "535683ded6c37914741f6759b10f3c84d5a8dce3002aab0c757e055d455806f8",
+        "chapter": "Source repository / GitHub",
+        "scope": "Actual public repository / source f9b7c04 / 1x playback",
+        "recording_id": "ep03-portal-20261106T053813Z",
+        "source_start": 0.0,
+        "source_duration": 18.5,
+        "duration": 18.5,
+        "screenshot": {
+          "file": "sources/data/browser/browser-repo.png",
+          "source_time": 3.0,
+          "sha256": "ed30858bd3061e2286ad8d9dfefde522b1d1395d2670388602e9d0519ee1ad7b"
+        },
+        "video_start": 0.0,
+        "video_end": 18.5
+      },
+      {
+        "name": "guide-overview-still",
+        "kind": "screenshot",
+        "file": "sources/guide/guide-overview.png",
+        "sha256": "bc4510e51e6ca55038cddbff15cf6db20da3fde7217e4f166c66d01ed86be5c3",
+        "chapter": "Offline source guide / guide overview",
+        "scope": "Episode 03 source walkthrough / scripted offline HTML navigation / not live deployment evidence",
+        "recording_id": null,
+        "source_start": 0.0,
+        "source_duration": 4.0,
+        "duration": 4.0,
+        "video_start": 18.5,
+        "video_end": 22.5
+      },
+      {
+        "name": "guide-overview",
+        "kind": "guide-video",
+        "file": "sources/guide/guide-overview.webm",
+        "sha256": "bf94b8b7bfcb2c3c28ae5820d37ab7150c1a0cfefb9f20a60e4f42771ab3c940",
+        "chapter": "Offline source guide / guide overview",
+        "scope": "Episode 03 source walkthrough / scripted offline HTML navigation / not live deployment evidence",
+        "recording_id": null,
+        "source_start": 1.5,
+        "source_duration": 9.18,
+        "duration": 9.2,
+        "video_start": 22.5,
+        "video_end": 31.7
+      },
+      {
+        "kind": "terminal",
+        "chapter": "01-prerequisites / preflight",
+        "command_index": 0,
+        "duration": 122.7,
+        "video_start": 31.7,
+        "video_end": 154.4
+      },
+      {
+        "kind": "terminal",
+        "chapter": "02-bootstrap",
+        "command_index": 1,
+        "duration": 2.2,
+        "video_start": 154.4,
+        "video_end": 156.6
+      },
+      {
+        "kind": "terminal",
+        "chapter": "02-bootstrap",
+        "command_index": 2,
+        "duration": 1.8,
+        "video_start": 156.6,
+        "video_end": 158.4
+      },
+      {
+        "kind": "terminal",
+        "chapter": "02-bootstrap",
+        "command_index": 3,
+        "duration": 4.5,
+        "video_start": 158.4,
+        "video_end": 162.9
+      },
+      {
+        "kind": "terminal",
+        "chapter": "02-bootstrap",
+        "command_index": 4,
+        "duration": 119.5,
+        "video_start": 162.9,
+        "video_end": 282.4
+      },
+      {
+        "name": "guide-network-still",
+        "kind": "screenshot",
+        "file": "sources/guide/guide-network.png",
+        "sha256": "0174c8086b83933b218e8f7ad521a47244c6098f65175c07e835a35115f3547d",
+        "chapter": "Offline source guide / network diagram",
+        "scope": "Episode 03 source walkthrough / scripted offline HTML navigation / not live deployment evidence",
+        "recording_id": null,
+        "source_start": 0.0,
+        "source_duration": 4.0,
+        "duration": 4.0,
+        "video_start": 282.4,
+        "video_end": 286.4
+      },
+      {
+        "name": "guide-network",
+        "kind": "guide-video",
+        "file": "sources/guide/guide-network.webm",
+        "sha256": "6d6c8a9b4739d67d465b4d0602096c4108d6aa94b865f95a04775ac40ca99070",
+        "chapter": "Offline source guide / network diagram",
+        "scope": "Episode 03 source walkthrough / scripted offline HTML navigation / not live deployment evidence",
+        "recording_id": null,
+        "source_start": 1.5,
+        "source_duration": 9.82,
+        "duration": 9.9,
+        "video_start": 286.4,
+        "video_end": 296.3
+      },
+      {
+        "kind": "terminal",
+        "chapter": "03-network / recorded failure",
+        "command_index": 5,
+        "duration": 4.3,
+        "video_start": 296.3,
+        "video_end": 300.6
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Storage policy / diagnosis and compliant adaptation",
+        "command_index": 6,
+        "duration": 2.8,
+        "video_start": 300.6,
+        "video_end": 303.4
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Storage policy / diagnosis and compliant adaptation",
+        "command_index": 7,
+        "duration": 2.6,
+        "video_start": 303.4,
+        "video_end": 306.0
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Storage policy / diagnosis and compliant adaptation",
+        "command_index": 8,
+        "duration": 2.9,
+        "video_start": 306.0,
+        "video_end": 308.9
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Storage policy / diagnosis and compliant adaptation",
+        "command_index": 9,
+        "duration": 6.6,
+        "video_start": 308.9,
+        "video_end": 315.5
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Storage policy / diagnosis and compliant adaptation",
+        "command_index": 10,
+        "duration": 1.1,
+        "video_start": 315.5,
+        "video_end": 316.6
+      },
+      {
+        "kind": "terminal",
+        "chapter": "03-network",
+        "command_index": 11,
+        "duration": 2.1,
+        "video_start": 316.6,
+        "video_end": 318.7
+      },
+      {
+        "kind": "terminal",
+        "chapter": "03-network",
+        "command_index": 12,
+        "duration": 1.7,
+        "video_start": 318.7,
+        "video_end": 320.4
+      },
+      {
+        "kind": "terminal",
+        "chapter": "03-network",
+        "command_index": 13,
+        "duration": 4.0,
+        "video_start": 320.4,
+        "video_end": 324.4
+      },
+      {
+        "kind": "terminal",
+        "chapter": "03-network",
+        "command_index": 14,
+        "duration": 127.9,
+        "video_start": 324.4,
+        "video_end": 452.3
+      },
+      {
+        "kind": "terminal",
+        "chapter": "04-platform",
+        "command_index": 15,
+        "duration": 1.7,
+        "video_start": 452.3,
+        "video_end": 454.0
+      },
+      {
+        "kind": "terminal",
+        "chapter": "04-platform",
+        "command_index": 16,
+        "duration": 1.6,
+        "video_start": 454.0,
+        "video_end": 455.6
+      },
+      {
+        "kind": "terminal",
+        "chapter": "04-platform",
+        "command_index": 17,
+        "duration": 4.8,
+        "video_start": 455.6,
+        "video_end": 460.4
+      },
+      {
+        "kind": "terminal",
+        "chapter": "04-platform",
+        "command_index": 18,
+        "duration": 249.1,
+        "video_start": 460.4,
+        "video_end": 709.5
+      },
+      {
+        "kind": "terminal",
+        "chapter": "05-aks",
+        "command_index": 19,
+        "duration": 3.0,
+        "video_start": 709.5,
+        "video_end": 712.5
+      },
+      {
+        "kind": "terminal",
+        "chapter": "05-aks",
+        "command_index": 20,
+        "duration": 2.1,
+        "video_start": 712.5,
+        "video_end": 714.6
+      },
+      {
+        "kind": "terminal",
+        "chapter": "05-aks",
+        "command_index": 21,
+        "duration": 5.7,
+        "video_start": 714.6,
+        "video_end": 720.3
+      },
+      {
+        "kind": "terminal",
+        "chapter": "05-aks",
+        "command_index": 22,
+        "duration": 1164.7,
+        "video_start": 720.3,
+        "video_end": 1885.0
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Live AKS verification",
+        "command_index": 23,
+        "duration": 3.3,
+        "video_start": 1885.0,
+        "video_end": 1888.3
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Live AKS verification",
+        "command_index": 24,
+        "duration": 3.1,
+        "video_start": 1888.3,
+        "video_end": 1891.4
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Live AKS verification",
+        "command_index": 25,
+        "duration": 1.1,
+        "video_start": 1891.4,
+        "video_end": 1892.5
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Live AKS verification",
+        "command_index": 26,
+        "duration": 3.5,
+        "video_start": 1892.5,
+        "video_end": 1896.0
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Live AKS verification",
+        "command_index": 27,
+        "duration": 2.9,
+        "video_start": 1896.0,
+        "video_end": 1898.9
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Live AKS verification",
+        "command_index": 28,
+        "duration": 1.8,
+        "video_start": 1898.9,
+        "video_end": 1900.7
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Live AKS verification",
+        "command_index": 29,
+        "duration": 1.9,
+        "video_start": 1900.7,
+        "video_end": 1902.6
+      },
+      {
+        "name": "browser-portal-overview",
+        "kind": "browser-video",
+        "file": "sources/data/browser/browser-portal-overview.mp4",
+        "sha256": "f54d91e29c8ccf5ec8ebf801f2ebce3af140a7facc0d75ac1ee550ade886096c",
+        "chapter": "Actual Azure Portal / cluster overview",
+        "scope": "Separate ep03ui lab, not the ep03live terminal run / removed after filming / 1x playback",
+        "recording_id": "ep03-portal-20261106T053813Z",
+        "source_start": 0.0,
+        "source_duration": 18.533333,
+        "duration": 18.6,
+        "screenshot": {
+          "file": "sources/data/browser/browser-portal-overview.png",
+          "source_time": 3.0,
+          "sha256": "a10c06725280f6897224c133363efd66704e996929618bd56b529a58a8027357"
+        },
+        "video_start": 1902.6,
+        "video_end": 1921.2
+      },
+      {
+        "name": "browser-portal-pools",
+        "kind": "browser-video",
+        "file": "sources/data/browser/browser-portal-pools.mp4",
+        "sha256": "174fcebf2fa30418b6637a0f9c42ad802d8c60b31c1468cda8b9319a6c0731f5",
+        "chapter": "Actual Azure Portal / node pools",
+        "scope": "Separate ep03ui lab / System 2 + User 1 / single zone, not production HA / 1x playback",
+        "recording_id": "ep03-portal-20261106T053813Z",
+        "source_start": 0.0,
+        "source_duration": 15.966667,
+        "duration": 16.0,
+        "screenshot": {
+          "file": "sources/data/browser/browser-portal-pools.png",
+          "source_time": 3.0,
+          "sha256": "6b7081e1603c28ddf4080cc97990ee2030f6317f97a9dd19b32c24186f8284df"
+        },
+        "video_start": 1921.2,
+        "video_end": 1937.2
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Live AKS verification",
+        "command_index": 30,
+        "duration": 2.6,
+        "video_start": 1937.2,
+        "video_end": 1939.8
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Live workload and HTTP verification",
+        "command_index": 31,
+        "duration": 3.7,
+        "video_start": 1939.8,
+        "video_end": 1943.5
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Live workload and HTTP verification",
+        "command_index": 32,
+        "duration": 2.6,
+        "video_start": 1943.5,
+        "video_end": 1946.1
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Import official lab images into ACR",
+        "command_index": 33,
+        "duration": 15.5,
+        "video_start": 1946.1,
+        "video_end": 1961.6
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Import official lab images into ACR",
+        "command_index": 34,
+        "duration": 35.1,
+        "video_start": 1961.6,
+        "video_end": 1996.7
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Live workload and HTTP verification",
+        "command_index": 35,
+        "duration": 2.5,
+        "video_start": 1996.7,
+        "video_end": 1999.2
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Live workload and HTTP verification",
+        "command_index": 36,
+        "duration": 2.4,
+        "video_start": 1999.2,
+        "video_end": 2001.6
+      },
+      {
+        "kind": "terminal",
+        "chapter": "07-ingress",
+        "command_index": 37,
+        "duration": 14.1,
+        "video_start": 2001.6,
+        "video_end": 2015.7
+      },
+      {
+        "kind": "terminal",
+        "chapter": "07-ingress",
+        "command_index": 38,
+        "duration": 5.4,
+        "video_start": 2015.7,
+        "video_end": 2021.1
+      },
+      {
+        "kind": "terminal",
+        "chapter": "07-ingress",
+        "command_index": 39,
+        "duration": 9.2,
+        "video_start": 2021.1,
+        "video_end": 2030.3
+      },
+      {
+        "kind": "terminal",
+        "chapter": "07-ingress",
+        "command_index": 40,
+        "duration": 21.2,
+        "video_start": 2030.3,
+        "video_end": 2051.5
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Live workload and HTTP verification",
+        "command_index": 41,
+        "duration": 1.9,
+        "video_start": 2051.5,
+        "video_end": 2053.4
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Live workload and HTTP verification",
+        "command_index": 42,
+        "duration": 26.7,
+        "video_start": 2053.4,
+        "video_end": 2080.1
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Live workload and HTTP verification",
+        "command_index": 43,
+        "duration": 2.1,
+        "video_start": 2080.1,
+        "video_end": 2082.2
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Live workload and HTTP verification",
+        "command_index": 44,
+        "duration": 1.1,
+        "video_start": 2082.2,
+        "video_end": 2083.3
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Live workload and HTTP verification",
+        "command_index": 45,
+        "duration": 2.2,
+        "video_start": 2083.3,
+        "video_end": 2085.5
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Live workload and HTTP verification",
+        "command_index": 46,
+        "duration": 1.9,
+        "video_start": 2085.5,
+        "video_end": 2087.4
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Live workload and HTTP verification",
+        "command_index": 47,
+        "duration": 1.8,
+        "video_start": 2087.4,
+        "video_end": 2089.2
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Live workload and HTTP verification",
+        "command_index": 48,
+        "duration": 1.1,
+        "video_start": 2089.2,
+        "video_end": 2090.3
+      },
+      {
+        "name": "browser-app",
+        "kind": "browser-video",
+        "file": "sources/data/browser/browser-app.mp4",
+        "sha256": "4784d7519691bcf72106519a64f1eb905700dd4db9a3128aa07506dddf90bb52",
+        "chapter": "Actual application / trusted HTTPS / Home + refresh",
+        "scope": "Separate ep03ui lab / temporary public-certificate frontend, not production TLS / 1x playback",
+        "recording_id": "ep03-portal-20261106T053813Z",
+        "source_start": 0.0,
+        "source_duration": 26.0,
+        "duration": 26.0,
+        "screenshot": {
+          "file": "sources/data/browser/browser-app.png",
+          "source_time": 3.0,
+          "sha256": "d0425452c00f38b552cc6aa29cc7964b210e9434361585c68ade6f81db17c910"
+        },
+        "video_start": 2090.3,
+        "video_end": 2116.3
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Live workload and HTTP verification",
+        "command_index": 49,
+        "duration": 3.0,
+        "video_start": 2116.3,
+        "video_end": 2119.3
+      },
+      {
+        "name": "guide-automatic-still",
+        "kind": "screenshot",
+        "file": "sources/guide/guide-automatic.png",
+        "sha256": "bce3fa1ad54c9be311a737cff348d78969706ae03100f461a048d0fea2845261",
+        "chapter": "Offline source guide / AKS Automatic / NOT deployed",
+        "scope": "Episode 03 source walkthrough / scripted offline HTML navigation / not live deployment evidence",
+        "recording_id": null,
+        "source_start": 0.0,
+        "source_duration": 4.0,
+        "duration": 4.0,
+        "video_start": 2119.3,
+        "video_end": 2123.3
+      },
+      {
+        "name": "guide-automatic",
+        "kind": "guide-video",
+        "file": "sources/guide/guide-automatic.webm",
+        "sha256": "fc282c47a830076720544e1640106ef5666bdecd3ed80f31886d6ea096d3a8e4",
+        "chapter": "Offline source guide / AKS Automatic / NOT deployed",
+        "scope": "Episode 03 source walkthrough / scripted offline HTML navigation / not live deployment evidence",
+        "recording_id": null,
+        "source_start": 1.5,
+        "source_duration": 10.06,
+        "duration": 10.1,
+        "video_start": 2123.3,
+        "video_end": 2133.4
+      },
+      {
+        "name": "guide-cleanup-still",
+        "kind": "screenshot",
+        "file": "sources/guide/guide-cleanup.png",
+        "sha256": "28d537d52ef92ee3fa785673d31d2797c078e9fb947e324d18b7f7e45305b354",
+        "chapter": "Offline source guide / cleanup instructions",
+        "scope": "Episode 03 source walkthrough / scripted offline HTML navigation / not live deployment evidence",
+        "recording_id": null,
+        "source_start": 0.0,
+        "source_duration": 4.0,
+        "duration": 4.0,
+        "video_start": 2133.4,
+        "video_end": 2137.4
+      },
+      {
+        "name": "guide-cleanup",
+        "kind": "guide-video",
+        "file": "sources/guide/guide-cleanup.webm",
+        "sha256": "4cccabd15b8d5dc751b3876fc3bfd217cf647c0fe055d38688ef5f8447aa6254",
+        "chapter": "Offline source guide / cleanup instructions",
+        "scope": "Episode 03 source walkthrough / scripted offline HTML navigation / not live deployment evidence",
+        "recording_id": null,
+        "source_start": 1.5,
+        "source_duration": 10.14,
+        "duration": 10.2,
+        "video_start": 2137.4,
+        "video_end": 2147.6
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Cleanup / 07-ingress",
+        "command_index": 50,
+        "duration": 12.0,
+        "video_start": 2147.6,
+        "video_end": 2159.6
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Cleanup / 07-ingress",
+        "command_index": 51,
+        "duration": 69.1,
+        "video_start": 2159.6,
+        "video_end": 2228.7
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Cleanup / 05-aks",
+        "command_index": 52,
+        "duration": 45.2,
+        "video_start": 2228.7,
+        "video_end": 2273.9
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Cleanup / 05-aks",
+        "command_index": 53,
+        "duration": 448.3,
+        "video_start": 2273.9,
+        "video_end": 2722.2
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Cleanup / 04-platform",
+        "command_index": 54,
+        "duration": 16.0,
+        "video_start": 2722.2,
+        "video_end": 2738.2
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Cleanup / 04-platform",
+        "command_index": 55,
+        "duration": 126.1,
+        "video_start": 2738.2,
+        "video_end": 2864.3
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Cleanup / 03-network",
+        "command_index": 56,
+        "duration": 9.5,
+        "video_start": 2864.3,
+        "video_end": 2873.8
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Cleanup / 03-network",
+        "command_index": 57,
+        "duration": 187.6,
+        "video_start": 2873.8,
+        "video_end": 3061.4
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Cleanup / 02-bootstrap",
+        "command_index": 58,
+        "duration": 11.0,
+        "video_start": 3061.4,
+        "video_end": 3072.4
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Cleanup / 02-bootstrap",
+        "command_index": 59,
+        "duration": 26.6,
+        "video_start": 3072.4,
+        "video_end": 3099.0
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Cleanup verification",
+        "command_index": 60,
+        "duration": 7.1,
+        "video_start": 3099.0,
+        "video_end": 3106.1
+      },
+      {
+        "kind": "terminal",
+        "chapter": "Cleanup verification",
+        "command_index": 61,
+        "duration": 9.5,
+        "video_start": 3106.1,
+        "video_end": 3115.6
+      }
+    ],
     "qa": {
       "full_decode": true,
-      "chapters": 19,
+      "chapters": 29,
+      "terminal_commands": 62,
+      "browser_clips": 4,
+      "guide_videos": 4,
+      "guide_screenshots": 4,
+      "terminal_seconds": 2981.1,
+      "inserted_screen_seconds": 134.5,
       "audio_video_end_difference": 0.0,
-      "megabytes": 53.26
+      "megabytes": 57.54
     }
   }
 }

@@ -1,0 +1,167 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "browser-https",
+        "namespace": "web",
+        "labels": {
+          "app": "browser-https",
+          "recording_id": "ep03-portal-20261106T053813Z"
+        },
+        "annotations": {
+          "service.beta.kubernetes.io/azure-dns-label-name": "ep03ui-20261106t053813z"
+        }
+      },
+      "spec": {
+        "type": "LoadBalancer",
+        "selector": {
+          "app": "browser-https"
+        },
+        "ports": [
+          {
+            "name": "http",
+            "port": 80,
+            "targetPort": 8080
+          },
+          {
+            "name": "https",
+            "port": 443,
+            "targetPort": 8443
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ConfigMap",
+      "metadata": {
+        "name": "browser-https",
+        "namespace": "web",
+        "labels": {
+          "app": "browser-https",
+          "recording_id": "ep03-portal-20261106T053813Z"
+        }
+      },
+      "data": {
+        "Caddyfile": "{\n admin off\n persist_config off\n http_port 8080\n https_port 8443\n acme_ca https://acme-v02.api.letsencrypt.org/directory\n servers {\n  protocols h1 h2\n }\n}\nhttps://ep03ui-20261106t053813z.koreacentral.cloudapp.azure.com {\n reverse_proxy http://web-gateway-approuting-istio.web.svc.cluster.local:80\n}\nhttp://ep03ui-20261106t053813z.koreacentral.cloudapp.azure.com {\n redir https://ep03ui-20261106t053813z.koreacentral.cloudapp.azure.com{uri} 308\n}\n"
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "browser-https",
+        "namespace": "web",
+        "labels": {
+          "app": "browser-https",
+          "recording_id": "ep03-portal-20261106T053813Z"
+        }
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app": "browser-https"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "browser-https",
+              "recording_id": "ep03-portal-20261106T053813Z"
+            },
+            "annotations": {
+              "checksum/config": "ad021ec228120b7aff566842fdf028d815339af7f5f0dc625f5227ad1b3fed2e"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 1000,
+              "runAsGroup": 1000,
+              "fsGroup": 1000,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "containers": [
+              {
+                "name": "caddy",
+                "image": "acrep03uitestkrc089ab.azurecr.io/demo/caddy@sha256:c2aeffaeb80d5403e9c8d1d908b50e191aad204e16129f991ae357ada642094d",
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "readOnlyRootFilesystem": true,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "50m",
+                    "memory": "64Mi"
+                  },
+                  "limits": {
+                    "cpu": "500m",
+                    "memory": "256Mi"
+                  }
+                },
+                "ports": [
+                  {
+                    "containerPort": 8080
+                  },
+                  {
+                    "containerPort": 8443
+                  }
+                ],
+                "readinessProbe": {
+                  "tcpSocket": {
+                    "port": 8443
+                  },
+                  "periodSeconds": 5
+                },
+                "volumeMounts": [
+                  {
+                    "name": "caddyfile",
+                    "mountPath": "/etc/caddy",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "data",
+                    "mountPath": "/data"
+                  },
+                  {
+                    "name": "config",
+                    "mountPath": "/config"
+                  }
+                ]
+              }
+            ],
+            "volumes": [
+              {
+                "name": "caddyfile",
+                "configMap": {
+                  "name": "browser-https"
+                }
+              },
+              {
+                "name": "data",
+                "emptyDir": {}
+              },
+              {
+                "name": "config",
+                "emptyDir": {}
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

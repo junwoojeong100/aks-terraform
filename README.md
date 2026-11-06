@@ -76,9 +76,12 @@ Follow the detailed steps starting from [Lab 01](labs/01-prerequisites.md). The 
 ## Practice recording
 
 An [actual Azure lab recording](https://github.com/junwoojeong100/aks-terraform/tree/main/recordings/2026-11-06-live-azure)
-is included under `recordings/2026-11-06-live-azure/`: a separate, unnarrated terminal replay of creation,
-3 Ready nodes, HTTP 200 and cleanup. Read its scope notes: a smaller single-zone lab, a disclosed policy-driven
-local-backend override, and no live Lab 06 secret-mount claim. The narrated YouTube edit belongs in `build-and-run-it`.
+is included under `recordings/2026-11-06-live-azure/`: a separate, unnarrated replay of creation,
+3 Ready nodes, HTTP 200 and cleanup, now including Episode 03's guide screenshots/recordings, GitHub,
+Azure Portal and trusted-HTTPS browser-app footage. The Portal/app scenes are labeled as a separate,
+cleaned-up supplemental lab; the original terminal casts are unchanged. Read its scope notes: a smaller single-zone lab,
+a disclosed policy-driven local-backend override, and no live Lab 06 secret-mount claim.
+The narrated YouTube edit belongs in `build-and-run-it`.
 
 ## Languages
 

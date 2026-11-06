@@ -1,0 +1,7 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793947683, "title": "Actual Azure execution / vault-retention", "env": {"TERM": "xterm-256color"}}
+[0.000776, "o", "$ az keyvault show -n kv-ep03ui-test-089ab --query '{purge_protection:properties.enablePurgeProtection,retention_days:properties.softDeleteRetentionInDays}' -o json --subscription <GUID>\r\n"]
+[1.983246, "o", "{\r\n"]
+[1.983415, "o", "  \"purge_protection\": true,\r\n"]
+[1.983457, "o", "  \"retention_days\": 7\r\n"]
+[1.983492, "o", "}\r\n"]
+[2.038018, "o", "[recorder] exit=0; elapsed=2.038s\r\n"]

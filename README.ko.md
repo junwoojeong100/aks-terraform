@@ -76,7 +76,9 @@ scripts/cleanup.sh --dry-run          # 실습을 마치면: 지울 목록 확�
 ## 실습 녹화
 
 `recordings/2026-11-06-live-azure/`에 [실제 Azure 실습 녹화](https://github.com/junwoojeong100/aks-terraform/tree/main/recordings/2026-11-06-live-azure)를
-추가했습니다. 생성·Ready 노드 3개·HTTP 200·정리를 담은 별도의 무해설 터미널 replay입니다.
+추가했습니다. 생성·Ready 노드 3개·HTTP 200·정리를 담은 별도의 무해설 실습본이며,
+에피소드 03의 가이드 캡처·녹화, GitHub, Azure Portal, 공인 HTTPS 앱 브라우저 영상도 포함합니다.
+Portal·앱 장면은 촬영 뒤 정리한 별도 추가 랩임을 표시하며 원본 터미널 cast는 그대로 보존합니다.
 축소한 단일 AZ 구성, 조직 정책에 따른 명시적 local backend override, 06-workload의 실제 비밀 mount 미검증 등
 실행 범위는 해당 폴더의 설명을 먼저 확인하세요. 유튜브용 내레이션 편집본은 별도 `build-and-run-it` 리포에 둡니다.
 

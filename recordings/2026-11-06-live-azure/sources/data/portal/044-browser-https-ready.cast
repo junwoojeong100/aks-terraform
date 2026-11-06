@@ -1,0 +1,5 @@
+{"version": 2, "width": 140, "height": 36, "timestamp": 1793947352, "title": "Actual Azure execution / browser-https-ready", "env": {"TERM": "xterm-256color"}}
+[0.000889, "o", "$ kubectl -n web rollout status deployment/browser-https --timeout=300s\r\n"]
+[0.712866, "o", "Waiting for deployment \"browser-https\" rollout to finish: 0 of 1 updated replicas are available...\r\n"]
+[2.220619, "o", "deployment \"browser-https\" successfully rolled out\r\n"]
+[2.225367, "o", "[recorder] exit=0; elapsed=2.225s\r\n"]
